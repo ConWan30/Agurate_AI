@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -184,9 +183,8 @@ export default function Upload() {
   };
 
   return (
-    <Layout>
-      <div className="space-y-8 max-w-2xl mx-auto">
-        <div>
+    <div className="space-y-8 max-w-2xl mx-auto">
+      <div>
           <h1 className="text-4xl font-bold mb-2">Upload Crop Image</h1>
           <p className="text-muted-foreground">AI-powered crop health analysis</p>
         </div>
@@ -305,9 +303,8 @@ export default function Upload() {
                 </div>
               )}
             </CardContent>
-          </Card>
-        )}
-      </div>
-    </Layout>
+        </Card>
+      )}
+    </div>
   );
 }
