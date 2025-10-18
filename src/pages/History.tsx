@@ -310,6 +310,5 @@ export default function History() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
   );
 }

@@ -361,6 +361,5 @@ export default function Fields() {
           </div>
         )}
       </div>
-    </div>
   );
 }
