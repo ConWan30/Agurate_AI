@@ -20,22 +20,23 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // STEP 1: Fetch current weather data for Louisiana
+    // STEP 1: Fetch current weather data for Louisiana (Morehouse Parish coordinates)
     let weatherData = null;
     try {
-      // Using Open-Meteo API for Louisiana (approximate center coordinates)
+      // Open-Meteo API for Morehouse Parish, LA (32.73°N, -91.76°W)
       const weatherResponse = await fetch(
-        'https://api.open-meteo.com/v1/forecast?latitude=31.0&longitude=-92.0&current=temperature_2m,precipitation,relative_humidity_2m,wind_speed_10m&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=3'
+        'https://api.open-meteo.com/v1/forecast?latitude=32.73&longitude=-91.76&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=7&timezone=America/Chicago'
       );
       if (weatherResponse.ok) {
         const weather = await weatherResponse.json();
+        const precipSum = weather.daily.precipitation_sum.reduce((a: number, b: number) => a + b, 0);
         weatherData = {
-          temp_f: weather.current.temperature_2m,
-          precipitation_inch: weather.current.precipitation,
-          humidity: weather.current.relative_humidity_2m,
-          wind_speed: weather.current.wind_speed_10m
+          temp_f: weather.current_weather.temperature,
+          precipitation_7day: precipSum,
+          temp_max: Math.max(...weather.daily.temperature_2m_max),
+          temp_min: Math.min(...weather.daily.temperature_2m_min)
         };
-        console.log('Weather data fetched:', weatherData);
+        console.log('Weather data fetched for Morehouse Parish:', weatherData);
       }
     } catch (err) {
       console.warn('Weather fetch failed, continuing without it:', err);
@@ -53,26 +54,65 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an agricultural AI assistant analyzing crop health from field images.
+            content: `You are an expert agricultural AI for Louisiana Delta farmers, specializing in rice, soybean, cotton, and corn.
 
-Given an image of a crop field, analyze for visible signs of plant stress such as discoloration, dryness, leaf damage, or patchy growth. Rate stress severity on a scale from 0.0 (no stress) to 1.0 (severe stress).
+CONTEXT:
+- Location: Morehouse Parish, Louisiana (subtropical climate, high disease pressure)
+- Soils: Alluvial/claypan soils typical of Mississippi Delta
+- Climate: Warm, humid with high rainfall
 
-Respond ONLY in JSON format.`
+Analyze crop field images for stress indicators using Louisiana-specific disease and deficiency patterns.
+
+Respond ONLY in JSON format with precise observations.`
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: `Analyze this ${cropType} field image. Respond with JSON:
+                text: `Analyze this ${cropType} field image from ${location || 'Morehouse Parish, Louisiana'}.
+
+**CROP-SPECIFIC INDICATORS:**
+
+${cropType.toLowerCase().includes('rice') ? `**RICE:** Look for:
+- Leaf rolling (water stress)
+- Yellowing (nitrogen deficiency)
+- Brown diamond spots (blast disease)
+- Sheath blight lesions` : ''}
+
+${cropType.toLowerCase().includes('soybean') ? `**SOYBEAN:** Look for:
+- Circular lesions (frogeye spot)
+- Purple spots (cercospora leaf blight)
+- Rust pustules on leaves
+- Yellowing (nitrogen/potassium deficiency)` : ''}
+
+${cropType.toLowerCase().includes('cotton') ? `**COTTON:** Look for:
+- Wilting symptoms
+- Yellowing lower leaves (nitrogen deficiency)
+- Purple tint (phosphorus deficiency)
+- Leaf spots or boll damage` : ''}
+
+${cropType.toLowerCase().includes('corn') ? `**CORN:** Look for:
+- V-shaped yellowing from tip (nitrogen deficiency)
+- Leaf rolling (water stress)
+- Rectangular lesions (gray leaf spot)
+- Rust pustules or stalk rot` : ''}
+
+**STRESS SCORING:**
+- 0.0-0.3 = Severe stress (immediate action needed)
+- 0.3-0.6 = Moderate stress (monitor closely)
+- 0.6-1.0 = Healthy (routine management)
+
+Respond with JSON:
 {
   "crop_type": "${cropType}",
   "stress_score": <float 0.0-1.0>,
   "condition": "Healthy" | "Mild Stress" | "Severe Stress",
-  "visual_cues": "<brief description of what you see>",
+  "visual_cues": "<specific symptoms observed>",
   "symptoms": [<array of 3-5 specific observations>],
   "health_score": <float 0.0-1.0, inverse of stress>,
-  "confidence_score": <float 0.0-1.0>
+  "confidence_score": <float 0.0-1.0, your confidence in this assessment>,
+  "analysis_summary": "<plain-language insight for Louisiana farmer>"
 }`
               },
               {
@@ -121,42 +161,52 @@ Respond ONLY in JSON format.`
         messages: [
           {
             role: 'system',
-            content: `You are an agronomic advisor generating field recommendations for Louisiana Delta farmers.
+            content: `You are an LSU AgCenter-aligned agricultural advisor for Morehouse Parish, Louisiana.
 
-Given crop analysis and weather data, provide actionable recommendations. Focus on irrigation, pest management, or nutrient correction as appropriate. Make it practical and Louisiana-specific.
+Generate actionable recommendations using LSU AgCenter best practices for Louisiana Delta farmers.
+
+**DECISION RULES:**
+1. If stress_score < 0.3 → Urgent action within 24-48 hours
+2. Disease symptoms → Recommend specific fungicide/treatment
+3. Nitrogen deficiency → Recommend 30-50 lbs N/acre
+4. Precipitation < 0.5" AND temp > 90°F → Urgent irrigation
+5. Precipitation > 2" in 7 days → Delay fertilizer (runoff risk)
+
+Use clear, farmer-friendly language. Reference LSU AgCenter guidelines when applicable.
 
 Respond ONLY in JSON format.`
           },
           {
             role: 'user',
-            content: `Generate recommendations for this ${cropType} field:
+            content: `Generate recommendations for this ${cropType} field in ${location || 'Morehouse Parish, Louisiana'}:
 
-Analysis Results:
-- Stress Score: ${imageAnalysis.stress_score}
+**FIELD ANALYSIS:**
+- Stress Score: ${imageAnalysis.stress_score.toFixed(2)}/1.0
 - Condition: ${imageAnalysis.condition}
 - Visual Cues: ${imageAnalysis.visual_cues}
 - Symptoms: ${imageAnalysis.symptoms?.join(', ')}
+- Confidence: ${imageAnalysis.confidence_score.toFixed(2)}
 
-${weatherData ? `Current Weather (Louisiana):
-- Temperature: ${weatherData.temp_f}°F
-- Precipitation: ${weatherData.precipitation_inch}" 
-- Humidity: ${weatherData.humidity}%
-- Wind Speed: ${weatherData.wind_speed} mph` : 'Weather data unavailable'}
+${weatherData ? `**CURRENT WEATHER (Morehouse Parish, LA):**
+- Current Temp: ${weatherData.temp_f}°F
+- 7-Day Rainfall: ${weatherData.precipitation_7day.toFixed(2)} inches
+- High: ${weatherData.temp_max}°F | Low: ${weatherData.temp_min}°F` : '**WEATHER:** Data unavailable'}
 
-Location: ${location || 'Louisiana Delta region'}
+**TASK:**
+Provide 1-3 specific, actionable recommendations. Prioritize based on stress severity and weather conditions.
 
 Respond with JSON:
 {
   "recommendations": [
     {
-      "text": "<actionable recommendation>",
-      "priority": "high" | "normal" | "low",
+      "text": "<specific actionable recommendation with quantities/timing>",
+      "priority": "urgent" | "high" | "normal" | "low",
       "category": "irrigation" | "fertilization" | "pest_control" | "disease_management" | "general",
-      "reasoning": "<why this is recommended>"
+      "reasoning": "<why this action is needed based on symptoms and weather>"
     }
   ],
-  "weather_note": "<how weather affects crop health>",
-  "analysis_summary": "<plain-language insight for farmer>"
+  "weather_note": "<how current/forecast weather affects crop health and recommended timing>",
+  "analysis_summary": "<2-3 sentence plain-language summary for farmer>"
 }`
           }
         ],
