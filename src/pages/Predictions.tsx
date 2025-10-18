@@ -25,19 +25,32 @@ interface PredictionData {
 export default function Predictions() {
   const [predictions, setPredictions] = useState<PredictionData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [needsMoreData, setNeedsMoreData] = useState(false);
 
   const loadPredictions = async () => {
     setIsLoading(true);
+    setNeedsMoreData(false);
     try {
       const { data, error } = await supabase.functions.invoke('predict-stress', {
         body: { days: 7 }
       });
 
-      if (error) throw error;
-      setPredictions(data);
+      if (error) {
+        console.error('Prediction error:', error);
+        setNeedsMoreData(true);
+        return;
+      }
+
+      // Check if we got back a message about needing more data
+      if (data && data.forecast && data.forecast.length === 0) {
+        setNeedsMoreData(true);
+        toast.info(data.summary || 'Need more assessment data to generate predictions');
+      } else {
+        setPredictions(data);
+      }
     } catch (error) {
       console.error('Prediction failed:', error);
-      toast.error('Failed to generate predictions');
+      setNeedsMoreData(true);
     } finally {
       setIsLoading(false);
     }
@@ -168,17 +181,33 @@ export default function Predictions() {
           </>
         ) : (
           <Card className="field-card">
-            <CardContent className="text-center py-12 space-y-4">
-              <TrendingUp className="h-16 w-16 text-muted-foreground mx-auto" />
-              <div className="space-y-2">
-                <h3 className="font-semibold text-lg">No predictions available</h3>
-                <p className="text-sm text-muted-foreground">
-                  Generate your first forecast to see AI-powered crop stress predictions
-                </p>
+            <CardContent className="text-center py-12 space-y-6">
+              <div className="flex items-center justify-center h-20 w-20 rounded-2xl gradient-sky shadow-glow mx-auto">
+                <TrendingUp className="h-10 w-10 text-white" />
               </div>
-              <Button onClick={loadPredictions} size="lg" className="gap-2">
+              <div className="space-y-3 max-w-md mx-auto">
+                <h3 className="font-display font-semibold text-2xl">Unlock AI Predictions</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Upload at least <strong>3 crop assessments</strong> to unlock 7-day AI-powered stress forecasts based on your field history and weather patterns.
+                </p>
+                <div className="pt-2 space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
+                    <Calendar className="h-4 w-4" />
+                    <span>Historical analysis of your fields</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
+                    <Cloud className="h-4 w-4" />
+                    <span>Real-time weather correlation</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
+                    <TrendingUp className="h-4 w-4" />
+                    <span>7-day stress predictions</span>
+                  </div>
+                </div>
+              </div>
+              <Button onClick={() => window.location.href = '/upload'} size="lg" className="gap-2">
                 <TrendingUp className="h-4 w-4" />
-                Generate Forecast
+                Start Analyzing Crops
               </Button>
             </CardContent>
           </Card>
