@@ -143,7 +143,7 @@ export const Layout = ({ children }: LayoutProps) => {
 
               {/* Delta Command Center Section */}
               <div className="mt-8 pt-6 border-t border-border">
-                <h2 className="text-sm font-semibold text-muted-foreground mb-4">DELTA COMMAND CENTER</h2>
+                <h2 className="text-sm font-bold text-muted-foreground mb-4">DELTA COMMAND CENTER</h2>
                 <div className="space-y-2">
                   {commandCenterItems.map((item) => {
                     const isActive = location.pathname === item.path;
@@ -173,7 +173,7 @@ export const Layout = ({ children }: LayoutProps) => {
 
               {/* Business Tools Section */}
               <div className="mt-8 pt-6 border-t border-border">
-                <h2 className="text-sm font-semibold text-muted-foreground mb-4">BUSINESS TOOLS</h2>
+                <h2 className="text-sm font-bold text-muted-foreground mb-4">BUSINESS TOOLS</h2>
                 <div className="space-y-2">
                   {businessItems.map((item) => {
                     const isActive = location.pathname === item.path;
