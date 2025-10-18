@@ -10,16 +10,16 @@ export default function HowItWorks() {
   const aiPipeline = [
     {
       icon: Camera,
-      title: 'Image Capture',
-      description: 'Capture crop photos in the field with GPS auto-tagging',
-      tech: 'Mobile Camera API + Geolocation',
+      title: 'Image & Video Capture',
+      description: 'Capture crop photos or upload drone video footage with GPS auto-tagging for comprehensive field analysis',
+      tech: 'Mobile Camera API + Drone Video Support + Geolocation',
       color: 'bg-blue-500/10 text-blue-700 border-blue-500/20'
     },
     {
       icon: Brain,
       title: 'AI Vision Analysis',
-      description: 'Google Gemini 2.5 analyzes visual stress indicators, leaf color, disease patterns',
-      tech: 'Gemini 2.5 Pro (Multimodal)',
+      description: 'Google Gemini 2.5 analyzes images and drone videos for visual stress indicators, disease patterns, and field-wide crop health variations',
+      tech: 'Gemini 2.5 Pro (Multimodal Video + Image)',
       color: 'bg-purple-500/10 text-purple-700 border-purple-500/20'
     },
     {
@@ -53,8 +53,8 @@ export default function HowItWorks() {
   ];
 
   const dataFlow = [
-    { from: 'Your Field Photo', to: 'Secure Cloud Storage', detail: 'Supabase Storage (encrypted)' },
-    { from: 'Image URL', to: 'AI Analysis', detail: 'Lovable AI Gateway' },
+    { from: 'Field Photo/Video', to: 'Secure Cloud Storage', detail: 'Supabase Storage (encrypted)' },
+    { from: 'Media URL', to: 'AI Analysis', detail: 'Lovable AI Gateway (Video/Image)' },
     { from: 'Visual Symptoms', to: 'Database', detail: 'PostgreSQL with RLS' },
     { from: 'Weather API', to: 'Correlation Engine', detail: 'Real-time enrichment' },
     { from: 'Historical Data', to: 'Predictions', detail: 'Pattern recognition' },
@@ -77,10 +77,10 @@ export default function HowItWorks() {
     },
     {
       icon: MapPin,
-      title: 'Zone-Specific Treatment',
-      scenario: 'GPS-tagged assessments show stressed zones in 50-acre field',
-      impact: 'Targeted treatment instead of whole-field spraying',
-      savings: '40% reduction in chemical costs'
+      title: 'Drone-Powered Field Mapping',
+      scenario: 'Upload drone video to identify stressed zones across entire 50-acre field in one analysis',
+      impact: 'Comprehensive aerial view shows patterns invisible from ground level',
+      savings: '60% faster field assessment'
     },
     {
       icon: TrendingUp,
@@ -113,7 +113,7 @@ export default function HowItWorks() {
         <section className="space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-display font-bold">The AI Pipeline</h2>
-            <p className="text-muted-foreground">From field photo to actionable recommendation in seconds</p>
+            <p className="text-muted-foreground">From field photo or drone video to actionable recommendation in seconds</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -194,8 +194,8 @@ export default function HowItWorks() {
                   <span className="font-semibold">2M tokens</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Image Analysis:</span>
-                  <span className="font-semibold">Multimodal</span>
+                  <span className="text-muted-foreground">Media Analysis:</span>
+                  <span className="font-semibold">Image + Video</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Avg Confidence:</span>
