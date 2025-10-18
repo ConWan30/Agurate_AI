@@ -93,18 +93,21 @@ export default function HowItWorks() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-12">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <Badge variant="outline" className="mb-2">AI Transparency</Badge>
-          <h1 className="text-5xl font-display font-bold text-gradient-delta">
+      {/* Hero Header */}
+      <div className="gradient-delta py-16 mb-12">
+        <div className="max-w-6xl mx-auto px-4 text-center space-y-6">
+          <Badge variant="outline" className="bg-white/10 text-white border-white/20">AI Transparency</Badge>
+          <h1 className="text-6xl font-display font-bold text-white drop-shadow-lg">
             How AgurateAI Works
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto">
             Understanding the AI-powered crop health intelligence built specifically 
             for Louisiana Delta agriculture
           </p>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 space-y-12">
 
         {/* AI Pipeline */}
         <section className="space-y-6">

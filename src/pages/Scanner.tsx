@@ -220,29 +220,31 @@ export default function Scanner() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-display font-bold text-gradient-delta">
+      {/* Hero Header */}
+      <div className="gradient-delta py-12 mb-8">
+        <div className="max-w-2xl mx-auto px-4 text-center space-y-4">
+          <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
             Mobile Field Scanner
           </h1>
-          <p className="text-muted-foreground">
-            Capture crop health in the field with GPS auto-tagging
+          <p className="text-lg text-white/90 max-w-xl mx-auto">
+            Capture crop health in the field with GPS auto-tagging and AI analysis
           </p>
         </div>
+      </div>
 
+      <div className="max-w-2xl mx-auto px-4 space-y-6">
         {/* Online/Offline Indicator */}
-        <Card className={isOnline ? 'border-green-500/20 bg-green-50/50' : 'border-red-500/20 bg-red-50/50'}>
+        <Card className={isOnline ? 'border-primary/20 bg-primary/5' : 'border-destructive/20 bg-destructive/5'}>
           <CardContent className="flex items-center gap-2 p-4">
             {isOnline ? (
               <>
-                <Wifi className="h-5 w-5 text-green-600" />
-                <span className="font-medium text-green-900">Online</span>
+                <Wifi className="h-5 w-5 text-primary" />
+                <span className="font-medium text-foreground">Online</span>
               </>
             ) : (
               <>
-                <WifiOff className="h-5 w-5 text-red-600" />
-                <span className="font-medium text-red-900">Offline Mode</span>
+                <WifiOff className="h-5 w-5 text-destructive" />
+                <span className="font-medium text-foreground">Offline Mode</span>
               </>
             )}
           </CardContent>
@@ -294,35 +296,35 @@ export default function Scanner() {
                   
                   {/* AR Overlay */}
                   {arEnabled && aiOverlay && (
-                    <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px]">
+                    <div className="absolute inset-0 bg-background/20 backdrop-blur-[0.5px]">
                       {/* Health Score Badge */}
-                      <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg">
-                        <div className="text-xs opacity-80">Health Score</div>
-                        <div className="text-2xl font-bold">
+                      <div className="absolute top-4 right-4 bg-card/90 backdrop-blur-sm border text-card-foreground px-4 py-2 rounded-lg shadow-md">
+                        <div className="text-xs text-muted-foreground">Health Score</div>
+                        <div className="text-2xl font-bold text-foreground">
                           {(aiOverlay.health_score * 100).toFixed(0)}%
                         </div>
                       </div>
 
                       {/* Stress Indicator */}
-                      <div className="absolute bottom-4 left-4 right-4 bg-black/70 text-white px-4 py-3 rounded-lg space-y-1">
+                      <div className="absolute bottom-4 left-4 right-4 bg-card/90 backdrop-blur-sm border text-card-foreground px-4 py-3 rounded-lg shadow-md space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold">
+                          <span className="text-sm font-semibold text-foreground">
                             {aiOverlay.stress_level === 'healthy' && '✓ Healthy'}
                             {aiOverlay.stress_level === 'moderate_stress' && '⚠ Moderate Stress'}
                             {aiOverlay.stress_level === 'severe_stress' && '⚠️ Severe Stress'}
                           </span>
                           <span className={`text-xs px-2 py-1 rounded ${
                             aiOverlay.stress_level === 'healthy' 
-                              ? 'bg-green-500/30 text-green-200'
+                              ? 'bg-primary/20 text-primary'
                               : aiOverlay.stress_level === 'moderate_stress'
-                              ? 'bg-yellow-500/30 text-yellow-200'
-                              : 'bg-red-500/30 text-red-200'
+                              ? 'bg-secondary/20 text-secondary-foreground'
+                              : 'bg-destructive/20 text-destructive'
                           }`}>
                             {aiOverlay.confidence_score && `${(aiOverlay.confidence_score * 100).toFixed(0)}% conf.`}
                           </span>
                         </div>
                         {aiOverlay.visual_cues && (
-                          <p className="text-xs opacity-90">{aiOverlay.visual_cues}</p>
+                          <p className="text-xs text-muted-foreground">{aiOverlay.visual_cues}</p>
                         )}
                       </div>
 
@@ -364,10 +366,10 @@ export default function Scanner() {
 
         {/* GPS Status */}
         {gpsCoords && (
-          <Card className="border-blue-500/20 bg-blue-50/50">
+          <Card className="border-primary/20 bg-primary/5">
             <CardContent className="flex items-center gap-2 p-4">
-              <MapPin className="h-5 w-5 text-blue-600" />
-              <span className="text-sm text-blue-900">
+              <MapPin className="h-5 w-5 text-primary" />
+              <span className="text-sm text-foreground">
                 Location: {gpsCoords.lat.toFixed(5)}, {gpsCoords.lng.toFixed(5)}
                 {gpsCoords.accuracy && ` (±${gpsCoords.accuracy.toFixed(0)}m)`}
               </span>

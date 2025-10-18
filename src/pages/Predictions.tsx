@@ -49,32 +49,35 @@ export default function Predictions() {
 
   const getRiskColor = (level: string) => {
     switch (level) {
-      case 'high': return 'bg-red-500/10 text-red-700 border-red-500/20';
-      case 'medium': return 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20';
-      default: return 'bg-green-500/10 text-green-700 border-green-500/20';
+      case 'high': return 'bg-destructive/10 text-destructive border-destructive/20';
+      case 'medium': return 'bg-secondary/10 text-secondary-foreground border-secondary/20';
+      default: return 'bg-primary/10 text-primary border-primary/20';
     }
   };
 
   const getRiskIcon = (level: string) => {
     switch (level) {
-      case 'high': return <AlertTriangle className="h-5 w-5 text-red-600" />;
-      case 'medium': return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-      default: return <TrendingUp className="h-5 w-5 text-green-600" />;
+      case 'high': return <AlertTriangle className="h-5 w-5 text-destructive" />;
+      case 'medium': return <AlertTriangle className="h-5 w-5 text-secondary-foreground" />;
+      default: return <TrendingUp className="h-5 w-5 text-primary" />;
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-4xl font-display font-bold text-gradient-delta">
+      {/* Hero Header */}
+      <div className="gradient-delta py-12 mb-8">
+        <div className="max-w-6xl mx-auto px-4 text-center space-y-4">
+          <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
             Predictive Stress Analytics
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-lg text-white/90 max-w-2xl mx-auto">
             AI-powered 7-day crop health forecasts based on your field history and weather patterns
           </p>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 space-y-6">
 
         {isLoading ? (
           <Card className="field-card">

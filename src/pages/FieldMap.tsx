@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Activity } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import FieldMapLeaflet from '@/components/FieldMapLeaflet';
 
 interface Field {
   id: string;
@@ -11,6 +13,8 @@ interface Field {
   location_lat: number;
   location_lng: number;
   acreage: number | null;
+  health_score?: number;
+  stress_level?: string;
 }
 
 interface Assessment {
@@ -26,12 +30,15 @@ interface Assessment {
 export default function FieldMap() {
   const [fields, setFields] = useState<Field[]>([]);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchFieldsAndAssessments();
   }, []);
 
   const fetchFieldsAndAssessments = async () => {
+    setIsLoading(true);
+    
     // Fetch user's fields
     const { data: fieldsData } = await supabase
       .from('fields')
@@ -41,7 +48,6 @@ export default function FieldMap() {
     const validFields = (fieldsData || []).filter(
       f => f.location_lat && f.location_lng
     );
-    setFields(validFields);
 
     // Fetch latest assessment for each field
     const { data: assessmentsData } = await supabase
@@ -58,6 +64,19 @@ export default function FieldMap() {
     });
 
     setAssessments(Object.values(latestAssessments));
+
+    // Merge health data into fields
+    const fieldsWithHealth = validFields.map(field => {
+      const assessment = Object.values(latestAssessments).find(a => a.field_id === field.id);
+      return {
+        ...field,
+        health_score: assessment?.health_score,
+        stress_level: assessment?.stress_level,
+      };
+    });
+
+    setFields(fieldsWithHealth);
+    setIsLoading(false);
   };
 
   const getHealthColor = (healthScore: number) => {
@@ -77,16 +96,19 @@ export default function FieldMap() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-display font-bold text-gradient-delta">
+      {/* Hero Header */}
+      <div className="gradient-delta py-12 mb-8">
+        <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
+          <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
             Delta Field Command Center
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-lg text-white/90 max-w-2xl mx-auto">
             Real-time spatial visualization of crop health across Louisiana Delta
           </p>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 space-y-6">
 
         {/* Legend */}
         <Card className="field-card">
@@ -112,19 +134,16 @@ export default function FieldMap() {
           </CardContent>
         </Card>
 
-        {/* Map Placeholder - Full interactive map requires leaflet setup */}
-        <Card className="field-card">
-          <CardContent className="p-6">
-            <div className="bg-muted rounded-lg p-8 text-center">
-              <MapPin className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">Interactive Map View</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Leaflet integration requires additional configuration.
-                View your fields below in list format.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Interactive Map */}
+        {isLoading ? (
+          <Card className="field-card">
+            <CardContent className="p-6 space-y-3">
+              <Skeleton className="h-[500px] w-full rounded-lg" />
+            </CardContent>
+          </Card>
+        ) : fields.length > 0 ? (
+          <FieldMapLeaflet fields={fields} />
+        ) : null}
 
         {/* Fields Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -174,13 +193,15 @@ export default function FieldMap() {
         </div>
 
         {fields.length === 0 && (
-          <Card className="field-card">
-            <CardContent className="p-12 text-center">
-              <MapPin className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">No Fields Registered</h3>
-              <p className="text-sm text-muted-foreground">
-                Add fields with GPS coordinates to see them on the map.
-              </p>
+          <Card className="field-card border-dashed">
+            <CardContent className="p-12 text-center space-y-4">
+              <MapPin className="h-16 w-16 mx-auto text-muted-foreground" />
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold">No Fields Registered</h3>
+                <p className="text-sm text-muted-foreground">
+                  Add fields with GPS coordinates to see them on the map
+                </p>
+              </div>
             </CardContent>
           </Card>
         )}

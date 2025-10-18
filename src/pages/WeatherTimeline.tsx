@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { Cloud, CloudRain, Sun, Wind, Droplets, AlertTriangle } from 'lucide-react';
+import { Cloud, CloudRain, Sun, Wind, Droplets, AlertTriangle, Activity } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Assessment {
   id: string;
@@ -104,16 +105,19 @@ export default function WeatherTimeline() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-display font-bold text-gradient-delta">
+      {/* Hero Header */}
+      <div className="gradient-delta py-12 mb-8">
+        <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
+          <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
             Weather-Correlated Health Timeline
           </h1>
-          <p className="text-muted-foreground">
-            Visualize how weather events impact crop health over time
+          <p className="text-lg text-white/90 max-w-2xl mx-auto">
+            Visualize how weather events impact crop health over time with data-driven insights
           </p>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 space-y-6">
 
         {/* Chart */}
         <Card className="field-card">
@@ -177,9 +181,15 @@ export default function WeatherTimeline() {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No assessment data available for the last 30 days.</p>
-                <p className="text-sm mt-2">Upload crop images to see health trends over time.</p>
+              <div className="text-center py-12 space-y-4">
+                <Activity className="h-16 w-16 text-muted-foreground mx-auto" />
+                <div className="space-y-2">
+                  <p className="font-semibold text-foreground">No assessment data available</p>
+                  <p className="text-sm text-muted-foreground">Upload crop images to see health trends over time</p>
+                </div>
+                <Button onClick={() => window.location.href = '/scanner'} size="lg">
+                  Start Scanning
+                </Button>
               </div>
             )}
           </CardContent>
