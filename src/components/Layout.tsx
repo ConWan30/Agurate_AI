@@ -9,7 +9,8 @@ import {
   User, 
   LogOut,
   Sprout,
-  TrendingUp
+  TrendingUp,
+  Lightbulb
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +37,7 @@ export const Layout = ({ children }: LayoutProps) => {
     { icon: Upload, label: "Upload", path: "/upload" },
     { icon: MapPin, label: "My Fields", path: "/fields" },
     { icon: History, label: "History", path: "/history" },
+    { icon: Lightbulb, label: "How It Works", path: "/how-it-works" },
     { icon: User, label: "Profile", path: "/profile" },
   ];
 

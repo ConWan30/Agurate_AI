@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { InteractiveTutorial } from "@/components/InteractiveTutorial";
 
 interface Field {
   id: string;
@@ -26,6 +27,7 @@ export default function Dashboard() {
   const [fields, setFields] = useState<Field[]>([]);
   const [recentAssessments, setRecentAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -114,16 +116,30 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header - Louisiana Agricultural Theme */}
-      <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
-          <div className="relative z-10">
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
-              Welcome to Your Farm Dashboard
-            </h1>
-            <p className="text-white/90 text-base md:text-lg max-w-2xl">
-              Monitor your fields and crop health with AI-powered precision agriculture for Morehouse Parish
-            </p>
+    <>
+      <InteractiveTutorial open={showTutorial} onOpenChange={setShowTutorial} />
+      
+      <div className="space-y-8">
+        {/* Header - Louisiana Agricultural Theme */}
+        <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+          <div className="relative z-10 flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+                Welcome to Your Farm Dashboard
+              </h1>
+              <p className="text-white/90 text-base md:text-lg max-w-2xl">
+                Monitor your fields and crop health with AI-powered precision agriculture for Morehouse Parish
+              </p>
+            </div>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={() => setShowTutorial(true)}
+              className="gap-2 hidden md:flex"
+            >
+              <Lightbulb className="h-4 w-4" />
+              Tutorial
+            </Button>
           </div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         </div>
@@ -304,5 +320,6 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+    </>
   );
 }
