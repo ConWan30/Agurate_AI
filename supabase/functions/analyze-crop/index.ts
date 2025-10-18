@@ -142,6 +142,12 @@ Respond with JSON:
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+      if (analysisResponse.status === 400 && errorText.includes('Failed to extract')) {
+        return new Response(
+          JSON.stringify({ error: 'Unsupported image format. Please use JPG, PNG, or WebP format.' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       throw new Error(`Analysis failed: ${analysisResponse.status}`);
     }
 

@@ -56,11 +56,12 @@ export default function Upload() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
+    // Validate file type - only allow JPEG, PNG, WebP
+    const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!supportedTypes.includes(file.type.toLowerCase())) {
       toast({
-        title: "Invalid file type",
-        description: "Please select an image file",
+        title: "Unsupported image format",
+        description: "Please use JPG, PNG, or WebP format. AVIF is not supported.",
         variant: "destructive",
       });
       return;
@@ -264,12 +265,12 @@ export default function Upload() {
                       <div>
                         <p className="font-medium mb-2">Click to upload or drag and drop</p>
                         <p className="text-sm text-muted-foreground">
-                          PNG, JPG up to 10MB
+                          JPG, PNG, or WebP up to 10MB
                         </p>
                       </div>
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
                         onChange={handleFileSelect}
                         className="hidden"
                         id="file-upload"
