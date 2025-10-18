@@ -13,6 +13,8 @@ interface Field {
   id: string;
   name: string;
   crop_type: string;
+  location_lat?: number;
+  location_lng?: number;
 }
 
 export default function Upload() {
@@ -36,7 +38,7 @@ export default function Upload() {
 
       const { data, error } = await supabase
         .from("fields")
-        .select("id, name, crop_type")
+        .select("id, name, crop_type, location_lat, location_lng")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -111,12 +113,16 @@ export default function Upload() {
       setUploading(false);
       setAnalyzing(true);
 
-      // Get field data for crop type
+      // Get field data for crop type and location
       const field = fields.find((f) => f.id === selectedField);
       if (!field) throw new Error("Field not found");
+      
+      const fieldLocation = field.location_lat && field.location_lng 
+        ? `${field.location_lat}, ${field.location_lng}`
+        : "Louisiana Delta region";
 
       // Call real AI analysis
-      await performAIAnalysis(publicUrl, field.crop_type, selectedField);
+      await performAIAnalysis(publicUrl, field.crop_type, fieldLocation, selectedField);
 
       toast({
         title: "Analysis complete!",
@@ -136,10 +142,10 @@ export default function Upload() {
     }
   };
 
-  const performAIAnalysis = async (imageUrl: string, cropType: string, fieldId: string) => {
-    // Call the AI edge function
+  const performAIAnalysis = async (imageUrl: string, cropType: string, location: string, fieldId: string) => {
+    // Call the AI edge function with two-step analysis
     const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
-      body: { imageUrl, cropType }
+      body: { imageUrl, cropType, location }
     });
 
     if (aiError) throw aiError;
@@ -155,8 +161,9 @@ export default function Upload() {
         stress_level: aiResult.stress_level,
         symptoms: aiResult.symptoms,
         confidence_score: aiResult.confidence_score,
-        weather_temp_f: null, // Weather integration to be added
-        weather_precipitation_mm: null,
+        weather_temp_f: aiResult.weather_data?.temp_f,
+        weather_precipitation_mm: aiResult.weather_data?.precipitation_inch ? 
+          aiResult.weather_data.precipitation_inch * 25.4 : null, // Convert inches to mm
       })
       .select()
       .single();
