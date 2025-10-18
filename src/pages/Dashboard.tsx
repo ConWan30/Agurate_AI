@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -108,19 +107,16 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </Layout>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Loading dashboard...</p>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="space-y-8">
-        {/* Header - Louisiana Agricultural Theme */}
-        <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+    <div className="space-y-8">
+      {/* Header - Louisiana Agricultural Theme */}
+      <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
           <div className="relative z-10">
             <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
               Welcome to Your Farm Dashboard
@@ -308,6 +304,6 @@ export default function Dashboard() {
           )}
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }

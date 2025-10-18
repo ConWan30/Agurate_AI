@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,18 +88,15 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading profile...</p>
-        </div>
-      </Layout>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Loading profile...</p>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="space-y-8 max-w-2xl mx-auto">
-        <div>
+    <div className="space-y-8 max-w-2xl mx-auto">
+      <div>
           <h1 className="text-4xl font-bold mb-2">Profile Settings</h1>
           <p className="text-muted-foreground">Manage your account information</p>
         </div>
@@ -189,6 +185,6 @@ export default function Profile() {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </div>
   );
 }

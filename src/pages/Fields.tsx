@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -167,9 +166,8 @@ export default function Fields() {
   };
 
   return (
-    <Layout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold mb-2">My Fields</h1>
             <p className="text-muted-foreground">Manage your farm fields and crop types</p>
@@ -363,6 +361,6 @@ export default function Fields() {
           </div>
         )}
       </div>
-    </Layout>
+    </div>
   );
 }

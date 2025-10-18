@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -114,18 +113,15 @@ export default function History() {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading assessment history...</p>
-        </div>
-      </Layout>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Loading assessment history...</p>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="space-y-8">
-        <div>
+    <div className="space-y-8">
+      <div>
           <h1 className="text-4xl font-bold mb-2">Assessment History</h1>
           <p className="text-muted-foreground">Review past crop health analyses and trends</p>
         </div>
@@ -314,6 +310,6 @@ export default function History() {
           </DialogContent>
         </Dialog>
       </div>
-    </Layout>
+    </div>
   );
 }
