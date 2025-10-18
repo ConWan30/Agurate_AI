@@ -2,3 +2,9 @@ project_id = "rkfvefhjyuyhjmcljzev"
 
 [functions.analyze-crop]
 verify_jwt = true
+
+[functions.ar-analyze]
+verify_jwt = true
+
+[functions.predict-stress]
+verify_jwt = true

@@ -14,6 +14,7 @@ import WeatherTimeline from "./pages/WeatherTimeline";
 import Fields from "./pages/Fields";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
+import Predictions from "./pages/Predictions";
 import NotFound from "./pages/NotFound";
 import { Layout } from "./components/Layout";
 
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/weather-timeline" element={<ProtectedRoute><Layout><WeatherTimeline /></Layout></ProtectedRoute>} />
           <Route path="/fields" element={<ProtectedRoute><Layout><Fields /></Layout></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute><Layout><History /></Layout></ProtectedRoute>} />
+          <Route path="/predictions" element={<ProtectedRoute><Layout><Predictions /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

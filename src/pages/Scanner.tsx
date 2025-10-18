@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera, MapPin, Upload, Wifi, WifiOff, Loader2 } from 'lucide-react';
+import { Camera, MapPin, Upload, Wifi, WifiOff, Loader2, Layers } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface Field {
   id: string;
@@ -29,6 +31,8 @@ export default function Scanner() {
   const [selectedFieldId, setSelectedFieldId] = useState<string>('');
   const [fields, setFields] = useState<Field[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [arEnabled, setArEnabled] = useState(false);
+  const [aiOverlay, setAiOverlay] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -98,7 +102,7 @@ export default function Scanner() {
     fileInputRef.current?.click();
   };
 
-  const handleImageCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -109,10 +113,35 @@ export default function Scanner() {
     }
 
     setImage(file);
-    setImagePreview(URL.createObjectURL(file));
+    const preview = URL.createObjectURL(file);
+    setImagePreview(preview);
 
     // Re-capture GPS at photo time
     captureLocation();
+
+    // If AR is enabled, generate quick overlay
+    if (arEnabled && selectedFieldId) {
+      await generateAROverlay(file);
+    }
+  };
+
+  const generateAROverlay = async (imageFile: File) => {
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(imageFile);
+      reader.onload = async () => {
+        const base64 = reader.result as string;
+        
+        const { data, error } = await supabase.functions.invoke('ar-analyze', {
+          body: { imageData: base64 }
+        });
+
+        if (error) throw error;
+        setAiOverlay(data);
+      };
+    } catch (error) {
+      console.error('AR overlay failed:', error);
+    }
   };
 
   // Upload and analyze
@@ -235,19 +264,80 @@ export default function Scanner() {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* AR Toggle */}
+            <div className="flex items-center justify-between pt-2 border-t">
+              <Label htmlFor="ar-mode" className="flex items-center gap-2 cursor-pointer">
+                <Layers className="h-4 w-4" />
+                AR Overlay Mode
+              </Label>
+              <Switch
+                id="ar-mode"
+                checked={arEnabled}
+                onCheckedChange={setArEnabled}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        {/* Camera Capture Area */}
+        {/* Camera Capture Area with AR Overlay */}
         <Card className="field-card overflow-hidden">
           <CardContent className="p-0">
             <div className="relative w-full aspect-[4/3] bg-muted">
               {imagePreview ? (
-                <img 
-                  src={imagePreview} 
-                  alt="Captured crop" 
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  <img 
+                    src={imagePreview} 
+                    alt="Captured crop" 
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* AR Overlay */}
+                  {arEnabled && aiOverlay && (
+                    <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px]">
+                      {/* Health Score Badge */}
+                      <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg">
+                        <div className="text-xs opacity-80">Health Score</div>
+                        <div className="text-2xl font-bold">
+                          {(aiOverlay.health_score * 100).toFixed(0)}%
+                        </div>
+                      </div>
+
+                      {/* Stress Indicator */}
+                      <div className="absolute bottom-4 left-4 right-4 bg-black/70 text-white px-4 py-3 rounded-lg space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold">
+                            {aiOverlay.stress_level === 'healthy' && '✓ Healthy'}
+                            {aiOverlay.stress_level === 'moderate_stress' && '⚠ Moderate Stress'}
+                            {aiOverlay.stress_level === 'severe_stress' && '⚠️ Severe Stress'}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            aiOverlay.stress_level === 'healthy' 
+                              ? 'bg-green-500/30 text-green-200'
+                              : aiOverlay.stress_level === 'moderate_stress'
+                              ? 'bg-yellow-500/30 text-yellow-200'
+                              : 'bg-red-500/30 text-red-200'
+                          }`}>
+                            {aiOverlay.confidence_score && `${(aiOverlay.confidence_score * 100).toFixed(0)}% conf.`}
+                          </span>
+                        </div>
+                        {aiOverlay.visual_cues && (
+                          <p className="text-xs opacity-90">{aiOverlay.visual_cues}</p>
+                        )}
+                      </div>
+
+                      {/* Grid Overlay for zone detection */}
+                      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                        <defs>
+                          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,255,0,0.1)" strokeWidth="1"/>
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+                      </svg>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div 
                   className="flex flex-col items-center justify-center h-full cursor-pointer hover:bg-muted/80 transition-colors"
@@ -255,6 +345,9 @@ export default function Scanner() {
                 >
                   <Camera className="h-16 w-16 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground font-medium">Tap to capture crop image</p>
+                  {arEnabled && (
+                    <p className="text-xs text-blue-600 mt-2">AR mode enabled</p>
+                  )}
                 </div>
               )}
               <input
