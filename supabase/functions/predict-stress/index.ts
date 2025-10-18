@@ -14,7 +14,12 @@ serve(async (req) => {
   try {
     const { days = 7 } = await req.json();
     
-    const authHeader = req.headers.get('Authorization')!;
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('No authorization header provided');
+      throw new Error('Missing authorization header');
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? '',
@@ -22,10 +27,17 @@ serve(async (req) => {
     );
 
     // Get user ID from auth
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) {
-      throw new Error('Unauthorized');
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError) {
+      console.error('Auth error:', authError);
+      throw new Error(`Authentication failed: ${authError.message}`);
     }
+    if (!user) {
+      console.error('No user found in auth');
+      throw new Error('Unauthorized - no user found');
+    }
+    
+    console.log('User authenticated:', user.id);
 
     // Fetch historical assessments
     const { data: assessments, error: assessError } = await supabaseClient
