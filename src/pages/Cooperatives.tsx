@@ -134,8 +134,8 @@ export default function Cooperatives() {
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1">
             <h1 className="text-4xl font-display font-bold text-gradient-delta">
               Cooperatives
             </h1>
@@ -179,6 +179,86 @@ export default function Cooperatives() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Educational Section */}
+        <Card className="field-card bg-primary/5 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              What are Farming Cooperatives?
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-semibold mb-2">Purpose</h3>
+                <p className="text-sm text-muted-foreground">
+                  Join forces with neighboring farmers to share insights, aggregate data, and make 
+                  better decisions together. Cooperatives enable multi-farm analytics, bulk purchasing 
+                  recommendations, and community-wide crop health monitoring across the Louisiana Delta.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Who Benefits?</h3>
+                <ul className="text-sm text-muted-foreground space-y-2">
+                  <li className="flex gap-2">
+                    <span className="text-primary">•</span>
+                    <span><strong>Farm managers</strong> overseeing multiple properties</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary">•</span>
+                    <span><strong>Neighboring farms</strong> sharing resources and knowledge</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary">•</span>
+                    <span><strong>Family operations</strong> managing inherited land across parishes</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <h3 className="font-semibold mb-3">How It Works</h3>
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                <div className="p-3 bg-background rounded-lg">
+                  <div className="font-semibold text-primary mb-1">1. Create Co-op</div>
+                  <p className="text-muted-foreground">
+                    Start a cooperative and invite other farmers to join your network
+                  </p>
+                </div>
+                <div className="p-3 bg-background rounded-lg">
+                  <div className="font-semibold text-primary mb-1">2. Link Fields</div>
+                  <p className="text-muted-foreground">
+                    Members can optionally assign their fields to the cooperative for shared analytics
+                  </p>
+                </div>
+                <div className="p-3 bg-background rounded-lg">
+                  <div className="font-semibold text-primary mb-1">3. Analyze Together</div>
+                  <p className="text-muted-foreground">
+                    View aggregate health scores, total acreage, and comparative insights across all member farms
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <p className="text-sm font-medium text-blue-700 mb-1">📊 Better Decisions</p>
+                <p className="text-sm text-muted-foreground">
+                  Compare your crop performance against cooperative averages to identify what is working
+                </p>
+              </div>
+              
+              <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <p className="text-sm font-medium text-green-700 mb-1">💰 Cost Savings</p>
+                <p className="text-sm text-muted-foreground">
+                  Pool purchasing power for bulk discounts on fertilizer, seeds, and treatments
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* My Memberships */}
         {myMemberships && myMemberships.length > 0 && (
