@@ -86,6 +86,65 @@ export type Database = {
           },
         ]
       }
+      cooperative_members: {
+        Row: {
+          cooperative_id: string
+          id: string
+          joined_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          cooperative_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          cooperative_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cooperative_members_cooperative_id_fkey"
+            columns: ["cooperative_id"]
+            isOneToOne: false
+            referencedRelation: "cooperatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cooperatives: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           assessment_id: string | null
@@ -155,6 +214,7 @@ export type Database = {
       fields: {
         Row: {
           acreage: number | null
+          cooperative_id: string | null
           created_at: string | null
           crop_type: string
           id: string
@@ -167,6 +227,7 @@ export type Database = {
         }
         Insert: {
           acreage?: number | null
+          cooperative_id?: string | null
           created_at?: string | null
           crop_type: string
           id?: string
@@ -179,6 +240,7 @@ export type Database = {
         }
         Update: {
           acreage?: number | null
+          cooperative_id?: string | null
           created_at?: string | null
           crop_type?: string
           id?: string
@@ -189,7 +251,93 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fields_cooperative_id_fkey"
+            columns: ["cooperative_id"]
+            isOneToOne: false
+            referencedRelation: "cooperatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_claims: {
+        Row: {
+          assessment_id: string | null
+          claim_number: string | null
+          created_at: string | null
+          description: string | null
+          estimated_loss_percentage: number | null
+          event_date: string
+          event_type: string
+          field_id: string
+          id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assessment_id?: string | null
+          claim_number?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_loss_percentage?: number | null
+          event_date: string
+          event_type: string
+          field_id: string
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assessment_id?: string | null
+          claim_number?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_loss_percentage?: number | null
+          event_date?: string
+          event_type?: string
+          field_id?: string
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_claims_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

@@ -10,7 +10,9 @@ import {
   LogOut,
   Sprout,
   TrendingUp,
-  Lightbulb
+  Lightbulb,
+  FileText,
+  Users
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -46,6 +48,11 @@ export const Layout = ({ children }: LayoutProps) => {
     { icon: MapPin, label: "Field Map", path: "/field-map" },
     { icon: History, label: "Weather Timeline", path: "/weather-timeline" },
     { icon: TrendingUp, label: "Predictions", path: "/predictions" },
+  ];
+
+  const businessItems = [
+    { icon: FileText, label: "Insurance", path: "/insurance" },
+    { icon: Users, label: "Cooperatives", path: "/cooperatives" },
   ];
 
   return (
@@ -139,6 +146,36 @@ export const Layout = ({ children }: LayoutProps) => {
                 <h2 className="text-sm font-semibold text-muted-foreground mb-4">DELTA COMMAND CENTER</h2>
                 <div className="space-y-2">
                   {commandCenterItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link key={item.path} to={item.path}>
+                        <div
+                          className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 hover-lift group ${
+                            isActive 
+                              ? 'bg-primary/10 text-primary shadow-field' 
+                              : 'hover:bg-muted text-foreground'
+                          }`}
+                        >
+                          <div className={`flex items-center justify-center h-10 w-10 rounded-lg transition-colors ${
+                            isActive 
+                              ? 'bg-primary/20' 
+                              : 'bg-muted group-hover:bg-primary/10'
+                          }`}>
+                            <item.icon className="h-5 w-5" />
+                          </div>
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Business Tools Section */}
+              <div className="mt-8 pt-6 border-t border-border">
+                <h2 className="text-sm font-semibold text-muted-foreground mb-4">BUSINESS TOOLS</h2>
+                <div className="space-y-2">
+                  {businessItems.map((item) => {
                     const isActive = location.pathname === item.path;
                     return (
                       <Link key={item.path} to={item.path}>
