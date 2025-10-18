@@ -113,7 +113,7 @@ export const Layout = ({ children }: LayoutProps) => {
           <aside className="hidden md:block w-72 flex-shrink-0">
             <nav className="space-y-2 sticky top-24">
               <div className="mb-6 pb-6 border-b border-border">
-                <h2 className="text-sm font-semibold text-muted-foreground mb-1">FARM MANAGEMENT</h2>
+                <h2 className="text-sm font-bold text-muted-foreground mb-1">FARM MANAGEMENT</h2>
                 <p className="text-xs text-muted-foreground">Delta Code Cultivation System™</p>
               </div>
               
