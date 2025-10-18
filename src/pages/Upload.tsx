@@ -23,6 +23,7 @@ export default function Upload() {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [fileType, setFileType] = useState<'image' | 'video'>('image');
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -56,27 +57,34 @@ export default function Upload() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type - only allow JPEG, PNG, WebP
-    const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!supportedTypes.includes(file.type.toLowerCase())) {
+    // Validate file type - allow images and videos
+    const supportedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const supportedVideoTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska'];
+    
+    const isImage = supportedImageTypes.includes(file.type.toLowerCase());
+    const isVideo = supportedVideoTypes.includes(file.type.toLowerCase());
+    
+    if (!isImage && !isVideo) {
       toast({
-        title: "Unsupported image format",
-        description: "Please use JPG, PNG, or WebP format. AVIF is not supported.",
+        title: "Unsupported file format",
+        description: "Please use JPG, PNG, WebP for images or MP4, MOV, AVI, MKV for drone videos.",
         variant: "destructive",
       });
       return;
     }
 
-    // Validate file size (10MB max)
-    if (file.size > 10 * 1024 * 1024) {
+    // Validate file size (50MB for videos, 10MB for images)
+    const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxSize) {
       toast({
         title: "File too large",
-        description: "Please select an image under 10MB",
+        description: isVideo ? "Please select a video under 50MB" : "Please select an image under 10MB",
         variant: "destructive",
       });
       return;
     }
 
+    setFileType(isVideo ? 'video' : 'image');
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
@@ -97,11 +105,14 @@ export default function Upload() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Upload image to storage
+      // Upload file to storage
       const fileName = `${user.id}/${Date.now()}-${selectedFile.name}`;
       const { error: uploadError } = await supabase.storage
         .from("crop-images")
-        .upload(fileName, selectedFile);
+        .upload(fileName, selectedFile, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (uploadError) throw uploadError;
 
@@ -122,7 +133,7 @@ export default function Upload() {
         : "Louisiana Delta region";
 
       // Call real AI analysis
-      await performAIAnalysis(publicUrl, field.crop_type, fieldLocation, selectedField);
+      await performAIAnalysis(publicUrl, field.crop_type, fieldLocation, selectedField, fileType);
 
       toast({
         title: "Analysis complete!",
@@ -142,10 +153,10 @@ export default function Upload() {
     }
   };
 
-  const performAIAnalysis = async (imageUrl: string, cropType: string, location: string, fieldId: string) => {
+  const performAIAnalysis = async (imageUrl: string, cropType: string, location: string, fieldId: string, mediaType: 'image' | 'video') => {
     // Call the AI edge function with two-step analysis
     const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
-      body: { imageUrl, cropType, location }
+      body: { imageUrl, cropType, location, mediaType }
     });
 
     if (aiError) throw aiError;
@@ -234,9 +245,9 @@ export default function Upload() {
                 </Select>
               </div>
 
-              {/* Image Upload */}
+              {/* Image/Video Upload */}
               <div className="space-y-2">
-                <Label>Upload Image *</Label>
+                <Label>Upload Image or Drone Video *</Label>
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 text-center ${
                     previewUrl ? "border-primary" : "border-border"
@@ -244,11 +255,19 @@ export default function Upload() {
                 >
                   {previewUrl ? (
                     <div className="space-y-4">
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="max-h-64 mx-auto rounded-lg object-contain"
-                      />
+                      {fileType === 'image' ? (
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="max-h-64 mx-auto rounded-lg object-contain"
+                        />
+                      ) : (
+                        <video
+                          src={previewUrl}
+                          controls
+                          className="max-h-64 mx-auto rounded-lg"
+                        />
+                      )}
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -256,7 +275,7 @@ export default function Upload() {
                           setPreviewUrl("");
                         }}
                       >
-                        Change Image
+                        Change {fileType === 'image' ? 'Image' : 'Video'}
                       </Button>
                     </div>
                   ) : (
@@ -265,19 +284,22 @@ export default function Upload() {
                       <div>
                         <p className="font-medium mb-2">Click to upload or drag and drop</p>
                         <p className="text-sm text-muted-foreground">
-                          JPG, PNG, or WebP up to 10MB
+                          Images: JPG, PNG, WebP (10MB max)
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Drone Videos: MP4, MOV, AVI, MKV (50MB max)
                         </p>
                       </div>
                       <input
                         type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        accept="image/jpeg,image/jpg,image/png,image/webp,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska"
                         onChange={handleFileSelect}
                         className="hidden"
                         id="file-upload"
                       />
                       <Button asChild variant="outline">
                         <label htmlFor="file-upload" className="cursor-pointer">
-                          Select Image
+                          Select Image or Video
                         </label>
                       </Button>
                     </div>
@@ -310,7 +332,8 @@ export default function Upload() {
               {analyzing && (
                 <div className="bg-muted p-4 rounded-lg">
                   <p className="text-sm text-center">
-                    AI is analyzing your crop image. This may take a few moments...
+                    AI is analyzing your crop {fileType === 'video' ? 'video' : 'image'}. 
+                    {fileType === 'video' && ' Video analysis may take longer...'}
                   </p>
                 </div>
               )}

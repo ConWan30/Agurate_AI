@@ -12,8 +12,8 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, cropType, location } = await req.json();
-    console.log('Analyzing crop image:', { imageUrl, cropType, location });
+    const { imageUrl, cropType, location, mediaType = 'image' } = await req.json();
+    console.log('Analyzing crop media:', { imageUrl, cropType, location, mediaType });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -42,7 +42,10 @@ serve(async (req) => {
       console.warn('Weather fetch failed, continuing without it:', err);
     }
 
-    // STEP 2: Analyze crop image
+    // STEP 2: Analyze crop media (image or video)
+    // Use gemini-2.5-pro for video analysis
+    const model = mediaType === 'video' ? 'google/gemini-2.5-pro' : 'google/gemini-2.5-flash';
+    
     const analysisResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -50,7 +53,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model,
         messages: [
           {
             role: 'system',
@@ -61,7 +64,9 @@ CONTEXT:
 - Soils: Alluvial/claypan soils typical of Mississippi Delta
 - Climate: Warm, humid with high rainfall
 
-Analyze crop field images for stress indicators using Louisiana-specific disease and deficiency patterns.
+${mediaType === 'video' 
+  ? 'Analyze drone video footage of crop fields, examining patterns across multiple frames for comprehensive field assessment.'
+  : 'Analyze crop field images for stress indicators using Louisiana-specific disease and deficiency patterns.'}
 
 Respond ONLY in JSON format with precise observations.`
           },
@@ -70,7 +75,16 @@ Respond ONLY in JSON format with precise observations.`
             content: [
               {
                 type: 'text',
-                text: `Analyze this ${cropType} field image from ${location || 'Morehouse Parish, Louisiana'}.
+                text: `Analyze this ${cropType} field ${mediaType === 'video' ? 'drone video' : 'image'} from ${location || 'Morehouse Parish, Louisiana'}.
+
+${mediaType === 'video' ? `**DRONE VIDEO ANALYSIS:**
+Examine the footage across multiple frames to identify:
+- Field-wide patterns of stress or disease
+- Variations in crop health across different field zones
+- Drainage or irrigation issues visible from aerial view
+- Overall field uniformity and coverage
+- Any concerning patterns that emerge over the video duration` : ''}
+
 
 **CROP-SPECIFIC INDICATORS:**
 
@@ -115,10 +129,15 @@ Respond with JSON:
   "analysis_summary": "<plain-language insight for Louisiana farmer>"
 }`
               },
-              {
-                type: 'image_url',
-                image_url: { url: imageUrl }
-              }
+              mediaType === 'video' 
+                ? {
+                    type: 'video_url',
+                    video_url: { url: imageUrl }
+                  }
+                : {
+                    type: 'image_url',
+                    image_url: { url: imageUrl }
+                  }
             ]
           }
         ],
