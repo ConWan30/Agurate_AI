@@ -14,30 +14,51 @@ serve(async (req) => {
   try {
     const { days = 7 } = await req.json();
     
+    // Get auth token from request header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error('No authorization header provided');
-      throw new Error('Missing authorization header');
+      console.error('No authorization header');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Authentication required',
+          forecast: [],
+          summary: 'Please log in to generate predictions.',
+          high_risk_days: 0
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
+        }
+      );
     }
 
+    // Create Supabase client with auth
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    // Get user ID from auth
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    if (authError) {
-      console.error('Auth error:', authError);
-      throw new Error(`Authentication failed: ${authError.message}`);
-    }
-    if (!user) {
-      console.error('No user found in auth');
-      throw new Error('Unauthorized - no user found');
+    // Get user from JWT (since verify_jwt = true, the JWT is already validated)
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('Failed to get user:', userError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Authentication failed',
+          forecast: [],
+          summary: 'Unable to verify user. Please log in again.',
+          high_risk_days: 0
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
+        }
+      );
     }
     
-    console.log('User authenticated:', user.id);
+    console.log('User authenticated successfully:', user.id);
 
     // Fetch historical assessments
     const { data: assessments, error: assessError } = await supabaseClient
@@ -47,7 +68,10 @@ serve(async (req) => {
       .order('analyzed_at', { ascending: false })
       .limit(50);
 
-    if (assessError) throw assessError;
+    if (assessError) {
+      console.error('Error fetching assessments:', assessError);
+      throw assessError;
+    }
 
     if (!assessments || assessments.length < 3) {
       return new Response(
