@@ -59,6 +59,13 @@ export type Database = {
             foreignKeyName: "assessments_field_id_fkey"
             columns: ["field_id"]
             isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "assessments_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
             referencedRelation: "fields"
             referencedColumns: ["id"]
           },
@@ -97,8 +104,29 @@ export type Database = {
             foreignKeyName: "feedback_assessment_id_fkey"
             columns: ["assessment_id"]
             isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "feedback_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
             referencedRelation: "assessments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "feedback_recommendation_id_fkey"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["recommendation_id"]
           },
           {
             foreignKeyName: "feedback_recommendation_id_fkey"
@@ -208,14 +236,65 @@ export type Database = {
             foreignKeyName: "recommendations_assessment_id_fkey"
             columns: ["assessment_id"]
             isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "recommendations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
             referencedRelation: "assessments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
           },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      assessment_details: {
+        Row: {
+          acreage: number | null
+          analyzed_at: string | null
+          assessment_id: string | null
+          confidence_score: number | null
+          crop_type: string | null
+          farm_name: string | null
+          farmer_name: string | null
+          field_id: string | null
+          field_name: string | null
+          health_score: number | null
+          image_url: string | null
+          location_lat: number | null
+          location_lng: number | null
+          stress_level: string | null
+          symptoms: string[] | null
+          user_id: string | null
+          weather_precipitation_mm: number | null
+          weather_temp_f: number | null
+        }
+        Relationships: []
+      }
+      recommendation_details: {
+        Row: {
+          assessment_id: string | null
+          category: string | null
+          created_at: string | null
+          crop_type: string | null
+          field_name: string | null
+          health_score: number | null
+          priority: string | null
+          recommendation_id: string | null
+          recommendation_text: string | null
+          stress_level: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
