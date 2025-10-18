@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf } from "lucide-react";
+import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { InteractiveTutorial } from "@/components/InteractiveTutorial";
@@ -176,15 +176,72 @@ export default function Dashboard() {
               </Card>
             </Link>
 
-            <Link to="/history">
+            <Link to="/delta">
               <Card className="field-card group cursor-pointer border-2 h-full">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-harvest shadow-glow mb-4 group-hover:scale-110 transition-transform">
-                    <TrendingUp className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                    <Brain className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">View History</h3>
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Delta AI</h3>
                   <p className="text-sm text-muted-foreground">
-                    Track crop health trends
+                    Expert Louisiana farming advice
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+
+        {/* New Features Highlight */}
+        <div>
+          <h2 className="text-2xl font-display font-bold mb-6">Business Tools</h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Link to="/insurance">
+              <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                      <FileText className="h-6 w-6 text-primary" />
+                    </div>
+                    <Badge variant="default" className="text-xs">Enhanced</Badge>
+                  </div>
+                  <h3 className="font-display font-bold text-lg mb-2">Insurance Claims</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Document damage with AI-verified evidence for faster settlements
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to="/cooperatives">
+              <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                      <Users className="h-6 w-6 text-primary" />
+                    </div>
+                    <Badge variant="default" className="text-xs">Enhanced</Badge>
+                  </div>
+                  <h3 className="font-display font-bold text-lg mb-2">Cooperatives</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Join farming cooperatives with invitation system and analytics
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to="/delta">
+              <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                      <Brain className="h-6 w-6 text-primary" />
+                    </div>
+                    <Badge variant="default" className="text-xs">New</Badge>
+                  </div>
+                  <h3 className="font-display font-bold text-lg mb-2">Delta Intelligence</h3>
+                  <p className="text-sm text-muted-foreground">
+                    AI trained on LSU AgCenter Delta-specific research
                   </p>
                 </CardContent>
               </Card>

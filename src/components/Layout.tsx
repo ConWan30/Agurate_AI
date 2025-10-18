@@ -12,7 +12,8 @@ import {
   TrendingUp,
   Lightbulb,
   FileText,
-  Users
+  Users,
+  Brain
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -54,6 +55,7 @@ export const Layout = ({ children }: LayoutProps) => {
   const businessItems = [
     { icon: FileText, label: "Insurance", path: "/insurance" },
     { icon: Users, label: "Cooperatives", path: "/cooperatives" },
+    { icon: Brain, label: "Delta AI", path: "/delta" },
   ];
 
   return (

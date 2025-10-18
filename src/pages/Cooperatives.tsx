@@ -284,6 +284,22 @@ export default function Cooperatives() {
                     </div>
                     <CardDescription>{membership.cooperative?.description}</CardDescription>
                   </CardHeader>
+                  {membership.role === 'admin' && (
+                    <CardContent>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-2"
+                        onClick={() => {
+                          setInviteCoopId(membership.cooperative?.id || '');
+                          setInviteCoopName(membership.cooperative?.name || '');
+                        }}
+                      >
+                        <UserPlus className="h-4 w-4" />
+                        Invite Members
+                      </Button>
+                    </CardContent>
+                  )}
                 </Card>
               ))}
             </div>
