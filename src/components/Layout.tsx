@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import MobileFloatingActions from "./MobileFloatingActions";
 
 interface LayoutProps {
   children: ReactNode;
@@ -209,6 +210,9 @@ export const Layout = ({ children }: LayoutProps) => {
           </main>
         </div>
       </div>
+      
+      {/* Mobile Floating Action Buttons */}
+      <MobileFloatingActions />
     </div>
   );
 };

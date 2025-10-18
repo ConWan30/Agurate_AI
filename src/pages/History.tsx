@@ -35,6 +35,8 @@ export default function History() {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const { toast } = useToast();
 
   useEffect(() => {
@@ -145,43 +147,72 @@ export default function History() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
-            {assessments.map((assessment) => (
-              <Card
-                key={assessment.id}
-                className="field-card border-2 cursor-pointer"
-                onClick={() => setSelectedAssessment(assessment)}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      {getStressIcon(assessment.stress_level)}
-                      <div>
-                        <CardTitle className="text-xl">{assessment.field.name}</CardTitle>
-                        <CardDescription className="capitalize">
-                          {assessment.field.crop_type} • {format(new Date(assessment.created_at), "MMM d, yyyy 'at' h:mm a")}
-                        </CardDescription>
+          <>
+            <div className="space-y-4">
+              {assessments
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                .map((assessment) => (
+                <Card
+                  key={assessment.id}
+                  className="field-card border-2 cursor-pointer"
+                  onClick={() => setSelectedAssessment(assessment)}
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        {getStressIcon(assessment.stress_level)}
+                        <div>
+                          <CardTitle className="text-xl">{assessment.field.name}</CardTitle>
+                          <CardDescription className="capitalize">
+                            {assessment.field.crop_type} • {format(new Date(assessment.created_at), "MMM d, yyyy 'at' h:mm a")}
+                          </CardDescription>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold">
+                          {Math.round((assessment.health_score || 0) * 100)}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Health Score</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-3xl font-bold">
-                        {Math.round((assessment.health_score || 0) * 100)}
-                      </div>
-                      <p className="text-xs text-muted-foreground">Health Score</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <Badge variant={assessment.stress_level === "Healthy" ? "default" : assessment.stress_level === "Moderate" ? "outline" : "destructive"}>
+                        {assessment.stress_level}
+                      </Badge>
+                      <Button variant="outline" size="sm">View Details</Button>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <Badge variant={assessment.stress_level === "Healthy" ? "default" : assessment.stress_level === "Moderate" ? "outline" : "destructive"}>
-                      {assessment.stress_level}
-                    </Badge>
-                    <Button variant="outline" size="sm">View Details</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {assessments.length > itemsPerPage && (
+              <div className="flex items-center justify-center gap-2 pt-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground px-4">
+                  Page {currentPage} of {Math.ceil(assessments.length / itemsPerPage)}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(assessments.length / itemsPerPage), p + 1))}
+                  disabled={currentPage >= Math.ceil(assessments.length / itemsPerPage)}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </>
         )}
 
         {/* Assessment Detail Dialog */}
@@ -202,6 +233,7 @@ export default function History() {
                       src={selectedAssessment.image_url}
                       alt="Crop assessment"
                       className="w-full h-64 object-cover"
+                      loading="lazy"
                     />
                   </div>
 

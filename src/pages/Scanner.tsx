@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import TutorialTooltip from '@/components/TutorialTooltip';
 
 interface Field {
   id: string;
@@ -218,8 +219,43 @@ export default function Scanner() {
     }
   };
 
+  const tutorialSteps = [
+    {
+      id: 'welcome',
+      title: 'Welcome to Field Scanner! 📸',
+      content: 'Capture crop photos and get instant AI health analysis with GPS tagging.',
+      position: 'top' as const,
+    },
+    {
+      id: 'select-field',
+      title: 'Step 1: Select Your Field',
+      content: 'Choose which field you\'re scanning from the dropdown menu above.',
+      position: 'top' as const,
+    },
+    {
+      id: 'ar-mode',
+      title: 'Optional: AR Overlay Mode',
+      content: 'Enable AR mode to see real-time health indicators overlaid on your camera view!',
+      position: 'top' as const,
+    },
+    {
+      id: 'capture',
+      title: 'Step 2: Capture Photo',
+      content: 'Tap the camera area to take a photo of your crops. GPS location is auto-captured.',
+      position: 'top' as const,
+    },
+    {
+      id: 'analyze',
+      title: 'Step 3: Analyze',
+      content: 'Press "Analyze Crop Health" and our AI will detect stress, diseases, and provide recommendations!',
+      position: 'bottom' as const,
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-subtle pb-24">
+    <>
+      <TutorialTooltip steps={tutorialSteps} storageKey="scanner-tutorial-completed" />
+      <div className="min-h-screen bg-gradient-subtle pb-24">
       {/* Hero Header */}
       <div className="gradient-delta py-12 mb-8">
         <div className="max-w-2xl mx-auto px-4 text-center space-y-4">
@@ -398,5 +434,6 @@ export default function Scanner() {
         </Button>
       </div>
     </div>
+    </>
   );
 }
