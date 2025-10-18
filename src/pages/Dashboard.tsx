@@ -119,151 +119,194 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="space-y-8">
+        {/* Header - Louisiana Agricultural Theme */}
+        <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+          <div className="relative z-10">
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+              Welcome to Your Farm Dashboard
+            </h1>
+            <p className="text-white/90 text-base md:text-lg max-w-2xl">
+              Monitor your fields and crop health with AI-powered precision agriculture for Morehouse Parish
+            </p>
+          </div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        </div>
+
+        {/* Quick Actions - Enhanced */}
         <div>
-          <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">Monitor your crop health and field performance</p>
+          <h2 className="text-2xl font-display font-bold mb-6">Quick Actions</h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Link to="/upload">
+              <Card className="field-card group cursor-pointer border-2 h-full">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-delta shadow-glow mb-4 group-hover:scale-110 transition-transform">
+                    <Upload className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                  </div>
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">New Assessment</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Upload crop images for AI-powered analysis
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to="/fields">
+              <Card className="field-card group cursor-pointer border-2 h-full">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-sky shadow-glow mb-4 group-hover:scale-110 transition-transform">
+                    <MapPin className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                  </div>
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Manage Fields</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {fields.length} field{fields.length !== 1 ? "s" : ""} registered
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to="/history">
+              <Card className="field-card group cursor-pointer border-2 h-full">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-harvest shadow-glow mb-4 group-hover:scale-110 transition-transform">
+                    <TrendingUp className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                  </div>
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">View History</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Track crop health trends
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <Link to="/upload">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary text-primary-foreground">
-                    <Upload className="h-6 w-6" />
-                  </div>
-                  <CardTitle>New Assessment</CardTitle>
+        {/* Fields Overview - Enhanced */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-display font-bold">My Fields</h2>
+            <Link to="/fields">
+              <Button variant="outline" className="gap-2">
+                <MapPin className="h-4 w-4" />
+                <span className="hidden sm:inline">Manage All Fields</span>
+              </Button>
+            </Link>
+          </div>
+          {fields.length === 0 ? (
+            <Card className="field-card border-dashed border-2">
+              <CardContent className="p-8 md:p-12 text-center">
+                <div className="flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl gradient-sky shadow-glow mx-auto mb-4">
+                  <MapPin className="h-8 w-8 md:h-10 md:w-10 text-white" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Upload crop image for AI analysis
+                <h3 className="font-display font-bold text-xl mb-2">No Fields Yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  Start by registering your first field to begin monitoring
                 </p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link to="/fields">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-secondary text-secondary-foreground">
-                    <MapPin className="h-6 w-6" />
-                  </div>
-                  <CardTitle>Manage Fields</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {fields.length} field{fields.length !== 1 ? "s" : ""} registered
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link to="/history">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-accent text-accent-foreground">
-                    <TrendingUp className="h-6 w-6" />
-                  </div>
-                  <CardTitle>View History</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Track crop health trends
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-
-        {/* Fields Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>My Fields</CardTitle>
-            <CardDescription>Overview of your registered fields</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {fields.length === 0 ? (
-              <div className="text-center py-8">
-                <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No fields registered yet</p>
                 <Link to="/fields">
-                  <Button>Add Your First Field</Button>
+                  <Button className="gradient-delta text-white">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    Add Your First Field
+                  </Button>
                 </Link>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {fields.map((field) => (
-                  <Card key={field.id}>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {fields.map((field) => {
+                const cropIcons: Record<string, string> = {
+                  rice: '🌾',
+                  soybean: '🫘',
+                  cotton: '🌿',
+                  corn: '🌽'
+                };
+                return (
+                  <Card key={field.id} className="field-card border-2">
                     <CardHeader>
-                      <CardTitle className="text-lg">{field.name}</CardTitle>
-                      <CardDescription className="capitalize">
-                        {field.crop_type} • {field.acreage} acres
-                      </CardDescription>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 text-2xl">
+                          {cropIcons[field.crop_type] || '🌱'}
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{field.name}</CardTitle>
+                          <CardDescription className="capitalize">
+                            {field.crop_type} • {field.acreage} acres
+                          </CardDescription>
+                        </div>
+                      </div>
                     </CardHeader>
                   </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
-        {/* Recent Assessments */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Assessments</CardTitle>
-            <CardDescription>Latest crop health analyses</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {recentAssessments.length === 0 ? (
-              <div className="text-center py-8">
-                <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No assessments yet</p>
+        {/* Recent Assessments - Enhanced */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-display font-bold">Recent Crop Health Analysis</h2>
+            <Link to="/history">
+              <Button variant="outline" className="gap-2">
+                <TrendingUp className="h-4 w-4" />
+                <span className="hidden sm:inline">View All History</span>
+              </Button>
+            </Link>
+          </div>
+          {recentAssessments.length === 0 ? (
+            <Card className="field-card border-dashed border-2">
+              <CardContent className="p-8 md:p-12 text-center">
+                <div className="flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl gradient-delta shadow-glow mx-auto mb-4">
+                  <Upload className="h-8 w-8 md:h-10 md:w-10 text-white" />
+                </div>
+                <h3 className="font-display font-bold text-xl mb-2">No Analysis Yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  Upload your first crop image to get AI-powered health insights
+                </p>
                 <Link to="/upload">
-                  <Button>Upload Your First Image</Button>
+                  <Button className="gradient-delta text-white">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload First Image
+                  </Button>
                 </Link>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {recentAssessments.map((assessment) => (
-                  <div
-                    key={assessment.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      {getStressIcon(assessment.stress_level)}
-                      <div>
-                        <p className="font-medium">{assessment.field.name}</p>
-                        <p className="text-sm text-muted-foreground capitalize">
-                          {assessment.field.crop_type} • {format(new Date(assessment.created_at), "MMM d, yyyy")}
-                        </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {recentAssessments.map((assessment) => (
+                <Card key={assessment.id} className="field-card border-2">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between gap-6">
+                      <div className="flex items-center gap-6 flex-1">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 flex-shrink-0">
+                          {getStressIcon(assessment.stress_level)}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-display font-bold text-xl mb-1">{assessment.field.name}</h3>
+                          <p className="text-sm text-muted-foreground capitalize">
+                            {assessment.field.crop_type} • {format(new Date(assessment.created_at), "MMM d, yyyy")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-6">
+                        <div className="text-right">
+                          <p className="text-3xl font-display font-bold text-primary">
+                            {Math.round((assessment.health_score || 0) * 100)}%
+                          </p>
+                          <p className="text-sm text-muted-foreground font-medium">Health Score</p>
+                        </div>
+                        <Badge 
+                          variant={getStressBadgeVariant(assessment.stress_level)}
+                          className={`${getStressBadgeClass(assessment.stress_level)} text-base px-4 py-2 font-semibold`}
+                        >
+                          {assessment.stress_level.charAt(0).toUpperCase() + assessment.stress_level.slice(1)}
+                        </Badge>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-2xl font-bold">
-                          {Math.round((assessment.health_score || 0) * 100)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">Health Score</p>
-                      </div>
-                      <Badge 
-                        variant={getStressBadgeVariant(assessment.stress_level)}
-                        className={getStressBadgeClass(assessment.stress_level)}
-                      >
-                        {assessment.stress_level.charAt(0).toUpperCase() + assessment.stress_level.slice(1)}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
   );
