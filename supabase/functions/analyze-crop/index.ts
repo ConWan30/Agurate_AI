@@ -223,11 +223,20 @@ Respond with JSON:
     const recommendations = JSON.parse(recData.choices[0].message.content);
     console.log('Recommendations generated:', recommendations);
 
+    // Normalize stress_level to match database constraint (lowercase, no spaces)
+    const normalizeStressLevel = (condition: string): string => {
+      const normalized = condition.toLowerCase().trim();
+      if (normalized.includes('severe')) return 'severe';
+      if (normalized.includes('mild') || normalized.includes('moderate')) return 'moderate';
+      if (normalized.includes('healthy')) return 'healthy';
+      return 'moderate'; // default fallback
+    };
+
     // Combine both AI outputs
     const finalResult = {
       // From image analysis
       health_score: imageAnalysis.health_score,
-      stress_level: imageAnalysis.condition,
+      stress_level: normalizeStressLevel(imageAnalysis.condition),
       stress_score: imageAnalysis.stress_score,
       symptoms: imageAnalysis.symptoms,
       visual_cues: imageAnalysis.visual_cues,
