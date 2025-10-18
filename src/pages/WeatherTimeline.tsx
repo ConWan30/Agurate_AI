@@ -1,0 +1,286 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { Cloud, CloudRain, Sun, Wind, Droplets, AlertTriangle } from 'lucide-react';
+
+interface Assessment {
+  id: string;
+  analyzed_at: string;
+  health_score: number;
+  stress_level: string;
+  weather_temp_f: number | null;
+  weather_precipitation_mm: number | null;
+  field_id: string;
+  fields?: {
+    name: string;
+  };
+}
+
+interface WeatherEvent {
+  id: string;
+  event_date: string;
+  event_type: string;
+  description: string | null;
+  temperature_f: number | null;
+  precipitation_inches: number | null;
+}
+
+interface TimelineDataPoint {
+  date: string;
+  healthScore: number;
+  temperature: number | null;
+  precipitation: number | null;
+  events: WeatherEvent[];
+}
+
+const getWeatherIcon = (eventType: string) => {
+  switch (eventType) {
+    case 'heavy_rain': return <CloudRain className="h-4 w-4" />;
+    case 'heat_wave': return <Sun className="h-4 w-4" />;
+    case 'high_wind': return <Wind className="h-4 w-4" />;
+    case 'drought': return <Droplets className="h-4 w-4" />;
+    case 'frost': return <Cloud className="h-4 w-4" />;
+    default: return <AlertTriangle className="h-4 w-4" />;
+  }
+};
+
+const getEventBadgeVariant = (eventType: string): "default" | "destructive" | "secondary" | "outline" => {
+  switch (eventType) {
+    case 'heavy_rain': return 'secondary';
+    case 'heat_wave': return 'destructive';
+    case 'frost': return 'secondary';
+    default: return 'outline';
+  }
+};
+
+export default function WeatherTimeline() {
+  const [assessments, setAssessments] = useState<Assessment[]>([]);
+  const [weatherEvents, setWeatherEvents] = useState<WeatherEvent[]>([]);
+  const [timelineData, setTimelineData] = useState<TimelineDataPoint[]>([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    // Fetch assessments from last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const { data: assessmentsData } = await supabase
+      .from('assessments')
+      .select('*, fields(name)')
+      .gte('analyzed_at', thirtyDaysAgo.toISOString())
+      .order('analyzed_at', { ascending: true });
+
+    setAssessments(assessmentsData || []);
+
+    // Fetch weather events
+    const { data: eventsData } = await supabase
+      .from('weather_events')
+      .select('*')
+      .gte('event_date', thirtyDaysAgo.toISOString().split('T')[0])
+      .order('event_date', { ascending: true });
+
+    setWeatherEvents(eventsData || []);
+
+    // Combine into timeline data
+    if (assessmentsData && assessmentsData.length > 0) {
+      const timeline: TimelineDataPoint[] = assessmentsData.map(assessment => ({
+        date: new Date(assessment.analyzed_at).toLocaleDateString(),
+        healthScore: (assessment.health_score || 0) * 100,
+        temperature: assessment.weather_temp_f,
+        precipitation: assessment.weather_precipitation_mm ? assessment.weather_precipitation_mm / 25.4 : null, // mm to inches
+        events: (eventsData || []).filter(e => 
+          new Date(e.event_date).toDateString() === new Date(assessment.analyzed_at).toDateString()
+        )
+      }));
+
+      setTimelineData(timeline);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-subtle pb-24">
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-display font-bold text-gradient-delta">
+            Weather-Correlated Health Timeline
+          </h1>
+          <p className="text-muted-foreground">
+            Visualize how weather events impact crop health over time
+          </p>
+        </div>
+
+        {/* Chart */}
+        <Card className="field-card">
+          <CardHeader>
+            <CardTitle>30-Day Crop Health & Weather Trends</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {timelineData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={timelineData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis 
+                    yAxisId="left"
+                    label={{ value: 'Health Score (%)', angle: -90, position: 'insideLeft' }}
+                    domain={[0, 100]}
+                  />
+                  <YAxis 
+                    yAxisId="right"
+                    orientation="right"
+                    label={{ value: 'Temperature (°F)', angle: 90, position: 'insideRight' }}
+                  />
+                  <Tooltip />
+                  <Legend />
+                  <Line 
+                    yAxisId="left"
+                    type="monotone" 
+                    dataKey="healthScore" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={3}
+                    name="Health Score"
+                    dot={{ r: 5 }}
+                  />
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="temperature" 
+                    stroke="#EF4444" 
+                    strokeWidth={2}
+                    name="Temperature"
+                    strokeDasharray="5 5"
+                  />
+                  {/* Precipitation reference lines */}
+                  {timelineData.map((point, idx) => 
+                    point.precipitation && point.precipitation > 0.5 ? (
+                      <ReferenceLine 
+                        key={`precip-${idx}`}
+                        x={point.date}
+                        stroke="#3B82F6"
+                        strokeDasharray="3 3"
+                        label={{ value: `${point.precipitation.toFixed(1)}"`, position: 'top' }}
+                      />
+                    ) : null
+                  )}
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <p>No assessment data available for the last 30 days.</p>
+                <p className="text-sm mt-2">Upload crop images to see health trends over time.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Weather Events Timeline */}
+        <Card className="field-card">
+          <CardHeader>
+            <CardTitle>Significant Weather Events</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {weatherEvents.length > 0 ? (
+              <div className="space-y-4">
+                {weatherEvents.map(event => (
+                  <div 
+                    key={event.id}
+                    className="flex items-start gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="mt-1">
+                      {getWeatherIcon(event.event_type)}
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant={getEventBadgeVariant(event.event_type)}>
+                          {event.event_type.replace('_', ' ')}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(event.event_date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {event.description && (
+                        <p className="text-sm">{event.description}</p>
+                      )}
+                      <div className="flex gap-4 text-xs text-muted-foreground">
+                        {event.temperature_f && (
+                          <span>🌡️ {event.temperature_f}°F</span>
+                        )}
+                        {event.precipitation_inches && (
+                          <span>🌧️ {event.precipitation_inches}" rain</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">
+                No significant weather events recorded in the last 30 days.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Recent Assessments */}
+        <Card className="field-card">
+          <CardHeader>
+            <CardTitle>Recent Assessments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {assessments.length > 0 ? (
+              <div className="space-y-3">
+                {assessments.slice(-10).reverse().map(assessment => (
+                  <div 
+                    key={assessment.id}
+                    className="flex items-center justify-between p-3 rounded-lg border bg-card"
+                  >
+                    <div className="space-y-1">
+                      <p className="font-medium">{assessment.fields?.name || 'Unknown Field'}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(assessment.analyzed_at).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="font-semibold">
+                          {((assessment.health_score || 0) * 100).toFixed(0)}%
+                        </p>
+                        {assessment.weather_temp_f && (
+                          <p className="text-xs text-muted-foreground">
+                            {assessment.weather_temp_f}°F
+                          </p>
+                        )}
+                      </div>
+                      <Badge variant={
+                        assessment.stress_level === 'healthy' ? 'default' :
+                        assessment.stress_level === 'moderate' ? 'secondary' : 'destructive'
+                      }>
+                        {assessment.stress_level}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">
+                No recent assessments available.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

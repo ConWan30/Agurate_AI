@@ -17,40 +17,55 @@ export type Database = {
       assessments: {
         Row: {
           analyzed_at: string | null
+          captured_offline: boolean | null
           confidence_score: number | null
           created_at: string | null
           field_id: string
+          gps_accuracy_meters: number | null
           health_score: number | null
           id: string
           image_url: string
+          photo_location_lat: number | null
+          photo_location_lng: number | null
           stress_level: string | null
           symptoms: string[] | null
+          synced_at: string | null
           weather_precipitation_mm: number | null
           weather_temp_f: number | null
         }
         Insert: {
           analyzed_at?: string | null
+          captured_offline?: boolean | null
           confidence_score?: number | null
           created_at?: string | null
           field_id: string
+          gps_accuracy_meters?: number | null
           health_score?: number | null
           id?: string
           image_url: string
+          photo_location_lat?: number | null
+          photo_location_lng?: number | null
           stress_level?: string | null
           symptoms?: string[] | null
+          synced_at?: string | null
           weather_precipitation_mm?: number | null
           weather_temp_f?: number | null
         }
         Update: {
           analyzed_at?: string | null
+          captured_offline?: boolean | null
           confidence_score?: number | null
           created_at?: string | null
           field_id?: string
+          gps_accuracy_meters?: number | null
           health_score?: number | null
           id?: string
           image_url?: string
+          photo_location_lat?: number | null
+          photo_location_lng?: number | null
           stress_level?: string | null
           symptoms?: string[] | null
+          synced_at?: string | null
           weather_precipitation_mm?: number | null
           weather_temp_f?: number | null
         }
@@ -254,6 +269,42 @@ export type Database = {
             referencedColumns: ["assessment_id"]
           },
         ]
+      }
+      weather_events: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event_date: string
+          event_type: string | null
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          precipitation_inches: number | null
+          temperature_f: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          event_date: string
+          event_type?: string | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          precipitation_inches?: number | null
+          temperature_f?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          event_date?: string
+          event_type?: string | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          precipitation_inches?: number | null
+          temperature_f?: number | null
+        }
+        Relationships: []
       }
     }
     Views: {

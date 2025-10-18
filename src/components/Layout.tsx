@@ -38,6 +38,12 @@ export const Layout = ({ children }: LayoutProps) => {
     { icon: User, label: "Profile", path: "/profile" },
   ];
 
+  const commandCenterItems = [
+    { icon: MapPin, label: "Field Scanner", path: "/scanner" },
+    { icon: MapPin, label: "Field Map", path: "/field-map" },
+    { icon: History, label: "Weather Timeline", path: "/weather-timeline" },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header - Louisiana Agricultural Theme */}
@@ -120,8 +126,38 @@ export const Layout = ({ children }: LayoutProps) => {
                       <span className="font-medium">{item.label}</span>
                     </div>
                   </Link>
-                );
-              })}
+                  );
+                })}
+
+              {/* Delta Command Center Section */}
+              <div className="mt-8 pt-6 border-t border-border">
+                <h2 className="text-sm font-semibold text-muted-foreground mb-4">DELTA COMMAND CENTER</h2>
+                <div className="space-y-2">
+                  {commandCenterItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link key={item.path} to={item.path}>
+                        <div
+                          className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 hover-lift group ${
+                            isActive 
+                              ? 'bg-primary/10 text-primary shadow-field' 
+                              : 'hover:bg-muted text-foreground'
+                          }`}
+                        >
+                          <div className={`flex items-center justify-center h-10 w-10 rounded-lg transition-colors ${
+                            isActive 
+                              ? 'bg-primary/20' 
+                              : 'bg-muted group-hover:bg-primary/10'
+                          }`}>
+                            <item.icon className="h-5 w-5" />
+                          </div>
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             </nav>
           </aside>
 
