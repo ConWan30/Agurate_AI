@@ -121,17 +121,27 @@ export default function History() {
 
   return (
     <div className="space-y-8">
-      <div>
-          <h1 className="text-4xl font-bold mb-2">Assessment History</h1>
-          <p className="text-muted-foreground">Review past crop health analyses and trends</p>
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl gradient-harvest p-8 md:p-12 shadow-glow">
+        <div className="relative z-10">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+            Assessment History
+          </h1>
+          <p className="text-white/90 text-base md:text-lg max-w-2xl">
+            Review past crop health analyses and track trends over time
+          </p>
         </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+      </div>
 
         {assessments.length === 0 ? (
-          <Card>
+          <Card className="field-card border-dashed border-2">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <Calendar className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No assessments yet</h3>
-              <p className="text-muted-foreground">Upload a crop image to get started</p>
+              <div className="flex items-center justify-center h-20 w-20 rounded-2xl gradient-harvest shadow-glow mx-auto mb-4">
+                <Calendar className="h-10 w-10 text-white" />
+              </div>
+              <h3 className="text-xl font-display font-semibold mb-2">No assessments yet</h3>
+              <p className="text-muted-foreground mb-6">Upload a crop image to get started</p>
             </CardContent>
           </Card>
         ) : (
@@ -139,7 +149,7 @@ export default function History() {
             {assessments.map((assessment) => (
               <Card
                 key={assessment.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer"
+                className="field-card border-2 cursor-pointer"
                 onClick={() => setSelectedAssessment(assessment)}
               >
                 <CardHeader>

@@ -183,25 +183,36 @@ export default function Upload() {
   };
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
-      <div>
-          <h1 className="text-4xl font-bold mb-2">Upload Crop Image</h1>
-          <p className="text-muted-foreground">AI-powered crop health analysis</p>
+    <div className="space-y-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+        <div className="relative z-10">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+            Upload Crop Image
+          </h1>
+          <p className="text-white/90 text-base md:text-lg max-w-2xl">
+            AI-powered crop health analysis using Google Gemini 2.5 Pro
+          </p>
         </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+      </div>
 
+      <div className="max-w-2xl mx-auto space-y-6">
         {fields.length === 0 ? (
-          <Card>
+          <Card className="field-card border-dashed border-2">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <ImageIcon className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No fields available</h3>
+              <div className="flex items-center justify-center h-20 w-20 rounded-2xl gradient-sky shadow-glow mx-auto mb-4">
+                <ImageIcon className="h-10 w-10 text-white" />
+              </div>
+              <h3 className="text-xl font-display font-semibold mb-2">No fields available</h3>
               <p className="text-muted-foreground mb-4">Add a field first to analyze crops</p>
-              <Button onClick={() => navigate("/fields")}>Go to My Fields</Button>
+              <Button onClick={() => navigate("/fields")} size="lg">Go to My Fields</Button>
             </CardContent>
           </Card>
         ) : (
-          <Card>
+          <Card className="field-card">
             <CardHeader>
-              <CardTitle>New Assessment</CardTitle>
+              <CardTitle className="text-2xl font-display">New Assessment</CardTitle>
               <CardDescription>Upload a crop image for AI analysis</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -303,8 +314,9 @@ export default function Upload() {
                 </div>
               )}
             </CardContent>
-        </Card>
-      )}
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

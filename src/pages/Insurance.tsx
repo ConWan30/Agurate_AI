@@ -111,85 +111,96 @@ AI-powered crop health analysis for Louisiana Delta agriculture
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        <div className="flex justify-between items-start gap-4">
-          <div className="flex-1">
-            <h1 className="text-4xl font-display font-bold text-gradient-delta">
-              Insurance Claims
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Document and export crop damage for insurance providers
-            </p>
+        {/* Hero Header */}
+        <div className="relative overflow-hidden rounded-2xl gradient-earth p-8 md:p-12 shadow-glow">
+          <div className="relative z-10 flex items-start justify-between">
+            <div className="flex-1">
+              <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+                Insurance Claims
+              </h1>
+              <p className="text-white/90 text-base md:text-lg">
+                Document crop damage for insurance providers with AI-verified evidence
+              </p>
+            </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button variant="secondary" size="lg" className="gap-2 hidden md:flex">
+                  <Plus className="h-4 w-4" />
+                  Create Claim
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Insurance Claim</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  createClaim.mutate(formData);
+                }} className="space-y-4">
+                  <div>
+                    <Label>Field</Label>
+                    <Select name="field_id" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select field" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fields?.map(field => (
+                          <SelectItem key={field.id} value={field.id}>
+                            {field.name} ({field.crop_type})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Event Type</Label>
+                    <Select name="event_type" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select event type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="flood">Flood</SelectItem>
+                        <SelectItem value="drought">Drought</SelectItem>
+                        <SelectItem value="hail">Hail</SelectItem>
+                        <SelectItem value="wind">Wind Damage</SelectItem>
+                        <SelectItem value="disease">Disease Outbreak</SelectItem>
+                        <SelectItem value="pest">Pest Infestation</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Event Date</Label>
+                    <Input type="date" name="event_date" required />
+                  </div>
+
+                  <div>
+                    <Label>Estimated Loss (%)</Label>
+                    <Input type="number" name="estimated_loss_percentage" min="0" max="100" step="0.1" required />
+                  </div>
+
+                  <div>
+                    <Label>Description</Label>
+                    <Textarea name="description" rows={4} placeholder="Describe the damage and circumstances..." required />
+                  </div>
+
+                  <Button type="submit" className="w-full">Create Claim</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        </div>
 
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                New Claim
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Insurance Claim</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                createClaim.mutate(formData);
-              }} className="space-y-4">
-                <div>
-                  <Label>Field</Label>
-                  <Select name="field_id" required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select field" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fields?.map(field => (
-                        <SelectItem key={field.id} value={field.id}>
-                          {field.name} ({field.crop_type})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Event Type</Label>
-                  <Select name="event_type" required>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="flood">Flood</SelectItem>
-                      <SelectItem value="drought">Drought</SelectItem>
-                      <SelectItem value="hail">Hail</SelectItem>
-                      <SelectItem value="wind">Wind Damage</SelectItem>
-                      <SelectItem value="disease">Disease Outbreak</SelectItem>
-                      <SelectItem value="pest">Pest Infestation</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Event Date</Label>
-                  <Input type="date" name="event_date" required />
-                </div>
-
-                <div>
-                  <Label>Estimated Loss (%)</Label>
-                  <Input type="number" name="estimated_loss_percentage" min="0" max="100" step="0.1" />
-                </div>
-
-                <div>
-                  <Label>Description</Label>
-                  <Textarea name="description" rows={4} placeholder="Describe the damage and circumstances..." />
-                </div>
-
-                <Button type="submit" className="w-full">Create Claim</Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+        {/* Mobile Create Button */}
+        <div className="md:hidden">
+          <Button onClick={() => setOpen(true)} className="w-full gap-2" size="lg">
+            <Plus className="h-4 w-4" />
+            Create Claim
+          </Button>
         </div>
 
         {/* Educational Section */}

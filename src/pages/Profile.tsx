@@ -95,13 +95,22 @@ export default function Profile() {
   }
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
-      <div>
-          <h1 className="text-4xl font-bold mb-2">Profile Settings</h1>
-          <p className="text-muted-foreground">Manage your account information</p>
+    <div className="space-y-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+        <div className="relative z-10">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+            Profile Settings
+          </h1>
+          <p className="text-white/90 text-base md:text-lg max-w-2xl">
+            Manage your account information and farm details
+          </p>
         </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+      </div>
 
-        <Card>
+      <div className="max-w-2xl mx-auto space-y-8">
+        <Card className="field-card">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-primary/10">
@@ -168,7 +177,7 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="field-card">
           <CardHeader>
             <CardTitle>About AgurateAI</CardTitle>
           </CardHeader>
@@ -185,5 +194,6 @@ export default function Profile() {
           </CardContent>
         </Card>
       </div>
+    </div>
   );
 }

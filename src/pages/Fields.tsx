@@ -167,10 +167,12 @@ export default function Fields() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl gradient-sky p-8 md:p-12 shadow-glow">
+        <div className="relative z-10 flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-bold mb-2">My Fields</h1>
-            <p className="text-muted-foreground">Manage your farm fields and crop types</p>
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">My Fields</h1>
+            <p className="text-white/90 text-base md:text-lg">Manage your farm fields and crop types</p>
           </div>
           <Dialog
             open={dialogOpen}
@@ -180,8 +182,8 @@ export default function Fields() {
             }}
           >
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button variant="secondary" size="lg" className="gap-2 hidden md:flex">
+                <Plus className="h-4 w-4" />
                 Add Field
               </Button>
             </DialogTrigger>
@@ -281,19 +283,140 @@ export default function Fields() {
             </DialogContent>
           </Dialog>
         </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+      </div>
+
+      {/* Mobile Add Button */}
+      <div className="md:hidden">
+        <Dialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open);
+            if (!open) resetForm();
+          }}
+        >
+          <DialogTrigger asChild>
+            <Button className="w-full gap-2" size="lg">
+              <Plus className="h-4 w-4" />
+              Add Field
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{editingField ? "Edit Field" : "Add New Field"}</DialogTitle>
+              <DialogDescription>
+                {editingField
+                  ? "Update your field information"
+                  : "Register a new field for crop monitoring"}
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name-mobile">Field Name *</Label>
+                <Input
+                  id="name-mobile"
+                  placeholder="e.g., North Field"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="crop_type-mobile">Crop Type *</Label>
+                <Select
+                  value={formData.crop_type}
+                  onValueChange={(value) => setFormData({ ...formData, crop_type: value })}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select crop type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rice">Rice</SelectItem>
+                    <SelectItem value="soybean">Soybean</SelectItem>
+                    <SelectItem value="cotton">Cotton</SelectItem>
+                    <SelectItem value="corn">Corn</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="acreage-mobile">Acreage *</Label>
+                <Input
+                  id="acreage-mobile"
+                  type="number"
+                  step="0.1"
+                  placeholder="e.g., 45.5"
+                  value={formData.acreage}
+                  onChange={(e) => setFormData({ ...formData, acreage: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="lat-mobile">Latitude</Label>
+                  <Input
+                    id="lat-mobile"
+                    type="number"
+                    step="0.0000001"
+                    placeholder="32.73"
+                    value={formData.location_lat}
+                    onChange={(e) => setFormData({ ...formData, location_lat: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lng-mobile">Longitude</Label>
+                  <Input
+                    id="lng-mobile"
+                    type="number"
+                    step="0.0000001"
+                    placeholder="-91.76"
+                    value={formData.location_lng}
+                    onChange={(e) => setFormData({ ...formData, location_lng: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes-mobile">Notes</Label>
+                <Textarea
+                  id="notes-mobile"
+                  placeholder="Additional field information..."
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Saving..." : editingField ? "Update Field" : "Add Field"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
         {loading && !dialogOpen ? (
-          <div className="flex items-center justify-center h-64">
-            <p className="text-muted-foreground">Loading fields...</p>
-          </div>
+          <Card className="field-card">
+            <CardContent className="flex items-center justify-center py-16">
+              <div className="space-y-4 text-center">
+                <div className="h-12 w-12 rounded-full border-4 border-primary border-t-transparent animate-spin mx-auto"></div>
+                <p className="text-muted-foreground">Loading fields...</p>
+              </div>
+            </CardContent>
+          </Card>
         ) : fields.length === 0 ? (
-          <Card>
+          <Card className="field-card border-dashed border-2">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <MapPin className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No fields yet</h3>
-              <p className="text-muted-foreground mb-4">Start by adding your first field</p>
-              <Button onClick={() => setDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
+              <div className="flex items-center justify-center h-20 w-20 rounded-2xl gradient-sky shadow-glow mx-auto mb-4">
+                <MapPin className="h-10 w-10 text-white" />
+              </div>
+              <h3 className="text-xl font-display font-semibold mb-2">No fields yet</h3>
+              <p className="text-muted-foreground mb-6">Start by adding your first field</p>
+              <Button onClick={() => setDialogOpen(true)} size="lg" className="gap-2">
+                <Plus className="h-4 w-4" />
                 Add Field
               </Button>
             </CardContent>
@@ -301,7 +424,7 @@ export default function Fields() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {fields.map((field) => (
-              <Card key={field.id} className="hover:shadow-lg transition-shadow">
+              <Card key={field.id} className="field-card border-2">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
