@@ -105,6 +105,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 <h2 className="text-sm font-semibold text-muted-foreground mb-1">FARM MANAGEMENT</h2>
                 <p className="text-xs text-muted-foreground">Delta Code Cultivation System™</p>
               </div>
+              
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
@@ -126,8 +127,8 @@ export const Layout = ({ children }: LayoutProps) => {
                       <span className="font-medium">{item.label}</span>
                     </div>
                   </Link>
-                  );
-                })}
+                );
+              })}
 
               {/* Delta Command Center Section */}
               <div className="mt-8 pt-6 border-t border-border">
