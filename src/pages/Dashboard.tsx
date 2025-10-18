@@ -65,28 +65,44 @@ export default function Dashboard() {
   };
 
   const getStressIcon = (stressLevel: string) => {
-    switch (stressLevel) {
-      case "Healthy":
-        return <CheckCircle2 className="h-5 w-5 text-success" />;
-      case "Moderate":
-        return <AlertTriangle className="h-5 w-5 text-warning" />;
-      case "Severe":
-        return <AlertCircle className="h-5 w-5 text-destructive" />;
+    const normalized = stressLevel?.toLowerCase();
+    switch (normalized) {
+      case "healthy":
+        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
+      case "moderate":
+        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      case "severe":
+        return <AlertCircle className="h-5 w-5 text-red-600" />;
       default:
         return <CheckCircle2 className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
-  const getStressBadgeVariant = (stressLevel: string) => {
-    switch (stressLevel) {
-      case "Healthy":
+  const getStressBadgeVariant = (stressLevel: string): "default" | "secondary" | "destructive" | "outline" => {
+    const normalized = stressLevel?.toLowerCase();
+    switch (normalized) {
+      case "healthy":
         return "default";
-      case "Moderate":
+      case "moderate":
         return "outline";
-      case "Severe":
+      case "severe":
         return "destructive";
       default:
         return "secondary";
+    }
+  };
+
+  const getStressBadgeClass = (stressLevel: string) => {
+    const normalized = stressLevel?.toLowerCase();
+    switch (normalized) {
+      case "healthy":
+        return "bg-green-100 text-green-800 border-green-300 hover:bg-green-200";
+      case "moderate":
+        return "bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200";
+      case "severe":
+        return "bg-red-100 text-red-800 border-red-300 hover:bg-red-200";
+      default:
+        return "";
     }
   };
 
@@ -235,8 +251,11 @@ export default function Dashboard() {
                         </p>
                         <p className="text-xs text-muted-foreground">Health Score</p>
                       </div>
-                      <Badge variant={getStressBadgeVariant(assessment.stress_level)}>
-                        {assessment.stress_level}
+                      <Badge 
+                        variant={getStressBadgeVariant(assessment.stress_level)}
+                        className={getStressBadgeClass(assessment.stress_level)}
+                      >
+                        {assessment.stress_level.charAt(0).toUpperCase() + assessment.stress_level.slice(1)}
                       </Badge>
                     </div>
                   </div>
