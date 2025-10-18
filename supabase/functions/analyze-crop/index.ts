@@ -200,8 +200,8 @@ Respond with JSON:
   "recommendations": [
     {
       "text": "<specific actionable recommendation with quantities/timing>",
-      "priority": "urgent" | "high" | "normal" | "low",
-      "category": "irrigation" | "fertilization" | "pest_control" | "disease_management" | "general",
+      "priority": "urgent" | "normal" | "low",
+      "category": "irrigation" | "fertilization" | "pest_management" | "weather_alert" | "general",
       "reasoning": "<why this action is needed based on symptoms and weather>"
     }
   ],
