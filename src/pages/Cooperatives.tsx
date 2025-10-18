@@ -9,10 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Users, Plus, Building2, BarChart3, TrendingUp } from 'lucide-react';
+import { Users, Plus, Building2, BarChart3, TrendingUp, UserPlus } from 'lucide-react';
+import { CooperativeInviteDialog } from '@/components/CooperativeInviteDialog';
 
 export default function Cooperatives() {
   const [open, setOpen] = useState(false);
+  const [inviteCoopId, setInviteCoopId] = useState<string | null>(null);
+  const [inviteCoopName, setInviteCoopName] = useState('');
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
@@ -358,6 +361,18 @@ export default function Cooperatives() {
             </div>
           )}
         </section>
+
+        {inviteCoopId && (
+          <CooperativeInviteDialog
+            cooperativeId={inviteCoopId}
+            cooperativeName={inviteCoopName}
+            open={!!inviteCoopId}
+            onClose={() => {
+              setInviteCoopId(null);
+              setInviteCoopName('');
+            }}
+          />
+        )}
     </div>
   );
 }

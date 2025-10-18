@@ -18,6 +18,8 @@ import Predictions from "./pages/Predictions";
 import HowItWorks from "./pages/HowItWorks";
 import Insurance from "./pages/Insurance";
 import Cooperatives from "./pages/Cooperatives";
+import CooperativeJoin from "./pages/CooperativeJoin";
+import DeltaIntelligence from "./pages/DeltaIntelligence";
 import NotFound from "./pages/NotFound";
 import { Layout } from "./components/Layout";
 

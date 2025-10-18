@@ -10,10 +10,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { FileText, Download, Plus, Calendar, TrendingDown } from 'lucide-react';
+import { FileText, Download, Plus, Calendar, TrendingDown, Eye } from 'lucide-react';
+import { InsuranceClaimDetail } from '@/components/InsuranceClaimDetail';
 
 export default function Insurance() {
   const [open, setOpen] = useState(false);
+  const [detailClaimId, setDetailClaimId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: claims } = useQuery({
@@ -349,19 +351,37 @@ AI-powered crop health analysis for Louisiana Delta agriculture
                     </div>
                   )}
 
-                  <Button 
-                    variant="outline" 
-                    className="w-full gap-2"
-                    onClick={() => exportClaim(claim.id)}
-                  >
-                    <Download className="h-4 w-4" />
-                    Export Insurance Report
-                  </Button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => setDetailClaimId(claim.id)}
+                    >
+                      <Eye className="h-4 w-4" />
+                      View Details
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => exportClaim(claim.id)}
+                    >
+                      <Download className="h-4 w-4" />
+                      Export
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))
           )}
         </div>
+
+        {detailClaimId && (
+          <InsuranceClaimDetail
+            claimId={detailClaimId}
+            open={!!detailClaimId}
+            onClose={() => setDetailClaimId(null)}
+          />
+        )}
       </div>
     </div>
   );

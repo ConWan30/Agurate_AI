@@ -86,6 +86,100 @@ export type Database = {
           },
         ]
       }
+      claim_assessments: {
+        Row: {
+          assessment_id: string
+          claim_id: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          assessment_id: string
+          claim_id: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          assessment_id?: string
+          claim_id?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_assessments_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "claim_assessments_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_assessments_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "claim_assessments_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cooperative_invitations: {
+        Row: {
+          accepted_at: string | null
+          cooperative_id: string
+          created_at: string | null
+          email: string
+          expires_at: string | null
+          id: string
+          invite_code: string
+          invited_by: string
+          status: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          cooperative_id: string
+          created_at?: string | null
+          email: string
+          expires_at?: string | null
+          id?: string
+          invite_code?: string
+          invited_by: string
+          status?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          cooperative_id?: string
+          created_at?: string | null
+          email?: string
+          expires_at?: string | null
+          id?: string
+          invite_code?: string
+          invited_by?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cooperative_invitations_cooperative_id_fkey"
+            columns: ["cooperative_id"]
+            isOneToOne: false
+            referencedRelation: "cooperatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cooperative_members: {
         Row: {
           cooperative_id: string
@@ -144,6 +238,62 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      delta_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          title: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      delta_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delta_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "delta_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       feedback: {
         Row: {
@@ -272,7 +422,9 @@ export type Database = {
           event_type: string
           field_id: string
           id: string
+          notes: string | null
           status: string | null
+          submitted_at: string | null
           updated_at: string | null
         }
         Insert: {
@@ -285,7 +437,9 @@ export type Database = {
           event_type: string
           field_id: string
           id?: string
+          notes?: string | null
           status?: string | null
+          submitted_at?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -298,7 +452,9 @@ export type Database = {
           event_type?: string
           field_id?: string
           id?: string
+          notes?: string | null
           status?: string | null
+          submitted_at?: string | null
           updated_at?: string | null
         }
         Relationships: [
