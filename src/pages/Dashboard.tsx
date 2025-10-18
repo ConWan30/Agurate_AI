@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb } from "lucide-react";
+import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { InteractiveTutorial } from "@/components/InteractiveTutorial";
@@ -97,11 +97,11 @@ export default function Dashboard() {
     const normalized = stressLevel?.toLowerCase();
     switch (normalized) {
       case "healthy":
-        return "bg-green-100 text-green-800 border-green-300 hover:bg-green-200";
+        return "status-healthy";
       case "moderate":
-        return "bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200";
+        return "status-moderate";
       case "severe":
-        return "bg-red-100 text-red-800 border-red-300 hover:bg-red-200";
+        return "status-severe";
       default:
         return "";
     }
@@ -135,10 +135,10 @@ export default function Dashboard() {
               variant="secondary" 
               size="sm" 
               onClick={() => setShowTutorial(true)}
-              className="gap-2 hidden md:flex"
+              className="gap-2"
             >
               <Lightbulb className="h-4 w-4" />
-              Tutorial
+              <span className="hidden sm:inline">Tutorial</span>
             </Button>
           </div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
@@ -224,18 +224,16 @@ export default function Dashboard() {
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {fields.map((field) => {
-                const cropIcons: Record<string, string> = {
-                  rice: '🌾',
-                  soybean: '🫘',
-                  cotton: '🌿',
-                  corn: '🌽'
-                };
+                const CropIcon = field.crop_type === 'rice' ? Wheat :
+                                 field.crop_type === 'soybean' ? Sprout :
+                                 field.crop_type === 'cotton' ? Leaf :
+                                 field.crop_type === 'corn' ? Wheat : Sprout;
                 return (
                   <Card key={field.id} className="field-card border-2">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 text-2xl">
-                          {cropIcons[field.crop_type] || '🌱'}
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                          <CropIcon className="h-6 w-6 text-primary" />
                         </div>
                         <div className="flex-1">
                           <CardTitle className="text-lg">{field.name}</CardTitle>

@@ -132,21 +132,21 @@ export default function Cooperatives() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-subtle pb-24">
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        <div className="flex justify-between items-start gap-4">
-          <div className="flex-1">
-            <h1 className="text-4xl font-display font-bold text-gradient-delta">
-              Cooperatives
+    <div className="space-y-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+        <div className="relative z-10 flex flex-col md:flex-row items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+              Farming Cooperatives
             </h1>
-            <p className="text-muted-foreground mt-2">
-              Multi-farm management and collaborative analytics
+            <p className="text-white/90 text-base md:text-lg max-w-2xl">
+              Multi-farm management and collaborative analytics for the Louisiana Delta
             </p>
           </div>
-
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button variant="secondary" className="gap-2 flex-shrink-0">
                 <Plus className="h-4 w-4" />
                 Create Cooperative
               </Button>
@@ -179,8 +179,10 @@ export default function Cooperatives() {
             </DialogContent>
           </Dialog>
         </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+      </div>
 
-        {/* Educational Section */}
+      {/* Educational Section */}
         <Card className="field-card bg-primary/5 border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -356,7 +358,6 @@ export default function Cooperatives() {
             </div>
           )}
         </section>
-      </div>
     </div>
   );
 }
