@@ -115,8 +115,8 @@ export default function Upload() {
       const field = fields.find((f) => f.id === selectedField);
       if (!field) throw new Error("Field not found");
 
-      // Simulate AI analysis (in production, this would call Lovable AI or edge function)
-      await simulateAIAnalysis(publicUrl, field.crop_type, selectedField);
+      // Call real AI analysis
+      await performAIAnalysis(publicUrl, field.crop_type, selectedField);
 
       toast({
         title: "Analysis complete!",
@@ -136,54 +136,40 @@ export default function Upload() {
     }
   };
 
-  const simulateAIAnalysis = async (imageUrl: string, cropType: string, fieldId: string) => {
-    // Simulate AI processing time
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+  const performAIAnalysis = async (imageUrl: string, cropType: string, fieldId: string) => {
+    // Call the AI edge function
+    const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
+      body: { imageUrl, cropType }
+    });
 
-    // Generate mock analysis results
-    const healthScore = 0.65 + Math.random() * 0.3; // 0.65-0.95
-    const stressLevel =
-      healthScore > 0.75 ? "Healthy" : healthScore > 0.5 ? "Moderate" : "Severe";
+    if (aiError) throw aiError;
+    if (!aiResult) throw new Error('No analysis results received');
 
-    const symptoms = [
-      "Good canopy coverage",
-      "Minor yellowing observed in 10-15% of plants",
-      "No visible disease symptoms",
-    ];
-
-    // Insert assessment
+    // Insert assessment with AI results
     const { data: assessment, error: assessmentError } = await supabase
       .from("assessments")
       .insert({
         field_id: fieldId,
         image_url: imageUrl,
-        health_score: healthScore,
-        stress_level: stressLevel,
-        symptoms: symptoms,
-        confidence_score: 0.85,
-        weather_temp_f: 88,
-        weather_precipitation_mm: 0.5,
+        health_score: aiResult.health_score,
+        stress_level: aiResult.stress_level,
+        symptoms: aiResult.symptoms,
+        confidence_score: aiResult.confidence_score,
+        weather_temp_f: null, // Weather integration to be added
+        weather_precipitation_mm: null,
       })
       .select()
       .single();
 
     if (assessmentError) throw assessmentError;
 
-    // Insert recommendations
-    const recommendations = [
-      {
-        assessment_id: assessment.id,
-        recommendation_text: "Monitor nitrogen levels - consider soil test within 5-7 days",
-        priority: "normal",
-        category: "fertilization",
-      },
-      {
-        assessment_id: assessment.id,
-        recommendation_text: "Maintain current irrigation schedule",
-        priority: "low",
-        category: "irrigation",
-      },
-    ];
+    // Insert AI-generated recommendations
+    const recommendations = aiResult.recommendations.map((rec: any) => ({
+      assessment_id: assessment.id,
+      recommendation_text: rec.text,
+      priority: rec.priority,
+      category: rec.category,
+    }));
 
     const { error: recError } = await supabase.from("recommendations").insert(recommendations);
 
