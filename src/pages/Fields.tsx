@@ -13,6 +13,7 @@ import riceIcon from "@/assets/rice-icon.png";
 import soybeanIcon from "@/assets/soybean-icon.png";
 import cottonIcon from "@/assets/cotton-icon.png";
 import cornIcon from "@/assets/corn-icon.png";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 interface Field {
   id: string;
@@ -32,6 +33,7 @@ const cropIcons: Record<string, string> = {
 };
 
 export default function Fields() {
+  const { isDemoMode, fields: demoFields } = useDemoData();
   const [fields, setFields] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -48,8 +50,13 @@ export default function Fields() {
   });
 
   useEffect(() => {
-    fetchFields();
-  }, []);
+    if (isDemoMode) {
+      setFields(demoFields);
+      setLoading(false);
+    } else {
+      fetchFields();
+    }
+  }, [isDemoMode]);
 
   const fetchFields = async () => {
     try {

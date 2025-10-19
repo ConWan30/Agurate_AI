@@ -12,6 +12,37 @@ AgurateAI is a comprehensive precision agriculture platform specifically designe
 **Authentication:**
 All pages except `/auth` and `/404` require user authentication via Supabase Auth.
 
+## Screenshots and Demo Routes
+
+**Important**: Due to authentication requirements, screenshots cannot be captured via automated tools for protected pages. However, **demo routes** have been created at `/demo/*` paths that bypass authentication for documentation purposes.
+
+### Available Demo Routes
+
+All screenshots were captured from these public demo routes with realistic mock data:
+
+- `/demo/auth` - Authentication (Sign In/Sign Up pages)
+- `/demo/dashboard` - Main dashboard with 3 sample fields and 5 recent assessments
+- `/demo/upload` - Image/video upload interface
+- `/demo/scanner` - Mobile field scanner with GPS and AR modes
+- `/demo/fields` - Field management (North Field 150ac, Delta South 200ac, Cotton Ridge 125ac)
+- `/demo/field-map` - Interactive Leaflet map centered on Morehouse Parish
+- `/demo/history` - 5 assessment history records with health scores 58-92
+- `/demo/predictions` - AI-powered 7-day stress forecasts
+- `/demo/weather-timeline` - 30-day weather correlation timeline
+- `/demo/delta` - Delta Intelligence AI chatbot
+- `/demo/insurance` - Insurance claims management
+- `/demo/cooperatives` - Cooperative management system
+- `/demo/profile` - User profile settings (John Farmer @ Green Acres Farm)
+- `/demo/how-it-works` - Platform tutorial and AI pipeline
+
+**Screenshot Highlights:**
+- **Dashboard**: Quick Actions, Business Tools, field overview, recent assessments
+- **Fields**: 3 field cards with crop icons, acreage, GPS coordinates
+- **History**: Health score progression from healthy (92) to severe (58) statuses
+- **Delta AI**: LSU AgCenter-trained chatbot with quick questions
+- **Scanner**: Mobile camera interface with AR overlay toggle
+- **How It Works**: 6-step AI pipeline visualization
+
 ---
 
 ## Public Pages

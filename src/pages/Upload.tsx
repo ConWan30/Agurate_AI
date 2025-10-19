@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Upload as UploadIcon, Loader2, Image as ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 interface Field {
   id: string;
@@ -17,6 +18,7 @@ interface Field {
 }
 
 export default function Upload() {
+  const { isDemoMode, fields: demoFields } = useDemoData();
   const [fields, setFields] = useState<Field[]>([]);
   const [selectedField, setSelectedField] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -24,12 +26,16 @@ export default function Upload() {
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [fileType, setFileType] = useState<'image' | 'video'>('image');
-  const { toast } = useToast();
+  const { toast} = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchFields();
-  }, []);
+    if (isDemoMode) {
+      setFields(demoFields);
+    } else {
+      fetchFields();
+    }
+  }, [isDemoMode]);
 
   const fetchFields = async () => {
     try {

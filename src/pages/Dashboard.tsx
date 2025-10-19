@@ -7,6 +7,7 @@ import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, L
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { InteractiveTutorial } from "@/components/InteractiveTutorial";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 interface Field {
   id: string;
@@ -24,14 +25,22 @@ interface Assessment {
 }
 
 export default function Dashboard() {
+  const { isDemoMode, fields: demoFields, assessments: demoAssessments } = useDemoData();
   const [fields, setFields] = useState<Field[]>([]);
   const [recentAssessments, setRecentAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (isDemoMode) {
+      // Use demo data in demo mode
+      setFields(demoFields);
+      setRecentAssessments(demoAssessments as any);
+      setLoading(false);
+    } else {
+      fetchDashboardData();
+    }
+  }, [isDemoMode]);
 
   const fetchDashboardData = async () => {
     try {

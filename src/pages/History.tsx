@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { CheckCircle2, AlertTriangle, AlertCircle, Calendar, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 interface Assessment {
   id: string;
@@ -32,6 +33,7 @@ interface Assessment {
 }
 
 export default function History() {
+  const { isDemoMode, assessments: demoAssessments } = useDemoData();
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,8 +42,13 @@ export default function History() {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    if (isDemoMode) {
+      setAssessments(demoAssessments as any);
+      setLoading(false);
+    } else {
+      fetchHistory();
+    }
+  }, [isDemoMode]);
 
   const fetchHistory = async () => {
     try {
