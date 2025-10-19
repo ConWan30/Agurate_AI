@@ -75,6 +75,21 @@ const App = () => (
           <Route path="/cooperatives/join/:code" element={<ProtectedRoute><CooperativeJoin /></ProtectedRoute>} />
           <Route path="/delta" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
+          {/* Demo routes for screenshots - bypasses authentication */}
+          <Route path="/demo/auth" element={<Auth />} />
+          <Route path="/demo/dashboard" element={<Layout><Dashboard /></Layout>} />
+          <Route path="/demo/upload" element={<Layout><Upload /></Layout>} />
+          <Route path="/demo/scanner" element={<Layout><Scanner /></Layout>} />
+          <Route path="/demo/field-map" element={<Layout><FieldMap /></Layout>} />
+          <Route path="/demo/weather-timeline" element={<Layout><WeatherTimeline /></Layout>} />
+          <Route path="/demo/fields" element={<Layout><Fields /></Layout>} />
+          <Route path="/demo/history" element={<Layout><History /></Layout>} />
+          <Route path="/demo/predictions" element={<Layout><Predictions /></Layout>} />
+          <Route path="/demo/how-it-works" element={<Layout><HowItWorks /></Layout>} />
+          <Route path="/demo/insurance" element={<Layout><Insurance /></Layout>} />
+          <Route path="/demo/cooperatives" element={<Layout><Cooperatives /></Layout>} />
+          <Route path="/demo/delta" element={<Layout><DeltaIntelligence /></Layout>} />
+          <Route path="/demo/profile" element={<Layout><Profile /></Layout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
