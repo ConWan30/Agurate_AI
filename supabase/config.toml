@@ -12,11 +12,5 @@ verify_jwt = true
 [functions.delta-chat]
 verify_jwt = true
 
-[functions.text-to-speech]
-verify_jwt = true
-
-[functions.speech-to-text]
-verify_jwt = true
-
 [functions.weather-alerts]
 verify_jwt = false
