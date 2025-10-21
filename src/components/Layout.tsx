@@ -5,7 +5,7 @@ import {
   LayoutDashboard, 
   Upload, 
   MapPin, 
-  History, 
+  History as HistoryIcon, 
   User, 
   LogOut,
   Sprout,
@@ -13,7 +13,9 @@ import {
   Lightbulb,
   FileText,
   Users,
-  Brain
+  Brain,
+  Scan,
+  Cloud
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -37,25 +39,25 @@ export const Layout = ({ children }: LayoutProps) => {
   };
 
   const navItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-    { icon: Upload, label: "Upload", path: "/upload" },
-    { icon: MapPin, label: "My Fields", path: "/fields" },
-    { icon: History, label: "History", path: "/history" },
-    { icon: Lightbulb, label: "How It Works", path: "/how-it-works" },
-    { icon: User, label: "Profile", path: "/profile" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/", gradient: "from-green-500/20 to-emerald-500/20", glow: "shadow-[0_0_15px_rgba(34,197,94,0.3)]" },
+    { icon: Upload, label: "Upload", path: "/upload", gradient: "from-blue-500/20 to-cyan-500/20", glow: "shadow-[0_0_15px_rgba(59,130,246,0.3)]" },
+    { icon: MapPin, label: "My Fields", path: "/fields", gradient: "from-amber-500/20 to-yellow-500/20", glow: "shadow-[0_0_15px_rgba(251,191,36,0.3)]" },
+    { icon: HistoryIcon, label: "History", path: "/history", gradient: "from-purple-500/20 to-pink-500/20", glow: "shadow-[0_0_15px_rgba(168,85,247,0.3)]" },
+    { icon: Lightbulb, label: "How It Works", path: "/how-it-works", gradient: "from-orange-500/20 to-red-500/20", glow: "shadow-[0_0_15px_rgba(249,115,22,0.3)]" },
+    { icon: User, label: "Profile", path: "/profile", gradient: "from-slate-500/20 to-gray-500/20", glow: "shadow-[0_0_15px_rgba(100,116,139,0.3)]" },
   ];
 
   const commandCenterItems = [
-    { icon: MapPin, label: "Field Scanner", path: "/scanner" },
-    { icon: MapPin, label: "Field Map", path: "/field-map" },
-    { icon: History, label: "Weather Timeline", path: "/weather-timeline" },
-    { icon: TrendingUp, label: "Predictions", path: "/predictions" },
+    { icon: Scan, label: "Field Scanner", path: "/scanner", accentIcon: Sprout, gradient: "from-green-500/10 to-emerald-600/10" },
+    { icon: MapPin, label: "Field Map", path: "/field-map", accentIcon: Sprout, gradient: "from-blue-500/10 to-sky-600/10" },
+    { icon: Cloud, label: "Weather Timeline", path: "/weather-timeline", accentIcon: Cloud, gradient: "from-cyan-500/10 to-blue-600/10" },
+    { icon: TrendingUp, label: "Predictions", path: "/predictions", accentIcon: TrendingUp, gradient: "from-purple-500/10 to-indigo-600/10" },
   ];
 
   const businessItems = [
-    { icon: FileText, label: "Insurance", path: "/insurance" },
-    { icon: Users, label: "Cooperatives", path: "/cooperatives" },
-    { icon: Brain, label: "Delta AI", path: "/delta" },
+    { icon: FileText, label: "Insurance", path: "/insurance", accentIcon: FileText, gradient: "from-red-500/10 to-rose-600/10" },
+    { icon: Users, label: "Cooperatives", path: "/cooperatives", accentIcon: Users, gradient: "from-amber-500/10 to-orange-600/10" },
+    { icon: Brain, label: "Delta AI", path: "/delta", accentIcon: Brain, gradient: "from-violet-500/10 to-purple-600/10" },
   ];
 
   return (
@@ -87,8 +89,8 @@ export const Layout = ({ children }: LayoutProps) => {
         </div>
       </header>
 
-      {/* Mobile Navigation - Enhanced Bottom Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 shadow-field">
+      {/* Mobile Navigation - Enhanced with Agricultural Aesthetics */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/98 backdrop-blur-lg supports-[backdrop-filter]:bg-card/90 shadow-delta-mist">
         <div className="grid grid-cols-5 gap-1 p-3">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -96,14 +98,25 @@ export const Layout = ({ children }: LayoutProps) => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all duration-200 active:scale-95 ${
+                className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all duration-300 group ${
                   isActive 
-                    ? 'bg-primary/10 text-primary' 
+                    ? `bg-gradient-to-br ${item.gradient} text-primary ${item.glow}` 
                     : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <item.icon className="h-5 w-5" />
-                <span className="text-xs font-medium">{item.label}</span>
+                {/* Animated background on hover */}
+                <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                
+                {/* Icon with micro animation */}
+                <item.icon className={`h-5 w-5 relative z-10 transition-transform duration-300 ${isActive ? 'delta-wave' : 'group-hover:scale-110'}`} />
+                
+                {/* Label */}
+                <span className="text-xs font-medium relative z-10">{item.label}</span>
+                
+                {/* Active indicator sprout */}
+                {isActive && (
+                  <Sprout className="absolute -top-1 -right-1 h-3 w-3 text-primary animate-float" />
+                )}
               </Link>
             );
           })}
@@ -125,20 +138,31 @@ export const Layout = ({ children }: LayoutProps) => {
                 return (
                   <Link key={item.path} to={item.path}>
                     <div
-                      className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 hover-lift group ${
+                      className={`relative flex items-center gap-4 p-4 rounded-xl transition-all duration-300 hover-lift group overflow-hidden ${
                         isActive 
                           ? 'bg-primary/10 text-primary shadow-field' 
                           : 'hover:bg-muted text-foreground'
                       }`}
                     >
-                      <div className={`flex items-center justify-center h-10 w-10 rounded-lg transition-colors ${
+                      {/* Animated gradient background */}
+                      <div className={`absolute inset-0 bg-gradient-to-r ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                      
+                      {/* Icon container with glow */}
+                      <div className={`relative flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-300 ${
                         isActive 
-                          ? 'bg-primary/20' 
-                          : 'bg-muted group-hover:bg-primary/10'
+                          ? `bg-primary/20 ${item.glow}` 
+                          : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'
                       }`}>
-                        <item.icon className="h-5 w-5" />
+                        <item.icon className={`h-5 w-5 relative z-10 ${isActive ? 'cotton-drift' : ''}`} />
                       </div>
-                      <span className="font-medium">{item.label}</span>
+                      
+                      {/* Label */}
+                      <span className="font-medium relative z-10">{item.label}</span>
+                      
+                      {/* Active sprout indicator */}
+                      {isActive && (
+                        <Sprout className="absolute right-4 h-4 w-4 text-primary/60 animate-float" />
+                      )}
                     </div>
                   </Link>
                 );
@@ -150,23 +174,29 @@ export const Layout = ({ children }: LayoutProps) => {
                 <div className="space-y-2">
                   {commandCenterItems.map((item) => {
                     const isActive = location.pathname === item.path;
+                    const AccentIcon = item.accentIcon;
                     return (
                       <Link key={item.path} to={item.path}>
                         <div
-                          className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 hover-lift group ${
+                          className={`relative flex items-center gap-4 p-4 rounded-xl transition-all duration-300 hover-lift group overflow-hidden ${
                             isActive 
                               ? 'bg-primary/10 text-primary shadow-field' 
                               : 'hover:bg-muted text-foreground'
                           }`}
                         >
-                          <div className={`flex items-center justify-center h-10 w-10 rounded-lg transition-colors ${
+                          {/* Gradient shimmer on hover */}
+                          <div className={`absolute inset-0 bg-gradient-to-r ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                          
+                          <div className={`relative flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-300 ${
                             isActive 
                               ? 'bg-primary/20' 
-                              : 'bg-muted group-hover:bg-primary/10'
+                              : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'
                           }`}>
-                            <item.icon className="h-5 w-5" />
+                            <item.icon className={`h-5 w-5 relative z-10 ${isActive ? 'delta-wave' : ''}`} />
+                            {/* Micro accent icon */}
+                            <AccentIcon className="absolute -bottom-1 -right-1 h-3 w-3 text-primary/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </div>
-                          <span className="font-medium">{item.label}</span>
+                          <span className="font-medium relative z-10">{item.label}</span>
                         </div>
                       </Link>
                     );
@@ -180,23 +210,29 @@ export const Layout = ({ children }: LayoutProps) => {
                 <div className="space-y-2">
                   {businessItems.map((item) => {
                     const isActive = location.pathname === item.path;
+                    const AccentIcon = item.accentIcon;
                     return (
                       <Link key={item.path} to={item.path}>
                         <div
-                          className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 hover-lift group ${
+                          className={`relative flex items-center gap-4 p-4 rounded-xl transition-all duration-300 hover-lift group overflow-hidden ${
                             isActive 
                               ? 'bg-primary/10 text-primary shadow-field' 
                               : 'hover:bg-muted text-foreground'
                           }`}
                         >
-                          <div className={`flex items-center justify-center h-10 w-10 rounded-lg transition-colors ${
+                          {/* Gradient background on hover */}
+                          <div className={`absolute inset-0 bg-gradient-to-r ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                          
+                          <div className={`relative flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-300 ${
                             isActive 
                               ? 'bg-primary/20' 
-                              : 'bg-muted group-hover:bg-primary/10'
+                              : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'
                           }`}>
-                            <item.icon className="h-5 w-5" />
+                            <item.icon className={`h-5 w-5 relative z-10 ${isActive ? 'cotton-drift' : ''}`} />
+                            {/* Pulse accent on hover */}
+                            <AccentIcon className="absolute -top-1 -right-1 h-3 w-3 text-primary/40 opacity-0 group-hover:opacity-100 animate-glow-pulse transition-opacity" />
                           </div>
-                          <span className="font-medium">{item.label}</span>
+                          <span className="font-medium relative z-10">{item.label}</span>
                         </div>
                       </Link>
                     );
