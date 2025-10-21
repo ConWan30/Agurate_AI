@@ -39,7 +39,7 @@ export const Layout = ({ children }: LayoutProps) => {
   };
 
   const navItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/", gradient: "from-green-500/20 to-emerald-500/20", glow: "shadow-[0_0_15px_rgba(34,197,94,0.3)]" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", gradient: "from-green-500/20 to-emerald-500/20", glow: "shadow-[0_0_15px_rgba(34,197,94,0.3)]" },
     { icon: Upload, label: "Upload", path: "/upload", gradient: "from-blue-500/20 to-cyan-500/20", glow: "shadow-[0_0_15px_rgba(59,130,246,0.3)]" },
     { icon: MapPin, label: "My Fields", path: "/fields", gradient: "from-amber-500/20 to-yellow-500/20", glow: "shadow-[0_0_15px_rgba(251,191,36,0.3)]" },
     { icon: HistoryIcon, label: "History", path: "/history", gradient: "from-purple-500/20 to-pink-500/20", glow: "shadow-[0_0_15px_rgba(168,85,247,0.3)]" },
