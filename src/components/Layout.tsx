@@ -67,8 +67,15 @@ export const Layout = ({ children }: LayoutProps) => {
         <div className="container mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="flex items-center justify-center h-12 w-12 rounded-xl gradient-delta shadow-glow transition-transform group-hover:scale-105">
-                <Sprout className="h-7 w-7 text-white" />
+              <div className="relative flex items-center justify-center h-12 w-12 transition-transform group-hover:scale-105">
+                {/* Outer circle - parish badge */}
+                <div className="absolute inset-0 rounded-full border-3 border-primary shadow-glow bg-gradient-to-br from-primary/20 to-primary/5" />
+                
+                {/* Inner circle */}
+                <div className="absolute inset-[6px] rounded-full border-2 border-primary/40" />
+                
+                {/* Leaf symbol in center */}
+                <Sprout className="h-6 w-6 text-primary relative z-10" />
               </div>
               <div>
                 <h1 className="text-2xl font-display font-bold text-foreground">
