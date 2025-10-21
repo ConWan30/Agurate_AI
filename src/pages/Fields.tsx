@@ -14,6 +14,7 @@ import soybeanIcon from "@/assets/soybean-icon.png";
 import cottonIcon from "@/assets/cotton-icon.png";
 import cornIcon from "@/assets/corn-icon.png";
 import { useDemoData } from "@/contexts/DemoDataContext";
+import bgTractorField from "@/assets/bg-tractor-field.jpg";
 
 interface Field {
   id: string;
@@ -175,7 +176,14 @@ export default function Fields() {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl gradient-sky p-8 md:p-12 shadow-glow">
+      <div 
+        className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-delta-mist"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(59, 130, 246, 0.92) 0%, rgba(37, 99, 235, 0.88) 100%), url(${bgTractorField})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <div className="relative z-10 flex items-start justify-between">
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">My Fields</h1>
