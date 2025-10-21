@@ -3,6 +3,7 @@ import { Camera, MapPin, Upload, Wifi, WifiOff, Loader2, Layers } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import bgMobileScanner from "@/assets/bg-mobile-scanner.jpg";
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -257,8 +258,15 @@ export default function Scanner() {
       <TutorialTooltip steps={tutorialSteps} storageKey="scanner-tutorial-completed" />
       <div className="min-h-screen bg-gradient-subtle pb-24">
       {/* Hero Header */}
-      <div className="gradient-delta py-12 mb-8">
-        <div className="max-w-2xl mx-auto px-4 text-center space-y-4">
+      <div 
+        className="py-12 mb-8 relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(16, 185, 129, 0.92) 0%, rgba(5, 150, 105, 0.88) 100%), url(${bgMobileScanner})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="max-w-2xl mx-auto px-4 text-center space-y-4 relative z-10">
           <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
             Mobile Field Scanner
           </h1>

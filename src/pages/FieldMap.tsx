@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Activity } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import FieldMapLeaflet from '@/components/FieldMapLeaflet';
+import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
 
 interface Field {
   id: string;
@@ -97,8 +98,15 @@ export default function FieldMap() {
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
       {/* Hero Header */}
-      <div className="gradient-delta py-12 mb-8">
-        <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
+      <div 
+        className="py-12 mb-8 relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(22, 163, 74, 0.92) 0%, rgba(21, 128, 61, 0.88) 100%), url(${bgFieldAerial})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 text-center space-y-4 relative z-10">
           <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
             Delta Field Command Center
           </h1>

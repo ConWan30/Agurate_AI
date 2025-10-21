@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { Cloud, CloudRain, Sun, Wind, Droplets, AlertTriangle, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import bgWeatherStation from "@/assets/bg-weather-station.jpg";
 
 interface Assessment {
   id: string;
@@ -106,8 +107,15 @@ export default function WeatherTimeline() {
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
       {/* Hero Header */}
-      <div className="gradient-delta py-12 mb-8">
-        <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
+      <div 
+        className="py-12 mb-8 relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(71, 85, 105, 0.92) 0%, rgba(51, 65, 85, 0.88) 100%), url(${bgWeatherStation})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 text-center space-y-4 relative z-10">
           <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
             Weather-Correlated Health Timeline
           </h1>

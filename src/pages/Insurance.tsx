@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { FileText, Download, Plus, Calendar, TrendingDown, Eye } from 'lucide-react';
 import { InsuranceClaimDetail } from '@/components/InsuranceClaimDetail';
+import bgCropDamage from "@/assets/bg-crop-damage.jpg";
 
 export default function Insurance() {
   const [open, setOpen] = useState(false);
@@ -114,7 +115,14 @@ AI-powered crop health analysis for Louisiana Delta agriculture
     <div className="min-h-screen bg-gradient-subtle pb-24">
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
         {/* Hero Header */}
-        <div className="relative overflow-hidden rounded-2xl gradient-earth p-8 md:p-12 shadow-glow">
+        <div 
+          className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-delta-mist"
+          style={{
+            backgroundImage: `linear-gradient(135deg, rgba(185, 28, 28, 0.90) 0%, rgba(153, 27, 27, 0.88) 100%), url(${bgCropDamage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           <div className="relative z-10 flex items-start justify-between">
             <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
