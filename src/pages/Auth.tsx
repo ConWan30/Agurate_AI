@@ -104,7 +104,7 @@ export default function Auth() {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroFields})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-primary/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/60" />
         <div className="relative z-10 flex flex-col justify-center px-12 text-primary-foreground">
           <div className="flex items-center gap-3 mb-6">
             <Sprout className="h-16 w-16" />

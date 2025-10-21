@@ -135,7 +135,7 @@ export default function Dashboard() {
         <div 
           className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(134, 107, 53, 0.98) 0%, rgba(80, 64, 31, 0.95) 100%), url(${bgDeltaRice})`,
+            backgroundImage: `linear-gradient(135deg, rgba(134, 107, 53, 0.85) 0%, rgba(80, 64, 31, 0.80) 100%), url(${bgDeltaRice})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}

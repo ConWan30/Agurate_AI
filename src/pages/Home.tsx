@@ -103,7 +103,7 @@ export default function Home() {
           role="img"
           aria-label="Louisiana agricultural fields"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-primary/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/60" />
         
         <div className={`relative z-10 container mx-auto px-4 py-24 md:py-32 transition-all duration-1000 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="max-w-3xl">
