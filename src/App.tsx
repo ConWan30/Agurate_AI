@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { DemoDataProvider } from "./contexts/DemoDataContext";
 import { SkeletonDashboard } from "@/components/ui/skeleton-card";
 import { Layout } from "./components/Layout";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import NetworkStatus from "./components/NetworkStatus";
 
 // Lazy load pages for better performance
 const Home = lazy(() => import("./pages/Home"));
@@ -27,6 +29,7 @@ const Cooperatives = lazy(() => import("./pages/Cooperatives"));
 const CooperativeJoin = lazy(() => import("./pages/CooperativeJoin"));
 const DeltaIntelligence = lazy(() => import("./pages/DeltaIntelligence"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Install = lazy(() => import("./pages/Install"));
 
 const queryClient = new QueryClient();
 
@@ -61,6 +64,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <PWAInstallPrompt />
+      <NetworkStatus />
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -75,6 +80,7 @@ const App = () => (
         }>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/install" element={<Install />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Layout><Upload /></Layout></ProtectedRoute>} />
