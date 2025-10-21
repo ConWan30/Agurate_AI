@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Keyboard } from 'lucide-react';
@@ -6,18 +7,26 @@ import { Badge } from './ui/badge';
 
 export function KeyboardShortcutsHelp() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const shortcuts = [
-    { key: 'D', description: 'Go to Dashboard' },
-    { key: 'F', description: 'Go to Fields' },
-    { key: 'S', description: 'Go to Scanner' },
-    { key: 'U', description: 'Go to Upload' },
-    { key: 'H', description: 'Go to History' },
-    { key: 'A', description: 'Go to Analytics' },
-    { key: 'P', description: 'Go to Predictions' },
-    { key: 'M', description: 'Go to Field Map' },
-    { key: '?', description: 'Show this help' },
+    { key: 'D', description: 'Go to Dashboard', path: '/dashboard' },
+    { key: 'F', description: 'Go to Fields', path: '/fields' },
+    { key: 'S', description: 'Go to Scanner', path: '/scanner' },
+    { key: 'U', description: 'Go to Upload', path: '/upload' },
+    { key: 'H', description: 'Go to History', path: '/history' },
+    { key: 'A', description: 'Go to Analytics', path: '/analytics' },
+    { key: 'P', description: 'Go to Predictions', path: '/predictions' },
+    { key: 'M', description: 'Go to Field Map', path: '/field-map' },
+    { key: '?', description: 'Show this help', path: null },
   ];
+
+  const handleShortcutClick = (path: string | null) => {
+    if (path) {
+      navigate(path);
+      setOpen(false);
+    }
+  };
 
   return (
     <>
@@ -45,15 +54,17 @@ export function KeyboardShortcutsHelp() {
 
           <div className="space-y-3 mt-4">
             {shortcuts.map((shortcut) => (
-              <div 
+              <button
                 key={shortcut.key}
-                className="flex items-center justify-between p-3 rounded-lg border"
+                onClick={() => handleShortcutClick(shortcut.path)}
+                disabled={!shortcut.path}
+                className="flex items-center justify-between p-3 rounded-lg border w-full text-left hover:bg-accent hover:border-accent-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-border"
               >
                 <span className="text-sm">{shortcut.description}</span>
                 <Badge variant="outline" className="font-mono">
                   {shortcut.key}
                 </Badge>
-              </div>
+              </button>
             ))}
           </div>
 
