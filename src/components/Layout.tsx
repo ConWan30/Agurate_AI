@@ -72,7 +72,7 @@ export const Layout = ({ children }: LayoutProps) => {
               </div>
               <div>
                 <h1 className="text-2xl font-display font-bold text-foreground">
-                  Agurate<span className="font-bold text-green-600">A🍃</span>
+                  Agurate<span className="font-bold text-green-600">AI</span>
                 </h1>
                 <p className="text-xs text-muted-foreground">Morehouse Parish, Louisiana</p>
               </div>
