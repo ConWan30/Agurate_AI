@@ -37,8 +37,16 @@ export default function MobileFloatingActions() {
     },
   ];
 
+  const handleClick = (path: string) => {
+    // Haptic feedback for mobile devices
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+    navigate(path);
+  };
+
   return (
-    <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-3 md:hidden">
+    <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-3 md:hidden" role="navigation" aria-label="Quick actions">
       {actions.map((action) => {
         const isActive = location.pathname === action.path;
         if (isActive) return null; // Don't show button for current page
@@ -47,12 +55,12 @@ export default function MobileFloatingActions() {
         return (
           <Button
             key={action.path}
-            onClick={() => navigate(action.path)}
+            onClick={() => handleClick(action.path)}
             size="icon"
-            className={`h-14 w-14 rounded-full shadow-lg ${action.color}`}
-            aria-label={action.label}
+            className={`h-14 w-14 min-h-[56px] min-w-[56px] rounded-full shadow-lg hover:scale-110 transition-transform ${action.color}`}
+            aria-label={`Navigate to ${action.label}`}
           >
-            <Icon className="h-6 w-6" />
+            <Icon className="h-6 w-6" aria-hidden="true" />
           </Button>
         );
       })}

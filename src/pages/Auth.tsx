@@ -52,11 +52,11 @@ export default function Auth() {
 
         if (profileError) throw profileError;
 
-        toast({
-          title: "Account created!",
-          description: "Welcome to AgurateAI",
-        });
-        navigate("/");
+      toast({
+        title: "Account created!",
+        description: "Welcome to AgurateAI",
+      });
+      navigate("/dashboard");
       }
     } catch (error: any) {
       toast({
@@ -84,7 +84,7 @@ export default function Auth() {
       toast({
         title: "Welcome back!",
       });
-      navigate("/");
+      navigate("/dashboard");
     } catch (error: any) {
       toast({
         title: "Error",

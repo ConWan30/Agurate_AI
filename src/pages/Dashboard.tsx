@@ -12,6 +12,7 @@ import { InteractiveTutorial } from "@/components/InteractiveTutorial";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { SkeletonDashboard } from "@/components/ui/skeleton-card";
 
 interface Field {
   id: string;
@@ -122,11 +123,7 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Loading dashboard...</p>
-      </div>
-    );
+    return <SkeletonDashboard />;
   }
 
   return (
@@ -138,17 +135,18 @@ export default function Dashboard() {
         <div 
           className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(134, 107, 53, 0.95) 0%, rgba(80, 64, 31, 0.92) 100%), url(${bgDeltaRice})`,
+            backgroundImage: `linear-gradient(135deg, rgba(134, 107, 53, 0.98) 0%, rgba(80, 64, 31, 0.95) 100%), url(${bgDeltaRice})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
+          role="banner"
         >
           <div className="relative z-10 flex items-start justify-between">
             <div>
-              <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+              <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3 drop-shadow-lg">
                 Welcome to Your Farm Dashboard
               </h1>
-              <p className="text-white/90 text-base md:text-lg max-w-2xl">
+              <p className="text-white text-base md:text-lg max-w-2xl drop-shadow">
                 Monitor your fields and crop health with AI-powered precision agriculture for Morehouse Parish
               </p>
             </div>
@@ -156,13 +154,14 @@ export default function Dashboard() {
               variant="secondary" 
               size="sm" 
               onClick={() => setShowTutorial(true)}
-              className="gap-2"
+              className="gap-2 min-h-[44px]"
+              aria-label="Open interactive tutorial"
             >
-              <Lightbulb className="h-4 w-4" />
+              <Lightbulb className="h-4 w-4" aria-hidden="true" />
               <span className="hidden sm:inline">Tutorial</span>
             </Button>
           </div>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" aria-hidden="true"></div>
         </div>
 
         {/* Core Features - LSU Pitch Focus */}
