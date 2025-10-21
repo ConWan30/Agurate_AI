@@ -38,17 +38,44 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-    });
+    let mounted = true;
+    
+    // Add timeout to prevent infinite loading in PWA/desktop mode
+    const timeoutId = setTimeout(() => {
+      if (mounted && isAuthenticated === null) {
+        console.warn('Auth check timeout - redirecting to auth page');
+        setIsAuthenticated(false);
+      }
+    }, 5000);
+
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (mounted) {
+          setIsAuthenticated(!!session);
+          clearTimeout(timeoutId);
+        }
+      })
+      .catch((error) => {
+        console.error('Auth check error:', error);
+        if (mounted) {
+          setIsAuthenticated(false);
+          clearTimeout(timeoutId);
+        }
+      });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
+      if (mounted) {
+        setIsAuthenticated(!!session);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (isAuthenticated === null) {
