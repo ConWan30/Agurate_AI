@@ -20,6 +20,17 @@ interface Assessment {
   weather_precipitation_mm: number;
   image_url: string;
   created_at: string;
+  growth_stage?: string;
+  disease_identified?: string[];
+  pest_identified?: string[];
+  nutrient_deficiencies?: any;
+  severity_ratings?: any;
+  field_uniformity_score?: number;
+  estimated_yield_impact_percent?: number;
+  canopy_coverage_percent?: number;
+  plant_density_assessment?: string;
+  root_health_indicators?: string[];
+  detailed_visual_analysis?: string;
   field: {
     id: string;
     name: string;
@@ -280,6 +291,200 @@ export default function History() {
                       </CardContent>
                     </Card>
                   </div>
+
+                  {/* Enhanced Analysis Section */}
+                  {selectedAssessment.detailed_visual_analysis && (
+                    <Card className="bg-primary/5 border-primary/20">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Detailed Visual Analysis</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm leading-relaxed">{selectedAssessment.detailed_visual_analysis}</p>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Growth & Field Metrics */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {selectedAssessment.growth_stage && (
+                      <Card>
+                        <CardContent className="pt-4">
+                          <p className="text-xs text-muted-foreground mb-1">Growth Stage</p>
+                          <p className="text-lg font-semibold">{selectedAssessment.growth_stage}</p>
+                        </CardContent>
+                      </Card>
+                    )}
+                    {selectedAssessment.canopy_coverage_percent !== undefined && (
+                      <Card>
+                        <CardContent className="pt-4">
+                          <p className="text-xs text-muted-foreground mb-1">Canopy Coverage</p>
+                          <p className="text-lg font-semibold">{Math.round(selectedAssessment.canopy_coverage_percent)}%</p>
+                        </CardContent>
+                      </Card>
+                    )}
+                    {selectedAssessment.field_uniformity_score !== undefined && (
+                      <Card>
+                        <CardContent className="pt-4">
+                          <p className="text-xs text-muted-foreground mb-1">Field Uniformity</p>
+                          <p className="text-lg font-semibold">{Math.round(selectedAssessment.field_uniformity_score * 100)}%</p>
+                        </CardContent>
+                      </Card>
+                    )}
+                    {selectedAssessment.plant_density_assessment && (
+                      <Card>
+                        <CardContent className="pt-4">
+                          <p className="text-xs text-muted-foreground mb-1">Plant Density</p>
+                          <p className="text-lg font-semibold capitalize">{selectedAssessment.plant_density_assessment.replace('_', ' ')}</p>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+
+                  {/* Yield Impact */}
+                  {selectedAssessment.estimated_yield_impact_percent !== undefined && (
+                    <Card className={selectedAssessment.estimated_yield_impact_percent > 10 ? "border-destructive/50 bg-destructive/5" : "border-warning/50 bg-warning/5"}>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-muted-foreground mb-1">Estimated Yield Impact</p>
+                            <p className="text-2xl font-bold">{Math.abs(Math.round(selectedAssessment.estimated_yield_impact_percent))}% {selectedAssessment.estimated_yield_impact_percent > 0 ? 'Loss' : 'Gain'}</p>
+                          </div>
+                          <AlertTriangle className={`h-8 w-8 ${selectedAssessment.estimated_yield_impact_percent > 10 ? 'text-destructive' : 'text-warning'}`} />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Disease & Pest Detection */}
+                  {(selectedAssessment.disease_identified && selectedAssessment.disease_identified.length > 0) || 
+                   (selectedAssessment.pest_identified && selectedAssessment.pest_identified.length > 0) ? (
+                    <Card className="border-destructive/30 bg-destructive/5">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <AlertCircle className="h-5 w-5 text-destructive" />
+                          Detected Issues
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {selectedAssessment.disease_identified && selectedAssessment.disease_identified.length > 0 && (
+                          <div>
+                            <p className="text-sm font-semibold mb-2">Diseases:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedAssessment.disease_identified.map((disease, idx) => (
+                                <Badge key={idx} variant="destructive">{disease}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {selectedAssessment.pest_identified && selectedAssessment.pest_identified.length > 0 && (
+                          <div>
+                            <p className="text-sm font-semibold mb-2">Pests:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedAssessment.pest_identified.map((pest, idx) => (
+                                <Badge key={idx} variant="destructive">{pest}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ) : null}
+
+                  {/* Nutrient Deficiencies */}
+                  {selectedAssessment.nutrient_deficiencies && (
+                    <>
+                      {(selectedAssessment.nutrient_deficiencies.nitrogen?.detected || 
+                        selectedAssessment.nutrient_deficiencies.phosphorus?.detected || 
+                        selectedAssessment.nutrient_deficiencies.potassium?.detected ||
+                        selectedAssessment.nutrient_deficiencies.other?.length > 0) && (
+                        <Card className="border-warning/30 bg-warning/5">
+                          <CardHeader>
+                            <CardTitle className="text-lg">Nutrient Deficiencies</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              {selectedAssessment.nutrient_deficiencies.nitrogen?.detected && (
+                                <div className="p-3 bg-background rounded-lg">
+                                  <p className="text-sm font-semibold">Nitrogen (N)</p>
+                                  <Badge variant={selectedAssessment.nutrient_deficiencies.nitrogen.severity === 'severe' ? 'destructive' : 'outline'}>
+                                    {selectedAssessment.nutrient_deficiencies.nitrogen.severity}
+                                  </Badge>
+                                </div>
+                              )}
+                              {selectedAssessment.nutrient_deficiencies.phosphorus?.detected && (
+                                <div className="p-3 bg-background rounded-lg">
+                                  <p className="text-sm font-semibold">Phosphorus (P)</p>
+                                  <Badge variant={selectedAssessment.nutrient_deficiencies.phosphorus.severity === 'severe' ? 'destructive' : 'outline'}>
+                                    {selectedAssessment.nutrient_deficiencies.phosphorus.severity}
+                                  </Badge>
+                                </div>
+                              )}
+                              {selectedAssessment.nutrient_deficiencies.potassium?.detected && (
+                                <div className="p-3 bg-background rounded-lg">
+                                  <p className="text-sm font-semibold">Potassium (K)</p>
+                                  <Badge variant={selectedAssessment.nutrient_deficiencies.potassium.severity === 'severe' ? 'destructive' : 'outline'}>
+                                    {selectedAssessment.nutrient_deficiencies.potassium.severity}
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </>
+                  )}
+
+                  {/* Severity Ratings */}
+                  {selectedAssessment.severity_ratings && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Severity Assessment</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {selectedAssessment.severity_ratings.disease_pressure && selectedAssessment.severity_ratings.disease_pressure !== 'none' && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Disease Pressure:</span>
+                              <Badge variant={selectedAssessment.severity_ratings.disease_pressure === 'severe' || selectedAssessment.severity_ratings.disease_pressure === 'high' ? 'destructive' : 'outline'}>
+                                {selectedAssessment.severity_ratings.disease_pressure}
+                              </Badge>
+                            </div>
+                          )}
+                          {selectedAssessment.severity_ratings.pest_pressure && selectedAssessment.severity_ratings.pest_pressure !== 'none' && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Pest Pressure:</span>
+                              <Badge variant={selectedAssessment.severity_ratings.pest_pressure === 'severe' || selectedAssessment.severity_ratings.pest_pressure === 'high' ? 'destructive' : 'outline'}>
+                                {selectedAssessment.severity_ratings.pest_pressure}
+                              </Badge>
+                            </div>
+                          )}
+                          {selectedAssessment.severity_ratings.environmental_stress && selectedAssessment.severity_ratings.environmental_stress !== 'none' && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Environmental Stress:</span>
+                              <Badge variant={selectedAssessment.severity_ratings.environmental_stress === 'severe' || selectedAssessment.severity_ratings.environmental_stress === 'high' ? 'destructive' : 'outline'}>
+                                {selectedAssessment.severity_ratings.environmental_stress}
+                              </Badge>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Root Health Indicators */}
+                  {selectedAssessment.root_health_indicators && selectedAssessment.root_health_indicators.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3">Root Health Indicators</h3>
+                      <ul className="space-y-2">
+                        {selectedAssessment.root_health_indicators.map((indicator, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <span className="text-sm">{indicator}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Symptoms */}
                   <div>

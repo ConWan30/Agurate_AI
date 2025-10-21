@@ -182,6 +182,18 @@ export default function Upload() {
         weather_temp_f: aiResult.weather_data?.temp_f,
         weather_precipitation_mm: aiResult.weather_data?.precipitation_inch ? 
           aiResult.weather_data.precipitation_inch * 25.4 : null, // Convert inches to mm
+        // Enhanced analytical fields
+        growth_stage: aiResult.growth_stage,
+        disease_identified: aiResult.disease_identified,
+        pest_identified: aiResult.pest_identified,
+        nutrient_deficiencies: aiResult.nutrient_deficiencies,
+        severity_ratings: aiResult.severity_ratings,
+        field_uniformity_score: aiResult.field_uniformity_score,
+        estimated_yield_impact_percent: aiResult.estimated_yield_impact_percent,
+        canopy_coverage_percent: aiResult.canopy_coverage_percent,
+        plant_density_assessment: aiResult.plant_density_assessment,
+        root_health_indicators: aiResult.root_health_indicators,
+        detailed_visual_analysis: aiResult.detailed_visual_analysis,
       })
       .select()
       .single();

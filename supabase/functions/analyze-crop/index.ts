@@ -126,7 +126,28 @@ Respond with JSON:
   "symptoms": [<array of 3-5 specific observations>],
   "health_score": <float 0.0-1.0, inverse of stress>,
   "confidence_score": <float 0.0-1.0, your confidence in this assessment>,
-  "analysis_summary": "<plain-language insight for Louisiana farmer>"
+  "analysis_summary": "<plain-language insight for Louisiana farmer>",
+  "growth_stage": "<specific growth stage: e.g., V6, R3, tillering, flowering, grain fill>",
+  "disease_identified": [<array of specific disease names if detected, empty if none>],
+  "pest_identified": [<array of specific pest names if detected, empty if none>],
+  "nutrient_deficiencies": {
+    "nitrogen": {"detected": <boolean>, "severity": "none"|"mild"|"moderate"|"severe"},
+    "phosphorus": {"detected": <boolean>, "severity": "none"|"mild"|"moderate"|"severe"},
+    "potassium": {"detected": <boolean>, "severity": "none"|"mild"|"moderate"|"severe"},
+    "other": [<array of other deficiencies with severity>]
+  },
+  "severity_ratings": {
+    "disease_pressure": "none"|"low"|"moderate"|"high"|"severe",
+    "pest_pressure": "none"|"low"|"moderate"|"high"|"severe",
+    "environmental_stress": "none"|"low"|"moderate"|"high"|"severe",
+    "overall_severity": "none"|"low"|"moderate"|"high"|"severe"
+  },
+  "field_uniformity_score": <float 0.0-1.0, 1.0 = perfectly uniform>,
+  "estimated_yield_impact_percent": <float 0-100, estimated % yield loss or negative for gain>,
+  "canopy_coverage_percent": <float 0-100, % ground covered by crop>,
+  "plant_density_assessment": "very_low"|"low"|"optimal"|"high"|"very_high",
+  "root_health_indicators": [<array of visible signs suggesting root health/issues>],
+  "detailed_visual_analysis": "<comprehensive 3-5 sentence analysis covering color patterns, leaf architecture, plant vigor, spatial distribution, and any anomalies>"
 }`
               },
               mediaType === 'video' 
@@ -266,6 +287,19 @@ Respond with JSON:
       symptoms: imageAnalysis.symptoms,
       visual_cues: imageAnalysis.visual_cues,
       confidence_score: imageAnalysis.confidence_score,
+      
+      // Enhanced analytical fields
+      growth_stage: imageAnalysis.growth_stage,
+      disease_identified: imageAnalysis.disease_identified,
+      pest_identified: imageAnalysis.pest_identified,
+      nutrient_deficiencies: imageAnalysis.nutrient_deficiencies,
+      severity_ratings: imageAnalysis.severity_ratings,
+      field_uniformity_score: imageAnalysis.field_uniformity_score,
+      estimated_yield_impact_percent: imageAnalysis.estimated_yield_impact_percent,
+      canopy_coverage_percent: imageAnalysis.canopy_coverage_percent,
+      plant_density_assessment: imageAnalysis.plant_density_assessment,
+      root_health_indicators: imageAnalysis.root_health_indicators,
+      detailed_visual_analysis: imageAnalysis.detailed_visual_analysis,
       
       // From recommendations
       recommendations: recommendations.recommendations,

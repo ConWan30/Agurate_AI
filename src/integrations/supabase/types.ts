@@ -17,16 +17,27 @@ export type Database = {
       assessments: {
         Row: {
           analyzed_at: string | null
+          canopy_coverage_percent: number | null
           captured_offline: boolean | null
           confidence_score: number | null
           created_at: string | null
+          detailed_visual_analysis: string | null
+          disease_identified: string[] | null
+          estimated_yield_impact_percent: number | null
           field_id: string
+          field_uniformity_score: number | null
           gps_accuracy_meters: number | null
+          growth_stage: string | null
           health_score: number | null
           id: string
           image_url: string
+          nutrient_deficiencies: Json | null
+          pest_identified: string[] | null
           photo_location_lat: number | null
           photo_location_lng: number | null
+          plant_density_assessment: string | null
+          root_health_indicators: string[] | null
+          severity_ratings: Json | null
           stress_level: string | null
           symptoms: string[] | null
           synced_at: string | null
@@ -35,16 +46,27 @@ export type Database = {
         }
         Insert: {
           analyzed_at?: string | null
+          canopy_coverage_percent?: number | null
           captured_offline?: boolean | null
           confidence_score?: number | null
           created_at?: string | null
+          detailed_visual_analysis?: string | null
+          disease_identified?: string[] | null
+          estimated_yield_impact_percent?: number | null
           field_id: string
+          field_uniformity_score?: number | null
           gps_accuracy_meters?: number | null
+          growth_stage?: string | null
           health_score?: number | null
           id?: string
           image_url: string
+          nutrient_deficiencies?: Json | null
+          pest_identified?: string[] | null
           photo_location_lat?: number | null
           photo_location_lng?: number | null
+          plant_density_assessment?: string | null
+          root_health_indicators?: string[] | null
+          severity_ratings?: Json | null
           stress_level?: string | null
           symptoms?: string[] | null
           synced_at?: string | null
@@ -53,16 +75,27 @@ export type Database = {
         }
         Update: {
           analyzed_at?: string | null
+          canopy_coverage_percent?: number | null
           captured_offline?: boolean | null
           confidence_score?: number | null
           created_at?: string | null
+          detailed_visual_analysis?: string | null
+          disease_identified?: string[] | null
+          estimated_yield_impact_percent?: number | null
           field_id?: string
+          field_uniformity_score?: number | null
           gps_accuracy_meters?: number | null
+          growth_stage?: string | null
           health_score?: number | null
           id?: string
           image_url?: string
+          nutrient_deficiencies?: Json | null
+          pest_identified?: string[] | null
           photo_location_lat?: number | null
           photo_location_lng?: number | null
+          plant_density_assessment?: string | null
+          root_health_indicators?: string[] | null
+          severity_ratings?: Json | null
           stress_level?: string | null
           symptoms?: string[] | null
           synced_at?: string | null
