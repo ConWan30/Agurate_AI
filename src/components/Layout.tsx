@@ -20,6 +20,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import MobileFloatingActions from "./MobileFloatingActions";
+import morehouseShape from "@/assets/morehouse-parish-shape.jpg";
 
 interface LayoutProps {
   children: ReactNode;
@@ -67,15 +68,20 @@ export const Layout = ({ children }: LayoutProps) => {
         <div className="container mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="relative flex items-center justify-center h-12 w-12 transition-transform group-hover:scale-105">
-                {/* Outer circle - parish badge */}
-                <div className="absolute inset-0 rounded-full border-3 border-primary shadow-glow bg-gradient-to-br from-primary/20 to-primary/5" />
-                
-                {/* Inner circle */}
-                <div className="absolute inset-[6px] rounded-full border-2 border-primary/40" />
+              <div className="relative flex items-center justify-center h-14 w-14 transition-transform group-hover:scale-105">
+                {/* Morehouse Parish shape background */}
+                <div className="absolute inset-0 overflow-hidden rounded-lg shadow-glow">
+                  <img 
+                    src={morehouseShape} 
+                    alt="Morehouse Parish" 
+                    className="w-full h-full object-contain brightness-110 contrast-125"
+                  />
+                </div>
                 
                 {/* Leaf symbol in center */}
-                <Sprout className="h-6 w-6 text-primary relative z-10" />
+                <div className="relative z-10 flex items-center justify-center h-7 w-7 rounded-full bg-primary/90">
+                  <Sprout className="h-4 w-4 text-white" />
+                </div>
               </div>
               <div>
                 <h1 className="text-2xl font-display font-bold text-foreground">
