@@ -5,32 +5,53 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Send, Sparkles, Loader2, BookOpen, HelpCircle } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Brain, Send, Sparkles, Loader2, BookOpen, HelpCircle, History, Plus, Trash2, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
-
-type Message = {
-  role: 'user' | 'assistant';
-  content: string;
-};
+import { useDeltaConversations, type Message } from '@/hooks/useDeltaConversations';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function DeltaIntelligence() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor, trained on LSU AgCenter research and decades of Louisiana Delta agriculture data.\n\n💡 **Try asking me:**\n- Crop-specific advice for rice, soybeans, cotton, or corn\n- Pest & disease identification\n- Soil management strategies\n- Weather-based planting guidance\n\nWhat can I help you with today?"
-    }
-  ]);
+  const {
+    conversations,
+    currentConversationId,
+    messages,
+    setMessages,
+    createConversation,
+    saveMessage,
+    deleteConversation,
+    startNewConversation,
+    selectConversation,
+  } = useDeltaConversations();
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Show welcome message only for new conversations
+  const displayMessages = messages.length === 0 ? [{
+    role: 'assistant' as const,
+    content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor, trained on LSU AgCenter research and decades of Louisiana Delta agriculture data.\n\n💡 **Try asking me:**\n- Crop-specific advice for rice, soybeans, cotton, or corn\n- Pest & disease identification\n- Soil management strategies\n- Weather-based planting guidance\n\nWhat can I help you with today?"
+  }] : messages;
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [displayMessages]);
 
   const streamChat = async (userMessage: string) => {
+    let conversationId = currentConversationId;
+
+    // Create new conversation if needed
+    if (!conversationId) {
+      conversationId = await createConversation(userMessage);
+    }
+
+    // Save user message
+    await saveMessage(conversationId, 'user', userMessage);
+
     const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
@@ -105,6 +126,11 @@ export default function DeltaIntelligence() {
             }
           }
         }
+
+        // Save assistant message after streaming is complete
+        if (conversationId && assistantMessage) {
+          await saveMessage(conversationId, 'assistant', assistantMessage);
+        }
       }
     } catch (error) {
       console.error('Chat error:', error);
@@ -128,6 +154,16 @@ export default function DeltaIntelligence() {
     { q: "Best cotton planting practices for Delta soils?", icon: "☁️" },
     { q: "When should I apply nitrogen to corn fields?", icon: "🌽" }
   ];
+
+  const handleNewConversation = () => {
+    startNewConversation();
+    setIsHistoryOpen(false);
+  };
+
+  const handleSelectConversation = (id: string) => {
+    selectConversation(id);
+    setIsHistoryOpen(false);
+  };
 
   return (
     <div className="min-h-screen pb-24">
@@ -162,11 +198,93 @@ export default function DeltaIntelligence() {
 
         {/* Clean Chat Interface */}
         <Card className="field-card shadow-field border-2">
+          <CardHeader className="border-b p-4 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-primary" />
+              <h3 className="font-medium">
+                {currentConversationId 
+                  ? conversations.find(c => c.id === currentConversationId)?.title || 'Conversation'
+                  : 'New Conversation'}
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNewConversation}
+                className="h-9"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                New
+              </Button>
+              <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <History className="h-4 w-4 mr-2" />
+                    History
+                    {conversations.length > 0 && (
+                      <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
+                        {conversations.length}
+                      </Badge>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-[350px] sm:w-[400px]">
+                  <SheetHeader>
+                    <SheetTitle>Conversation History</SheetTitle>
+                  </SheetHeader>
+                  <ScrollArea className="h-[calc(100vh-8rem)] mt-6">
+                    <div className="space-y-2">
+                      {conversations.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <p className="text-sm">No conversations yet</p>
+                          <p className="text-xs mt-1">Start chatting to create your first conversation</p>
+                        </div>
+                      ) : (
+                        conversations.map((conv) => (
+                          <div
+                            key={conv.id}
+                            className={`group p-3 rounded-lg border cursor-pointer transition-all hover:bg-accent ${
+                              currentConversationId === conv.id ? 'bg-accent border-primary' : ''
+                            }`}
+                            onClick={() => handleSelectConversation(conv.id)}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium line-clamp-2 mb-1">
+                                  {conv.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {formatDistanceToNow(new Date(conv.updated_at), { addSuffix: true })}
+                                </p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteConversation(conv.id);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </CardHeader>
           <CardContent className="p-0">
             {/* Messages Area */}
-            <ScrollArea className="h-[550px] p-6">
+            <ScrollArea className="h-[500px] p-6">
               <div className="space-y-6">
-                {messages.map((msg, idx) => (
+                {displayMessages.map((msg, idx) => (
                   <div
                     key={idx}
                     className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -211,7 +329,7 @@ export default function DeltaIntelligence() {
             </ScrollArea>
 
             {/* Quick Start Questions - Only show at start */}
-            {messages.length === 1 && (
+            {displayMessages.length === 1 && displayMessages[0].role === 'assistant' && (
               <div className="px-6 py-4 border-t bg-gradient-to-r from-purple-500/5 to-indigo-500/5">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles className="h-4 w-4 text-purple-600" />
