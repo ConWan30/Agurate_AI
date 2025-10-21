@@ -1,8 +1,9 @@
 import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { MagneticButton } from '@/components/ui/magnetic-button';
 import { useNavigate } from 'react-router-dom';
+import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 
 export default function HowItWorks() {
   const navigate = useNavigate();
@@ -117,27 +118,37 @@ export default function HowItWorks() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {aiPipeline.map((step, idx) => (
-              <Card key={idx} className={`border-2 ${step.color} hover-lift`}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <step.icon className="h-5 w-5 text-primary" />
+            {aiPipeline.map((step, idx) => {
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
+              return (
+                <div 
+                  key={idx} 
+                  ref={ref}
+                  className={`${hasIntersected ? 'animate-fade-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
+                >
+                  <Card className={`border-2 ${step.color} hover-lift glass`}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center animate-float">
+                            <step.icon className="h-5 w-5 text-primary" />
+                          </div>
+                          <Badge variant="outline">{idx + 1}</Badge>
+                        </div>
                       </div>
-                      <Badge variant="outline">{idx + 1}</Badge>
-                    </div>
-                  </div>
-                  <CardTitle className="text-lg mt-3">{step.title}</CardTitle>
-                  <CardDescription>{step.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-xs font-mono bg-muted/50 px-3 py-2 rounded border">
-                    {step.tech}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                      <CardTitle className="text-lg mt-3">{step.title}</CardTitle>
+                      <CardDescription>{step.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-xs font-mono bg-muted/50 px-3 py-2 rounded border shimmer">
+                        {step.tech}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -256,29 +267,39 @@ export default function HowItWorks() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {useCases.map((useCase, idx) => (
-              <Card key={idx} className="field-card hover-lift">
-                <CardHeader>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="h-12 w-12 rounded-xl gradient-delta shadow-glow flex items-center justify-center">
-                      <useCase.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <CardTitle className="text-xl">{useCase.title}</CardTitle>
-                  </div>
-                  <CardDescription className="text-base">{useCase.scenario}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="p-3 bg-muted/50 rounded-lg border">
-                    <p className="text-sm font-medium mb-1">Impact:</p>
-                    <p className="text-sm text-muted-foreground">{useCase.impact}</p>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                    <span className="text-sm font-medium text-green-700">Estimated Savings:</span>
-                    <span className="text-lg font-bold text-green-700">{useCase.savings}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {useCases.map((useCase, idx) => {
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
+              return (
+                <div 
+                  key={idx}
+                  ref={ref}
+                  className={`${hasIntersected ? 'animate-scale-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
+                >
+                  <Card className="field-card hover-lift glass-strong">
+                    <CardHeader>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="h-12 w-12 rounded-xl gradient-delta shadow-glow flex items-center justify-center animate-glow-pulse">
+                          <useCase.icon className="h-6 w-6 text-white" />
+                        </div>
+                        <CardTitle className="text-xl">{useCase.title}</CardTitle>
+                      </div>
+                      <CardDescription className="text-base">{useCase.scenario}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="p-3 bg-muted/50 rounded-lg border">
+                        <p className="text-sm font-medium mb-1">Impact:</p>
+                        <p className="text-sm text-muted-foreground">{useCase.impact}</p>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                        <span className="text-sm font-medium text-green-700">Estimated Savings:</span>
+                        <span className="text-lg font-bold text-green-700">{useCase.savings}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -287,14 +308,14 @@ export default function HowItWorks() {
           <h3 className="text-2xl font-display font-bold">Ready to Try It?</h3>
           <p className="text-muted-foreground">Start analyzing your crops with AI-powered intelligence</p>
           <div className="flex gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate('/scanner')} className="gap-2">
+            <MagneticButton size="lg" variant="magnetic" onClick={() => navigate('/scanner')} className="gap-2">
               <Camera className="h-5 w-5" />
               Start Field Scan
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/predictions')} className="gap-2">
+            </MagneticButton>
+            <MagneticButton size="lg" variant="outline" onClick={() => navigate('/predictions')} className="gap-2">
               <TrendingUp className="h-5 w-5" />
               View Predictions
-            </Button>
+            </MagneticButton>
           </div>
         </div>
       </div>

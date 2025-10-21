@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { InteractiveTutorial } from "@/components/InteractiveTutorial";
 import { useDemoData } from "@/contexts/DemoDataContext";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 
 interface Field {
   id: string;
@@ -158,9 +160,9 @@ export default function Dashboard() {
           <h2 className="text-2xl font-display font-bold mb-6">Quick Actions</h2>
           <div className="grid gap-6 md:grid-cols-3">
             <Link to="/upload">
-              <Card className="field-card group cursor-pointer border-2 h-full">
+              <Card hover glass className="group cursor-pointer border-2 h-full">
                 <CardContent className="p-6 md:p-8">
-                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-delta shadow-glow mb-4 group-hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-delta shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
                     <Upload className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
                   <h3 className="font-display font-bold text-lg md:text-xl mb-2">New Assessment</h3>
@@ -172,23 +174,23 @@ export default function Dashboard() {
             </Link>
 
             <Link to="/fields">
-              <Card className="field-card group cursor-pointer border-2 h-full">
+              <Card hover glass className="group cursor-pointer border-2 h-full">
                 <CardContent className="p-6 md:p-8">
-                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-sky shadow-glow mb-4 group-hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-sky shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
                     <MapPin className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
                   <h3 className="font-display font-bold text-lg md:text-xl mb-2">Manage Fields</h3>
                   <p className="text-sm text-muted-foreground">
-                    {fields.length} field{fields.length !== 1 ? "s" : ""} registered
+                    <AnimatedCounter value={fields.length} /> field{fields.length !== 1 ? "s" : ""} registered
                   </p>
                 </CardContent>
               </Card>
             </Link>
 
             <Link to="/delta">
-              <Card className="field-card group cursor-pointer border-2 h-full">
+              <Card hover glass className="group cursor-pointer border-2 h-full">
                 <CardContent className="p-6 md:p-8">
-                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-harvest shadow-glow mb-4 group-hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-harvest shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
                     <Brain className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
                   <h3 className="font-display font-bold text-lg md:text-xl mb-2">Delta AI</h3>
@@ -365,7 +367,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-6">
                         <div className="text-right">
                           <p className="text-3xl font-display font-bold text-primary">
-                            {Math.round((assessment.health_score || 0) * 100)}%
+                            <AnimatedCounter value={Math.round((assessment.health_score || 0) * 100)} suffix="%" />
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">Health Score</p>
                         </div>
