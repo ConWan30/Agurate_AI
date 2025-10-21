@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText } from "lucide-react";
+import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { InteractiveTutorial } from "@/components/InteractiveTutorial";
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [recentAssessments, setRecentAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showAdditionalTools, setShowAdditionalTools] = useState(false);
 
   useEffect(() => {
     if (isDemoMode) {
@@ -155,110 +157,191 @@ export default function Dashboard() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Quick Actions - Enhanced */}
+        {/* Core Features - LSU Pitch Focus */}
         <div>
-          <h2 className="text-2xl font-display font-bold mb-6">Quick Actions</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-display font-bold">Core Features</h2>
+              <p className="text-sm text-muted-foreground mt-1">LSU AgCenter-validated precision agriculture</p>
+            </div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {/* 1. AI Crop Scanner - Flagship */}
             <Link to="/upload">
               <Card hover glass className="group cursor-pointer border-2 h-full">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-delta shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
-                    <Upload className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                    <Scan className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">New Assessment</h3>
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">AI Crop Scanner</h3>
                   <p className="text-sm text-muted-foreground">
-                    Upload crop images for AI-powered analysis
+                    Instant crop health analysis from any smartphone
                   </p>
+                  <Badge variant="default" className="text-xs mt-3">Core Feature</Badge>
                 </CardContent>
               </Card>
             </Link>
 
-            <Link to="/fields">
+            {/* 2. Predictive Analytics - Research Angle */}
+            <Link to="/predictions">
               <Card hover glass className="group cursor-pointer border-2 h-full">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-sky shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
-                    <MapPin className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                    <TrendingUp className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Manage Fields</h3>
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Predictive Analytics</h3>
                   <p className="text-sm text-muted-foreground">
-                    <AnimatedCounter value={fields.length} /> field{fields.length !== 1 ? "s" : ""} registered
+                    7-day stress forecasts powered by weather AI
                   </p>
+                  <Badge variant="default" className="text-xs mt-3">Core Feature</Badge>
                 </CardContent>
               </Card>
             </Link>
 
+            {/* 3. Delta Intelligence AI - LSU Knowledge Integration */}
             <Link to="/delta">
               <Card hover glass className="group cursor-pointer border-2 h-full">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-harvest shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
                     <Brain className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Delta AI</h3>
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Delta Intelligence</h3>
                   <p className="text-sm text-muted-foreground">
-                    Expert Louisiana farming advice
+                    AI trained on LSU AgCenter research data
                   </p>
+                  <Badge variant="default" className="text-xs mt-3">Core Feature</Badge>
                 </CardContent>
               </Card>
             </Link>
-          </div>
-        </div>
 
-        {/* New Features Highlight */}
-        <div>
-          <h2 className="text-2xl font-display font-bold mb-6">Business Tools</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+            {/* 4. Insurance Documentation - Farmer Value */}
             <Link to="/insurance">
-              <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
-                      <FileText className="h-6 w-6 text-primary" />
-                    </div>
-                    <Badge variant="default" className="text-xs">Enhanced</Badge>
+              <Card hover glass className="group cursor-pointer border-2 h-full">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-delta shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
+                    <FileText className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg mb-2">Insurance Claims</h3>
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Insurance Claims</h3>
                   <p className="text-sm text-muted-foreground">
-                    Document damage with AI-verified evidence for faster settlements
+                    AI-verified damage documentation system
                   </p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/cooperatives">
-              <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
-                      <Users className="h-6 w-6 text-primary" />
-                    </div>
-                    <Badge variant="default" className="text-xs">Enhanced</Badge>
-                  </div>
-                  <h3 className="font-display font-bold text-lg mb-2">Cooperatives</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Join farming cooperatives with invitation system and analytics
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/delta">
-              <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
-                      <Brain className="h-6 w-6 text-primary" />
-                    </div>
-                    <Badge variant="default" className="text-xs">New</Badge>
-                  </div>
-                  <h3 className="font-display font-bold text-lg mb-2">Delta Intelligence</h3>
-                  <p className="text-sm text-muted-foreground">
-                    AI trained on LSU AgCenter Delta-specific research
-                  </p>
+                  <Badge variant="default" className="text-xs mt-3">Core Feature</Badge>
                 </CardContent>
               </Card>
             </Link>
           </div>
         </div>
+
+        {/* Additional Tools - Collapsible */}
+        <Collapsible open={showAdditionalTools} onOpenChange={setShowAdditionalTools}>
+          <div className="space-y-4">
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full justify-between hover:bg-muted">
+                <span className="font-display font-bold">Additional Tools & Features</span>
+                {showAdditionalTools ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Link to="/fields">
+                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                          <MapPin className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <h3 className="font-display font-bold text-lg mb-2">Field Management</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Register and manage your farm fields
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link to="/field-map">
+                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                          <Map className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <h3 className="font-display font-bold text-lg mb-2">Interactive Field Map</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Visual map of all your registered fields
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link to="/weather-timeline">
+                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                          <Cloud className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <h3 className="font-display font-bold text-lg mb-2">Weather Timeline</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Historical and forecast weather data
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link to="/cooperatives">
+                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                          <Users className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <h3 className="font-display font-bold text-lg mb-2">Cooperatives</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Join and share data with farming cooperatives
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link to="/scanner">
+                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                          <Scan className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <h3 className="font-display font-bold text-lg mb-2">AR Field Scanner</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Augmented reality crop scanning
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link to="/history">
+                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                          <HistoryIcon className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <h3 className="font-display font-bold text-lg mb-2">Assessment History</h3>
+                      <p className="text-sm text-muted-foreground">
+                        View all past crop health assessments
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
 
         {/* Fields Overview - Enhanced */}
         <div>
