@@ -75,7 +75,7 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <Sprout className="h-8 w-8 text-primary" aria-hidden="true" />
             <h1 className="text-2xl font-display font-bold">
-              Agurate<span className="font-bold text-green-600">AI</span>
+              Agurate<span className="font-bold text-primary">AI</span>
             </h1>
           </div>
           <div className="flex items-center gap-4">
@@ -281,7 +281,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <Sprout className="h-6 w-6 text-primary" aria-hidden="true" />
               <span className="font-display font-bold text-lg">
-                Agurate<span className="text-green-600">AI</span>
+                Agurate<span className="text-primary">AI</span>
               </span>
             </div>
             <p className="text-sm text-muted-foreground text-center">
