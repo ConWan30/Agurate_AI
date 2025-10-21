@@ -15,6 +15,10 @@ import cottonIcon from "@/assets/cotton-icon.png";
 import cornIcon from "@/assets/corn-icon.png";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import bgTractorField from "@/assets/bg-tractor-field.jpg";
+import { SwipeableCard } from "@/components/ui/swipeable-card";
+import { PullToRefresh } from "@/components/PullToRefresh";
+import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface Field {
   id: string;
@@ -40,6 +44,9 @@ export default function Fields() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<Field | null>(null);
   const { toast } = useToast();
+  
+  // Enable keyboard shortcuts
+  useGlobalKeyboardShortcuts();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -60,6 +67,7 @@ export default function Fields() {
   }, [isDemoMode]);
 
   const fetchFields = async () => {
+    setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -174,7 +182,8 @@ export default function Fields() {
   };
 
   return (
-    <div className="space-y-8">
+    <PullToRefresh onRefresh={fetchFields}>
+      <div className="space-y-8">
       {/* Hero Header */}
       <div 
         className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-delta-mist"
@@ -423,23 +432,18 @@ export default function Fields() {
             </CardContent>
           </Card>
         ) : fields.length === 0 ? (
-          <Card className="field-card border-dashed border-2">
-            <CardContent className="flex flex-col items-center justify-center py-16">
-              <div className="flex items-center justify-center h-20 w-20 rounded-2xl gradient-sky shadow-glow mx-auto mb-4">
-                <MapPin className="h-10 w-10 text-white" />
-              </div>
-              <h3 className="text-xl font-display font-semibold mb-2">No fields yet</h3>
-              <p className="text-muted-foreground mb-6">Start by adding your first field</p>
-              <Button onClick={() => setDialogOpen(true)} size="lg" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Field
-              </Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={MapPin}
+            title="No Fields Registered"
+            description="Register your first field to start monitoring crop health. Add location, crop type, and acreage details."
+            actionLabel="Add Your First Field"
+            onAction={() => setDialogOpen(true)}
+          />
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {fields.map((field) => (
-              <Card key={field.id} className="field-card border-2">
+              <SwipeableCard key={field.id}>
+                <Card className="field-card border-2">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -495,9 +499,11 @@ export default function Fields() {
                   </div>
                 </CardContent>
               </Card>
+              </SwipeableCard>
             ))}
           </div>
         )}
       </div>
+    </PullToRefresh>
   );
 }

@@ -9,6 +9,11 @@ import { CheckCircle2, AlertTriangle, AlertCircle, Calendar, ThumbsUp, ThumbsDow
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import bgCropTimeline from "@/assets/bg-crop-timeline.jpg";
+import { ProgressiveImage } from "@/components/ui/progressive-image";
+import { SwipeableCard } from "@/components/ui/swipeable-card";
+import { PullToRefresh } from "@/components/PullToRefresh";
+import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface Assessment {
   id: string;
@@ -52,6 +57,9 @@ export default function History() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const { toast } = useToast();
+  
+  // Enable keyboard shortcuts
+  useGlobalKeyboardShortcuts();
 
   useEffect(() => {
     if (isDemoMode) {
@@ -63,6 +71,7 @@ export default function History() {
   }, [isDemoMode]);
 
   const fetchHistory = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from("assessments")
@@ -141,7 +150,8 @@ export default function History() {
   }
 
   return (
-    <div className="space-y-8">
+    <PullToRefresh onRefresh={fetchHistory}>
+      <div className="space-y-8">
       {/* Hero Header */}
       <div 
         className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-delta-mist"
@@ -163,26 +173,32 @@ export default function History() {
       </div>
 
         {assessments.length === 0 ? (
-          <Card className="field-card border-dashed border-2">
-            <CardContent className="flex flex-col items-center justify-center py-16">
-              <div className="flex items-center justify-center h-20 w-20 rounded-2xl gradient-harvest shadow-glow mx-auto mb-4">
-                <Calendar className="h-10 w-10 text-white" />
-              </div>
-              <h3 className="text-xl font-display font-semibold mb-2">No assessments yet</h3>
-              <p className="text-muted-foreground mb-6">Upload a crop image to get started</p>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={Calendar}
+            title="No Assessment History"
+            description="Upload your first crop image to start tracking health trends over time. All assessments will appear here."
+            actionLabel="Upload Crop Image"
+            onAction={() => window.location.href = '/upload'}
+          />
         ) : (
           <>
             <div className="space-y-4">
               {assessments
                 .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                .map((assessment) => (
-                <Card
+                .map((assessment, index) => (
+                <SwipeableCard
                   key={assessment.id}
-                  className="field-card border-2 cursor-pointer"
-                  onClick={() => setSelectedAssessment(assessment)}
+                  onSwipeLeft={() => {
+                    const nextIndex = (currentPage - 1) * itemsPerPage + index + 1;
+                    if (nextIndex < assessments.length) {
+                      setSelectedAssessment(assessments[nextIndex]);
+                    }
+                  }}
                 >
+                  <Card
+                    className="field-card border-2 cursor-pointer hover:border-primary/50 transition-all"
+                    onClick={() => setSelectedAssessment(assessment)}
+                  >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -211,6 +227,7 @@ export default function History() {
                     </div>
                   </CardContent>
                 </Card>
+                </SwipeableCard>
               ))}
             </div>
 
@@ -253,13 +270,12 @@ export default function History() {
                 </DialogHeader>
 
                 <div className="space-y-6">
-                  {/* Image */}
+                  {/* Image with Progressive Loading */}
                   <div className="rounded-lg overflow-hidden">
-                    <img
+                    <ProgressiveImage
                       src={selectedAssessment.image_url}
                       alt="Crop assessment"
                       className="w-full h-64 object-cover"
-                      loading="lazy"
                     />
                   </div>
 
@@ -572,5 +588,6 @@ export default function History() {
           </DialogContent>
         </Dialog>
       </div>
+    </PullToRefresh>
   );
 }
