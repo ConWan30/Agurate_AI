@@ -1,9 +1,10 @@
-import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap } from 'lucide-react';
+import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 import { useNavigate } from 'react-router-dom';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
 
 export default function HowItWorks() {
   const navigate = useNavigate();
@@ -93,62 +94,101 @@ export default function HowItWorks() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-subtle pb-24">
-      {/* Hero Header */}
-      <div className="gradient-delta py-16 mb-12">
-        <div className="max-w-6xl mx-auto px-4 text-center space-y-6">
-          <Badge variant="outline" className="bg-white/10 text-white border-white/20">AI Transparency</Badge>
-          <h1 className="text-6xl font-display font-bold text-white drop-shadow-lg">
+    <div className="min-h-screen pb-24">
+      {/* Hero Header with Background */}
+      <div 
+        className="py-16 mb-12 relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(34, 197, 94, 0.92) 0%, rgba(22, 163, 74, 0.88) 100%), url(${bgDeltaRice})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-4 text-center space-y-6 relative z-10">
+          <Badge variant="outline" className="bg-white/10 text-white border-white/20 backdrop-blur-sm">
+            <Zap className="h-3 w-3 mr-1" />
+            AI Transparency
+          </Badge>
+          <h1 className="text-5xl md:text-6xl font-display font-bold text-white drop-shadow-lg">
             How AgurateAI Works
           </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
             Understanding the AI-powered crop health intelligence built specifically 
             for Louisiana Delta agriculture
           </p>
         </div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-12">
 
-        {/* AI Pipeline */}
-        <section className="space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-display font-bold">The AI Pipeline</h2>
-            <p className="text-muted-foreground">From field photo or drone video to actionable recommendation in seconds</p>
+        {/* Streamlined AI Pipeline */}
+        <section className="space-y-8">
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+              <Brain className="h-3 w-3 mr-1" />
+              AI Technology
+            </Badge>
+            <h2 className="text-4xl font-display font-bold">The AI Pipeline</h2>
+            <p className="text-lg text-muted-foreground">
+              From field photo or drone video to actionable recommendation in seconds
+            </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {aiPipeline.map((step, idx) => {
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
-              return (
-                <div 
-                  key={idx} 
-                  ref={ref}
-                  className={`${hasIntersected ? 'animate-fade-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
-                >
-                  <Card className={`border-2 ${step.color} hover-lift glass`}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center animate-float">
-                            <step.icon className="h-5 w-5 text-primary" />
+          {/* Clean Pipeline Flow */}
+          <div className="relative max-w-4xl mx-auto">
+            <div className="space-y-4">
+              {aiPipeline.map((step, idx) => {
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
+                const isLast = idx === aiPipeline.length - 1;
+                
+                return (
+                  <div 
+                    key={idx} 
+                    ref={ref}
+                    className={`${hasIntersected ? 'animate-fade-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
+                  >
+                    <div className="relative">
+                      <Card className="field-card hover-lift border-2 transition-all group">
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-6">
+                            {/* Step Number & Icon */}
+                            <div className="flex-shrink-0">
+                              <div className="relative">
+                                <div className={`h-16 w-16 rounded-2xl ${step.color} flex flex-col items-center justify-center shadow-field group-hover:scale-110 transition-transform`}>
+                                  <step.icon className="h-7 w-7 mb-1" />
+                                  <span className="text-xs font-bold">{idx + 1}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-xl font-display font-bold mb-2">{step.title}</h3>
+                              <p className="text-muted-foreground leading-relaxed mb-3">
+                                {step.description}
+                              </p>
+                              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg border text-xs font-mono">
+                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                                {step.tech}
+                              </div>
+                            </div>
                           </div>
-                          <Badge variant="outline">{idx + 1}</Badge>
+                        </CardContent>
+                      </Card>
+
+                      {/* Connecting Arrow */}
+                      {!isLast && (
+                        <div className="flex justify-center py-2">
+                          <ArrowRight className="h-6 w-6 text-primary/40 rotate-90" />
                         </div>
-                      </div>
-                      <CardTitle className="text-lg mt-3">{step.title}</CardTitle>
-                      <CardDescription>{step.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-xs font-mono bg-muted/50 px-3 py-2 rounded border shimmer">
-                        {step.tech}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            })}
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
 
