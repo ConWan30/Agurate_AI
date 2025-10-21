@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Sprout, Shield, CheckCircle2, ArrowLeft, Zap, Users } from "lucide-react";
 import heroFields from "@/assets/hero-fields.jpg";
+import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -99,6 +100,13 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex relative overflow-hidden">
+      {/* Louisiana Delta Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${bgDeltaRice})` }}
+      />
+      <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
+      
       {/* Background decorative elements */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="absolute top-20 left-20 w-96 h-96 bg-primary rounded-full blur-3xl animate-float" />
