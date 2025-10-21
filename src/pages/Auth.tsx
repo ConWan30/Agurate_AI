@@ -105,7 +105,7 @@ export default function Auth() {
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${bgDeltaRice})` }}
       />
-      <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-background/30 backdrop-blur-[2px]" />
       
       {/* Background decorative elements */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
