@@ -133,7 +133,7 @@ export default function DeltaIntelligence() {
       setIsPlayingAudio(true);
       
       const { data, error } = await supabase.functions.invoke('text-to-speech', {
-        body: { text, voice: 'sage' },
+        body: { text, voice: 'SAz9YHcvj6GT2YYXdXww' }, // River voice
       });
 
       if (error) throw error;

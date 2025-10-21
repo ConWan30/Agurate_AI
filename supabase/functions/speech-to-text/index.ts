@@ -31,11 +31,11 @@ serve(async (req) => {
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    // Prepare form data
+    // Prepare form data with all required fields
     const formData = new FormData();
     const blob = new Blob([bytes], { type: 'audio/webm' });
-    formData.append('file', blob, 'audio.webm');
-    formData.append('model', 'whisper-1');
+    formData.append('audio', blob, 'audio.webm');
+    formData.append('model_id', 'eleven_multilingual_v2');
 
     // Use ElevenLabs speech-to-text API
     const response = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
@@ -63,7 +63,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in speech-to-text function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

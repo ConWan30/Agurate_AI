@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voice = 'sage' } = await req.json();
+    const { text, voice = 'SAz9YHcvj6GT2YYXdXww' } = await req.json(); // Default to River voice
 
     if (!text) {
       throw new Error('Text is required');
@@ -22,7 +22,7 @@ serve(async (req) => {
       throw new Error('ElevenLabs API key not configured');
     }
 
-    console.log('Generating speech for text length:', text.length);
+    console.log('Generating speech for text length:', text.length, 'with voice:', voice);
 
     // Use ElevenLabs text-to-speech API
     const response = await fetch(
@@ -70,7 +70,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in text-to-speech function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
