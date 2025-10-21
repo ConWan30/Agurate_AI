@@ -85,11 +85,11 @@ export default function Dashboard() {
     const normalized = stressLevel?.toLowerCase();
     switch (normalized) {
       case "healthy":
-        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
+        return <CheckCircle2 className="h-5 w-5 text-primary" />;
       case "moderate":
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+        return <AlertTriangle className="h-5 w-5 text-accent" />;
       case "severe":
-        return <AlertCircle className="h-5 w-5 text-red-600" />;
+        return <AlertCircle className="h-5 w-5 text-destructive" />;
       default:
         return <CheckCircle2 className="h-5 w-5 text-muted-foreground" />;
     }
@@ -144,25 +144,31 @@ export default function Dashboard() {
         >
           <div className="relative z-10 flex items-start justify-between">
             <div>
+              <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                🌾 Morehouse Parish Precision Agriculture
+              </Badge>
               <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3 drop-shadow-lg">
                 Welcome to Your Farm Dashboard
               </h1>
               <p className="text-white text-base md:text-lg max-w-2xl drop-shadow">
-                Monitor your fields and crop health with AI-powered precision agriculture for Morehouse Parish
+                Monitor your fields and crop health with AI-powered precision agriculture
               </p>
             </div>
             <Button 
               variant="secondary" 
               size="sm" 
               onClick={() => setShowTutorial(true)}
-              className="gap-2 min-h-[44px]"
+              className="gap-2 min-h-[44px] bg-white/20 hover:bg-white/30 backdrop-blur-sm border-white/30"
               aria-label="Open interactive tutorial"
             >
               <Lightbulb className="h-4 w-4" aria-hidden="true" />
               <span className="hidden sm:inline">Tutorial</span>
             </Button>
           </div>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" aria-hidden="true"></div>
+          {/* Decorative particles */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float" aria-hidden="true"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl animate-float" style={{ animationDelay: '1s' }} aria-hidden="true"></div>
+          <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }} aria-hidden="true"></div>
         </div>
 
         {/* Core Features - LSU Pitch Focus */}
@@ -175,65 +181,65 @@ export default function Dashboard() {
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {/* 1. AI Crop Scanner - Flagship */}
-            <Link to="/upload">
-              <Card hover glass className="group cursor-pointer border-2 h-full">
+            <Link to="/upload" className="group">
+              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-delta shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
                     <Scan className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">AI Crop Scanner</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">AI Crop Scanner</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
                     Instant crop health analysis from any smartphone
                   </p>
-                  <Badge variant="default" className="text-xs mt-3">Core Feature</Badge>
+                  <Badge variant="default" className="text-xs">Core Feature</Badge>
                 </CardContent>
               </Card>
             </Link>
 
             {/* 2. Predictive Analytics - Research Angle */}
-            <Link to="/predictions">
-              <Card hover glass className="group cursor-pointer border-2 h-full">
+            <Link to="/predictions" className="group">
+              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-sky shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
                     <TrendingUp className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Predictive Analytics</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">Predictive Analytics</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
                     7-day stress forecasts powered by weather AI
                   </p>
-                  <Badge variant="default" className="text-xs mt-3">Core Feature</Badge>
+                  <Badge variant="default" className="text-xs">Core Feature</Badge>
                 </CardContent>
               </Card>
             </Link>
 
             {/* 3. Delta Intelligence AI - LSU Knowledge Integration */}
-            <Link to="/delta">
-              <Card hover glass className="group cursor-pointer border-2 h-full">
+            <Link to="/delta" className="group">
+              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-harvest shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
                     <Brain className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Delta Intelligence</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">Delta Intelligence</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
                     AI trained on LSU AgCenter research data
                   </p>
-                  <Badge variant="default" className="text-xs mt-3">Core Feature</Badge>
+                  <Badge variant="default" className="text-xs">Core Feature</Badge>
                 </CardContent>
               </Card>
             </Link>
 
             {/* 4. Insurance Documentation - Farmer Value */}
-            <Link to="/insurance">
-              <Card hover glass className="group cursor-pointer border-2 h-full">
+            <Link to="/insurance" className="group">
+              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-2xl gradient-delta shadow-glow mb-4 group-hover:scale-110 transition-transform animate-glow-pulse">
                     <FileText className="h-7 w-7 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-lg md:text-xl mb-2">Insurance Claims</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-display font-bold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">Insurance Claims</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
                     AI-verified damage documentation system
                   </p>
-                  <Badge variant="default" className="text-xs mt-3">Core Feature</Badge>
+                  <Badge variant="default" className="text-xs">Core Feature</Badge>
                 </CardContent>
               </Card>
             </Link>
@@ -251,15 +257,15 @@ export default function Dashboard() {
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Link to="/analytics">
-                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <Link to="/analytics" className="group">
+                  <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <BarChart3 className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">Advanced Analytics</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Advanced Analytics</h3>
                       <p className="text-sm text-muted-foreground">
                         Deep insights and performance metrics
                       </p>
@@ -267,15 +273,15 @@ export default function Dashboard() {
                   </Card>
                 </Link>
 
-                <Link to="/fields">
-                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <Link to="/fields" className="group">
+                  <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <MapPin className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">Field Management</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Field Management</h3>
                       <p className="text-sm text-muted-foreground">
                         Register and manage your farm fields
                       </p>
@@ -283,15 +289,15 @@ export default function Dashboard() {
                   </Card>
                 </Link>
 
-                <Link to="/field-map">
-                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <Link to="/field-map" className="group">
+                  <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <Map className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">Interactive Field Map</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Interactive Field Map</h3>
                       <p className="text-sm text-muted-foreground">
                         Visual map of all your registered fields
                       </p>
@@ -299,15 +305,15 @@ export default function Dashboard() {
                   </Card>
                 </Link>
 
-                <Link to="/weather-timeline">
-                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <Link to="/weather-timeline" className="group">
+                  <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <Cloud className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">Weather Timeline</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Weather Timeline</h3>
                       <p className="text-sm text-muted-foreground">
                         Historical and forecast weather data
                       </p>
@@ -315,15 +321,15 @@ export default function Dashboard() {
                   </Card>
                 </Link>
 
-                <Link to="/cooperatives">
-                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <Link to="/cooperatives" className="group">
+                  <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <Users className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">Cooperatives</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Cooperatives</h3>
                       <p className="text-sm text-muted-foreground">
                         Join and share data with farming cooperatives
                       </p>
@@ -331,15 +337,15 @@ export default function Dashboard() {
                   </Card>
                 </Link>
 
-                <Link to="/scanner">
-                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <Link to="/scanner" className="group">
+                  <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <Scan className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">AR Field Scanner</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">AR Field Scanner</h3>
                       <p className="text-sm text-muted-foreground">
                         Augmented reality crop scanning
                       </p>
@@ -347,15 +353,15 @@ export default function Dashboard() {
                   </Card>
                 </Link>
 
-                <Link to="/history">
-                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                <Link to="/history" className="group">
+                  <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <HistoryIcon className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">Assessment History</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Assessment History</h3>
                       <p className="text-sm text-muted-foreground">
                         View all past crop health assessments
                       </p>
@@ -379,9 +385,9 @@ export default function Dashboard() {
             </Link>
           </div>
           {fields.length === 0 ? (
-            <Card className="field-card border-dashed border-2">
+            <Card glass className="border-dashed border-2">
               <CardContent className="p-8 md:p-12 text-center">
-                <div className="flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl gradient-sky shadow-glow mx-auto mb-4">
+                <div className="flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl gradient-sky shadow-glow mx-auto mb-4 animate-float">
                   <MapPin className="h-8 w-8 md:h-10 md:w-10 text-white" />
                 </div>
                 <h3 className="font-display font-bold text-xl mb-2">No Fields Yet</h3>
@@ -389,7 +395,7 @@ export default function Dashboard() {
                   Start by registering your first field to begin monitoring
                 </p>
                 <Link to="/fields">
-                  <Button className="gradient-delta text-white">
+                  <Button className="gradient-delta text-white shadow-glow hover:shadow-glow-lg">
                     <MapPin className="mr-2 h-4 w-4" />
                     Add Your First Field
                   </Button>
@@ -404,14 +410,14 @@ export default function Dashboard() {
                                  field.crop_type === 'cotton' ? Leaf :
                                  field.crop_type === 'corn' ? Wheat : Sprout;
                 return (
-                  <Card key={field.id} className="field-card border-2">
+                  <Card key={field.id} glass className="border-2 group hover:border-primary/50 hover:shadow-card hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <CropIcon className="h-6 w-6 text-primary" />
                         </div>
                         <div className="flex-1">
-                          <CardTitle className="text-lg">{field.name}</CardTitle>
+                          <CardTitle className="text-lg group-hover:text-primary transition-colors">{field.name}</CardTitle>
                           <CardDescription className="capitalize">
                             {field.crop_type} • {field.acreage} acres
                           </CardDescription>
@@ -440,9 +446,9 @@ export default function Dashboard() {
             </Link>
           </div>
           {recentAssessments.length === 0 ? (
-            <Card className="field-card border-dashed border-2">
+            <Card glass className="border-dashed border-2">
               <CardContent className="p-8 md:p-12 text-center">
-                <div className="flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl gradient-delta shadow-glow mx-auto mb-4">
+                <div className="flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl gradient-delta shadow-glow mx-auto mb-4 animate-float">
                   <Upload className="h-8 w-8 md:h-10 md:w-10 text-white" />
                 </div>
                 <h3 className="font-display font-bold text-xl mb-2">No Analysis Yet</h3>
@@ -450,7 +456,7 @@ export default function Dashboard() {
                   Upload your first crop image to get AI-powered health insights
                 </p>
                 <Link to="/upload">
-                  <Button className="gradient-delta text-white">
+                  <Button className="gradient-delta text-white shadow-glow hover:shadow-glow-lg">
                     <Upload className="mr-2 h-4 w-4" />
                     Upload First Image
                   </Button>
@@ -460,15 +466,15 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-6">
               {recentAssessments.map((assessment) => (
-                <Card key={assessment.id} className="field-card border-2">
+                <Card key={assessment.id} glass className="border-2 group hover:border-primary/50 hover:shadow-glow transition-all duration-300">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-6">
                       <div className="flex items-center gap-6 flex-1">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 flex-shrink-0">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                           {getStressIcon(assessment.stress_level)}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-display font-bold text-xl mb-1">{assessment.field.name}</h3>
+                          <h3 className="font-display font-bold text-xl mb-1 group-hover:text-primary transition-colors">{assessment.field.name}</h3>
                           <p className="text-sm text-muted-foreground capitalize">
                             {assessment.field.crop_type} • {format(new Date(assessment.created_at), "MMM d, yyyy")}
                           </p>
