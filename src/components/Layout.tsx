@@ -71,7 +71,9 @@ export const Layout = ({ children }: LayoutProps) => {
                 <Sprout className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-display font-bold text-foreground">AgurateAI</h1>
+                <h1 className="text-2xl font-display font-bold text-foreground">
+                  Agurate<span className="font-bold text-green-600">A🍃</span>
+                </h1>
                 <p className="text-xs text-muted-foreground">Morehouse Parish, Louisiana</p>
               </div>
             </Link>
