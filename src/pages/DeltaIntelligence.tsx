@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Send, Sparkles, Loader2, BookOpen, HelpCircle } from 'lucide-react';
+import { Brain, Send, Sparkles, Loader2, BookOpen, HelpCircle, Mic, Volume2, VolumeX } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
+import { VoiceRecorder } from '@/utils/voiceRecorder';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -24,7 +25,12 @@ export default function DeltaIntelligence() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [autoPlayAudio, setAutoPlayAudio] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const voiceRecorderRef = useRef<VoiceRecorder | null>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -121,6 +127,124 @@ export default function DeltaIntelligence() {
     setInput('');
     await streamChat(userMessage);
   };
+
+  const playAudioResponse = async (text: string) => {
+    try {
+      setIsPlayingAudio(true);
+      
+      const { data, error } = await supabase.functions.invoke('text-to-speech', {
+        body: { text, voice: 'sage' },
+      });
+
+      if (error) throw error;
+
+      // Stop any currently playing audio
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
+
+      // Convert base64 to audio and play
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
+        { type: 'audio/mpeg' }
+      );
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      currentAudioRef.current = audio;
+
+      audio.onended = () => {
+        setIsPlayingAudio(false);
+        URL.revokeObjectURL(audioUrl);
+        currentAudioRef.current = null;
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      toast.error('Failed to play audio response');
+      setIsPlayingAudio(false);
+    }
+  };
+
+  const startVoiceRecording = async () => {
+    try {
+      if (!voiceRecorderRef.current) {
+        voiceRecorderRef.current = new VoiceRecorder();
+      }
+      
+      await voiceRecorderRef.current.start();
+      setIsRecording(true);
+      toast.success('Listening... speak your question');
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      toast.error('Failed to start recording. Please check microphone permissions.');
+    }
+  };
+
+  const stopVoiceRecording = async () => {
+    try {
+      if (!voiceRecorderRef.current) return;
+
+      const audioBase64 = await voiceRecorderRef.current.stop();
+      setIsRecording(false);
+      setIsLoading(true);
+
+      const { data, error } = await supabase.functions.invoke('speech-to-text', {
+        body: { audio: audioBase64 },
+      });
+
+      if (error) throw error;
+
+      const transcribedText = data.text;
+      if (transcribedText && transcribedText.trim()) {
+        setInput(transcribedText);
+        toast.success('Question transcribed successfully');
+      } else {
+        toast.error('No speech detected. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error processing voice:', error);
+      toast.error('Failed to process voice input');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleVoiceRecording = () => {
+    if (isRecording) {
+      stopVoiceRecording();
+    } else {
+      startVoiceRecording();
+    }
+  };
+
+  const stopAudioPlayback = () => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+      setIsPlayingAudio(false);
+    }
+  };
+
+  // Auto-play audio for assistant responses
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (
+      autoPlayAudio &&
+      lastMessage &&
+      lastMessage.role === 'assistant' &&
+      lastMessage.content &&
+      !isLoading &&
+      !isPlayingAudio
+    ) {
+      // Only play if the message is complete (not streaming)
+      const isStreamingComplete = messages.length > 1;
+      if (isStreamingComplete) {
+        playAudioResponse(lastMessage.content);
+      }
+    }
+  }, [messages, autoPlayAudio, isLoading]);
 
   const quickQuestions = [
     { q: "What rice varieties work best in Morehouse Parish?", icon: "🌾" },
@@ -237,8 +361,54 @@ export default function DeltaIntelligence() {
               </div>
             )}
 
-            {/* Input Area */}
-            <div className="p-4 border-t bg-background">
+            {/* Input Area with Voice Controls */}
+            <div className="p-4 border-t bg-background space-y-3">
+              {/* Voice Controls Bar */}
+              <div className="flex items-center justify-between gap-3 pb-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setAutoPlayAudio(!autoPlayAudio)}
+                    className="h-9"
+                  >
+                    {autoPlayAudio ? (
+                      <Volume2 className="h-4 w-4 mr-2" />
+                    ) : (
+                      <VolumeX className="h-4 w-4 mr-2" />
+                    )}
+                    <span className="text-xs">Auto-play {autoPlayAudio ? 'On' : 'Off'}</span>
+                  </Button>
+                  {isPlayingAudio && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={stopAudioPlayback}
+                      className="h-9"
+                    >
+                      <VolumeX className="h-4 w-4 mr-2" />
+                      <span className="text-xs">Stop Audio</span>
+                    </Button>
+                  )}
+                </div>
+                {!autoPlayAudio && messages.length > 1 && messages[messages.length - 1].role === 'assistant' && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => playAudioResponse(messages[messages.length - 1].content)}
+                    disabled={isPlayingAudio}
+                    className="h-9"
+                  >
+                    <Volume2 className="h-4 w-4 mr-2" />
+                    <span className="text-xs">Play Response</span>
+                  </Button>
+                )}
+              </div>
+
+              {/* Input Form */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -246,16 +416,26 @@ export default function DeltaIntelligence() {
                 }}
                 className="flex gap-3"
               >
+                <Button
+                  type="button"
+                  variant={isRecording ? "default" : "outline"}
+                  size="icon"
+                  onClick={toggleVoiceRecording}
+                  disabled={isLoading}
+                  className={`h-11 w-11 ${isRecording ? 'bg-red-500 hover:bg-red-600 animate-pulse' : ''}`}
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about Louisiana Delta farming..."
-                  disabled={isLoading}
+                  placeholder="Type or speak your question..."
+                  disabled={isLoading || isRecording}
                   className="flex-1 h-11"
                 />
                 <Button 
                   type="submit" 
-                  disabled={isLoading || !input.trim()} 
+                  disabled={isLoading || !input.trim() || isRecording} 
                   size="icon"
                   className="h-11 w-11 gradient-delta shadow-glow"
                 >
