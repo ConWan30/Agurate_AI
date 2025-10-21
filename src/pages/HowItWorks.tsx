@@ -1,8 +1,8 @@
-import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap, ArrowRight } from 'lucide-react';
+import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MagneticButton } from '@/components/ui/magnetic-button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
 
@@ -95,29 +95,43 @@ export default function HowItWorks() {
 
   return (
     <div className="min-h-screen pb-24">
+      {/* Back to home link */}
+      <div className="max-w-6xl mx-auto px-4 pt-6">
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Home
+        </Link>
+      </div>
+
       {/* Hero Header with Background */}
       <div 
-        className="py-16 mb-12 relative overflow-hidden"
+        className="py-20 mb-12 relative overflow-hidden"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(34, 197, 94, 0.92) 0%, rgba(22, 163, 74, 0.88) 100%), url(${bgDeltaRice})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        <div className="max-w-6xl mx-auto px-4 text-center space-y-6 relative z-10">
-          <Badge variant="outline" className="bg-white/10 text-white border-white/20 backdrop-blur-sm">
+        {/* Decorative floating elements */}
+        <div className="absolute top-10 right-10 w-64 h-64 bg-primary-foreground/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-10 left-10 w-64 h-64 bg-primary-foreground/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+
+        <div className="max-w-6xl mx-auto px-4 text-center space-y-6 relative z-10 animate-fade-in">
+          <Badge variant="outline" className="glass border-primary-foreground/40 text-primary-foreground backdrop-blur-md shadow-glow">
             <Zap className="h-3 w-3 mr-1" />
             AI Transparency
           </Badge>
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-white drop-shadow-lg">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-primary-foreground drop-shadow-lg">
             How AgurateAI Works
           </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto leading-relaxed">
             Understanding the AI-powered crop health intelligence built specifically 
             for Louisiana Delta agriculture
           </p>
         </div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-12">
@@ -344,15 +358,31 @@ export default function HowItWorks() {
         </section>
 
         {/* CTA */}
-        <div className="text-center space-y-4 pt-8">
-          <h3 className="text-2xl font-display font-bold">Ready to Try It?</h3>
-          <p className="text-muted-foreground">Start analyzing your crops with AI-powered intelligence</p>
-          <div className="flex gap-4 justify-center">
-            <MagneticButton size="lg" variant="magnetic" onClick={() => navigate('/scanner')} className="gap-2">
+        <div className="text-center space-y-6 pt-12">
+          <Badge className="shadow-card">
+            <Zap className="h-3 w-3 mr-1" />
+            Get Started Today
+          </Badge>
+          <h3 className="text-3xl md:text-4xl font-display font-bold">Ready to Try It?</h3>
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            Start analyzing your crops with AI-powered intelligence
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <MagneticButton 
+              size="lg" 
+              variant="magnetic" 
+              onClick={() => navigate('/scanner')} 
+              className="gap-2 shadow-glow hover:shadow-field"
+            >
               <Camera className="h-5 w-5" />
               Start Field Scan
             </MagneticButton>
-            <MagneticButton size="lg" variant="outline" onClick={() => navigate('/predictions')} className="gap-2">
+            <MagneticButton 
+              size="lg" 
+              variant="outline" 
+              onClick={() => navigate('/predictions')} 
+              className="gap-2"
+            >
               <TrendingUp className="h-5 w-5" />
               View Predictions
             </MagneticButton>

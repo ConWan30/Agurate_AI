@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Sprout } from "lucide-react";
+import { Sprout, Shield, CheckCircle2, ArrowLeft, Zap, Users } from "lucide-react";
 import heroFields from "@/assets/hero-fields.jpg";
 
 export default function Auth() {
@@ -97,58 +98,172 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Hero */}
+    <div className="min-h-screen flex relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="absolute top-20 left-20 w-96 h-96 bg-primary rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-secondary rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      </div>
+
+      {/* Left side - Enhanced Hero */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroFields})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/60" />
-        <div className="relative z-10 flex flex-col justify-center px-12 text-primary-foreground">
-          <div className="flex items-center gap-3 mb-6">
-            <Sprout className="h-16 w-16" />
-            <h1 className="text-5xl font-bold">AgurateAI</h1>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/85 via-primary/75 to-primary/65" />
+        
+        {/* Floating particles effect */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-primary-foreground/30 rounded-full animate-float" />
+          <div className="absolute top-1/2 right-1/3 w-3 h-3 bg-primary-foreground/20 rounded-full animate-float" style={{ animationDelay: '1s' }} />
+          <div className="absolute bottom-1/3 left-1/2 w-2 h-2 bg-primary-foreground/25 rounded-full animate-float" style={{ animationDelay: '2s' }} />
+        </div>
+
+        <div className="relative z-10 flex flex-col justify-center px-12 text-primary-foreground animate-fade-in">
+          {/* Logo with glow */}
+          <div className="flex items-center gap-4 mb-8 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary-foreground/20 rounded-2xl blur-xl animate-glow-pulse" />
+              <div className="relative h-20 w-20 rounded-2xl bg-primary-foreground/10 backdrop-blur-sm flex items-center justify-center border border-primary-foreground/20">
+                <Sprout className="h-12 w-12 animate-float" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-5xl font-display font-bold">
+                Agurate<span className="text-primary-foreground">AI</span>
+              </h1>
+              <p className="text-sm opacity-75 mt-1">Morehouse Parish, Louisiana</p>
+            </div>
           </div>
-          <p className="text-xl mb-4">AI-Powered Crop Health Monitoring</p>
-          <p className="text-lg opacity-90">
-            Transform your farming with intelligent crop analysis for rice, soybean, cotton, and corn.
+
+          <Badge className="mb-6 w-fit glass border-primary-foreground/40 text-primary-foreground backdrop-blur-md">
+            <Zap className="h-3 w-3 mr-1" />
+            AI-Powered Precision Agriculture
+          </Badge>
+          
+          <h2 className="text-3xl font-display font-bold mb-4 leading-tight">
+            Transform Your Farming with Intelligent Crop Analysis
+          </h2>
+          
+          <p className="text-lg opacity-90 mb-8 leading-relaxed">
+            Real-time crop health monitoring for rice, soybean, cotton, and corn. 
+            Backed by LSU AgCenter research.
           </p>
-          <div className="mt-8 space-y-2 text-sm">
-            <p>✓ Real-time crop health assessment</p>
-            <p>✓ Weather-integrated recommendations</p>
-            <p>✓ Field management made simple</p>
+
+          {/* Feature list with icons */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 group">
+              <div className="h-10 w-10 rounded-xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-semibold">Real-time Crop Assessment</p>
+                <p className="text-sm opacity-75">Instant AI-powered analysis</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 group">
+              <div className="h-10 w-10 rounded-xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Shield className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-semibold">LSU AgCenter Validated</p>
+                <p className="text-sm opacity-75">Research-backed insights</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 group">
+              <div className="h-10 w-10 rounded-xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-semibold">Cooperative Network</p>
+                <p className="text-sm opacity-75">Share insights with neighbors</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Trust badges */}
+          <div className="mt-12 pt-8 border-t border-primary-foreground/20 flex items-center gap-6">
+            <Badge variant="outline" className="glass border-primary-foreground/40 text-primary-foreground">
+              <Shield className="h-3 w-3 mr-1" />
+              Secure & Private
+            </Badge>
+            <Badge variant="outline" className="glass border-primary-foreground/40 text-primary-foreground">
+              <CheckCircle2 className="h-3 w-3 mr-1" />
+              LSU Verified
+            </Badge>
           </div>
         </div>
       </div>
 
-      {/* Right side - Auth Forms */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Sprout className="h-10 w-10 text-primary" />
-              <span className="text-3xl font-bold">AgurateAI</span>
+      {/* Right side - Enhanced Auth Forms */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background relative">
+        <div className="w-full max-w-md relative z-10">
+          {/* Back to home link */}
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8 group"
+          >
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            Back to Home
+          </Link>
+
+          {/* Mobile header with enhanced styling */}
+          <div className="lg:hidden text-center mb-8 animate-fade-in">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-xl blur-lg" />
+                <div className="relative h-14 w-14 rounded-xl gradient-delta shadow-glow flex items-center justify-center">
+                  <Sprout className="h-8 w-8 text-primary-foreground animate-float" />
+                </div>
+              </div>
+              <div className="text-left">
+                <span className="text-3xl font-display font-bold">
+                  Agurate<span className="text-primary">AI</span>
+                </span>
+                <p className="text-xs text-muted-foreground">Morehouse Parish, LA</p>
+              </div>
             </div>
             <p className="text-muted-foreground">AI-Powered Crop Health Monitoring</p>
           </div>
 
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          <Tabs defaultValue="signin" className="w-full animate-fade-in">
+            <TabsList className="grid w-full grid-cols-2 p-1 bg-muted/50 h-12">
+              <TabsTrigger 
+                value="signin"
+                className="data-[state=active]:bg-background data-[state=active]:shadow-card transition-all"
+              >
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger 
+                value="signup"
+                className="data-[state=active]:bg-background data-[state=active]:shadow-card transition-all"
+              >
+                Sign Up
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Sign In</CardTitle>
-                  <CardDescription>Enter your credentials to access your account</CardDescription>
+            <TabsContent value="signin" className="animate-fade-in">
+              <Card className="border-2 shadow-field hover-lift transition-all">
+                <CardHeader className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-xl gradient-delta shadow-glow flex items-center justify-center">
+                      <Sprout className="h-6 w-6 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl">Welcome Back</CardTitle>
+                      <CardDescription>Sign in to access your dashboard</CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSignIn} className="space-y-4">
+                  <form onSubmit={handleSignIn} className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="signin-email">Email</Label>
+                      <Label htmlFor="signin-email" className="text-sm font-semibold">
+                        Email Address
+                      </Label>
                       <Input
                         id="signin-email"
                         type="email"
@@ -157,39 +272,80 @@ export default function Auth() {
                         onChange={(e) =>
                           setSignInData({ ...signInData, email: e.target.value })
                         }
+                        className="h-11 border-2 focus:border-primary transition-colors"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signin-password">Password</Label>
+                      <Label htmlFor="signin-password" className="text-sm font-semibold">
+                        Password
+                      </Label>
                       <Input
                         id="signin-password"
                         type="password"
+                        placeholder="Enter your password"
                         value={signInData.password}
                         onChange={(e) =>
                           setSignInData({ ...signInData, password: e.target.value })
                         }
+                        className="h-11 border-2 focus:border-primary transition-colors"
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "Signing in..." : "Sign In"}
+                    <Button 
+                      type="submit" 
+                      className="w-full h-11 shadow-glow hover:shadow-field transition-all hover-lift text-base font-semibold" 
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                          Signing in...
+                        </span>
+                      ) : (
+                        "Sign In to Dashboard"
+                      )}
                     </Button>
+
+                    <div className="pt-4 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Don't have an account?{" "}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const signupTab = document.querySelector('[value="signup"]') as HTMLElement;
+                            signupTab?.click();
+                          }}
+                          className="text-primary font-semibold hover:underline"
+                        >
+                          Create one now
+                        </button>
+                      </p>
+                    </div>
                   </form>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="signup">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Create Account</CardTitle>
-                  <CardDescription>Join AgurateAI to start monitoring your crops</CardDescription>
+            <TabsContent value="signup" className="animate-fade-in">
+              <Card className="border-2 shadow-field hover-lift transition-all">
+                <CardHeader className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-xl gradient-harvest shadow-glow flex items-center justify-center">
+                      <Users className="h-6 w-6 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl">Join AgurateAI</CardTitle>
+                      <CardDescription>Start monitoring your crops with AI</CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSignUp} className="space-y-4">
+                  <form onSubmit={handleSignUp} className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="signup-name">Full Name</Label>
+                      <Label htmlFor="signup-name" className="text-sm font-semibold">
+                        Full Name
+                      </Label>
                       <Input
                         id="signup-name"
                         type="text"
@@ -198,11 +354,15 @@ export default function Auth() {
                         onChange={(e) =>
                           setSignUpData({ ...signUpData, fullName: e.target.value })
                         }
+                        className="h-11 border-2 focus:border-primary transition-colors"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-farm">Farm Name (Optional)</Label>
+                      <Label htmlFor="signup-farm" className="text-sm font-semibold">
+                        Farm Name{" "}
+                        <span className="text-muted-foreground font-normal">(Optional)</span>
+                      </Label>
                       <Input
                         id="signup-farm"
                         type="text"
@@ -211,10 +371,13 @@ export default function Auth() {
                         onChange={(e) =>
                           setSignUpData({ ...signUpData, farmName: e.target.value })
                         }
+                        className="h-11 border-2 focus:border-primary transition-colors"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-email">Email</Label>
+                      <Label htmlFor="signup-email" className="text-sm font-semibold">
+                        Email Address
+                      </Label>
                       <Input
                         id="signup-email"
                         type="email"
@@ -223,11 +386,14 @@ export default function Auth() {
                         onChange={(e) =>
                           setSignUpData({ ...signUpData, email: e.target.value })
                         }
+                        className="h-11 border-2 focus:border-primary transition-colors"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-password">Password</Label>
+                      <Label htmlFor="signup-password" className="text-sm font-semibold">
+                        Password
+                      </Label>
                       <Input
                         id="signup-password"
                         type="password"
@@ -236,13 +402,53 @@ export default function Auth() {
                         onChange={(e) =>
                           setSignUpData({ ...signUpData, password: e.target.value })
                         }
+                        className="h-11 border-2 focus:border-primary transition-colors"
                         required
                         minLength={6}
                       />
+                      <p className="text-xs text-muted-foreground">
+                        Must be at least 6 characters long
+                      </p>
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "Creating account..." : "Create Account"}
+
+                    {/* Trust indicators */}
+                    <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/50 border">
+                      <Shield className="h-5 w-5 text-success flex-shrink-0" />
+                      <p className="text-xs text-muted-foreground">
+                        Your data is encrypted and secure. We never share your information.
+                      </p>
+                    </div>
+
+                    <Button 
+                      type="submit" 
+                      className="w-full h-11 shadow-glow hover:shadow-field transition-all hover-lift text-base font-semibold" 
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                          Creating account...
+                        </span>
+                      ) : (
+                        "Create Account"
+                      )}
                     </Button>
+
+                    <div className="pt-4 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Already have an account?{" "}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const signinTab = document.querySelector('[value="signin"]') as HTMLElement;
+                            signinTab?.click();
+                          }}
+                          className="text-primary font-semibold hover:underline"
+                        >
+                          Sign in here
+                        </button>
+                      </p>
+                    </div>
                   </form>
                 </CardContent>
               </Card>
