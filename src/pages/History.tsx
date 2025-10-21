@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { CheckCircle2, AlertTriangle, AlertCircle, Calendar, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useDemoData } from "@/contexts/DemoDataContext";
+import bgCropTimeline from "@/assets/bg-crop-timeline.jpg";
 
 interface Assessment {
   id: string;
@@ -131,7 +132,14 @@ export default function History() {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl gradient-harvest p-8 md:p-12 shadow-glow">
+      <div 
+        className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-delta-mist"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(251, 146, 60, 0.92) 0%, rgba(249, 115, 22, 0.88) 100%), url(${bgCropTimeline})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <div className="relative z-10">
           <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
             Assessment History
