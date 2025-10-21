@@ -14,6 +14,9 @@ import { useDemoData } from "@/contexts/DemoDataContext";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { SkeletonDashboard } from "@/components/ui/skeleton-card";
+import { PullToRefresh } from "@/components/PullToRefresh";
+import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface Field {
   id: string;
@@ -37,6 +40,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showAdditionalTools, setShowAdditionalTools] = useState(false);
+  
+  // Enable keyboard shortcuts
+  useGlobalKeyboardShortcuts();
 
   useEffect(() => {
     if (isDemoMode) {
@@ -50,6 +56,7 @@ export default function Dashboard() {
   }, [isDemoMode]);
 
   const fetchDashboardData = async () => {
+    setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -131,7 +138,8 @@ export default function Dashboard() {
     <>
       <InteractiveTutorial open={showTutorial} onOpenChange={setShowTutorial} />
       
-      <div className="space-y-8">
+      <PullToRefresh onRefresh={fetchDashboardData}>
+        <div className="space-y-8">
         {/* Header - Louisiana Agricultural Theme with Background */}
         <div 
           className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
@@ -385,23 +393,13 @@ export default function Dashboard() {
             </Link>
           </div>
           {fields.length === 0 ? (
-            <Card glass className="border-dashed border-2">
-              <CardContent className="p-8 md:p-12 text-center">
-                <div className="flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl gradient-sky shadow-glow mx-auto mb-4 animate-float">
-                  <MapPin className="h-8 w-8 md:h-10 md:w-10 text-white" />
-                </div>
-                <h3 className="font-display font-bold text-xl mb-2">No Fields Yet</h3>
-                <p className="text-muted-foreground mb-6">
-                  Start by registering your first field to begin monitoring
-                </p>
-                <Link to="/fields">
-                  <Button className="gradient-delta text-white shadow-glow hover:shadow-glow-lg">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    Add Your First Field
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={MapPin}
+              title="No Fields Registered"
+              description="Start monitoring your crops by registering your first field. Add location, crop type, and acreage to begin."
+              actionLabel="Register Your First Field"
+              onAction={() => window.location.href = '/fields'}
+            />
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {fields.map((field) => {
@@ -446,23 +444,13 @@ export default function Dashboard() {
             </Link>
           </div>
           {recentAssessments.length === 0 ? (
-            <Card glass className="border-dashed border-2">
-              <CardContent className="p-8 md:p-12 text-center">
-                <div className="flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-2xl gradient-delta shadow-glow mx-auto mb-4 animate-float">
-                  <Upload className="h-8 w-8 md:h-10 md:w-10 text-white" />
-                </div>
-                <h3 className="font-display font-bold text-xl mb-2">No Analysis Yet</h3>
-                <p className="text-muted-foreground mb-6">
-                  Upload your first crop image to get AI-powered health insights
-                </p>
-                <Link to="/upload">
-                  <Button className="gradient-delta text-white shadow-glow hover:shadow-glow-lg">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload First Image
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={Upload}
+              title="No Crop Analysis Yet"
+              description="Upload your first crop image to receive AI-powered health assessments, stress detection, and actionable recommendations."
+              actionLabel="Upload First Crop Image"
+              onAction={() => window.location.href = '/upload'}
+            />
           ) : (
             <div className="space-y-6">
               {recentAssessments.map((assessment) => (
@@ -502,6 +490,7 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+      </PullToRefresh>
     </>
   );
 }

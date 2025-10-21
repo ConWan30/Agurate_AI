@@ -20,6 +20,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import MobileFloatingActions from "./MobileFloatingActions";
+import { KeyboardShortcutsHelp } from "./KeyboardShortcutsHelp";
 
 interface LayoutProps {
   children: ReactNode;
@@ -78,15 +79,18 @@ export const Layout = ({ children }: LayoutProps) => {
               </div>
             </Link>
             
-            <Button 
-              onClick={handleLogout} 
-              variant="ghost" 
-              size="sm"
-              className="hover:bg-destructive/10 hover:text-destructive transition-colors"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
+            <div className="flex items-center gap-2">
+              <KeyboardShortcutsHelp />
+              <Button 
+                onClick={handleLogout} 
+                variant="ghost" 
+                size="sm"
+                className="hover:bg-destructive/10 hover:text-destructive transition-colors"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>

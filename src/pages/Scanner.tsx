@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import TutorialTooltip from '@/components/TutorialTooltip';
+import { useHaptics } from '@/hooks/use-haptics';
+import { useGlobalKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 interface Field {
   id: string;
@@ -37,6 +39,10 @@ export default function Scanner() {
   const [aiOverlay, setAiOverlay] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const { triggerHaptic } = useHaptics();
+  
+  // Enable keyboard shortcuts
+  useGlobalKeyboardShortcuts();
 
   // Fetch fields
   useEffect(() => {
@@ -111,12 +117,16 @@ export default function Scanner() {
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast.error('Image too large. Please use image under 10MB.');
+      triggerHaptic('error');
       return;
     }
 
     setImage(file);
     const preview = URL.createObjectURL(file);
     setImagePreview(preview);
+    
+    // Haptic feedback on successful capture
+    triggerHaptic('success');
 
     // Re-capture GPS at photo time
     captureLocation();
@@ -204,11 +214,13 @@ export default function Scanner() {
 
       if (dbError) throw dbError;
 
+      triggerHaptic('success');
       toast.success('Analysis complete!');
       navigate(`/history`);
 
     } catch (error) {
       console.error('Analysis failed:', error);
+      triggerHaptic('error');
 
       if (!isOnline) {
         toast.error('Offline mode - assessment saved locally and will sync when online');
