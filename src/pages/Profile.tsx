@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "lucide-react";
+import bgHandsSoil from "@/assets/bg-hands-soil.jpg";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -97,7 +98,14 @@ export default function Profile() {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+      <div 
+        className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-delta-mist"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(120, 53, 15, 0.88) 0%, rgba(92, 64, 51, 0.85) 100%), url(${bgHandsSoil})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <div className="relative z-10">
           <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
             Profile Settings
