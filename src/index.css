@@ -50,16 +50,19 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Gradients */
+    /* Gradients - Louisiana Agricultural Landscapes */
     --gradient-delta: linear-gradient(135deg, hsl(142 65% 42%), hsl(142 70% 55%));
     --gradient-sky: linear-gradient(180deg, hsl(205 85% 58%), hsl(205 75% 68%));
     --gradient-harvest: linear-gradient(135deg, hsl(42 96% 56%), hsl(38 92% 50%));
     --gradient-earth: linear-gradient(135deg, hsl(30 35% 45%), hsl(25 40% 35%));
+    --gradient-cotton: linear-gradient(135deg, hsl(0 0% 98%), hsl(45 20% 94%));
+    --gradient-rice-field: linear-gradient(135deg, hsl(142 40% 35%), hsl(85 45% 45%));
 
     /* Shadows - Agricultural depth */
     --shadow-field: 0 10px 30px -10px hsl(142 65% 42% / 0.2);
     --shadow-card: 0 4px 12px -2px hsl(142 30% 20% / 0.08);
     --shadow-glow: 0 0 40px hsl(142 70% 55% / 0.3);
+    --shadow-delta-mist: 0 20px 60px -15px hsl(142 50% 30% / 0.25);
 
     /* Sidebar */
     --sidebar-background: 142 30% 98%;
@@ -264,5 +267,48 @@ All colors MUST be HSL.
 
   .plant-grow {
     animation: plant-grow 1s ease-out;
+  }
+
+  /* Novel Louisiana Delta Animations */
+  @keyframes delta-wave {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes cotton-drift {
+    0%, 100% {
+      transform: translateX(0) rotate(0deg);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateX(15px) rotate(5deg);
+      opacity: 1;
+    }
+  }
+
+  @keyframes field-shimmer {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .delta-wave {
+    animation: delta-wave 3s ease-in-out infinite;
+  }
+
+  .cotton-drift {
+    animation: cotton-drift 4s ease-in-out infinite;
+  }
+
+  .field-shimmer {
+    background-size: 200% 200%;
+    animation: field-shimmer 8s ease infinite;
   }
 }

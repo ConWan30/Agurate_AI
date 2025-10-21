@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -133,8 +134,15 @@ export default function Dashboard() {
       <InteractiveTutorial open={showTutorial} onOpenChange={setShowTutorial} />
       
       <div className="space-y-8">
-        {/* Header - Louisiana Agricultural Theme */}
-        <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+        {/* Header - Louisiana Agricultural Theme with Background */}
+        <div 
+          className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
+          style={{
+            backgroundImage: `linear-gradient(135deg, rgba(134, 107, 53, 0.95) 0%, rgba(80, 64, 31, 0.92) 100%), url(${bgDeltaRice})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           <div className="relative z-10 flex items-start justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">

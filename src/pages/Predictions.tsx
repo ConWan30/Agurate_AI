@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import bgCottonField from "@/assets/bg-cotton-field.jpg";
+import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
 
 interface Prediction {
   day: number;
@@ -78,9 +80,16 @@ export default function Predictions() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
-      {/* Hero Header */}
-      <div className="gradient-delta py-12 mb-8">
-        <div className="max-w-6xl mx-auto px-4 text-center space-y-4">
+      {/* Hero Header with Background */}
+      <div 
+        className="py-12 mb-8 field-shimmer relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(42, 96, 156, 0.93) 0%, rgba(80, 64, 131, 0.90) 100%), url(${bgCottonField})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-4 text-center space-y-4 relative z-10">
           <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
             Predictive Stress Analytics
           </h1>
@@ -103,11 +112,18 @@ export default function Predictions() {
           </Card>
         ) : predictions ? (
           <>
-            {/* Summary Card */}
-            <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            {/* Summary Card with Subtle Background */}
+            <Card 
+              className="border-primary/20 relative overflow-hidden"
+              style={{
+                backgroundImage: `linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%), url(${bgSoybeanResearch})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Cloud className="h-5 w-5" />
+                  <Cloud className="h-5 w-5 delta-wave" />
                   7-Day Forecast Summary
                 </CardTitle>
               </CardHeader>
