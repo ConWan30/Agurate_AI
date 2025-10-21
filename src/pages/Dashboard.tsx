@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon } from "lucide-react";
+import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon, BarChart3 } from "lucide-react";
+import { WeatherAlerts } from "@/components/WeatherAlerts";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -250,6 +251,22 @@ export default function Dashboard() {
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Link to="/analytics">
+                  <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10">
+                          <BarChart3 className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <h3 className="font-display font-bold text-lg mb-2">Advanced Analytics</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Deep insights and performance metrics
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
                 <Link to="/fields">
                   <Card className="field-card group cursor-pointer border-2 h-full hover:border-primary/50">
                     <CardContent className="p-6">
@@ -407,6 +424,9 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+
+        {/* Weather Alerts Section */}
+        <WeatherAlerts />
 
         {/* Recent Assessments - Enhanced */}
         <div>

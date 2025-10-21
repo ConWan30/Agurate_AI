@@ -30,6 +30,7 @@ const CooperativeJoin = lazy(() => import("./pages/CooperativeJoin"));
 const DeltaIntelligence = lazy(() => import("./pages/DeltaIntelligence"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Install = lazy(() => import("./pages/Install"));
+const Analytics = lazy(() => import("./pages/Analytics"));
 
 const queryClient = new QueryClient();
 
@@ -95,6 +96,7 @@ const App = () => (
           <Route path="/cooperatives" element={<ProtectedRoute><Layout><Cooperatives /></Layout></ProtectedRoute>} />
           <Route path="/cooperatives/join/:code" element={<ProtectedRoute><CooperativeJoin /></ProtectedRoute>} />
           <Route path="/delta" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><Layout><Analytics /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
           {/* Demo routes for screenshots - bypasses authentication */}
           <Route path="/demo/auth" element={<Auth />} />
@@ -110,6 +112,7 @@ const App = () => (
           <Route path="/demo/insurance" element={<Layout><Insurance /></Layout>} />
           <Route path="/demo/cooperatives" element={<Layout><Cooperatives /></Layout>} />
           <Route path="/demo/delta" element={<Layout><DeltaIntelligence /></Layout>} />
+          <Route path="/demo/analytics" element={<Layout><Analytics /></Layout>} />
           <Route path="/demo/profile" element={<Layout><Profile /></Layout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.delta-chat]
 verify_jwt = true
+
+[functions.weather-alerts]
+verify_jwt = false
