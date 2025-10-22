@@ -46,7 +46,7 @@ export default function MobileFloatingActions() {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-3 md:hidden" role="navigation" aria-label="Quick actions">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 md:hidden" role="navigation" aria-label="Quick actions">
       {actions.map((action) => {
         const isActive = location.pathname === action.path;
         if (isActive) return null; // Don't show button for current page

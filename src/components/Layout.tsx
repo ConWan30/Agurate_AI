@@ -20,6 +20,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import MobileFloatingActions from "./MobileFloatingActions";
+import MobileDrawerNav from "./MobileDrawerNav";
 import { KeyboardShortcutsHelp } from "./KeyboardShortcutsHelp";
 
 interface LayoutProps {
@@ -95,41 +96,14 @@ export const Layout = ({ children }: LayoutProps) => {
         </div>
       </header>
 
-      {/* Mobile Navigation - Enhanced with Agricultural Aesthetics */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/98 backdrop-blur-lg supports-[backdrop-filter]:bg-card/90 shadow-delta-mist">
-        <div className="grid grid-cols-5 gap-1 p-3">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all duration-300 group ${
-                  isActive 
-                    ? `bg-gradient-to-br ${item.gradient} text-primary ${item.glow}` 
-                    : 'hover:bg-muted text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {/* Animated background on hover */}
-                <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                
-                {/* Icon with micro animation */}
-                <item.icon className={`h-5 w-5 relative z-10 transition-transform duration-300 ${isActive ? 'delta-wave' : 'group-hover:scale-110'}`} />
-                
-                {/* Label */}
-                <span className="text-xs font-medium relative z-10">{item.label}</span>
-                
-                {/* Active indicator sprout */}
-                {isActive && (
-                  <Sprout className="absolute -top-1 -right-1 h-3 w-3 text-primary animate-float" />
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      {/* Mobile Drawer Navigation */}
+      <MobileDrawerNav 
+        navItems={navItems}
+        commandCenterItems={commandCenterItems}
+        businessItems={businessItems}
+      />
 
-      <div className="container mx-auto px-6 py-8 pb-24 md:pb-8">
+      <div className="container mx-auto px-6 py-8 pb-8">
         <div className="flex gap-8">
           {/* Desktop Sidebar - Louisiana Agricultural Theme */}
           <aside className="hidden md:block w-72 flex-shrink-0">
