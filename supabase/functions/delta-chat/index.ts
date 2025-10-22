@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
@@ -8,6 +9,15 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const deltaChatSchema = z.object({
+  messages: z.array(z.object({
+    role: z.enum(['user', 'assistant', 'system']),
+    content: z.string().min(1).max(10000)
+  })).min(1).max(50),
+  conversationId: z.string().uuid().optional()
+});
 
 const SYSTEM_PROMPT = `You are Delta Intelligence, an AI expert assistant specialized in Louisiana Delta agriculture. You have deep knowledge of:
 
@@ -40,7 +50,24 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, conversationId } = await req.json();
+    // Validate input
+    const rawBody = await req.json();
+    const validation = deltaChatSchema.safeParse(rawBody);
+    
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input data",
+          details: validation.error.errors 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const { messages, conversationId } = validation.data;
     
     const authHeader = req.headers.get('authorization');
     const supabaseClient = createClient(
@@ -118,8 +145,23 @@ serve(async (req) => {
     return new Response(response.body, {
       headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Delta chat error:', error);
+    
+    // Handle validation errors
+    if (error?.name === 'ZodError') {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input data",
+          details: error.errors 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,

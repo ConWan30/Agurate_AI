@@ -685,7 +685,18 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      can_view_invitation: {
+        Args: { inv_id: string; user_id: string }
+        Returns: boolean
+      }
+      is_cooperative_admin: {
+        Args: { coop_id: string; user_id: string }
+        Returns: boolean
+      }
+      is_cooperative_member: {
+        Args: { coop_id: string; user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

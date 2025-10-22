@@ -11,11 +11,35 @@ import { useToast } from "@/hooks/use-toast";
 import { Sprout, Shield, CheckCircle2, ArrowLeft, Zap, Users } from "lucide-react";
 import heroFields from "@/assets/hero-fields.jpg";
 import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
+import { z } from "zod";
+
+// Validation schemas
+const signInSchema = z.object({
+  email: z.string().email("Invalid email address").max(255, "Email too long"),
+  password: z.string().min(1, "Password is required")
+});
+
+const signUpSchema = z.object({
+  email: z.string().email("Invalid email address").max(255, "Email too long"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .max(72, "Password too long"),
+  fullName: z.string()
+    .min(1, "Full name is required")
+    .max(100, "Name too long")
+    .trim(),
+  farmName: z.string()
+    .max(200, "Farm name too long")
+    .trim()
+    .optional()
+    .or(z.literal(''))
+});
 
 export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [signUpData, setSignUpData] = useState({
     email: "",
@@ -32,6 +56,21 @@ export default function Auth() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrors({});
+
+    // Validate input
+    const validation = signUpSchema.safeParse(signUpData);
+    if (!validation.success) {
+      const fieldErrors: Record<string, string> = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -49,7 +88,7 @@ export default function Auth() {
             id: data.user.id,
             email: signUpData.email,
             full_name: signUpData.fullName,
-            farm_name: signUpData.farmName,
+            farm_name: signUpData.farmName || null,
           });
 
         if (profileError) throw profileError;
@@ -74,6 +113,21 @@ export default function Auth() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrors({});
+
+    // Validate input
+    const validation = signInSchema.safeParse(signInData);
+    if (!validation.success) {
+      const fieldErrors: Record<string, string> = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      setLoading(false);
+      return;
+    }
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -283,6 +337,7 @@ export default function Auth() {
                         className="h-11 border-2 focus:border-primary transition-colors"
                         required
                       />
+                      {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signin-password" className="text-sm font-semibold">
@@ -299,6 +354,7 @@ export default function Auth() {
                         className="h-11 border-2 focus:border-primary transition-colors"
                         required
                       />
+                      {errors.password && <p className="text-sm text-destructive mt-1">{errors.password}</p>}
                     </div>
                     <Button 
                       type="submit" 
@@ -365,6 +421,7 @@ export default function Auth() {
                         className="h-11 border-2 focus:border-primary transition-colors"
                         required
                       />
+                      {errors.fullName && <p className="text-sm text-destructive mt-1">{errors.fullName}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-farm" className="text-sm font-semibold">
@@ -381,6 +438,7 @@ export default function Auth() {
                         }
                         className="h-11 border-2 focus:border-primary transition-colors"
                       />
+                      {errors.farmName && <p className="text-sm text-destructive mt-1">{errors.farmName}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-email" className="text-sm font-semibold">
@@ -397,6 +455,7 @@ export default function Auth() {
                         className="h-11 border-2 focus:border-primary transition-colors"
                         required
                       />
+                      {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-password" className="text-sm font-semibold">
@@ -405,7 +464,7 @@ export default function Auth() {
                       <Input
                         id="signup-password"
                         type="password"
-                        placeholder="Minimum 6 characters"
+                        placeholder="Minimum 8 characters"
                         value={signUpData.password}
                         onChange={(e) =>
                           setSignUpData({ ...signUpData, password: e.target.value })

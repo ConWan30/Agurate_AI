@@ -1,10 +1,19 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const analyzeCropSchema = z.object({
+  imageUrl: z.string().url().max(2048),
+  cropType: z.enum(['rice', 'soybean', 'cotton', 'corn']),
+  location: z.string().max(200).optional(),
+  mediaType: z.enum(['image', 'video']).default('image')
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,7 +21,24 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, cropType, location, mediaType = 'image' } = await req.json();
+    // Validate input
+    const rawBody = await req.json();
+    const validation = analyzeCropSchema.safeParse(rawBody);
+    
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input data",
+          details: validation.error.errors 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const { imageUrl, cropType, location, mediaType } = validation.data;
     console.log('Analyzing crop media:', { imageUrl, cropType, location, mediaType });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -119,35 +145,35 @@ ${cropType.toLowerCase().includes('corn') ? `**CORN:** Look for:
 
 Respond with JSON:
 {
-  "crop_type": "${cropType}",
-  "stress_score": <float 0.0-1.0>,
-  "condition": "Healthy" | "Mild Stress" | "Severe Stress",
-  "visual_cues": "<specific symptoms observed>",
-  "symptoms": [<array of 3-5 specific observations>],
-  "health_score": <float 0.0-1.0, inverse of stress>,
-  "confidence_score": <float 0.0-1.0, your confidence in this assessment>,
-  "analysis_summary": "<plain-language insight for Louisiana farmer>",
-  "growth_stage": "<specific growth stage: e.g., V6, R3, tillering, flowering, grain fill>",
-  "disease_identified": [<array of specific disease names if detected, empty if none>],
-  "pest_identified": [<array of specific pest names if detected, empty if none>],
-  "nutrient_deficiencies": {
-    "nitrogen": {"detected": <boolean>, "severity": "none"|"mild"|"moderate"|"severe"},
-    "phosphorus": {"detected": <boolean>, "severity": "none"|"mild"|"moderate"|"severe"},
-    "potassium": {"detected": <boolean>, "severity": "none"|"mild"|"moderate"|"severe"},
-    "other": [<array of other deficiencies with severity>]
+  \"crop_type\": \"${cropType}\",
+  \"stress_score\": <float 0.0-1.0>,
+  \"condition\": \"Healthy\" | \"Mild Stress\" | \"Severe Stress\",
+  \"visual_cues\": \"<specific symptoms observed>\",
+  \"symptoms\": [<array of 3-5 specific observations>],
+  \"health_score\": <float 0.0-1.0, inverse of stress>,
+  \"confidence_score\": <float 0.0-1.0, your confidence in this assessment>,
+  \"analysis_summary\": \"<plain-language insight for Louisiana farmer>\",
+  \"growth_stage\": \"<specific growth stage: e.g., V6, R3, tillering, flowering, grain fill>\",
+  \"disease_identified\": [<array of specific disease names if detected, empty if none>],
+  \"pest_identified\": [<array of specific pest names if detected, empty if none>],
+  \"nutrient_deficiencies\": {
+    \"nitrogen\": {\"detected\": <boolean>, \"severity\": \"none\"|\"mild\"|\"moderate\"|\"severe\"},
+    \"phosphorus\": {\"detected\": <boolean>, \"severity\": \"none\"|\"mild\"|\"moderate\"|\"severe\"},
+    \"potassium\": {\"detected\": <boolean>, \"severity\": \"none\"|\"mild\"|\"moderate\"|\"severe\"},
+    \"other\": [<array of other deficiencies with severity>]
   },
-  "severity_ratings": {
-    "disease_pressure": "none"|"low"|"moderate"|"high"|"severe",
-    "pest_pressure": "none"|"low"|"moderate"|"high"|"severe",
-    "environmental_stress": "none"|"low"|"moderate"|"high"|"severe",
-    "overall_severity": "none"|"low"|"moderate"|"high"|"severe"
+  \"severity_ratings\": {
+    \"disease_pressure\": \"none\"|\"low\"|\"moderate\"|\"high\"|\"severe\",
+    \"pest_pressure\": \"none\"|\"low\"|\"moderate\"|\"high\"|\"severe\",
+    \"environmental_stress\": \"none\"|\"low\"|\"moderate\"|\"high\"|\"severe\",
+    \"overall_severity\": \"none\"|\"low\"|\"moderate\"|\"high\"|\"severe\"
   },
-  "field_uniformity_score": <float 0.0-1.0, 1.0 = perfectly uniform>,
-  "estimated_yield_impact_percent": <float 0-100, estimated % yield loss or negative for gain>,
-  "canopy_coverage_percent": <float 0-100, % ground covered by crop>,
-  "plant_density_assessment": "very_low"|"low"|"optimal"|"high"|"very_high",
-  "root_health_indicators": [<array of visible signs suggesting root health/issues>],
-  "detailed_visual_analysis": "<comprehensive 3-5 sentence analysis covering color patterns, leaf architecture, plant vigor, spatial distribution, and any anomalies>"
+  \"field_uniformity_score\": <float 0.0-1.0, 1.0 = perfectly uniform>,
+  \"estimated_yield_impact_percent\": <float 0-100, estimated % yield loss or negative for gain>,
+  \"canopy_coverage_percent\": <float 0-100, % ground covered by crop>,
+  \"plant_density_assessment\": \"very_low\"|\"low\"|\"optimal\"|\"high\"|\"very_high\",
+  \"root_health_indicators\": [<array of visible signs suggesting root health/issues>],
+  \"detailed_visual_analysis\": \"<comprehensive 3-5 sentence analysis covering color patterns, leaf architecture, plant vigor, spatial distribution, and any anomalies>\"
 }`
               },
               mediaType === 'video' 
@@ -243,16 +269,16 @@ Provide 1-3 specific, actionable recommendations. Prioritize based on stress sev
 
 Respond with JSON:
 {
-  "recommendations": [
+  \"recommendations\": [
     {
-      "text": "<specific actionable recommendation with quantities/timing>",
-      "priority": "urgent" | "normal" | "low",
-      "category": "irrigation" | "fertilization" | "pest_management" | "weather_alert" | "general",
-      "reasoning": "<why this action is needed based on symptoms and weather>"
+      \"text\": \"<specific actionable recommendation with quantities/timing>\",
+      \"priority\": \"urgent\" | \"normal\" | \"low\",
+      \"category\": \"irrigation\" | \"fertilization\" | \"pest_management\" | \"weather_alert\" | \"general\",
+      \"reasoning\": \"<why this action is needed based on symptoms and weather>\"
     }
   ],
-  "weather_note": "<how current/forecast weather affects crop health and recommended timing>",
-  "analysis_summary": "<2-3 sentence plain-language summary for farmer>"
+  \"weather_note\": \"<how current/forecast weather affects crop health and recommended timing>\",
+  \"analysis_summary\": \"<2-3 sentence plain-language summary for farmer>\"
 }`
           }
         ],
@@ -318,6 +344,21 @@ Respond with JSON:
     );
   } catch (error: any) {
     console.error('Error in analyze-crop function:', error);
+    
+    // Handle validation errors
+    if (error.name === 'ZodError') {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input data",
+          details: error.errors 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
     return new Response(
       JSON.stringify({ error: error.message || 'Analysis failed' }),
       {
