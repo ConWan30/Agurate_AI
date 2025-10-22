@@ -56,9 +56,9 @@ export default function Cooperatives() {
       
       if (memberError) throw memberError;
 
-      // Get roles for each membership
+      // Get roles for each membership from cooperative_roles table
       const { data: roles, error: roleError } = await supabase
-        .from('cooperative_roles')
+        .from('cooperative_roles' as any)
         .select('cooperative_id, role')
         .eq('user_id', user?.id || '');
       
@@ -67,7 +67,7 @@ export default function Cooperatives() {
       // Merge roles with memberships
       return memberships?.map(m => ({
         ...m,
-        role: roles?.find(r => r.cooperative_id === m.cooperative_id)?.role || 'member'
+        role: (roles as any)?.find((r: any) => r.cooperative_id === m.cooperative_id)?.role || 'member'
       }));
     },
     enabled: !!user
@@ -97,9 +97,9 @@ export default function Cooperatives() {
       
       if (memberError) throw memberError;
 
-      // Add creator as admin in roles table
+      // Add creator as admin in cooperative_roles table
       const { error: roleError } = await supabase
-        .from('cooperative_roles')
+        .from('cooperative_roles' as any)
         .insert([{
           cooperative_id: coop.id,
           user_id: user?.id || '',
