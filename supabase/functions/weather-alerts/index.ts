@@ -1,10 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const weatherAlertsSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
 
 interface WeatherAlert {
   type: "frost" | "drought" | "severe_weather" | "excessive_rain";
@@ -22,11 +29,9 @@ serve(async (req) => {
   }
 
   try {
-    const { latitude, longitude } = await req.json();
-
-    if (!latitude || !longitude) {
-      throw new Error("Latitude and longitude are required");
-    }
+    // Validate input
+    const body = weatherAlertsSchema.parse(await req.json());
+    const { latitude, longitude } = body;
 
     // NOAA API - National Weather Service alerts
     const alertsUrl = `https://api.weather.gov/alerts/active?point=${latitude},${longitude}`;
@@ -109,6 +114,23 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("Weather alerts error:", error);
+    
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input parameters",
+          details: error.errors,
+          alerts: [],
+          count: 0
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+    
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : "Unknown error",

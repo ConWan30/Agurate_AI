@@ -46,7 +46,7 @@ export default function Cooperatives() {
   const { data: myMemberships } = useQuery({
     queryKey: ['my-memberships'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: memberships, error: memberError } = await supabase
         .from('cooperative_members')
         .select(`
           *,
@@ -54,8 +54,21 @@ export default function Cooperatives() {
         `)
         .eq('user_id', user?.id || '');
       
-      if (error) throw error;
-      return data;
+      if (memberError) throw memberError;
+
+      // Get roles for each membership
+      const { data: roles, error: roleError } = await supabase
+        .from('cooperative_roles')
+        .select('cooperative_id, role')
+        .eq('user_id', user?.id || '');
+      
+      if (roleError) throw roleError;
+
+      // Merge roles with memberships
+      return memberships?.map(m => ({
+        ...m,
+        role: roles?.find(r => r.cooperative_id === m.cooperative_id)?.role || 'member'
+      }));
     },
     enabled: !!user
   });
@@ -74,16 +87,26 @@ export default function Cooperatives() {
       
       if (coopError) throw coopError;
 
-      // Add creator as admin member
+      // Add creator as member
       const { error: memberError } = await supabase
         .from('cooperative_members')
+        .insert([{
+          cooperative_id: coop.id,
+          user_id: user?.id || ''
+        }]);
+      
+      if (memberError) throw memberError;
+
+      // Add creator as admin in roles table
+      const { error: roleError } = await supabase
+        .from('cooperative_roles')
         .insert([{
           cooperative_id: coop.id,
           user_id: user?.id || '',
           role: 'admin'
         }]);
       
-      if (memberError) throw memberError;
+      if (roleError) throw roleError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cooperatives'] });
