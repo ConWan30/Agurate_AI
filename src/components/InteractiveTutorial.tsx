@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Scan, TrendingUp, Brain, FileText, CheckCircle2, ArrowRight, X, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Scan, TrendingUp, Brain, FileText, CheckCircle2, ArrowRight, X, AlertTriangle, Sprout, Cloud, Zap, Target, Compass, MapPin } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
 
 interface InteractiveTutorialProps {
@@ -13,86 +14,190 @@ interface InteractiveTutorialProps {
 
 export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialProps) {
   const [step, setStep] = useState(0);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   const navigate = useNavigate();
+
+  // Simulate scanning animation
+  useEffect(() => {
+    if (step === 1 && open) {
+      setScanProgress(0);
+      setIsAnimating(true);
+      const interval = setInterval(() => {
+        setScanProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setIsAnimating(false);
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 30);
+      return () => clearInterval(interval);
+    }
+  }, [step, open]);
 
   const steps = [
     {
-      icon: Scan,
-      title: 'Meet James: Louisiana Delta Farmer',
-      description: 'A real-world story of AI-powered precision agriculture',
+      icon: Compass,
+      title: 'Welcome to the Louisiana Delta',
+      description: 'Your AI-powered partner in precision agriculture',
       content: (
-        <div className="space-y-4">
-          <p className="text-lg font-medium">Tuesday, 6:30 AM - Morehouse Parish, Louisiana</p>
-          <p className="text-muted-foreground leading-relaxed">
-            James walks his 400-acre soybean field. He notices some yellowing leaves in Section B. 
-            In the past, he'd have to wait days for an extension agent visit or risk applying the 
-            wrong treatment. Not anymore.
-          </p>
-          <div className="grid gap-3">
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-              <Scan className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">Instant AI crop diagnosis from smartphone</span>
+        <div className="space-y-6">
+          {/* Animated Hero Section */}
+          <div className="relative overflow-hidden rounded-xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 p-8">
+            <div className="absolute inset-0 field-shimmer opacity-30" />
+            <div className="relative z-10 text-center space-y-4">
+              <Sprout className="h-16 w-16 mx-auto text-primary animate-bounce delta-wave" />
+              <h3 className="text-2xl font-bold text-gradient-delta">AgurateAI Platform</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Where Louisiana farming tradition meets cutting-edge AI technology
+              </p>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">7-day stress forecasts based on weather</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-              <Brain className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">LSU AgCenter research at his fingertips</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-              <FileText className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">Automatic insurance documentation</span>
-            </div>
+            {/* Floating elements */}
+            <Cloud className="absolute top-4 right-4 h-8 w-8 text-secondary/30 cotton-drift" />
+            <MapPin className="absolute bottom-4 left-4 h-6 w-6 text-primary/30 animate-pulse" />
           </div>
-          <p className="text-sm text-primary font-medium pt-2">Let's see how James uses AgurateAI...</p>
-        </div>
-      ),
-      action: "Start James's Story"
-    },
-    {
-      icon: Scan,
-      title: 'Core Feature #1: AI Crop Scanner',
-      description: '6:35 AM - James scans the yellowing leaves',
-      content: (
-        <div className="space-y-4">
-          <div className="relative rounded-lg overflow-hidden">
-            <div className="aspect-video bg-gradient-to-br from-green-500/20 to-yellow-500/20 flex items-center justify-center border-2 border-dashed border-primary/30">
-              <div className="text-center">
-                <Scan className="h-16 w-16 text-primary mx-auto mb-3 animate-pulse" />
-                <p className="text-sm font-medium">Opens phone camera • Takes 3 photos • GPS auto-tagged</p>
-              </div>
-            </div>
-          </div>
-          
-          <Card className="border-primary/30 bg-gradient-to-br from-green-500/5 to-yellow-500/5">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3 mb-3">
-                <CheckCircle2 className="h-5 w-5 text-green-600 mt-1" />
-                <div>
-                  <p className="font-semibold mb-1">AI Analysis Complete (1.2 seconds)</p>
-                  <div className="space-y-1 text-sm text-muted-foreground">
-                    <p>• Health Score: <span className="font-bold text-yellow-600">68%</span> (Moderate Stress)</p>
-                    <p>• Likely Issue: <span className="font-medium">Potassium Deficiency</span></p>
-                    <p>• Confidence: <span className="font-bold">94%</span></p>
-                    <p>• Location: Section B, Row 14 (GPS tagged)</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">🎯 LSU Pitch Value:</p>
+          {/* Feature Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
+              <Scan className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
+              <p className="text-sm font-semibold mb-1">AI Scanner</p>
+              <p className="text-xs text-muted-foreground">Instant crop health diagnosis</p>
+            </div>
+            <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
+              <TrendingUp className="h-8 w-8 text-secondary mb-2 group-hover:scale-110 transition-transform" />
+              <p className="text-sm font-semibold mb-1">Predictions</p>
+              <p className="text-xs text-muted-foreground">7-day stress forecasting</p>
+            </div>
+            <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
+              <Brain className="h-8 w-8 text-accent mb-2 group-hover:scale-110 transition-transform" />
+              <p className="text-sm font-semibold mb-1">Delta AI</p>
+              <p className="text-xs text-muted-foreground">Research-backed advisor</p>
+            </div>
+            <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
+              <FileText className="h-8 w-8 text-success mb-2 group-hover:scale-110 transition-transform" />
+              <p className="text-sm font-semibold mb-1">Insurance</p>
+              <p className="text-xs text-muted-foreground">Automated claim docs</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 p-4 rounded-lg bg-primary/5 border border-primary/20">
+            <Target className="h-5 w-5 text-primary shrink-0" />
             <p className="text-sm text-muted-foreground">
-              Farmers get <span className="font-bold">instant diagnosis</span> anywhere in the field. 
-              No extension agent needed for first-level assessment. Multiplies AgCenter reach by 1000x.
+              <span className="font-semibold text-foreground">Follow James's journey</span> – a real Louisiana Delta farmer using AI to transform his 400-acre operation
             </p>
           </div>
         </div>
       ),
-      action: 'Next: Predictions'
+      action: "Begin Journey →"
+    },
+    {
+      icon: Scan,
+      title: 'AI Crop Scanner in Action',
+      description: 'Tuesday, 6:35 AM - Section B, Morehouse Parish',
+      content: (
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            James notices yellowing leaves in Section B. He pulls out his phone and opens AgurateAI Scanner...
+          </p>
+
+          {/* Interactive Scanning Simulation */}
+          <div className="relative rounded-xl overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-success/5 via-warning/5 to-destructive/5">
+            <div className="aspect-video flex items-center justify-center p-6">
+              {scanProgress === 0 && (
+                <div className="text-center space-y-4 animate-fade-in">
+                  <div className="relative">
+                    <Scan className="h-20 w-20 text-primary mx-auto animate-pulse" />
+                    <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold">📱 Camera Opens</p>
+                    <p className="text-xs text-muted-foreground">Focuses on yellowing leaves</p>
+                  </div>
+                </div>
+              )}
+              
+              {scanProgress > 0 && scanProgress < 100 && (
+                <div className="w-full space-y-4 animate-fade-in">
+                  <div className="text-center">
+                    <Zap className="h-16 w-16 text-primary mx-auto mb-3 animate-spin" />
+                    <p className="text-sm font-semibold mb-2">AI Analysis in Progress...</p>
+                  </div>
+                  <Progress value={scanProgress} className="h-3" />
+                  <div className="grid grid-cols-3 gap-2 text-xs text-center">
+                    <div className={scanProgress > 30 ? 'text-primary font-medium' : 'text-muted-foreground'}>
+                      Vision AI
+                      {scanProgress > 30 && <CheckCircle2 className="h-3 w-3 inline ml-1" />}
+                    </div>
+                    <div className={scanProgress > 60 ? 'text-primary font-medium' : 'text-muted-foreground'}>
+                      Pattern Match
+                      {scanProgress > 60 && <CheckCircle2 className="h-3 w-3 inline ml-1" />}
+                    </div>
+                    <div className={scanProgress > 90 ? 'text-primary font-medium' : 'text-muted-foreground'}>
+                      Diagnosis
+                      {scanProgress > 90 && <CheckCircle2 className="h-3 w-3 inline ml-1" />}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {scanProgress === 100 && (
+                <div className="w-full space-y-3 animate-scale-in">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <CheckCircle2 className="h-8 w-8 text-success animate-bounce" />
+                    <span className="text-lg font-bold text-success">Analysis Complete!</span>
+                  </div>
+                  
+                  <Card className="border-warning/30 bg-warning/5">
+                    <CardContent className="p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Health Score</span>
+                        <Badge className="bg-warning text-warning-foreground">68%</Badge>
+                      </div>
+                      <Progress value={68} className="h-2" />
+                      <p className="text-xs text-muted-foreground">Moderate Stress Detected</p>
+                    </CardContent>
+                  </Card>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2 rounded bg-card border">
+                      <p className="text-muted-foreground mb-1">Issue</p>
+                      <p className="font-semibold">K Deficiency</p>
+                    </div>
+                    <div className="p-2 rounded bg-card border">
+                      <p className="text-muted-foreground mb-1">Confidence</p>
+                      <p className="font-semibold text-success">94%</p>
+                    </div>
+                    <div className="p-2 rounded bg-card border">
+                      <p className="text-muted-foreground mb-1">Location</p>
+                      <p className="font-semibold text-xs">Row 14</p>
+                    </div>
+                    <div className="p-2 rounded bg-card border">
+                      <p className="text-muted-foreground mb-1">Time</p>
+                      <p className="font-semibold">1.2s</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 p-4 rounded-lg glass border border-primary/20">
+            <Target className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold mb-1">Why This Matters</p>
+              <p className="text-xs text-muted-foreground">
+                Traditional diagnosis takes 3-7 days waiting for extension agent. 
+                <span className="font-semibold text-foreground"> AgurateAI delivers results in seconds</span>, 
+                enabling immediate action before damage spreads.
+              </p>
+            </div>
+          </div>
+        </div>
+      ),
+      action: 'Next: Predictions →'
     },
     {
       icon: TrendingUp,
@@ -339,14 +444,16 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-xl gradient-delta shadow-glow flex items-center justify-center">
-                <Icon className="h-6 w-6 text-white" />
+              <div className="relative h-14 w-14 rounded-xl gradient-delta shadow-glow flex items-center justify-center animate-fade-in">
+                <Icon className="h-7 w-7 text-white" />
+                {/* Ambient glow animation */}
+                <div className="absolute inset-0 rounded-xl bg-primary/20 animate-pulse" />
               </div>
-              <div>
+              <div className="animate-fade-in stagger-1">
                 <DialogTitle className="text-2xl">{currentStep.title}</DialogTitle>
                 <p className="text-sm text-muted-foreground mt-1">{currentStep.description}</p>
               </div>
@@ -354,41 +461,71 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </div>
         </DialogHeader>
 
-        <div className="mt-4">
+        <div className="mt-6 animate-fade-in stagger-2">
           {currentStep.content}
         </div>
 
-        {/* Progress Indicators */}
-        <div className="flex items-center justify-center gap-2 mt-6">
-          {steps.map((_, idx) => (
-            <div
-              key={idx}
-              className={`h-2 rounded-full transition-all ${
-                idx === step 
-                  ? 'w-8 bg-primary' 
-                  : idx < step 
-                  ? 'w-2 bg-primary/50' 
-                  : 'w-2 bg-muted'
-              }`}
-            />
-          ))}
+        {/* Enhanced Progress Indicators with Labels */}
+        <div className="mt-8 space-y-3">
+          <div className="flex items-center justify-center gap-2">
+            {steps.map((stepItem, idx) => (
+              <div
+                key={idx}
+                className={`relative h-2 rounded-full transition-all duration-500 ${
+                  idx === step 
+                    ? 'w-12 bg-primary shadow-glow' 
+                    : idx < step 
+                    ? 'w-8 bg-primary/60' 
+                    : 'w-6 bg-muted'
+                }`}
+              >
+                {idx === step && (
+                  <div className="absolute inset-0 rounded-full bg-primary animate-pulse" />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <span className={step >= 0 ? 'text-primary font-medium' : ''}>Welcome</span>
+            <span>→</span>
+            <span className={step >= 1 ? 'text-primary font-medium' : ''}>Scanner</span>
+            <span>→</span>
+            <span className={step >= 2 ? 'text-primary font-medium' : ''}>Predictions</span>
+            <span>→</span>
+            <span className={step >= 3 ? 'text-primary font-medium' : ''}>AI Advisor</span>
+            <span>→</span>
+            <span className={step >= 4 ? 'text-primary font-medium' : ''}>Insurance</span>
+            <span>→</span>
+            <span className={step >= 5 ? 'text-primary font-medium' : ''}>Impact</span>
+          </div>
         </div>
 
-        {/* Actions */}
+        {/* Enhanced Actions */}
         <div className="flex items-center justify-between mt-6 pt-6 border-t">
-          <Button variant="ghost" onClick={handleSkip} className="gap-2">
+          <Button 
+            variant="ghost" 
+            onClick={handleSkip} 
+            className="gap-2 hover:text-destructive transition-colors"
+          >
             <X className="h-4 w-4" />
-            {step === steps.length - 1 ? 'Close' : 'Skip Tutorial'}
+            {step === steps.length - 1 ? 'Close' : 'Skip Tour'}
           </Button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {step > 0 && (
-              <Button variant="outline" onClick={() => setStep(step - 1)}>
-                Back
+              <Button 
+                variant="outline" 
+                onClick={() => setStep(step - 1)}
+                className="gap-2 hover-lift"
+              >
+                ← Back
               </Button>
             )}
-            <Button onClick={handleNext} className="gap-2">
+            <Button 
+              onClick={handleNext} 
+              className="gap-2 gradient-delta text-white hover-lift shadow-field"
+            >
               {currentStep.action}
-              <ArrowRight className="h-4 w-4" />
+              {step < steps.length - 1 && <ArrowRight className="h-4 w-4" />}
             </Button>
           </div>
         </div>
