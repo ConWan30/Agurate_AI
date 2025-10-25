@@ -172,9 +172,44 @@ section {
     @apply font-display;
   }
   
+  /* Mobile viewport height fix */
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Ensure inputs are at least 16px to prevent iOS zoom */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+  
+  /* Skip link for keyboard navigation */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+    z-index: 100;
+  }
+  
+  .skip-link:focus {
+    top: 0;
+  }
+  
   /* Accessibility: Focus visible for keyboard navigation */
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+  
+  /* Better tap highlight for mobile */
+  * {
+    -webkit-tap-highlight-color: hsl(var(--primary) / 0.1);
   }
   
   /* Smooth scrolling for better UX */

@@ -92,11 +92,20 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      {/* Skip link for keyboard accessibility */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <PWAInstallPrompt />
       <NetworkStatus />
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
         <DemoDataProvider>
         <Suspense fallback={
           <div className="min-h-screen flex items-center justify-center">
@@ -107,9 +116,9 @@ const App = () => (
           </div>
         }>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/install" element={<Install />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<main id="main-content"><Home /></main>} />
+            <Route path="/install" element={<main id="main-content"><Install /></main>} />
+            <Route path="/auth" element={<main id="main-content"><Auth /></main>} />
             <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Layout><Upload /></Layout></ProtectedRoute>} />
           <Route path="/scanner" element={<ProtectedRoute><Layout><Scanner /></Layout></ProtectedRoute>} />

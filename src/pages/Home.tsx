@@ -130,7 +130,6 @@ export default function Home() {
           src={heroFields}
           alt="Louisiana agricultural fields"
           className="absolute inset-0 w-full h-full object-cover"
-          fetchPriority="high"
           loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/60" />
