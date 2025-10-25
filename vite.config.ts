@@ -14,7 +14,8 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+      injectRegister: null,
       includeAssets: ['favicon.ico', 'robots.txt', 'src/assets/*.png', 'src/assets/*.jpg'],
       manifest: {
         name: 'AgurateAI - Crop Health Monitoring',
