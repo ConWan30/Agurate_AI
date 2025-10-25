@@ -6,6 +6,17 @@
 All colors MUST be HSL.
 */
 
+/* Font Display Optimization */
+@font-face {
+  font-family: 'Inter';
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-display: swap;
+}
+
 @layer base {
   :root {
     /* Louisiana Delta Earth Tones - Light Mode */
