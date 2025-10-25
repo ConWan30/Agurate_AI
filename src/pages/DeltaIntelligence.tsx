@@ -30,6 +30,7 @@ export default function DeltaIntelligence() {
   const [isLoading, setIsLoading] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Show welcome message only for new conversations
   const displayMessages = messages.length === 0 ? [{
@@ -37,9 +38,27 @@ export default function DeltaIntelligence() {
     content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor, trained on LSU AgCenter research and decades of Louisiana Delta agriculture data.\n\n💡 **Try asking me:**\n- Crop-specific advice for rice, soybeans, cotton, or corn\n- Pest & disease identification\n- Soil management strategies\n- Weather-based planting guidance\n\nWhat can I help you with today?"
   }] : messages;
 
+  // Smooth scroll only when messages length changes (new message added), not during streaming updates
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [displayMessages]);
+    if (scrollRef.current && !isLoading) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages.length]);
+
+  // During streaming, maintain scroll at bottom without jerky behavior
+  useEffect(() => {
+    if (isLoading && scrollRef.current) {
+      const scrollContainer = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        const { scrollHeight, scrollTop, clientHeight } = scrollContainer;
+        const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+        
+        if (isNearBottom) {
+          scrollRef.current.scrollIntoView({ behavior: 'instant' });
+        }
+      }
+    }
+  }, [displayMessages, isLoading]);
 
   const streamChat = async (userMessage: string) => {
     let conversationId = currentConversationId;
@@ -212,18 +231,18 @@ export default function DeltaIntelligence() {
                 variant="outline"
                 size="sm"
                 onClick={handleNewConversation}
-                className="h-9"
+                className="h-9 px-2 sm:px-3"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                New
+                <Plus className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">New</span>
               </Button>
               <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9">
-                    <History className="h-4 w-4 mr-2" />
-                    History
+                  <Button variant="outline" size="sm" className="h-9 px-2 sm:px-3">
+                    <History className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">History</span>
                     {conversations.length > 0 && (
-                      <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
+                      <Badge variant="secondary" className="ml-1 sm:ml-2 h-5 px-1.5 text-xs">
                         {conversations.length}
                       </Badge>
                     )}
@@ -282,7 +301,7 @@ export default function DeltaIntelligence() {
           </CardHeader>
           <CardContent className="p-0">
             {/* Messages Area */}
-            <ScrollArea className="h-[500px] p-6">
+            <ScrollArea className="h-[500px] p-6" ref={scrollAreaRef}>
               <div className="space-y-6">
                 {displayMessages.map((msg, idx) => (
                   <div
