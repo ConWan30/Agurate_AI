@@ -17,6 +17,20 @@ All colors MUST be HSL.
   font-display: swap;
 }
 
+/* Performance: Reduce reflow scope with CSS containment */
+section {
+  contain: layout style;
+}
+
+/* Performance: GPU acceleration for animations */
+.animate-fade-in,
+.animate-scale-in,
+.animate-float,
+.animate-glow-pulse,
+.hover-lift {
+  will-change: transform, opacity;
+}
+
 @layer base {
   :root {
     /* Louisiana Delta Earth Tones - Light Mode */
@@ -301,23 +315,23 @@ All colors MUST be HSL.
     animation: plant-grow 1s ease-out;
   }
 
-  /* Novel Louisiana Delta Animations */
+  /* Novel Louisiana Delta Animations - GPU Accelerated */
   @keyframes delta-wave {
     0%, 100% {
-      transform: translateY(0);
+      transform: translate3d(0, 0, 0);
     }
     50% {
-      transform: translateY(-10px);
+      transform: translate3d(0, -10px, 0);
     }
   }
 
   @keyframes cotton-drift {
     0%, 100% {
-      transform: translateX(0) rotate(0deg);
+      transform: translate3d(0, 0, 0) rotate(0deg);
       opacity: 0.6;
     }
     50% {
-      transform: translateX(15px) rotate(5deg);
+      transform: translate3d(15px, 0, 0) rotate(5deg);
       opacity: 1;
     }
   }

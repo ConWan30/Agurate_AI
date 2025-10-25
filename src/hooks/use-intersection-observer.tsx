@@ -21,12 +21,15 @@ export function useIntersectionObserver(
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const isElementIntersecting = entry.isIntersecting;
-        setIsIntersecting(isElementIntersecting);
-        
-        if (isElementIntersecting && !hasIntersected) {
-          setHasIntersected(true);
-        }
+        // Use RAF to batch state updates and prevent forced reflows
+        requestAnimationFrame(() => {
+          const isElementIntersecting = entry.isIntersecting;
+          setIsIntersecting(isElementIntersecting);
+          
+          if (isElementIntersecting && !hasIntersected) {
+            setHasIntersected(true);
+          }
+        });
       },
       { threshold, root, rootMargin }
     );
