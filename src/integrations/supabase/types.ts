@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_insights: {
+        Row: {
+          actionable_recommendations: string[]
+          created_at: string | null
+          field_id: string
+          id: string
+          insight_data: Json
+          insight_type: string
+          lsu_research_basis: string[]
+        }
+        Insert: {
+          actionable_recommendations: string[]
+          created_at?: string | null
+          field_id: string
+          id?: string
+          insight_data: Json
+          insight_type: string
+          lsu_research_basis: string[]
+        }
+        Update: {
+          actionable_recommendations?: string[]
+          created_at?: string | null
+          field_id?: string
+          id?: string
+          insight_data?: Json
+          insight_type?: string
+          lsu_research_basis?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_insights_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "analytics_insights_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessments: {
         Row: {
           analyzed_at: string | null
@@ -119,6 +164,50 @@ export type Database = {
           },
         ]
       }
+      best_practices_network: {
+        Row: {
+          adoption_count: number | null
+          average_savings: number | null
+          created_at: string | null
+          description: string
+          id: string
+          lsu_research_basis: string[]
+          lsu_researcher_id: string | null
+          practice_name: string
+          success_rate: number | null
+        }
+        Insert: {
+          adoption_count?: number | null
+          average_savings?: number | null
+          created_at?: string | null
+          description: string
+          id?: string
+          lsu_research_basis: string[]
+          lsu_researcher_id?: string | null
+          practice_name: string
+          success_rate?: number | null
+        }
+        Update: {
+          adoption_count?: number | null
+          average_savings?: number | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          lsu_research_basis?: string[]
+          lsu_researcher_id?: string | null
+          practice_name?: string
+          success_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "best_practices_network_lsu_researcher_id_fkey"
+            columns: ["lsu_researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_assessments: {
         Row: {
           assessment_id: string
@@ -165,6 +254,144 @@ export type Database = {
             columns: ["claim_id"]
             isOneToOne: false
             referencedRelation: "insurance_claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_insights: {
+        Row: {
+          community_rating: number | null
+          created_at: string | null
+          farmer_id: string
+          field_id: string
+          id: string
+          insight_type: string
+          lsu_validation: boolean | null
+          outcome: string
+          practice: string
+          savings_achieved: number | null
+        }
+        Insert: {
+          community_rating?: number | null
+          created_at?: string | null
+          farmer_id: string
+          field_id: string
+          id?: string
+          insight_type: string
+          lsu_validation?: boolean | null
+          outcome: string
+          practice: string
+          savings_achieved?: number | null
+        }
+        Update: {
+          community_rating?: number | null
+          created_at?: string | null
+          farmer_id?: string
+          field_id?: string
+          id?: string
+          insight_type?: string
+          lsu_validation?: boolean | null
+          outcome?: string
+          practice?: string
+          savings_achieved?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_insights_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "community_insights_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conservation_adoption_metrics: {
+        Row: {
+          average_savings: number | null
+          id: string
+          last_updated: string | null
+          lsu_validation_score: number | null
+          practice_type: string
+          total_acres: number | null
+          total_adopters: number | null
+        }
+        Insert: {
+          average_savings?: number | null
+          id?: string
+          last_updated?: string | null
+          lsu_validation_score?: number | null
+          practice_type: string
+          total_acres?: number | null
+          total_adopters?: number | null
+        }
+        Update: {
+          average_savings?: number | null
+          id?: string
+          last_updated?: string | null
+          lsu_validation_score?: number | null
+          practice_type?: string
+          total_acres?: number | null
+          total_adopters?: number | null
+        }
+        Relationships: []
+      }
+      conservation_predictions: {
+        Row: {
+          climate_factor: number
+          confidence_score: number
+          created_at: string | null
+          current_impact: number
+          field_id: string
+          id: string
+          practice_type: string
+          predicted_impact_1_year: number
+          predicted_impact_5_year: number
+          soil_health_improvement: number
+        }
+        Insert: {
+          climate_factor: number
+          confidence_score: number
+          created_at?: string | null
+          current_impact: number
+          field_id: string
+          id?: string
+          practice_type: string
+          predicted_impact_1_year: number
+          predicted_impact_5_year: number
+          soil_health_improvement: number
+        }
+        Update: {
+          climate_factor?: number
+          confidence_score?: number
+          created_at?: string | null
+          current_impact?: number
+          field_id?: string
+          id?: string
+          practice_type?: string
+          predicted_impact_1_year?: number
+          predicted_impact_5_year?: number
+          soil_health_improvement?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conservation_predictions_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "conservation_predictions_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
             referencedColumns: ["id"]
           },
         ]
@@ -328,6 +555,102 @@ export type Database = {
           },
         ]
       }
+      dirt_referral_metrics: {
+        Row: {
+          created_at: string | null
+          dirt_clicked: boolean | null
+          field_id: string
+          id: string
+          irrigation_scheduled: boolean | null
+          lsu_researcher_id: string | null
+          water_savings: number | null
+          water_stress_score: number
+        }
+        Insert: {
+          created_at?: string | null
+          dirt_clicked?: boolean | null
+          field_id: string
+          id?: string
+          irrigation_scheduled?: boolean | null
+          lsu_researcher_id?: string | null
+          water_savings?: number | null
+          water_stress_score: number
+        }
+        Update: {
+          created_at?: string | null
+          dirt_clicked?: boolean | null
+          field_id?: string
+          id?: string
+          irrigation_scheduled?: boolean | null
+          lsu_researcher_id?: string | null
+          water_savings?: number | null
+          water_stress_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dirt_referral_metrics_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "dirt_referral_metrics_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dirt_referral_metrics_lsu_researcher_id_fkey"
+            columns: ["lsu_researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      farmer_researcher_interactions: {
+        Row: {
+          created_at: string | null
+          farmer_id: string
+          id: string
+          interaction_type: string
+          question: string | null
+          researcher_id: string
+          response: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          farmer_id: string
+          id?: string
+          interaction_type: string
+          question?: string | null
+          researcher_id: string
+          response?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          farmer_id?: string
+          id?: string
+          interaction_type?: string
+          question?: string | null
+          researcher_id?: string
+          response?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "farmer_researcher_interactions_researcher_id_fkey"
+            columns: ["researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feedback: {
         Row: {
           assessment_id: string | null
@@ -398,6 +721,8 @@ export type Database = {
         Row: {
           acreage: number | null
           cooperative_id: string | null
+          corn_hybrid: string | null
+          cotton_variety: string | null
           created_at: string | null
           crop_type: string
           id: string
@@ -405,12 +730,16 @@ export type Database = {
           location_lng: number | null
           name: string
           notes: string | null
+          rice_variety: string | null
+          soybean_variety: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           acreage?: number | null
           cooperative_id?: string | null
+          corn_hybrid?: string | null
+          cotton_variety?: string | null
           created_at?: string | null
           crop_type: string
           id?: string
@@ -418,12 +747,16 @@ export type Database = {
           location_lng?: number | null
           name: string
           notes?: string | null
+          rice_variety?: string | null
+          soybean_variety?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           acreage?: number | null
           cooperative_id?: string | null
+          corn_hybrid?: string | null
+          cotton_variety?: string | null
           created_at?: string | null
           crop_type?: string
           id?: string
@@ -431,6 +764,8 @@ export type Database = {
           location_lng?: number | null
           name?: string
           notes?: string | null
+          rice_variety?: string | null
+          soybean_variety?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -528,6 +863,184 @@ export type Database = {
           },
         ]
       }
+      lsu_publications: {
+        Row: {
+          authors: string[]
+          created_at: string | null
+          crops: string[]
+          farmer_views: number | null
+          id: string
+          impact_score: number | null
+          key_findings: string[]
+          researcher_id: string | null
+          title: string
+          topics: string[]
+          url: string
+          year: number
+        }
+        Insert: {
+          authors: string[]
+          created_at?: string | null
+          crops: string[]
+          farmer_views?: number | null
+          id: string
+          impact_score?: number | null
+          key_findings: string[]
+          researcher_id?: string | null
+          title: string
+          topics: string[]
+          url: string
+          year: number
+        }
+        Update: {
+          authors?: string[]
+          created_at?: string | null
+          crops?: string[]
+          farmer_views?: number | null
+          id?: string
+          impact_score?: number | null
+          key_findings?: string[]
+          researcher_id?: string | null
+          title?: string
+          topics?: string[]
+          url?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lsu_publications_researcher_id_fkey"
+            columns: ["researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lsu_researchers: {
+        Row: {
+          availability: string | null
+          contact_preferences: Json | null
+          created_at: string | null
+          department: string
+          email: string
+          expertise: string[]
+          id: string
+          name: string
+          research_areas: string[]
+        }
+        Insert: {
+          availability?: string | null
+          contact_preferences?: Json | null
+          created_at?: string | null
+          department: string
+          email: string
+          expertise: string[]
+          id?: string
+          name: string
+          research_areas: string[]
+        }
+        Update: {
+          availability?: string | null
+          contact_preferences?: Json | null
+          created_at?: string | null
+          department?: string
+          email?: string
+          expertise?: string[]
+          id?: string
+          name?: string
+          research_areas?: string[]
+        }
+        Relationships: []
+      }
+      prediction_outcomes: {
+        Row: {
+          accuracy_achieved: number
+          actual_outcome: Json
+          created_at: string | null
+          farmer_feedback: string | null
+          id: string
+          lsu_researcher_feedback: string | null
+          prediction_id: string
+        }
+        Insert: {
+          accuracy_achieved: number
+          actual_outcome: Json
+          created_at?: string | null
+          farmer_feedback?: string | null
+          id?: string
+          lsu_researcher_feedback?: string | null
+          prediction_id: string
+        }
+        Update: {
+          accuracy_achieved?: number
+          actual_outcome?: Json
+          created_at?: string | null
+          farmer_feedback?: string | null
+          id?: string
+          lsu_researcher_feedback?: string | null
+          prediction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_outcomes_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "predictive_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      predictive_models: {
+        Row: {
+          accuracy_score: number | null
+          confidence_score: number
+          created_at: string | null
+          field_id: string
+          id: string
+          lsu_validation: boolean | null
+          model_type: string
+          prediction_data: Json
+          prediction_horizon: number
+        }
+        Insert: {
+          accuracy_score?: number | null
+          confidence_score: number
+          created_at?: string | null
+          field_id: string
+          id?: string
+          lsu_validation?: boolean | null
+          model_type: string
+          prediction_data: Json
+          prediction_horizon: number
+        }
+        Update: {
+          accuracy_score?: number | null
+          confidence_score?: number
+          created_at?: string | null
+          field_id?: string
+          id?: string
+          lsu_validation?: boolean | null
+          model_type?: string
+          prediction_data?: Json
+          prediction_horizon?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "predictive_models_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "predictive_models_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -604,6 +1117,202 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "recommendation_details"
             referencedColumns: ["assessment_id"]
+          },
+        ]
+      }
+      variety_performance_metrics: {
+        Row: {
+          created_at: string | null
+          crop_type: string
+          disease_resistance: number
+          field_id: string
+          id: string
+          input_efficiency: number
+          lsu_researcher_id: string | null
+          lsu_variety: boolean | null
+          performance_score: number
+          variety_name: string
+          yield_performance: number
+        }
+        Insert: {
+          created_at?: string | null
+          crop_type: string
+          disease_resistance: number
+          field_id: string
+          id?: string
+          input_efficiency: number
+          lsu_researcher_id?: string | null
+          lsu_variety?: boolean | null
+          performance_score: number
+          variety_name: string
+          yield_performance: number
+        }
+        Update: {
+          created_at?: string | null
+          crop_type?: string
+          disease_resistance?: number
+          field_id?: string
+          id?: string
+          input_efficiency?: number
+          lsu_researcher_id?: string | null
+          lsu_variety?: boolean | null
+          performance_score?: number
+          variety_name?: string
+          yield_performance?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variety_performance_metrics_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "variety_performance_metrics_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "variety_performance_metrics_lsu_researcher_id_fkey"
+            columns: ["lsu_researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      variety_recommendations: {
+        Row: {
+          created_at: string | null
+          current_variety: string | null
+          expected_improvement: number
+          field_id: string
+          id: string
+          lsu_research_basis: string[]
+          recommended_variety: string
+          risk_assessment: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_variety?: string | null
+          expected_improvement: number
+          field_id: string
+          id?: string
+          lsu_research_basis: string[]
+          recommended_variety: string
+          risk_assessment: string
+        }
+        Update: {
+          created_at?: string | null
+          current_variety?: string | null
+          expected_improvement?: number
+          field_id?: string
+          id?: string
+          lsu_research_basis?: string[]
+          recommended_variety?: string
+          risk_assessment?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variety_recommendations_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "variety_recommendations_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_stress_events: {
+        Row: {
+          assessment_id: string
+          confidence: number
+          created_at: string | null
+          dirt_clicked: boolean | null
+          dirt_recommendation: boolean | null
+          field_id: string
+          id: string
+          irrigation_applied: boolean | null
+          outcome_improvement: number | null
+          severity: string
+          stress_score: number
+          symptoms_detected: string[]
+          weather_context: Json
+        }
+        Insert: {
+          assessment_id: string
+          confidence: number
+          created_at?: string | null
+          dirt_clicked?: boolean | null
+          dirt_recommendation?: boolean | null
+          field_id: string
+          id?: string
+          irrigation_applied?: boolean | null
+          outcome_improvement?: number | null
+          severity: string
+          stress_score: number
+          symptoms_detected: string[]
+          weather_context: Json
+        }
+        Update: {
+          assessment_id?: string
+          confidence?: number
+          created_at?: string | null
+          dirt_clicked?: boolean | null
+          dirt_recommendation?: boolean | null
+          field_id?: string
+          id?: string
+          irrigation_applied?: boolean | null
+          outcome_improvement?: number | null
+          severity?: string
+          stress_score?: number
+          symptoms_detected?: string[]
+          weather_context?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_stress_events_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "water_stress_events_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "water_stress_events_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "water_stress_events_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "water_stress_events_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
           },
         ]
       }
