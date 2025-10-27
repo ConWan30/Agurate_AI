@@ -62,6 +62,12 @@ export const Layout = ({ children }: LayoutProps) => {
     { icon: Brain, label: "Delta AI", path: "/delta", accentIcon: Brain, gradient: "from-violet-500/10 to-purple-600/10" },
   ];
 
+  const enhancedItems = [
+    { icon: TrendingUp, label: "LSU Researchers", path: "/lsu-researchers", accentIcon: Lightbulb, gradient: "from-green-500/10 to-emerald-600/10" },
+    { icon: Users, label: "Community Insights", path: "/community-insights", accentIcon: Users, gradient: "from-purple-500/10 to-pink-600/10" },
+    { icon: Brain, label: "Enhanced Analytics", path: "/enhanced-analytics", accentIcon: TrendingUp, gradient: "from-indigo-500/10 to-purple-600/10" },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header - Louisiana Agricultural Theme */}
@@ -101,6 +107,7 @@ export const Layout = ({ children }: LayoutProps) => {
         navItems={navItems}
         commandCenterItems={commandCenterItems}
         businessItems={businessItems}
+        enhancedItems={enhancedItems}
       />
 
       <div className="container mx-auto px-6 py-8 pb-8">
@@ -211,6 +218,40 @@ export const Layout = ({ children }: LayoutProps) => {
                             <item.icon className={`h-5 w-5 relative z-10 ${isActive ? 'cotton-drift' : ''}`} />
                             {/* Pulse accent on hover */}
                             <AccentIcon className="absolute -top-1 -right-1 h-3 w-3 text-primary/40 opacity-0 group-hover:opacity-100 animate-glow-pulse transition-opacity" />
+                          </div>
+                          <span className="font-medium relative z-10">{item.label}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Enhanced Features Section */}
+              <div className="mt-8 pt-6 border-t border-border">
+                <h2 className="text-sm font-bold text-muted-foreground mb-4">🧠 AI ENHANCED FEATURES</h2>
+                <div className="space-y-2">
+                  {enhancedItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    const AccentIcon = item.accentIcon;
+                    return (
+                      <Link key={item.path} to={item.path}>
+                        <div
+                          className={`relative flex items-center gap-4 p-4 rounded-xl transition-all duration-300 hover-lift group overflow-hidden ${
+                            isActive 
+                              ? 'bg-primary/10 text-primary shadow-field' 
+                              : 'hover:bg-muted text-foreground'
+                          }`}
+                        >
+                          <div className={`absolute inset-0 bg-gradient-to-r ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                          
+                          <div className={`relative flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-300 ${
+                            isActive 
+                              ? 'bg-primary/20' 
+                              : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'
+                          }`}>
+                            <item.icon className={`h-5 w-5 relative z-10 ${isActive ? 'delta-wave' : ''}`} />
+                            <AccentIcon className="absolute -bottom-1 -right-1 h-3 w-3 text-primary/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </div>
                           <span className="font-medium relative z-10">{item.label}</span>
                         </div>

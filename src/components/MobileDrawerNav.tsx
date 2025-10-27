@@ -18,9 +18,10 @@ interface MobileDrawerNavProps {
   navItems: NavItem[];
   commandCenterItems: NavItem[];
   businessItems: NavItem[];
+  enhancedItems?: NavItem[];
 }
 
-export default function MobileDrawerNav({ navItems, commandCenterItems, businessItems }: MobileDrawerNavProps) {
+export default function MobileDrawerNav({ navItems, commandCenterItems, businessItems, enhancedItems }: MobileDrawerNavProps) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -104,6 +105,13 @@ export default function MobileDrawerNav({ navItems, commandCenterItems, business
             <Separator />
             
             <NavSection title="Business Tools" items={businessItems} />
+
+            {enhancedItems && enhancedItems.length > 0 && (
+              <>
+                <Separator />
+                <NavSection title="🧠 AI Enhanced Features" items={enhancedItems} />
+              </>
+            )}
           </div>
         </ScrollArea>
       </SheetContent>

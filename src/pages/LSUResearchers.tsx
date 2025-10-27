@@ -1,0 +1,200 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { LSUResearcher } from '@/types/enhanced-features';
+import { LSUResearcherContactCard } from '@/components/LSUResearcherContactCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Search, GraduationCap, BookOpen } from 'lucide-react';
+import { SkeletonCard } from '@/components/ui/skeleton-card';
+import { EmptyState } from '@/components/ui/empty-state';
+
+export default function LSUResearchers() {
+  const [researchers, setResearchers] = useState<LSUResearcher[]>([]);
+  const [publications, setPublications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [{ data: researchersData }, { data: publicationsData }] = await Promise.all([
+        supabase.from('lsu_researchers').select('*').order('name'),
+        supabase.from('lsu_publications').select('*').order('year', { ascending: false }).limit(10)
+      ]);
+
+      if (researchersData) setResearchers(researchersData as LSUResearcher[]);
+      if (publicationsData) setPublications(publicationsData);
+    } catch (error) {
+      console.error('Error fetching LSU data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredResearchers = researchers.filter(r =>
+    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.expertise.some(e => e.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    r.department.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <SkeletonCard />
+        <div className="grid gap-6 md:grid-cols-2">
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 p-8 text-white shadow-glow">
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm">
+              <GraduationCap className="h-6 w-6" />
+            </div>
+            <Badge variant="secondary" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+              LSU AgCenter Partnership
+            </Badge>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">
+            LSU AgCenter Researchers
+          </h1>
+          <p className="text-lg text-white/90 max-w-2xl">
+            Connect with Louisiana State University agricultural experts for specialized guidance on your crops
+          </p>
+        </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float" />
+      </div>
+
+      {/* Search */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search by name, expertise, or department..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Researchers Grid */}
+      <div>
+        <h2 className="text-2xl font-display font-bold mb-6">Available Researchers</h2>
+        {filteredResearchers.length === 0 ? (
+          <EmptyState
+            icon={GraduationCap}
+            title="No researchers found"
+            description="Try adjusting your search criteria"
+          />
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2">
+            {filteredResearchers.map((researcher) => (
+              <LSUResearcherContactCard
+                key={researcher.id}
+                researcher={researcher}
+                onContact={() => console.log('Contact researcher:', researcher.id)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Recent Publications */}
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10">
+            <BookOpen className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-display font-bold">Recent LSU Publications</h2>
+            <p className="text-sm text-muted-foreground">Research backing our AI recommendations</p>
+          </div>
+        </div>
+        <div className="space-y-4">
+          {publications.map((pub) => (
+            <Card key={pub.id} className="border-primary/20">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg">{pub.title}</CardTitle>
+                    <CardDescription className="mt-2">
+                      By {pub.authors.join(', ')} • {pub.year}
+                    </CardDescription>
+                  </div>
+                  <Badge variant="outline">{pub.crops[0]}</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {pub.topics.slice(0, 3).map((topic: string) => (
+                      <Badge key={topic} variant="secondary" className="text-xs">
+                        {topic}
+                      </Badge>
+                    ))}
+                  </div>
+                  {pub.key_findings && pub.key_findings.length > 0 && (
+                    <div className="text-sm text-muted-foreground">
+                      <strong>Key Findings:</strong>
+                      <ul className="list-disc list-inside mt-1 space-y-1">
+                        {pub.key_findings.slice(0, 2).map((finding: string, idx: number) => (
+                          <li key={idx}>{finding}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <a
+                    href={pub.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    View Publication →
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Partnership Notice */}
+      <Card className="bg-accent/10 border-accent/20">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-accent/20 flex-shrink-0">
+              <GraduationCap className="h-6 w-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="font-bold mb-2">Pre-Partnership Notice</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                We're currently in discussions with LSU AgCenter for an official partnership. 
+                All researcher contact requests are currently routed through the LSU AgCenter general office at agcenter@lsu.edu.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Once the partnership is finalized, you'll have direct access to researcher contact information 
+                and personalized expert guidance for your specific crop challenges.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

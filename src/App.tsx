@@ -31,6 +31,9 @@ const DeltaIntelligence = lazy(() => import("./pages/DeltaIntelligence"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Install = lazy(() => import("./pages/Install"));
 const Analytics = lazy(() => import("./pages/Analytics"));
+const LSUResearchers = lazy(() => import("./pages/LSUResearchers"));
+const CommunityInsights = lazy(() => import("./pages/CommunityInsights"));
+const EnhancedAnalytics = lazy(() => import("./pages/EnhancedAnalytics"));
 
 const queryClient = new QueryClient();
 
@@ -133,6 +136,9 @@ const App = () => (
           <Route path="/cooperatives/join/:code" element={<ProtectedRoute><CooperativeJoin /></ProtectedRoute>} />
           <Route path="/delta" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><Layout><Analytics /></Layout></ProtectedRoute>} />
+          <Route path="/lsu-researchers" element={<ProtectedRoute><Layout><LSUResearchers /></Layout></ProtectedRoute>} />
+          <Route path="/community-insights" element={<ProtectedRoute><Layout><CommunityInsights /></Layout></ProtectedRoute>} />
+          <Route path="/enhanced-analytics" element={<ProtectedRoute><Layout><EnhancedAnalytics /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
           {/* Demo routes for screenshots - bypasses authentication */}
           <Route path="/demo/auth" element={<Auth />} />
@@ -149,6 +155,9 @@ const App = () => (
           <Route path="/demo/cooperatives" element={<Layout><Cooperatives /></Layout>} />
           <Route path="/demo/delta" element={<Layout><DeltaIntelligence /></Layout>} />
           <Route path="/demo/analytics" element={<Layout><Analytics /></Layout>} />
+          <Route path="/demo/lsu-researchers" element={<Layout><LSUResearchers /></Layout>} />
+          <Route path="/demo/community-insights" element={<Layout><CommunityInsights /></Layout>} />
+          <Route path="/demo/enhanced-analytics" element={<Layout><EnhancedAnalytics /></Layout>} />
           <Route path="/demo/profile" element={<Layout><Profile /></Layout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
