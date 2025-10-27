@@ -14,3 +14,21 @@ verify_jwt = true
 
 [functions.weather-alerts]
 verify_jwt = true
+
+[functions.unified-ai-analysis]
+verify_jwt = true
+
+[functions.generate-conservation-predictions]
+verify_jwt = true
+
+[functions.predict-water-stress]
+verify_jwt = true
+
+[functions.recommend-varieties]
+verify_jwt = true
+
+[functions.generate-community-insights]
+verify_jwt = true
+
+[functions.generate-comprehensive-predictions]
+verify_jwt = true

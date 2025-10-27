@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
@@ -11,6 +12,7 @@ const corsHeaders = {
 const analyzeCropSchema = z.object({
   imageUrl: z.string().url().max(2048),
   cropType: z.enum(['rice', 'soybean', 'cotton', 'corn']),
+  fieldId: z.string().uuid().optional(),
   location: z.string().max(200).optional(),
   mediaType: z.enum(['image', 'video']).default('image')
 });
@@ -38,12 +40,79 @@ serve(async (req) => {
       );
     }
 
-    const { imageUrl, cropType, location, mediaType } = validation.data;
-    console.log('Analyzing crop media:', { imageUrl, cropType, location, mediaType });
+    const { imageUrl, cropType, fieldId, location, mediaType } = validation.data;
+    console.log('🌾 Analyzing crop media with unified context:', { imageUrl, cropType, fieldId, location, mediaType });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
+    }
+
+    // STEP 0: Gather unified context if fieldId provided
+    let unifiedContext = '';
+    if (fieldId) {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+
+      const [
+        { data: fieldData },
+        { data: assessmentHistory },
+        { data: conservationData },
+        { data: varietyData },
+        { data: waterStressData }
+      ] = await Promise.all([
+        supabase.from('fields').select('*').eq('id', fieldId).single(),
+        supabase.from('assessments').select('health_score, stress_level, symptoms, analyzed_at').eq('field_id', fieldId).order('analyzed_at', { ascending: false }).limit(5),
+        supabase.from('conservation_predictions').select('practice_type, current_impact, confidence_score').eq('field_id', fieldId).order('created_at', { ascending: false }).limit(3),
+        supabase.from('variety_performance_metrics').select('variety_name, performance_score, disease_resistance').eq('field_id', fieldId).order('created_at', { ascending: false }).limit(3),
+        supabase.from('water_stress_events').select('stress_score, severity, created_at').eq('field_id', fieldId).order('created_at', { ascending: false }).limit(3)
+      ]);
+
+      unifiedContext = `
+═══════════════════════════════════════════════════════════════
+🧠 UNIFIED FIELD INTELLIGENCE (Historical Context Integration)
+═══════════════════════════════════════════════════════════════
+
+📊 FIELD PROFILE:
+- Variety: ${fieldData?.rice_variety || fieldData?.soybean_variety || fieldData?.cotton_variety || fieldData?.corn_hybrid || 'Unknown'}
+- Acreage: ${fieldData?.acreage || 'Unknown'} acres
+- Soil Type: ${fieldData?.soil_type || 'Not specified'}
+
+📈 HISTORICAL HEALTH TREND (Last 5 Assessments):
+${assessmentHistory && assessmentHistory.length > 0 
+  ? assessmentHistory.map((a: any, i: number) => 
+      `${i + 1}. ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${a.health_score}%, Stress: ${a.stress_level}${a.symptoms?.length > 0 ? `, Symptoms: ${a.symptoms.join(', ')}` : ''}`
+    ).join('\n') 
+  : '- No historical data available (first assessment)'}
+
+🌱 ACTIVE CONSERVATION PRACTICES:
+${conservationData && conservationData.length > 0 
+  ? conservationData.map((c: any) => `- ${c.practice_type}: Current Impact ${(c.current_impact * 100).toFixed(0)}%, Confidence ${(c.confidence_score * 100).toFixed(0)}%`).join('\n')
+  : '- No conservation practices recorded'}
+
+🔬 VARIETY PERFORMANCE INTELLIGENCE:
+${varietyData && varietyData.length > 0
+  ? varietyData.map((v: any) => `- ${v.variety_name}: Performance ${(v.performance_score * 100).toFixed(0)}%, Disease Resistance ${(v.disease_resistance * 100).toFixed(0)}%`).join('\n')
+  : '- No variety performance data available'}
+
+💧 RECENT WATER STRESS EVENTS (Last 30 days):
+${waterStressData && waterStressData.length > 0
+  ? waterStressData.map((w: any) => `- ${new Date(w.created_at).toLocaleDateString()}: Stress Score ${(w.stress_score * 100).toFixed(0)}%, Severity: ${w.severity}`).join('\n')
+  : '- No water stress events recorded'}
+
+🎯 CRITICAL ANALYSIS DIRECTIVE:
+Use ALL historical context above to:
+1. Compare current symptoms with historical progression patterns
+2. Identify if issues are worsening, stable, or improving
+3. Cross-reference variety-specific vulnerabilities
+4. Consider conservation practice impacts on current health
+5. Provide context-aware recommendations that account for field history
+
+═══════════════════════════════════════════════════════════════
+`;
+      console.log('✅ Unified context gathered for field:', fieldId);
     }
 
     // STEP 1: Fetch current weather data for Louisiana (Morehouse Parish coordinates)
@@ -83,12 +152,14 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an expert agricultural AI for Louisiana Delta farmers, specializing in rice, soybean, cotton, and corn.
+            content: `You are an expert agricultural AI for Louisiana Delta farmers with access to comprehensive field intelligence history.
 
 CONTEXT:
 - Location: Morehouse Parish, Louisiana (subtropical climate, high disease pressure)
 - Soils: Alluvial/claypan soils typical of Mississippi Delta
 - Climate: Warm, humid with high rainfall
+
+${unifiedContext ? '🧠 YOU HAVE ACCESS TO UNIFIED FIELD INTELLIGENCE - Use historical context to enhance diagnosis accuracy!' : ''}
 
 ${mediaType === 'video' 
   ? 'Analyze drone video footage of crop fields, examining patterns across multiple frames for comprehensive field assessment.'
@@ -101,7 +172,9 @@ Respond ONLY in JSON format with precise observations.`
             content: [
               {
                 type: 'text',
-                text: `Analyze this ${cropType} field ${mediaType === 'video' ? 'drone video' : 'image'} from ${location || 'Morehouse Parish, Louisiana'}.
+                text: `${unifiedContext}
+
+Analyze this ${cropType} field ${mediaType === 'video' ? 'drone video' : 'image'} from ${location || 'Morehouse Parish, Louisiana'}.
 
 ${mediaType === 'video' ? `**DRONE VIDEO ANALYSIS:**
 Examine the footage across multiple frames to identify:
@@ -173,7 +246,13 @@ Respond with JSON:
   \"canopy_coverage_percent\": <float 0-100, % ground covered by crop>,
   \"plant_density_assessment\": \"very_low\"|\"low\"|\"optimal\"|\"high\"|\"very_high\",
   \"root_health_indicators\": [<array of visible signs suggesting root health/issues>],
-  \"detailed_visual_analysis\": \"<comprehensive 3-5 sentence analysis covering color patterns, leaf architecture, plant vigor, spatial distribution, and any anomalies>\"
+  \"detailed_visual_analysis\": \"<comprehensive 3-5 sentence analysis covering color patterns, leaf architecture, plant vigor, spatial distribution, and any anomalies>\"${unifiedContext ? `,
+  \"historical_comparison\": {
+    \"trend\": \"improving\"|\"stable\"|\"declining\",
+    \"context\": \"<how current analysis compares to historical field data>\",
+    \"pattern_insights\": \"<cross-referenced patterns from historical assessments>\"
+  },
+  \"context_enhanced_insights\": [\"<insight from unified context>\", \"<another insight>\"]` : ''}
 }`
               },
               mediaType === 'video' 

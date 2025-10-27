@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_intelligence_pool: {
+        Row: {
+          community_patterns: Json
+          confidence_scores: Json
+          conservation_effectiveness: Json
+          created_at: string | null
+          field_id: string
+          id: string
+          image_analysis_patterns: Json
+          predictive_insights: Json
+          snapshot_date: string | null
+          updated_at: string | null
+          variety_intelligence: Json
+          weather_correlations: Json
+        }
+        Insert: {
+          community_patterns?: Json
+          confidence_scores?: Json
+          conservation_effectiveness?: Json
+          created_at?: string | null
+          field_id: string
+          id?: string
+          image_analysis_patterns?: Json
+          predictive_insights?: Json
+          snapshot_date?: string | null
+          updated_at?: string | null
+          variety_intelligence?: Json
+          weather_correlations?: Json
+        }
+        Update: {
+          community_patterns?: Json
+          confidence_scores?: Json
+          conservation_effectiveness?: Json
+          created_at?: string | null
+          field_id?: string
+          id?: string
+          image_analysis_patterns?: Json
+          predictive_insights?: Json
+          snapshot_date?: string | null
+          updated_at?: string | null
+          variety_intelligence?: Json
+          weather_correlations?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_intelligence_pool_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["field_id"]
+          },
+          {
+            foreignKeyName: "ai_intelligence_pool_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_insights: {
         Row: {
           actionable_recommendations: string[]
