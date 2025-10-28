@@ -14,6 +14,7 @@ import NetworkStatus from "./components/NetworkStatus";
 // Lazy load pages for better performance
 const Home = lazy(() => import("./pages/Home"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Upload = lazy(() => import("./pages/Upload"));
 const Scanner = lazy(() => import("./pages/Scanner"));
@@ -122,6 +123,7 @@ const App = () => (
             <Route path="/" element={<main id="main-content"><Home /></main>} />
             <Route path="/install" element={<main id="main-content"><Install /></main>} />
             <Route path="/auth" element={<main id="main-content"><Auth /></main>} />
+            <Route path="/reset-password" element={<main id="main-content"><ResetPassword /></main>} />
             <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Layout><Upload /></Layout></ProtectedRoute>} />
           <Route path="/scanner" element={<ProtectedRoute><Layout><Scanner /></Layout></ProtectedRoute>} />

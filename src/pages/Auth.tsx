@@ -208,9 +208,9 @@ export default function Auth() {
             Transform Your Farming with Intelligent Crop Analysis
           </h2>
           
-          <p className="text-lg opacity-90 mb-8 leading-relaxed">
+              <p className="text-lg opacity-90 mb-8 leading-relaxed">
             Real-time crop health monitoring for rice, soybean, cotton, and corn. 
-            Backed by LSU AgCenter research.
+            Built on LSU AgCenter research.
           </p>
 
           {/* Feature list with icons */}
@@ -230,8 +230,8 @@ export default function Auth() {
                 <Shield className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold">LSU AgCenter Validated</p>
-                <p className="text-sm opacity-75">Research-backed insights</p>
+                <p className="font-semibold">LSU Research-Based</p>
+                <p className="text-sm opacity-75">Built on 130+ years of research</p>
               </div>
             </div>
             
@@ -254,7 +254,7 @@ export default function Auth() {
             </Badge>
             <Badge variant="outline" className="glass border-primary-foreground/40 text-primary-foreground">
               <CheckCircle2 className="h-3 w-3 mr-1" />
-              LSU Verified
+              LSU Research-Based
             </Badge>
           </div>
         </div>
@@ -323,7 +323,7 @@ export default function Auth() {
                 <CardContent>
                   <form onSubmit={handleSignIn} className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="signin-email" className="text-sm font-semibold">
+            <Label htmlFor="signin-email" className="text-sm font-semibold">
                         Email Address
                       </Label>
                       <Input
@@ -335,14 +335,23 @@ export default function Auth() {
                           setSignInData({ ...signInData, email: e.target.value })
                         }
                         className="h-11 border-2 focus:border-primary transition-colors"
+                        autoComplete="email"
                         required
                       />
                       {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signin-password" className="text-sm font-semibold">
-                        Password
-                      </Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="signin-password" className="text-sm font-semibold">
+                          Password
+                        </Label>
+                        <Link 
+                          to="/reset-password" 
+                          className="text-sm text-primary hover:underline"
+                        >
+                          Forgot password?
+                        </Link>
+                      </div>
                       <Input
                         id="signin-password"
                         type="password"
@@ -352,6 +361,7 @@ export default function Auth() {
                           setSignInData({ ...signInData, password: e.target.value })
                         }
                         className="h-11 border-2 focus:border-primary transition-colors"
+                        autoComplete="current-password"
                         required
                       />
                       {errors.password && <p className="text-sm text-destructive mt-1">{errors.password}</p>}
@@ -399,8 +409,8 @@ export default function Auth() {
                       <Users className="h-6 w-6 text-primary-foreground" />
                     </div>
                     <div>
-                      <CardTitle className="text-2xl">Join AgurateAI</CardTitle>
-                      <CardDescription>Start monitoring your crops with AI</CardDescription>
+                      <CardTitle className="text-2xl">Join Free Beta</CardTitle>
+                      <CardDescription>Be one of the first 100 Louisiana Delta farmers</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -419,6 +429,7 @@ export default function Auth() {
                           setSignUpData({ ...signUpData, fullName: e.target.value })
                         }
                         className="h-11 border-2 focus:border-primary transition-colors"
+                        autoComplete="name"
                         required
                       />
                       {errors.fullName && <p className="text-sm text-destructive mt-1">{errors.fullName}</p>}
@@ -453,6 +464,7 @@ export default function Auth() {
                           setSignUpData({ ...signUpData, email: e.target.value })
                         }
                         className="h-11 border-2 focus:border-primary transition-colors"
+                        autoComplete="email"
                         required
                       />
                       {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}

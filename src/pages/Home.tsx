@@ -66,10 +66,10 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: 98, label: "Accuracy Rate", suffix: "%" },
-    { value: 10, label: "Analysis Time", prefix: "<", suffix: "s" },
-    { value: 4, label: "Crop Types", suffix: "" },
-    { value: 24, label: "Availability", suffix: "/7" }
+    { value: 95, label: "LSU-Validated Accuracy", suffix: "+%" },
+    { value: 2, label: "Instant Assessment", prefix: "<", suffix: "s" },
+    { value: 4, label: "Delta Crops Supported", suffix: "" },
+    { value: 24, label: "Always Available", suffix: "/7" }
   ];
 
   const testimonials = [
@@ -113,7 +113,7 @@ export default function Home() {
             </Link>
             <Link to="/auth">
               <Button size="sm" className="gap-2 shadow-glow hover:shadow-field">
-                Get Started
+                Join Beta
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -136,9 +136,9 @@ export default function Home() {
         
         <div className={`relative z-10 container mx-auto px-4 py-24 md:py-32 transition-all duration-1000 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="max-w-3xl">
-            <Badge className="mb-6 text-sm px-4 py-2 glass border-primary-foreground/40 text-primary-foreground backdrop-blur-md animate-fade-in">
-              <Smartphone className="h-4 w-4 mr-2" aria-hidden="true" />
-              Mobile-First Precision Agriculture
+            {/* Beta Badge */}
+            <Badge className="mb-6 text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white border-none shadow-glow animate-fade-in">
+              🌱 FREE BETA - Limited to First 100 Louisiana Delta Farmers
             </Badge>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-primary-foreground mb-6 leading-tight">
@@ -147,13 +147,13 @@ export default function Home() {
             
             <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8 leading-relaxed">
               Transform your farming with intelligent crop analysis for rice, soybean, cotton, and corn. 
-              Backed by LSU AgCenter research.
+              Built on LSU AgCenter research.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/auth">
                 <Button size="lg" className="w-full sm:w-auto bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 text-lg px-8 py-6 shadow-glow hover:shadow-field transition-all hover-lift">
-                  Start Free Trial
+                  Join Free Beta
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </Link>
@@ -205,7 +205,7 @@ export default function Home() {
           <div className={`text-center mb-16 transition-all duration-1000 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
               <Zap className="h-3 w-3 mr-1" />
-              Core Features
+              Built on LSU AgCenter Research
             </Badge>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
               Everything You Need to Monitor Your Crops
@@ -248,10 +248,10 @@ export default function Home() {
       >
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-            <div className={`transition-all duration-1000 ${benefitsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+          <div className={`transition-all duration-1000 ${benefitsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
                 <Award className="h-3 w-3 mr-1" />
-                Why Choose AgurateAI
+                130+ Years of LSU AgCenter Research
               </Badge>
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
                 Built for Louisiana Delta Farmers
@@ -283,7 +283,7 @@ export default function Home() {
                 </Link>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Shield className="h-4 w-4 text-success" />
-                  <span>LSU AgCenter Validated</span>
+                  <span>LSU Research-Based</span>
                 </div>
               </div>
             </div>
@@ -291,8 +291,8 @@ export default function Home() {
             <div className={`grid grid-cols-2 gap-6 transition-all duration-1000 ${benefitsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
               <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group">
                 <Shield className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">LSU Validated</h3>
-                <p className="text-sm text-muted-foreground">Research-backed recommendations</p>
+                <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">LSU Research-Based</h3>
+                <p className="text-sm text-muted-foreground">Built on 130+ years of research</p>
               </Card>
               
               <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group mt-8">
@@ -382,18 +382,18 @@ export default function Home() {
             Start Free Today
           </Badge>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
-            Ready to Transform Your Farming?
+            Ready to Join the Beta?
           </h2>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90">
-            Join Louisiana Delta farmers who are already using AI to improve their crop yields
+            Get FREE unlimited access as one of the first 100 Louisiana Delta farmers
           </p>
           <Link to="/auth">
             <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 text-lg px-8 py-6 shadow-glow hover:shadow-field hover-lift animate-glow-pulse">
-              Start Your Free Trial
+              Join Free Beta Now
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Button>
           </Link>
-          <p className="text-sm mt-6 opacity-75">No credit card required • 7-day free trial • Cancel anytime</p>
+          <p className="text-sm mt-6 opacity-75">Free Beta Access • No credit card required • Unlimited use during beta</p>
         </div>
       </section>
 
@@ -414,7 +414,7 @@ export default function Home() {
               </p>
               <div className="flex items-center gap-2 text-sm">
                 <Shield className="h-4 w-4 text-success" />
-                <span className="text-muted-foreground">LSU AgCenter Partner</span>
+                <span className="text-muted-foreground">LSU Research-Based</span>
               </div>
             </div>
 
@@ -450,7 +450,7 @@ export default function Home() {
               <h3 className="font-bold mb-4">Resources</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/delta-intelligence" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Link to="/delta" className="text-muted-foreground hover:text-primary transition-colors">
                     Delta Intelligence
                   </Link>
                 </li>
@@ -460,8 +460,8 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/analytics" className="text-muted-foreground hover:text-primary transition-colors">
-                    Analytics
+                  <Link to="/enhanced-analytics" className="text-muted-foreground hover:text-primary transition-colors">
+                    Enhanced Analytics
                   </Link>
                 </li>
                 <li>
