@@ -1,0 +1,231 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Trophy, DollarSign, MapPin } from "lucide-react";
+
+interface SuccessStoryPromptProps {
+  open: boolean;
+  onClose: () => void;
+  assessmentId?: string;
+}
+
+export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStoryPromptProps) {
+  const [problemEncountered, setProblemEncountered] = useState("");
+  const [actionTaken, setActionTaken] = useState("");
+  const [outcome, setOutcome] = useState("");
+  const [estimatedSavings, setEstimatedSavings] = useState("");
+  const [acresProtected, setAcresProtected] = useState("");
+  const [testimonial, setTestimonial] = useState("");
+  const [allowPublicUse, setAllowPublicUse] = useState(false);
+  const [allowName, setAllowName] = useState(false);
+  const [allowFarmName, setAllowFarmName] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async () => {
+    if (!problemEncountered || !actionTaken || !outcome || !testimonial) {
+      toast({
+        variant: "destructive",
+        title: "Missing information",
+        description: "Please fill out all required fields.",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { error } = await supabase.from('success_stories').insert({
+        user_id: user.id,
+        assessment_id: assessmentId,
+        problem_encountered: problemEncountered.trim(),
+        action_taken: actionTaken.trim(),
+        outcome: outcome.trim(),
+        estimated_savings: estimatedSavings ? parseFloat(estimatedSavings) : null,
+        acres_protected: acresProtected ? parseFloat(acresProtected) : null,
+        testimonial: testimonial.trim(),
+        allow_public_use: allowPublicUse,
+        allow_name: allowName,
+        allow_farm_name: allowFarmName,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "🏆 Success story saved!",
+        description: "Thank you for sharing your experience. This helps other farmers and strengthens our LSU partnership.",
+      });
+      onClose();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error saving success story",
+        description: error.message,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-2xl">
+            <Trophy className="h-6 w-6 text-primary" />
+            Share Your Success Story
+          </DialogTitle>
+          <DialogDescription>
+            Your experience helps other Louisiana farmers and strengthens our partnership with LSU AgCenter
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Problem Encountered */}
+          <div className="space-y-2">
+            <Label htmlFor="problem">What crop problem did you encounter? *</Label>
+            <Textarea
+              id="problem"
+              placeholder="e.g., Noticed yellowing leaves on 50 acres of soybeans..."
+              value={problemEncountered}
+              onChange={(e) => setProblemEncountered(e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          {/* Action Taken */}
+          <div className="space-y-2">
+            <Label htmlFor="action">What action did you take based on AgurateAI? *</Label>
+            <Textarea
+              id="action"
+              placeholder="e.g., AI detected early stage soybean rust. Applied fungicide within 24 hours..."
+              value={actionTaken}
+              onChange={(e) => setActionTaken(e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          {/* Outcome */}
+          <div className="space-y-2">
+            <Label htmlFor="outcome">What was the result? *</Label>
+            <Textarea
+              id="outcome"
+              placeholder="e.g., Stopped disease spread, saved majority of crop, yield only decreased 5%..."
+              value={outcome}
+              onChange={(e) => setOutcome(e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          {/* Financial Impact */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="savings" className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Estimated Savings
+              </Label>
+              <Input
+                id="savings"
+                type="number"
+                placeholder="e.g., 15000"
+                value={estimatedSavings}
+                onChange={(e) => setEstimatedSavings(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="acres" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Acres Protected
+              </Label>
+              <Input
+                id="acres"
+                type="number"
+                placeholder="e.g., 180"
+                value={acresProtected}
+                onChange={(e) => setAcresProtected(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Testimonial */}
+          <div className="space-y-2">
+            <Label htmlFor="testimonial">Your testimonial (in your own words) *</Label>
+            <Textarea
+              id="testimonial"
+              placeholder="e.g., AgurateAI caught this disease days before I would have noticed it. Saved me at least $15K this season..."
+              value={testimonial}
+              onChange={(e) => setTestimonial(e.target.value)}
+              rows={4}
+            />
+          </div>
+
+          {/* Permission Settings */}
+          <div className="space-y-3 p-4 bg-accent rounded-lg">
+            <p className="text-sm font-medium">Privacy Preferences</p>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="public"
+                  checked={allowPublicUse}
+                  onCheckedChange={(checked) => setAllowPublicUse(checked as boolean)}
+                />
+                <label
+                  htmlFor="public"
+                  className="text-sm cursor-pointer leading-tight"
+                >
+                  Allow AgurateAI to share this story publicly (website, presentations, LSU partnership materials)
+                </label>
+              </div>
+              {allowPublicUse && (
+                <>
+                  <div className="flex items-center space-x-2 ml-6">
+                    <Checkbox
+                      id="name"
+                      checked={allowName}
+                      onCheckedChange={(checked) => setAllowName(checked as boolean)}
+                    />
+                    <label htmlFor="name" className="text-sm cursor-pointer">
+                      Include my name
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2 ml-6">
+                    <Checkbox
+                      id="farmName"
+                      checked={allowFarmName}
+                      onCheckedChange={(checked) => setAllowFarmName(checked as boolean)}
+                    />
+                    <label htmlFor="farmName" className="text-sm cursor-pointer">
+                      Include my farm name
+                    </label>
+                  </div>
+                </>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Your story will help other Louisiana farmers and strengthen our LSU AgCenter partnership. 
+              You can remain anonymous if preferred.
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-4">
+            <Button variant="outline" onClick={onClose} disabled={isSubmitting} className="flex-1">
+              Maybe Later
+            </Button>
+            <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
+              {isSubmitting ? 'Saving...' : 'Share Success Story'}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

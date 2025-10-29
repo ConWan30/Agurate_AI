@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { BetaCountdown } from "@/components/BetaCountdown";
 import { 
   Sprout, 
   Brain, 
   TrendingUp, 
   Shield, 
-  Smartphone, 
+  Smartphone,
   Users, 
   CheckCircle2, 
   ArrowRight,
@@ -184,6 +185,10 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+          
+          <div className="max-w-md mx-auto mt-12">
+            <BetaCountdown />
           </div>
         </div>
       </section>

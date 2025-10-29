@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { BetaWelcomeBanner } from "@/components/BetaWelcomeBanner";
 import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon, BarChart3 } from "lucide-react";
 import { WeatherAlerts } from "@/components/WeatherAlerts";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -40,17 +42,33 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showAdditionalTools, setShowAdditionalTools] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   // Enable keyboard shortcuts
   useGlobalKeyboardShortcuts();
 
   useEffect(() => {
+    const checkOnboarding = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .single();
+        
+        if (data && !data.onboarding_completed) {
+          setShowOnboarding(true);
+        }
+      }
+    };
+    
     if (isDemoMode) {
-      // Use demo data in demo mode
       setFields(demoFields);
       setRecentAssessments(demoAssessments as any);
       setLoading(false);
     } else {
+      checkOnboarding();
       fetchDashboardData();
     }
   }, [isDemoMode]);

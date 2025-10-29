@@ -268,6 +268,69 @@ export type Database = {
           },
         ]
       }
+      beta_feedback: {
+        Row: {
+          category: string
+          created_at: string | null
+          feature_context: string | null
+          id: string
+          message: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          feature_context?: string | null
+          id?: string
+          message: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          feature_context?: string | null
+          id?: string
+          message?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bug_reports: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          page_url: string | null
+          screenshot_url: string | null
+          status: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          page_url?: string | null
+          screenshot_url?: string | null
+          status?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          page_url?: string | null
+          screenshot_url?: string | null
+          status?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       claim_assessments: {
         Row: {
           assessment_id: string
@@ -1103,30 +1166,63 @@ export type Database = {
       }
       profiles: {
         Row: {
+          beta_farmer: boolean | null
+          beta_signup_date: string | null
+          beta_welcome_dismissed: boolean | null
           created_at: string | null
           email: string | null
           farm_name: string | null
           full_name: string | null
           id: string
+          lifetime_discount: number | null
+          onboarding_completed: boolean | null
+          onboarding_completed_at: string | null
+          parish: string | null
           phone: string | null
+          primary_crops: string[] | null
+          subscription_status: string | null
+          subscription_tier: string | null
+          total_acreage: number | null
           updated_at: string | null
         }
         Insert: {
+          beta_farmer?: boolean | null
+          beta_signup_date?: string | null
+          beta_welcome_dismissed?: boolean | null
           created_at?: string | null
           email?: string | null
           farm_name?: string | null
           full_name?: string | null
           id: string
+          lifetime_discount?: number | null
+          onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
+          parish?: string | null
           phone?: string | null
+          primary_crops?: string[] | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
+          total_acreage?: number | null
           updated_at?: string | null
         }
         Update: {
+          beta_farmer?: boolean | null
+          beta_signup_date?: string | null
+          beta_welcome_dismissed?: boolean | null
           created_at?: string | null
           email?: string | null
           farm_name?: string | null
           full_name?: string | null
           id?: string
+          lifetime_discount?: number | null
+          onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
+          parish?: string | null
           phone?: string | null
+          primary_crops?: string[] | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
+          total_acreage?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1173,6 +1269,76 @@ export type Database = {
           },
           {
             foreignKeyName: "recommendations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
+          },
+        ]
+      }
+      success_stories: {
+        Row: {
+          acres_protected: number | null
+          action_taken: string
+          allow_farm_name: boolean | null
+          allow_name: boolean | null
+          allow_public_use: boolean | null
+          assessment_id: string | null
+          created_at: string | null
+          estimated_savings: number | null
+          id: string
+          outcome: string
+          problem_encountered: string
+          testimonial: string
+          user_id: string
+        }
+        Insert: {
+          acres_protected?: number | null
+          action_taken: string
+          allow_farm_name?: boolean | null
+          allow_name?: boolean | null
+          allow_public_use?: boolean | null
+          assessment_id?: string | null
+          created_at?: string | null
+          estimated_savings?: number | null
+          id?: string
+          outcome: string
+          problem_encountered: string
+          testimonial: string
+          user_id: string
+        }
+        Update: {
+          acres_protected?: number | null
+          action_taken?: string
+          allow_farm_name?: boolean | null
+          allow_name?: boolean | null
+          allow_public_use?: boolean | null
+          assessment_id?: string | null
+          created_at?: string | null
+          estimated_savings?: number | null
+          id?: string
+          outcome?: string
+          problem_encountered?: string
+          testimonial?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "success_stories_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "success_stories_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "success_stories_assessment_id_fkey"
             columns: ["assessment_id"]
             isOneToOne: false
             referencedRelation: "recommendation_details"
@@ -1434,6 +1600,19 @@ export type Database = {
           user_id: string | null
           weather_precipitation_mm: number | null
           weather_temp_f: number | null
+        }
+        Relationships: []
+      }
+      beta_metrics: {
+        Row: {
+          active_users_30d: number | null
+          active_users_7d: number | null
+          avg_rating: number | null
+          completed_onboarding: number | null
+          feedback_count: number | null
+          public_success_stories: number | null
+          total_assessments: number | null
+          total_signups: number | null
         }
         Relationships: []
       }
