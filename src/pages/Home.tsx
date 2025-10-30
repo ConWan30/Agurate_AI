@@ -18,7 +18,14 @@ import {
   Cloud,
   Award,
   Zap,
-  Quote
+  Quote,
+  Droplets,
+  Leaf,
+  GraduationCap,
+  Network,
+  BarChart3,
+  Microscope,
+  Sparkles
 } from "lucide-react";
 import heroFields from "@/assets/hero-fields.jpg";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
@@ -34,43 +41,83 @@ export default function Home() {
     {
       icon: Scan,
       title: "AI Crop Scanner",
-      description: "Instant crop health analysis from any smartphone camera. Detect stress, disease, and nutrient deficiencies in seconds.",
+      description: "Instant crop health analysis from any smartphone camera. Detect stress, disease, and nutrient deficiencies in seconds with 95%+ accuracy.",
       color: "gradient-delta"
     },
     {
       icon: TrendingUp,
       title: "Predictive Analytics",
-      description: "7-day stress forecasts powered by weather AI. Know what's coming before it affects your yield.",
+      description: "7-14 day stress forecasts powered by weather AI. Comprehensive predictions for water stress, disease risk, and yield optimization.",
       color: "gradient-sky"
     },
     {
       icon: Brain,
-      title: "Delta Intelligence",
-      description: "AI trained on LSU AgCenter research data specific to Louisiana Delta crops and conditions.",
+      title: "Delta Intelligence Chat",
+      description: "24/7 AI advisor trained on LSU AgCenter research. Field-aware conversations with image analysis and treatment recommendations.",
+      color: "gradient-harvest"
+    },
+    {
+      icon: Droplets,
+      title: "Water Stress Intelligence",
+      description: "Real-time water stress detection with direct integration to MSU DIRT irrigation scheduling for precision water management.",
+      color: "gradient-delta"
+    },
+    {
+      icon: Leaf,
+      title: "Conservation Tracking",
+      description: "Track sustainable practices with AI-powered cost-benefit analysis. Monitor cover crops, no-till, and precision fertilization impact.",
+      color: "gradient-sky"
+    },
+    {
+      icon: Microscope,
+      title: "Variety Recommendations",
+      description: "AI-powered rice and soybean variety selection based on your soil type, planting conditions, and LSU research data.",
+      color: "gradient-harvest"
+    },
+    {
+      icon: GraduationCap,
+      title: "LSU Researcher Access",
+      description: "Connect directly with LSU AgCenter experts. Get specialized support for complex crop issues and participate in research.",
+      color: "gradient-delta"
+    },
+    {
+      icon: Network,
+      title: "Community Intelligence",
+      description: "Anonymous cooperative insights from neighboring farms. Early outbreak detection and shared best practices network.",
+      color: "gradient-sky"
+    },
+    {
+      icon: MapPin,
+      title: "Interactive Field Maps",
+      description: "GPS-tagged assessments with color-coded health markers. Visualize crop health patterns across your entire operation.",
       color: "gradient-harvest"
     },
     {
       icon: FileText,
       title: "Insurance Documentation",
-      description: "AI-verified damage documentation system for streamlined insurance claims.",
+      description: "AI-verified damage documentation with GPS-stamped photos. Automated evidence collection for faster claims processing.",
       color: "gradient-delta"
     }
   ];
 
   const benefits = [
-    "Real-time crop health assessment",
-    "Weather-integrated recommendations",
-    "Field management made simple",
-    "LSU AgCenter-validated insights",
-    "Cooperative data sharing",
-    "Mobile-first design"
+    "Real-time crop health assessment with 95%+ accuracy",
+    "7-14 day predictive analytics for proactive decisions",
+    "Water stress monitoring with DIRT integration",
+    "LSU AgCenter-validated insights and researcher access",
+    "Conservation practice tracking and ROI analysis",
+    "Community intelligence and cooperative insights",
+    "Variety recommendations for rice and soybeans",
+    "GPS-tagged field mapping and health visualization",
+    "Insurance claim automation with AI verification",
+    "Mobile-first design with offline capabilities"
   ];
 
   const stats = [
-    { value: 95, label: "LSU-Validated Accuracy", suffix: "+%" },
-    { value: 2, label: "Instant Assessment", prefix: "<", suffix: "s" },
-    { value: 4, label: "Delta Crops Supported", suffix: "" },
-    { value: 24, label: "Always Available", suffix: "/7" }
+    { value: 95, label: "AI Accuracy Rate", suffix: "+%", prefix: "" },
+    { value: 14, label: "Day Predictions", suffix: "", prefix: "" },
+    { value: 10, label: "Integrated Features", suffix: "+", prefix: "" },
+    { value: 24, label: "AI Advisor Available", suffix: "/7", prefix: "" }
   ];
 
   const testimonials = [
@@ -222,21 +269,21 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Card 
                   key={index}
                   className={`border-2 hover:border-primary transition-all duration-500 hover-lift group ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
+                  style={{ transitionDelay: `${index * 50}ms` }}
                 >
-                  <CardContent className="p-8">
-                    <div className={`flex items-center justify-center h-16 w-16 rounded-2xl ${feature.color} shadow-glow mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                      <Icon className="h-8 w-8 text-primary-foreground" aria-hidden="true" />
+                  <CardContent className="p-6">
+                    <div className={`flex items-center justify-center h-14 w-14 rounded-2xl ${feature.color} shadow-glow mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className="h-7 w-7 text-primary-foreground" aria-hidden="true" />
                     </div>
-                    <h3 className="text-2xl font-display font-bold mb-3 group-hover:text-primary transition-colors">{feature.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                    <h3 className="text-xl font-display font-bold mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                   </CardContent>
                 </Card>
               );
@@ -268,15 +315,15 @@ export default function Home() {
                 ensuring accurate, relevant recommendations for your crops.
               </p>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {benefits.map((benefit, index) => (
                   <div 
                     key={index}
                     className="flex items-start gap-3"
-                    style={{ transitionDelay: `${index * 50}ms` }}
+                    style={{ transitionDelay: `${index * 30}ms` }}
                   >
-                    <CheckCircle2 className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" aria-hidden="true" />
-                    <span className="text-lg">{benefit}</span>
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" aria-hidden="true" />
+                    <span className="text-base">{benefit}</span>
                   </div>
                 ))}
               </div>
@@ -325,7 +372,79 @@ export default function Home() {
       </section>
 
       {/* Section Divider */}
-      <div className="h-24 bg-gradient-to-b from-background to-muted/30" />
+      <div className="h-24 bg-gradient-to-b from-background to-accent/50" />
+
+      {/* Technology Innovation Section */}
+      <section className="py-24 bg-accent/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
+              <Sparkles className="h-3 w-3 mr-1" />
+              Cutting-Edge Agricultural Technology
+            </Badge>
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
+              Unified AI Intelligence System
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+              Our proprietary AI synergy system connects all features for context-aware insights. 
+              Every data point strengthens predictions across the entire platform.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <Card className="border-2 hover:border-primary transition-all hover-lift">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center h-16 w-16 rounded-2xl gradient-delta shadow-glow mx-auto mb-4">
+                  <Brain className="h-8 w-8 text-primary-foreground" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Context-Aware AI</h3>
+                <p className="text-sm text-muted-foreground">
+                  Every scan, prediction, and chat response uses your complete field history, weather patterns, 
+                  and crop performance data for personalized insights.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 hover:border-primary transition-all hover-lift">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center h-16 w-16 rounded-2xl gradient-sky shadow-glow mx-auto mb-4">
+                  <Network className="h-8 w-8 text-primary-foreground" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Cross-Feature Synergy</h3>
+                <p className="text-sm text-muted-foreground">
+                  Crop health assessments inform water stress predictions. Conservation practices 
+                  influence variety recommendations. Everything connects intelligently.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 hover:border-primary transition-all hover-lift">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center h-16 w-16 rounded-2xl gradient-harvest shadow-glow mx-auto mb-4">
+                  <GraduationCap className="h-8 w-8 text-primary-foreground" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">LSU Research Integration</h3>
+                <p className="text-sm text-muted-foreground">
+                  Every AI decision is backed by 130+ years of LSU AgCenter research. 
+                  Scientifically validated recommendations for Louisiana Delta conditions.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link to="/how-it-works">
+              <Button variant="outline" size="lg" className="gap-2">
+                Learn About Our Technology
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Divider */}
+      <div className="h-24 bg-gradient-to-b from-accent/50 to-muted/30" />
 
       {/* Testimonials Section */}
       <section 
