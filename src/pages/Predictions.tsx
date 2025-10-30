@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import { TrendingUp, Cloud, Droplets, ThermometerSun, AlertTriangle, Calendar, Loader2 } from 'lucide-react';
+import { TrendingUp, Cloud, AlertTriangle, Calendar, Loader2, Brain, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PredictiveAnalyticsDashboard } from '@/components/PredictiveAnalyticsDashboard';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PredictiveModel } from '@/types/enhanced-features';
 import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
 
@@ -24,9 +28,19 @@ interface PredictionData {
   high_risk_days: number;
 }
 
+interface Field {
+  id: string;
+  name: string;
+  crop_type: string;
+}
+
 export default function Predictions() {
   const [predictions, setPredictions] = useState<PredictionData | null>(null);
+  const [enhancedPredictions, setEnhancedPredictions] = useState<PredictiveModel[]>([]);
+  const [fields, setFields] = useState<Field[]>([]);
+  const [selectedFieldId, setSelectedFieldId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingEnhanced, setIsLoadingEnhanced] = useState(false);
   const [needsMoreData, setNeedsMoreData] = useState(false);
 
   const loadPredictions = async () => {
@@ -74,8 +88,53 @@ export default function Predictions() {
   };
 
   useEffect(() => {
+    fetchFields();
     loadPredictions();
   }, []);
+
+  useEffect(() => {
+    if (selectedFieldId) {
+      fetchEnhancedPredictions();
+    }
+  }, [selectedFieldId]);
+
+  const fetchFields = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('fields')
+        .select('id, name, crop_type')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (data && data.length > 0) {
+        setFields(data);
+        setSelectedFieldId(data[0].id);
+      }
+    } catch (error) {
+      console.error('Error fetching fields:', error);
+    }
+  };
+
+  const fetchEnhancedPredictions = async () => {
+    setIsLoadingEnhanced(true);
+    try {
+      const { data } = await supabase
+        .from('predictive_models')
+        .select('*')
+        .eq('field_id', selectedFieldId)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (data) setEnhancedPredictions(data as PredictiveModel[]);
+    } catch (error) {
+      console.error('Error fetching enhanced predictions:', error);
+    } finally {
+      setIsLoadingEnhanced(false);
+    }
+  };
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -105,16 +164,75 @@ export default function Predictions() {
         }}
       >
         <div className="max-w-6xl mx-auto px-4 text-center space-y-4 relative z-10">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Badge variant="secondary" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+              Unified AI Intelligence
+            </Badge>
+          </div>
           <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
-            Predictive Stress Analytics
+            Predictive Analytics
           </h1>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            AI-powered 7-day crop health forecasts based on your field history and weather patterns
+            AI-powered forecasts combining crop analysis, weather patterns, conservation practices, and community intelligence
           </p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 space-y-6">
+      <div className="max-w-6xl mx-auto px-4 space-y-8">
+
+        {/* Field Selector */}
+        {fields.length > 0 && (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-2 block">Select Field for Analysis</label>
+                  <Select value={selectedFieldId} onValueChange={setSelectedFieldId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a field" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fields.map((field) => (
+                        <SelectItem key={field.id} value={field.id}>
+                          {field.name} ({field.crop_type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Enhanced 30-Day Predictive Analytics */}
+        {selectedFieldId && enhancedPredictions.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-display font-bold">30-Day Enhanced Forecast</h2>
+            </div>
+            {isLoadingEnhanced ? (
+              <Card className="field-card">
+                <CardContent className="flex items-center justify-center py-12">
+                  <div className="text-center space-y-4">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+                    <p className="text-muted-foreground">Loading enhanced predictions...</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <PredictiveAnalyticsDashboard predictions={enhancedPredictions} />
+            )}
+          </div>
+        )}
+
+        {/* 7-Day Stress Predictions */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Cloud className="h-5 w-5 text-primary" />
+            <h2 className="text-2xl font-display font-bold">7-Day Stress Forecast</h2>
+          </div>
 
         {isLoading ? (
           <Card className="field-card">
@@ -242,6 +360,63 @@ export default function Predictions() {
               </Button>
             </CardContent>
           </Card>
+        )}
+        </div>
+
+        {/* Feature Highlights */}
+        {fields.length > 0 && (
+          <div className="grid gap-6 md:grid-cols-3">
+            <Card className="border-primary/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10">
+                    <Brain className="h-5 w-5 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">Unified Context</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  AI analyzes your field using historical assessments, conservation practices, variety performance, 
+                  weather patterns, and community insights for comprehensive predictions.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="border-accent/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-accent/10">
+                    <TrendingUp className="h-5 w-5 text-accent" />
+                  </div>
+                  <CardTitle className="text-lg">Extended Forecasting</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Combines 7-day stress predictions with 30-day extended forecasts, giving you more time to plan interventions, 
+                  order supplies, and optimize treatment timing.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="border-secondary/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-secondary/10">
+                    <Zap className="h-5 w-5 text-secondary" />
+                  </div>
+                  <CardTitle className="text-lg">LSU-Validated</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  All predictions and recommendations are cross-referenced with LSU AgCenter research data 
+                  and validated against proven agricultural practices for Louisiana Delta conditions.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>
