@@ -2,16 +2,17 @@ import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Brain, Send, Sparkles, Loader2, BookOpen, HelpCircle, History, Plus, Trash2, MessageSquare } from 'lucide-react';
+import { Brain, Loader2, BookOpen, HelpCircle, History, Plus, Trash2, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
 import { useDeltaConversations, type Message } from '@/hooks/useDeltaConversations';
 import { formatDistanceToNow } from 'date-fns';
+import { DeltaChatInput } from '@/components/DeltaChatInput';
+import { PredictiveQuestions } from '@/components/PredictiveQuestions';
 
 export default function DeltaIntelligence() {
   const {
@@ -26,9 +27,9 @@ export default function DeltaIntelligence() {
     selectConversation,
   } = useDeltaConversations();
 
-  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [fieldContext, setFieldContext] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +61,40 @@ export default function DeltaIntelligence() {
     }
   }, [displayMessages, isLoading]);
 
-  const streamChat = async (userMessage: string) => {
+  // Load field context for predictive questions
+  useEffect(() => {
+    const loadFieldContext = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: fields } = await supabase
+        .from('fields')
+        .select('id, name, crop_type')
+        .eq('user_id', user.id)
+        .limit(1)
+        .single();
+
+      if (fields) {
+        const { data: assessment } = await supabase
+          .from('assessments')
+          .select('health_score, stress_level, analyzed_at')
+          .eq('field_id', fields.id)
+          .order('analyzed_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        setFieldContext({
+          recentAssessment: assessment,
+          cropType: fields.crop_type,
+          healthScore: assessment?.health_score,
+        });
+      }
+    };
+
+    loadFieldContext();
+  }, []);
+
+  const streamChat = async (userMessage: string, imageUrl?: string) => {
     let conversationId = currentConversationId;
 
     // Create new conversation if needed
@@ -68,10 +102,13 @@ export default function DeltaIntelligence() {
       conversationId = await createConversation(userMessage);
     }
 
-    // Save user message
-    await saveMessage(conversationId, 'user', userMessage);
+    // Save user message with optional image
+    const messageContent = imageUrl 
+      ? `[Image: ${imageUrl}]\n${userMessage}`
+      : userMessage;
+    await saveMessage(conversationId, 'user', messageContent);
 
-    const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
+    const newMessages = [...messages, { role: 'user' as const, content: messageContent }];
     setMessages(newMessages);
     setIsLoading(true);
 
@@ -160,19 +197,19 @@ export default function DeltaIntelligence() {
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    const userMessage = input.trim();
-    setInput('');
-    await streamChat(userMessage);
+  const handleTextMessage = async (message: string) => {
+    if (isLoading) return;
+    await streamChat(message);
   };
 
-  const quickQuestions = [
-    { q: "What rice varieties work best in Morehouse Parish?", icon: "🌾" },
-    { q: "How do I identify soybean rust early?", icon: "🔍" },
-    { q: "Best cotton planting practices for Delta soils?", icon: "☁️" },
-    { q: "When should I apply nitrogen to corn fields?", icon: "🌽" }
-  ];
+  const handleImageMessage = async (imageUrl: string, question: string) => {
+    if (isLoading) return;
+    await streamChat(question, imageUrl);
+  };
+
+  const handleQuestionSelect = async (question: string) => {
+    await streamChat(question);
+  };
 
   const handleNewConversation = () => {
     startNewConversation();
@@ -347,58 +384,21 @@ export default function DeltaIntelligence() {
               </div>
             </ScrollArea>
 
-            {/* Quick Start Questions - Only show at start */}
-            {displayMessages.length === 1 && displayMessages[0].role === 'assistant' && (
-              <div className="px-6 py-4 border-t bg-gradient-to-r from-purple-500/5 to-indigo-500/5">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="h-4 w-4 text-purple-600" />
-                  <p className="text-sm font-medium text-foreground">Quick Start Questions</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {quickQuestions.map((item, idx) => (
-                    <Button
-                      key={idx}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setInput(item.q);
-                        setTimeout(() => handleSend(), 100);
-                      }}
-                      className="text-xs justify-start h-auto py-3 px-4 hover:bg-purple-500/10 hover:border-purple-500/30 transition-all"
-                    >
-                      <span className="mr-2 text-base">{item.icon}</span>
-                      <span className="text-left line-clamp-2">{item.q}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Predictive Questions - Show at start or based on context */}
+            {(displayMessages.length === 1 && displayMessages[0].role === 'assistant') || fieldContext?.recentAssessment ? (
+              <PredictiveQuestions 
+                fieldContext={fieldContext}
+                onSelectQuestion={handleQuestionSelect}
+              />
+            ) : null}
 
-            {/* Input Area */}
+            {/* Enhanced Input Area with Voice and Image */}
             <div className="p-4 border-t bg-background">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSend();
-                }}
-                className="flex gap-3"
-              >
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your question..."
-                  disabled={isLoading}
-                  className="flex-1 h-11"
-                />
-                <Button 
-                  type="submit" 
-                  disabled={isLoading || !input.trim()} 
-                  size="icon"
-                  className="h-11 w-11 gradient-delta shadow-glow"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </form>
+              <DeltaChatInput
+                onTextMessage={handleTextMessage}
+                onImageMessage={handleImageMessage}
+                disabled={isLoading}
+              />
             </div>
           </CardContent>
         </Card>

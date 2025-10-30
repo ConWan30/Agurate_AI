@@ -14,10 +14,28 @@ const corsHeaders = {
 const deltaChatSchema = z.object({
   messages: z.array(z.object({
     role: z.enum(['user', 'assistant', 'system']),
-    content: z.string().min(1).max(10000)
+    content: z.string().min(1).max(20000) // Increased for image URLs
   })).min(1).max(50),
   conversationId: z.string().uuid().optional()
 });
+
+// Extract image URL from message if present
+function extractImageUrl(content: string): { imageUrl: string | null; textContent: string } {
+  const imagePattern = /\[Image: (https?:\/\/[^\]]+)\]\n?/;
+  const match = content.match(imagePattern);
+  
+  if (match) {
+    return {
+      imageUrl: match[1],
+      textContent: content.replace(imagePattern, '').trim()
+    };
+  }
+  
+  return {
+    imageUrl: null,
+    textContent: content
+  };
+}
 
 const SYSTEM_PROMPT = `You are Delta Intelligence, an AI expert assistant specialized in Louisiana Delta agriculture. You have deep knowledge of:
 
@@ -105,6 +123,33 @@ serve(async (req) => {
       }
     }
 
+    // Process messages for image analysis
+    const processedMessages = messages.map((msg: any) => {
+      if (msg.role === 'user') {
+        const { imageUrl, textContent } = extractImageUrl(msg.content);
+        
+        if (imageUrl) {
+          // Gemini Vision format: array of content parts
+          return {
+            role: msg.role,
+            content: [
+              {
+                type: 'text',
+                text: textContent || 'What do you see in this image?'
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: imageUrl
+                }
+              }
+            ]
+          };
+        }
+      }
+      return msg;
+    });
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -112,10 +157,10 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-flash', // Supports vision
         messages: [
           { role: 'system', content: SYSTEM_PROMPT + contextPrompt },
-          ...messages
+          ...processedMessages
         ],
         stream: true,
       }),
