@@ -33,12 +33,26 @@ export default function Predictions() {
     setIsLoading(true);
     setNeedsMoreData(false);
     try {
+      // Get current session to pass auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error('Please log in to view predictions');
+        setNeedsMoreData(true);
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('predict-stress', {
-        body: { days: 7 }
+        body: { days: 7 },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       if (error) {
         console.error('Prediction error:', error);
+        toast.error('Failed to generate predictions. Please try again.');
         setNeedsMoreData(true);
         return;
       }
@@ -52,6 +66,7 @@ export default function Predictions() {
       }
     } catch (error) {
       console.error('Prediction failed:', error);
+      toast.error('An error occurred while generating predictions');
       setNeedsMoreData(true);
     } finally {
       setIsLoading(false);
