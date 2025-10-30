@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import bgCooperativeCommunity from '@/assets/bg-cooperative-community.jpg';
 
 export default function Cooperatives() {
   const [open, setOpen] = useState(false);
@@ -188,7 +189,14 @@ export default function Cooperatives() {
 
   return (
     <div className="space-y-8">
-      <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
+      <div 
+        className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(45, 106, 79, 0.92) 0%, rgba(27, 64, 48, 0.88) 100%), url(${bgCooperativeCommunity})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <div className="relative z-10 flex flex-col md:flex-row items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">

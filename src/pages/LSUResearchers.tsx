@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, GraduationCap, BookOpen } from 'lucide-react';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { EmptyState } from '@/components/ui/empty-state';
+import bgLsuResearch from '@/assets/bg-lsu-research.jpg';
 
 export default function LSUResearchers() {
   const [researchers, setResearchers] = useState<LSUResearcher[]>([]);
@@ -57,7 +58,14 @@ export default function LSUResearchers() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 p-8 text-white shadow-glow">
+      <div 
+        className="relative overflow-hidden rounded-2xl p-8 text-white shadow-glow"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(16, 185, 129, 0.92) 0%, rgba(5, 150, 105, 0.88) 100%), url(${bgLsuResearch})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm">
