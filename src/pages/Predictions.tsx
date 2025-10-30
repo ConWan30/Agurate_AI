@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TrendingUp, Cloud, AlertTriangle, Calendar, Loader2, Brain, Zap } from 'lucide-react';
+import { TrendingUp, Cloud, AlertTriangle, Calendar, Loader2, Brain, Zap, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { PredictiveModel } from '@/types/enhanced-features';
 import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
+import { EnhancedPageHeader } from '@/components/EnhancedPageHeader';
 
 interface Prediction {
   day: number;
@@ -154,29 +155,14 @@ export default function Predictions() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
-      {/* Hero Header with Background */}
-      <div 
-        className="py-12 mb-8 field-shimmer relative overflow-hidden"
-        style={{
-          backgroundImage: `linear-gradient(135deg, rgba(42, 96, 156, 0.93) 0%, rgba(80, 64, 131, 0.90) 100%), url(${bgCottonField})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="max-w-6xl mx-auto px-4 text-center space-y-4 relative z-10">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-              Unified AI Intelligence
-            </Badge>
-          </div>
-          <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
-            Predictive Analytics
-          </h1>
-          <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            AI-powered forecasts combining crop analysis, weather patterns, conservation practices, and community intelligence
-          </p>
-        </div>
-      </div>
+      {/* Enhanced Page Header */}
+      <EnhancedPageHeader
+        icon={TrendingUp}
+        badge={{ icon: Sparkles, text: "Unified AI Intelligence" }}
+        title="Predictive Analytics"
+        description="AI-powered forecasts combining crop analysis, weather patterns, conservation practices, and community intelligence for 7-30 day predictions"
+        gradient="delta"
+      />
 
       <div className="max-w-6xl mx-auto px-4 space-y-8">
 

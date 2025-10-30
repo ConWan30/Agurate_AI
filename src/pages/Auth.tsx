@@ -12,6 +12,7 @@ import { Sprout, Shield, CheckCircle2, ArrowLeft, Zap, Users } from "lucide-reac
 import heroFields from "@/assets/hero-fields.jpg";
 import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
 import { z } from "zod";
+import { TrustIndicators } from "@/components/TrustIndicators";
 
 // Validation schemas
 const signInSchema = z.object({
@@ -247,15 +248,8 @@ export default function Auth() {
           </div>
 
           {/* Trust badges */}
-          <div className="mt-12 pt-8 border-t border-primary-foreground/20 flex items-center gap-6">
-            <Badge variant="outline" className="glass border-primary-foreground/40 text-primary-foreground">
-              <Shield className="h-3 w-3 mr-1" />
-              Secure & Private
-            </Badge>
-            <Badge variant="outline" className="glass border-primary-foreground/40 text-primary-foreground">
-              <CheckCircle2 className="h-3 w-3 mr-1" />
-              LSU Research-Based
-            </Badge>
+          <div className="mt-12 pt-8 border-t border-primary-foreground/20">
+            <TrustIndicators variant="compact" className="justify-center md:justify-start" />
           </div>
         </div>
       </div>

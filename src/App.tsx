@@ -139,6 +139,7 @@ const App = () => (
           <Route path="/cooperatives" element={<ProtectedRoute><Layout><Cooperatives /></Layout></ProtectedRoute>} />
           <Route path="/cooperatives/join/:code" element={<ProtectedRoute><CooperativeJoin /></ProtectedRoute>} />
           <Route path="/delta" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
+          <Route path="/delta-intelligence" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><Layout><Analytics /></Layout></ProtectedRoute>} />
           <Route path="/lsu-researchers" element={<ProtectedRoute><Layout><LSUResearchers /></Layout></ProtectedRoute>} />
           <Route path="/community-insights" element={<ProtectedRoute><Layout><CommunityInsights /></Layout></ProtectedRoute>} />

@@ -30,6 +30,9 @@ import {
 import heroFields from "@/assets/hero-fields.jpg";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { TrustIndicators } from "@/components/TrustIndicators";
+import { LSUPartnershipSection } from "@/components/LSUPartnershipSection";
+import { ComparisonSection } from "@/components/ComparisonSection";
 
 export default function Home() {
   const { ref: heroRef, isIntersecting: heroVisible } = useIntersectionObserver({ threshold: 0.1 });
@@ -328,17 +331,14 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="mt-8 flex items-center gap-4">
+              <div className="mt-8 space-y-4">
                 <Link to="/auth">
                   <Button size="lg" className="gap-2 shadow-glow hover:shadow-field hover-lift">
                     Get Started Now
                     <ArrowRight className="h-5 w-5" aria-hidden="true" />
                   </Button>
                 </Link>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Shield className="h-4 w-4 text-success" />
-                  <span>LSU Research-Based</span>
-                </div>
+                <TrustIndicators variant="compact" />
               </div>
             </div>
 
@@ -490,6 +490,24 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Trust Indicators Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
+              Trusted by Louisiana Delta Farmers
+            </h2>
+          </div>
+          <TrustIndicators variant="full" className="max-w-6xl mx-auto" />
+        </div>
+      </section>
+
+      {/* LSU Partnership Section */}
+      <LSUPartnershipSection />
+
+      {/* Comparison Section */}
+      <ComparisonSection />
 
       {/* Section Divider */}
       <div className="h-24 bg-gradient-to-b from-muted/30 to-primary" />
