@@ -187,8 +187,10 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="max-w-md mx-auto mt-12">
-            <BetaCountdown />
+          <div className="max-w-md mx-auto mt-12 animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <div className="p-2 bg-background/95 backdrop-blur-sm rounded-lg shadow-2xl">
+              <BetaCountdown />
+            </div>
           </div>
         </div>
       </section>

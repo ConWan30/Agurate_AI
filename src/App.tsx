@@ -16,6 +16,7 @@ const Home = lazy(() => import("./pages/Home"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const BetaMetrics = lazy(() => import("./pages/BetaMetrics"));
 const Upload = lazy(() => import("./pages/Upload"));
 const Scanner = lazy(() => import("./pages/Scanner"));
 const FieldMap = lazy(() => import("./pages/FieldMap"));
@@ -124,7 +125,8 @@ const App = () => (
             <Route path="/install" element={<main id="main-content"><Install /></main>} />
             <Route path="/auth" element={<main id="main-content"><Auth /></main>} />
             <Route path="/reset-password" element={<main id="main-content"><ResetPassword /></main>} />
-            <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+          <Route path="/beta-metrics" element={<ProtectedRoute><Layout><BetaMetrics /></Layout></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Layout><Upload /></Layout></ProtectedRoute>} />
           <Route path="/scanner" element={<ProtectedRoute><Layout><Scanner /></Layout></ProtectedRoute>} />
           <Route path="/field-map" element={<ProtectedRoute><Layout><FieldMap /></Layout></ProtectedRoute>} />

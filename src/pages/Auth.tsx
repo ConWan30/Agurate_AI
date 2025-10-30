@@ -509,7 +509,7 @@ export default function Auth() {
                           Creating account...
                         </span>
                       ) : (
-                        "Create Account"
+                        "Join Free Beta"
                       )}
                     </Button>
 

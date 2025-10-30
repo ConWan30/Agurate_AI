@@ -6,6 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { BetaWelcomeBanner } from "@/components/BetaWelcomeBanner";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
+import { SuccessStoryPrompt } from "@/components/SuccessStoryPrompt";
+import { BetaConversionBanner } from "@/components/BetaConversionBanner";
 import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon, BarChart3 } from "lucide-react";
 import { WeatherAlerts } from "@/components/WeatherAlerts";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -43,6 +46,8 @@ export default function Dashboard() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showAdditionalTools, setShowAdditionalTools] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [showSuccessStory, setShowSuccessStory] = useState(false);
   
   // Enable keyboard shortcuts
   useGlobalKeyboardShortcuts();
@@ -155,9 +160,16 @@ export default function Dashboard() {
   return (
     <>
       <InteractiveTutorial open={showTutorial} onOpenChange={setShowTutorial} />
+      <OnboardingWizard 
+        open={showOnboarding} 
+        onComplete={() => setShowOnboarding(false)}
+        onSkip={() => setShowOnboarding(false)}
+      />
       
       <PullToRefresh onRefresh={fetchDashboardData}>
         <div className="space-y-8">
+        <BetaWelcomeBanner />
+        <BetaConversionBanner />
         {/* Header - Louisiana Agricultural Theme with Background */}
         <div 
           className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
@@ -509,6 +521,35 @@ export default function Dashboard() {
         </div>
       </div>
       </PullToRefresh>
+
+      {/* Feedback Widget */}
+      {showFeedback && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-md">
+          <FeedbackWidget 
+            featureContext="dashboard"
+            onClose={() => setShowFeedback(false)}
+          />
+        </div>
+      )}
+
+      {/* Success Story Prompt */}
+      <SuccessStoryPrompt 
+        open={showSuccessStory}
+        onClose={() => setShowSuccessStory(false)}
+      />
+
+      {/* Floating Feedback Button */}
+      {!showFeedback && (
+        <button
+          onClick={() => setShowFeedback(true)}
+          className="fixed bottom-6 right-6 z-40 bg-primary text-primary-foreground rounded-full p-4 shadow-glow hover:shadow-field transition-all hover:scale-110"
+          aria-label="Give feedback"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+          </svg>
+        </button>
+      )}
     </>
   );
 }
