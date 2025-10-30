@@ -43,12 +43,62 @@ serve(async (req) => {
     const { imageUrl, cropType, fieldId, location, mediaType } = validation.data;
     console.log('🌾 Analyzing crop media with unified context:', { imageUrl, cropType, fieldId, location, mediaType });
 
+    // Authenticate user
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token);
+    
+    if (userError || !user) {
+      console.error('Authentication failed:', userError);
+      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Verify field ownership if fieldId provided
+    if (fieldId) {
+      const { data: field, error: fieldError } = await supabaseAuth
+        .from('fields')
+        .select('user_id')
+        .eq('id', fieldId)
+        .single();
+
+      if (fieldError || !field) {
+        console.error('Field not found:', fieldError);
+        return new Response(JSON.stringify({ error: 'Field not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (field.user_id !== user.id) {
+        console.error('Unauthorized field access attempt');
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // STEP 0: Gather unified context if fieldId provided
+    // STEP 0: Gather unified context if fieldId provided (use service role after auth check)
     let unifiedContext = '';
     if (fieldId) {
       const supabase = createClient(

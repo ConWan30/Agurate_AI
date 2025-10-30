@@ -1,10 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const predictStressSchema = z.object({
+  days: z.number().int().min(1).max(30).default(7)
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,7 +17,17 @@ serve(async (req) => {
   }
 
   try {
-    const { days = 7 } = await req.json();
+    const rawBody = await req.json();
+    const validation = predictStressSchema.safeParse(rawBody);
+    
+    if (!validation.success) {
+      return new Response(JSON.stringify({ error: 'Invalid input data', forecast: [], summary: '', high_risk_days: 0 }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const { days } = validation.data;
     
     // Get auth token from request header
     const authHeader = req.headers.get('Authorization');
@@ -193,7 +208,7 @@ Generate ${days}-day forecast predicting crop stress levels. Return JSON only.`
     console.error('Prediction error:', error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Prediction failed',
+        error: 'Unable to generate predictions. Please try again.',
         forecast: [],
         summary: 'Unable to generate predictions at this time.',
         high_risk_days: 0

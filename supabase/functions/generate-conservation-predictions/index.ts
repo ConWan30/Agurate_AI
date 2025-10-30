@@ -1,10 +1,18 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const conservationSchema = z.object({
+  fieldId: z.string().uuid(),
+  practiceType: z.string().min(1).max(100),
+  fieldHistory: z.any().optional(),
+  weatherForecast: z.any().optional()
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,7 +20,56 @@ serve(async (req) => {
   }
 
   try {
-    const { fieldId, practiceType, fieldHistory, weatherForecast } = await req.json();
+    const rawBody = await req.json();
+    const validation = conservationSchema.safeParse(rawBody);
+    
+    if (!validation.success) {
+      return new Response(JSON.stringify({ error: 'Invalid input data' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const { fieldId, practiceType, fieldHistory, weatherForecast } = validation.data;
+
+    // Authenticate user and verify field ownership
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !user) {
+      console.error('Authentication failed:', userError);
+      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Verify field ownership
+    const { data: field, error: fieldError } = await supabase
+      .from('fields')
+      .select('user_id')
+      .eq('id', fieldId)
+      .single();
+
+    if (fieldError || !field || field.user_id !== user.id) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -77,12 +134,7 @@ Return JSON with numeric values and brief reasoning.`;
       };
     }
 
-    // Save to database
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
+    // Save to database (use regular client, RLS allows user to insert their own data)
     const { data, error } = await supabase
       .from('conservation_predictions')
       .insert({
@@ -107,7 +159,7 @@ Return JSON with numeric values and brief reasoning.`;
   } catch (error) {
     console.error('Error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'Unable to generate prediction. Please try again.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

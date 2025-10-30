@@ -1,10 +1,17 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const communityInsightsSchema = z.object({
+  cropType: z.enum(['rice', 'soybeans', 'cotton', 'corn']),
+  practiceType: z.string().min(1).max(100),
+  region: z.string().max(100).optional()
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,7 +19,42 @@ serve(async (req) => {
   }
 
   try {
-    const { cropType, practiceType, region } = await req.json();
+    const rawBody = await req.json();
+    const validation = communityInsightsSchema.safeParse(rawBody);
+    
+    if (!validation.success) {
+      return new Response(JSON.stringify({ error: 'Invalid input data' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const { cropType, practiceType, region } = validation.data;
+
+    // Authenticate user (community insights are aggregated, not field-specific)
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token);
+    
+    if (userError || !user) {
+      console.error('Authentication failed:', userError);
+      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
     
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -92,7 +134,7 @@ Return JSON with community insights and best practices.`;
   } catch (error) {
     console.error('Error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'Unable to generate insights. Please try again.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

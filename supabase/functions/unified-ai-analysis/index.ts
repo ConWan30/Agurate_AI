@@ -1,10 +1,17 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const unifiedAnalysisSchema = z.object({
+  imageUrl: z.string().url().max(2048),
+  fieldId: z.string().uuid(),
+  assessmentId: z.string().uuid().optional()
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,9 +19,68 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, fieldId, assessmentId } = await req.json();
+    const rawBody = await req.json();
+    const validation = unifiedAnalysisSchema.safeParse(rawBody);
     
+    if (!validation.success) {
+      return new Response(JSON.stringify({ error: 'Invalid input data' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const { imageUrl, fieldId, assessmentId } = validation.data;
+
+    // Authenticate user and verify field ownership
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !user) {
+      console.error('Authentication failed:', userError);
+      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Verify field ownership
+    const { data: field, error: fieldError } = await supabase
+      .from('fields')
+      .select('user_id')
+      .eq('id', fieldId)
+      .single();
+
+    if (fieldError || !field) {
+      console.error('Field not found:', fieldError);
+      return new Response(JSON.stringify({ error: 'Field not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (field.user_id !== user.id) {
+      console.error('Unauthorized field access attempt');
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Use service role for database operations after auth check
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
@@ -22,7 +88,7 @@ serve(async (req) => {
     console.log('🌾 Starting unified AI analysis for field:', fieldId);
 
     // STEP 1: Gather unified context from all systems
-    const context = await gatherUnifiedContext(supabase, fieldId);
+    const context = await gatherUnifiedContext(supabaseAdmin, fieldId);
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -46,7 +112,7 @@ serve(async (req) => {
     ]);
 
     // STEP 4: Update AI intelligence pool
-    await updateIntelligencePool(supabase, fieldId, {
+    await updateIntelligencePool(supabaseAdmin, fieldId, {
       visionAnalysis,
       waterStress,
       conservation,
@@ -85,7 +151,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('❌ Unified AI analysis error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'Unable to complete analysis. Please try again.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
