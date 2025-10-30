@@ -600,12 +600,7 @@ export default function Home() {
                 </li>
                 <li>
                   <Link to="/cooperatives" className="text-muted-foreground hover:text-primary transition-colors">
-                    Cooperatives
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/enhanced-analytics" className="text-muted-foreground hover:text-primary transition-colors">
-                    Enhanced Analytics
+                    Cooperatives & Community
                   </Link>
                 </li>
                 <li>

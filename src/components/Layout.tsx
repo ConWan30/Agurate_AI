@@ -58,14 +58,12 @@ export const Layout = ({ children }: LayoutProps) => {
 
   const businessItems = [
     { icon: FileText, label: "Insurance", path: "/insurance", accentIcon: FileText, gradient: "from-red-500/10 to-rose-600/10" },
-    { icon: Users, label: "Cooperatives", path: "/cooperatives", accentIcon: Users, gradient: "from-amber-500/10 to-orange-600/10" },
+    { icon: Users, label: "Cooperatives & Community", path: "/cooperatives", accentIcon: Users, gradient: "from-amber-500/10 to-orange-600/10" },
     { icon: Brain, label: "Delta AI", path: "/delta", accentIcon: Brain, gradient: "from-violet-500/10 to-purple-600/10" },
   ];
 
   const enhancedItems = [
     { icon: TrendingUp, label: "LSU Researchers", path: "/lsu-researchers", accentIcon: Lightbulb, gradient: "from-green-500/10 to-emerald-600/10" },
-    { icon: Users, label: "Community Insights", path: "/community-insights", accentIcon: Users, gradient: "from-purple-500/10 to-pink-600/10" },
-    { icon: Brain, label: "Enhanced Analytics", path: "/enhanced-analytics", accentIcon: TrendingUp, gradient: "from-indigo-500/10 to-purple-600/10" },
   ];
 
   return (

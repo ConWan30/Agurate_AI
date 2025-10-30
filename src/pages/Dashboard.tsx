@@ -331,13 +331,13 @@ export default function Dashboard() {
             </Link>
 
             {/* 8. Community Intelligence */}
-            <Link to="/community-insights" className="group">
+            <Link to="/cooperatives" className="group">
               <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-sky shadow-glow mb-3 group-hover:scale-110 transition-transform">
                     <Network className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Community Insights</h3>
+                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Cooperatives & Community</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     Anonymous cooperative intelligence
                   </p>

@@ -258,8 +258,8 @@ export default function BetaMetrics() {
                   : '0% share rate'}
               </p>
               <Button variant="outline" className="w-full gap-2" asChild>
-                <Link to="/community-insights">
-                  View Success Stories
+                <Link to="/cooperatives">
+                  View Community Insights
                 </Link>
               </Button>
             </div>
