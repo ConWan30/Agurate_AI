@@ -69,7 +69,6 @@ export default function Cooperatives() {
       
       if (memberError) throw memberError;
 
-      // Get roles for each membership from cooperative_roles table
       const { data: roles, error: roleError } = await supabase
         .from('cooperative_roles' as any)
         .select('cooperative_id, role')
@@ -77,7 +76,6 @@ export default function Cooperatives() {
       
       if (roleError) throw roleError;
 
-      // Merge roles with memberships
       return memberships?.map(m => ({
         ...m,
         role: (roles as any)?.find((r: any) => r.cooperative_id === m.cooperative_id)?.role || 'member'
@@ -100,7 +98,6 @@ export default function Cooperatives() {
       
       if (coopError) throw coopError;
 
-      // Add creator as member
       const { error: memberError } = await supabase
         .from('cooperative_members')
         .insert([{
@@ -110,7 +107,6 @@ export default function Cooperatives() {
       
       if (memberError) throw memberError;
 
-      // Add creator as admin in cooperative_roles table
       const { error: roleError } = await supabase
         .from('cooperative_roles' as any)
         .insert([{
@@ -136,13 +132,11 @@ export default function Cooperatives() {
 
       const stats = await Promise.all(
         cooperatives.map(async (coop) => {
-          // Get all fields in this cooperative
           const { data: fields } = await supabase
             .from('fields')
             .select('id, acreage')
             .eq('cooperative_id', coop.id);
 
-          // Get recent assessments for cooperative fields
           const fieldIds = fields?.map(f => f.id) || [];
           const { data: assessments } = await supabase
             .from('assessments')
@@ -170,7 +164,6 @@ export default function Cooperatives() {
     enabled: !!cooperatives?.length
   });
 
-  // Fetch community insights data
   useEffect(() => {
     const fetchCommunityData = async () => {
       try {
@@ -195,7 +188,6 @@ export default function Cooperatives() {
 
   return (
     <div className="space-y-8">
-      {/* Hero Header */}
       <div className="relative overflow-hidden rounded-2xl gradient-delta p-8 md:p-12 shadow-glow">
         <div className="relative z-10 flex flex-col md:flex-row items-start justify-between gap-4">
           <div>
@@ -226,7 +218,6 @@ export default function Cooperatives() {
                   <Label>Cooperative Name</Label>
                   <Input name="name" placeholder="Delta Farmers Co-op" required />
                 </div>
-
                 <div>
                   <Label>Description</Label>
                   <Textarea 
@@ -235,7 +226,6 @@ export default function Cooperatives() {
                     placeholder="Collaborative farming network for Louisiana Delta region..."
                   />
                 </div>
-
                 <Button type="submit" className="w-full">Create Cooperative</Button>
               </form>
             </DialogContent>
@@ -244,7 +234,6 @@ export default function Cooperatives() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Tabbed Content */}
       <Tabs defaultValue="cooperatives" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="cooperatives" className="gap-2">
@@ -258,7 +247,6 @@ export default function Cooperatives() {
         </TabsList>
 
         <TabsContent value="cooperatives" className="space-y-8">
-          {/* Educational Section */}
           <Card className="field-card bg-primary/5 border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -276,7 +264,6 @@ export default function Cooperatives() {
                     recommendations, and community-wide crop health monitoring across the Louisiana Delta.
                   </p>
                 </div>
-                
                 <div>
                   <h3 className="font-semibold mb-2">Who Benefits?</h3>
                   <ul className="text-sm text-muted-foreground space-y-2">
@@ -327,7 +314,6 @@ export default function Cooperatives() {
                     Compare your crop performance against cooperative averages to identify what is working
                   </p>
                 </div>
-                
                 <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
                   <p className="text-sm font-medium text-green-700 mb-1">💰 Cost Savings</p>
                   <p className="text-sm text-muted-foreground">
@@ -338,7 +324,6 @@ export default function Cooperatives() {
             </CardContent>
           </Card>
 
-          {/* My Memberships */}
           {myMemberships && myMemberships.length > 0 && (
             <section className="space-y-4">
               <h2 className="text-2xl font-display font-bold">My Cooperatives</h2>
@@ -379,10 +364,8 @@ export default function Cooperatives() {
             </section>
           )}
 
-          {/* All Cooperatives */}
           <section className="space-y-4">
             <h2 className="text-2xl font-display font-bold">All Cooperatives</h2>
-            
             {cooperatives?.length === 0 ? (
               <Card className="field-card">
                 <CardContent className="pt-6 text-center py-12">
@@ -397,7 +380,6 @@ export default function Cooperatives() {
               <div className="grid gap-6">
                 {cooperatives?.map(coop => {
                   const stats = cooperativeStats?.find(s => s.cooperative_id === coop.id);
-                  
                   return (
                     <Card key={coop.id} className="field-card hover-lift">
                       <CardHeader>
@@ -414,7 +396,6 @@ export default function Cooperatives() {
                           </Badge>
                         </div>
                       </CardHeader>
-                      
                       {stats && (
                         <CardContent>
                           <div className="grid grid-cols-3 gap-4">
@@ -425,7 +406,6 @@ export default function Cooperatives() {
                               </div>
                               <p className="text-xs text-muted-foreground">Fields</p>
                             </div>
-                            
                             <div className="p-4 bg-muted/50 rounded-lg text-center">
                               <div className="flex items-center justify-center gap-2 mb-1">
                                 <Building2 className="h-4 w-4 text-primary" />
@@ -433,7 +413,6 @@ export default function Cooperatives() {
                               </div>
                               <p className="text-xs text-muted-foreground">Total Acres</p>
                             </div>
-                            
                             <div className="p-4 bg-muted/50 rounded-lg text-center">
                               <div className="flex items-center justify-center gap-2 mb-1">
                                 <TrendingUp className="h-4 w-4 text-primary" />
@@ -452,9 +431,7 @@ export default function Cooperatives() {
           </section>
         </TabsContent>
 
-        {/* Community Insights Tab */}
         <TabsContent value="insights" className="space-y-8">
-          {/* Adoption Metrics Overview */}
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="border-primary/20">
               <CardContent className="p-6">
@@ -471,7 +448,6 @@ export default function Cooperatives() {
                 </div>
               </CardContent>
             </Card>
-
             <Card className="border-primary/20">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
@@ -487,7 +463,6 @@ export default function Cooperatives() {
                 </div>
               </CardContent>
             </Card>
-
             <Card className="border-primary/20">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
@@ -505,7 +480,6 @@ export default function Cooperatives() {
             </Card>
           </div>
 
-          {/* Filter */}
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
@@ -526,7 +500,6 @@ export default function Cooperatives() {
             </CardContent>
           </Card>
 
-          {/* Best Practices Grid */}
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10">
@@ -557,7 +530,6 @@ export default function Cooperatives() {
             )}
           </div>
 
-          {/* Privacy Notice */}
           <Card className="bg-muted/50 border-muted">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
