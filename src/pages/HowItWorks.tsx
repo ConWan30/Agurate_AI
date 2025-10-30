@@ -1,4 +1,4 @@
-import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap, ArrowRight, ArrowLeft, Database, GitBranch, Network } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MagneticButton } from '@/components/ui/magnetic-button';
@@ -11,45 +11,45 @@ export default function HowItWorks() {
 
   const aiPipeline = [
     {
-      icon: Camera,
-      title: 'Image & Video Capture',
-      description: 'Capture crop photos or upload drone video footage with GPS auto-tagging for comprehensive field analysis',
-      tech: 'Mobile Camera API + Drone Video Support + Geolocation',
+      icon: Database,
+      title: 'Context Gathering',
+      description: 'AI pulls your last 10 assessments, conservation practices, variety performance, weather history, community insights, and water stress predictions',
+      tech: 'Unified Intelligence Pool Query',
       color: 'bg-blue-500/10 text-blue-700 border-blue-500/20'
     },
     {
       icon: Brain,
-      title: 'AI Vision Analysis',
-      description: 'Google Gemini 2.5 analyzes images and drone videos for visual stress indicators, disease patterns, and field-wide crop health variations',
-      tech: 'Gemini 2.5 Pro (Multimodal Video + Image)',
+      title: 'Enhanced Vision Analysis',
+      description: 'Gemini 2.5 analyzes your photo WITH full field context—comparing to historical progression, variety-specific disease signatures, weather patterns, and successful community interventions',
+      tech: 'Gemini 2.5 Pro + Unified Context',
       color: 'bg-purple-500/10 text-purple-700 border-purple-500/20'
     },
     {
-      icon: Cloud,
-      title: 'Weather Correlation',
-      description: 'Cross-reference with real-time Louisiana Delta weather data',
-      tech: 'Open-Meteo API + Historical Data',
+      icon: GitBranch,
+      title: 'Parallel AI Enrichment',
+      description: 'Simultaneously runs water stress prediction, conservation impact assessment, variety recommendations, community pattern matching, and predictive analytics—all informed by vision results',
+      tech: 'Multi-Model Parallel Processing',
       color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20'
     },
     {
-      icon: FileText,
-      title: 'LSU AgCenter Integration',
-      description: 'Apply Louisiana-specific agricultural research and best practices',
-      tech: 'LSU AgCenter Guidelines',
+      icon: Network,
+      title: 'Intelligence Pool Update',
+      description: 'New insights are fed back into the central pool, creating patterns that enhance all future analyses for your field and similar farms',
+      tech: 'Circular Data Enrichment',
       color: 'bg-green-500/10 text-green-700 border-green-500/20'
     },
     {
       icon: TrendingUp,
-      title: 'Predictive Analytics',
-      description: 'Forecast 7-day crop stress based on your field history + weather patterns',
-      tech: 'Pattern Recognition + Time Series',
+      title: 'Unified Recommendations',
+      description: 'AI synthesizes all parallel analyses into prioritized actions, matching you with LSU researchers if needed, and updating predictive forecasts',
+      tech: 'Multi-Source Recommendation Engine',
       color: 'bg-orange-500/10 text-orange-700 border-orange-500/20'
     },
     {
       icon: Layers,
-      title: 'AR Overlay',
-      description: 'Real-time augmented reality health indicators on live camera feed',
-      tech: 'AR Vision Processing',
+      title: 'Continuous Learning',
+      description: 'Every analysis makes the system smarter—building variety-specific disease libraries, weather correlation patterns, and conservation effectiveness data',
+      tech: 'Self-Improving Intelligence',
       color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
     }
   ];
@@ -128,24 +128,69 @@ export default function HowItWorks() {
             How AgurateAI Works
           </h1>
           <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto leading-relaxed">
-            Understanding the AI-powered crop health intelligence built specifically 
-            for Louisiana Delta agriculture
+            A unified AI intelligence system where every analysis enriches every other—creating exponentially smarter insights for Louisiana Delta farmers
           </p>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-12">
 
-        {/* Streamlined AI Pipeline */}
+        {/* Unified Intelligence System Overview */}
+        <section className="space-y-8">
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+              <Network className="h-3 w-3 mr-1" />
+              Unified AI Intelligence
+            </Badge>
+            <h2 className="text-4xl font-display font-bold">Synergistic Data Flow</h2>
+            <p className="text-lg text-muted-foreground">
+              Unlike traditional AI that analyzes each photo in isolation, AgurateAI creates a <strong>circular intelligence network</strong> where every data point enhances every other analysis
+            </p>
+          </div>
+
+          {/* Central Intelligence Pool Diagram */}
+          <Card className="field-card border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+            <CardContent className="p-8">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary/20 mb-4">
+                  <Database className="h-10 w-10 text-primary" />
+                </div>
+                <h3 className="text-2xl font-display font-bold mb-2">Central AI Intelligence Pool</h3>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Every analysis feeds insights into a unified context that makes all future analyses exponentially smarter
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  { icon: Camera, label: 'Historical Image Progression', desc: 'Visual symptom evolution patterns' },
+                  { icon: TrendingUp, label: 'Variety-Specific Signatures', desc: 'Disease resistance & stress traits' },
+                  { icon: Cloud, label: 'Weather Correlation Patterns', desc: 'Symptom triggers from climate data' },
+                  { icon: Layers, label: 'Conservation Practice Impact', desc: 'Soil health improvement tracking' },
+                  { icon: Network, label: 'Community Success Patterns', desc: 'Proven interventions from peers' },
+                  { icon: Brain, label: 'Predictive Analytics Feed', desc: 'Yield trajectories & risk forecasts' }
+                ].map((item, idx) => (
+                  <div key={idx} className="text-center p-4 bg-background/50 rounded-lg border">
+                    <item.icon className="h-8 w-8 mx-auto mb-3 text-primary" />
+                    <h4 className="font-semibold mb-1 text-sm">{item.label}</h4>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Enhanced AI Pipeline */}
         <section className="space-y-8">
           <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+            <Badge variant="outline" className="bg-purple/10 text-purple border-purple/20">
               <Brain className="h-3 w-3 mr-1" />
-              AI Technology
+              Context-Aware Analysis
             </Badge>
-            <h2 className="text-4xl font-display font-bold">The AI Pipeline</h2>
+            <h2 className="text-4xl font-display font-bold">Enhanced Gemini Vision</h2>
             <p className="text-lg text-muted-foreground">
-              From field photo or drone video to actionable recommendation in seconds
+              Every crop photo analysis is enriched with comprehensive field intelligence
             </p>
           </div>
 
