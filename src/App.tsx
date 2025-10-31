@@ -36,6 +36,7 @@ const Analytics = lazy(() => import("./pages/Analytics"));
 const LSUResearchers = lazy(() => import("./pages/LSUResearchers"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const ConservationPractices = lazy(() => import("./pages/ConservationPractices"));
+const ConversationalFormsAnalytics = lazy(() => import("./pages/ConversationalFormsAnalytics"));
 
 const queryClient = new QueryClient();
 
@@ -144,6 +145,7 @@ const App = () => (
           <Route path="/analytics" element={<ProtectedRoute><Layout><Analytics /></Layout></ProtectedRoute>} />
           <Route path="/lsu-researchers" element={<ProtectedRoute><Layout><LSUResearchers /></Layout></ProtectedRoute>} />
           <Route path="/conservation-practices" element={<ProtectedRoute><Layout><ConservationPractices /></Layout></ProtectedRoute>} />
+          <Route path="/conversational-forms-analytics" element={<ProtectedRoute><Layout><ConversationalFormsAnalytics /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
           {/* Demo routes for screenshots - bypasses authentication */}
           <Route path="/demo/auth" element={<Auth />} />
