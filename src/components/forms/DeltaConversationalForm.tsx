@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +37,8 @@ export const DeltaConversationalForm = ({
   const [inputValue, setInputValue] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevMessagesLengthRef = useRef(0);
+  const prevIsSendingRef = useRef(false);
   
   const {
     session,
@@ -56,6 +58,29 @@ export const DeltaConversationalForm = ({
     extractedData
   } = useConversationalForm(formType, { ...context, initialData });
 
+  // Helper function to scroll to bottom with retry logic
+  const scrollToBottom = useCallback(() => {
+    const attemptScroll = (retries = 3) => {
+      requestAnimationFrame(() => {
+        if (scrollAreaRef.current) {
+          const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+          if (viewport) {
+            viewport.scrollTo({
+              top: viewport.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
+        }
+        
+        // Retry if content might still be rendering
+        if (retries > 0) {
+          setTimeout(() => attemptScroll(retries - 1), 100);
+        }
+      });
+    };
+    attemptScroll();
+  }, []);
+
   // Create session on mount
   useEffect(() => {
     if (!sessionId && !isCreatingSession) {
@@ -63,16 +88,33 @@ export const DeltaConversationalForm = ({
     }
   }, [sessionId, isCreatingSession, createSession]);
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll when new messages arrive
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      // ScrollArea contains a viewport div that we need to scroll
-      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight;
-      }
+    const hasNewMessages = messages.length > prevMessagesLengthRef.current;
+    
+    if (hasNewMessages) {
+      // Use setTimeout to ensure DOM has rendered the new message
+      setTimeout(() => {
+        scrollToBottom();
+      }, 150);
     }
-  }, [messages, isSendingMessage]);
+    
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages.length, scrollToBottom]);
+
+  // Auto-scroll when AI finishes responding (loading indicator disappears)
+  useEffect(() => {
+    const wasLoadingNowNot = prevIsSendingRef.current && !isSendingMessage;
+    
+    if (wasLoadingNowNot) {
+      // Give extra time for markdown content to render
+      setTimeout(() => {
+        scrollToBottom();
+      }, 300);
+    }
+    
+    prevIsSendingRef.current = isSendingMessage;
+  }, [isSendingMessage, scrollToBottom]);
 
   // Auto-focus input when form is ready
   useEffect(() => {
