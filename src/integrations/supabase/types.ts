@@ -519,6 +519,86 @@ export type Database = {
           },
         ]
       }
+      conversational_form_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          field_mapping: Json | null
+          id: string
+          role: string
+          session_id: string
+          validation_status: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          field_mapping?: Json | null
+          id?: string
+          role: string
+          session_id: string
+          validation_status?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          field_mapping?: Json | null
+          id?: string
+          role?: string
+          session_id?: string
+          validation_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversational_form_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "conversational_form_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversational_form_sessions: {
+        Row: {
+          abandoned_at: string | null
+          completed_at: string | null
+          completion_percentage: number | null
+          context_data: Json | null
+          created_at: string | null
+          extracted_data: Json | null
+          form_type: string
+          id: string
+          started_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          abandoned_at?: string | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          context_data?: Json | null
+          created_at?: string | null
+          extracted_data?: Json | null
+          form_type: string
+          id?: string
+          started_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          abandoned_at?: string | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          context_data?: Json | null
+          created_at?: string | null
+          extracted_data?: Json | null
+          form_type?: string
+          id?: string
+          started_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cooperative_invitations: {
         Row: {
           accepted_at: string | null
@@ -898,6 +978,44 @@ export type Database = {
             columns: ["cooperative_id"]
             isOneToOne: false
             referencedRelation: "cooperatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_completion_analytics: {
+        Row: {
+          completion_time_seconds: number | null
+          created_at: string | null
+          form_type: string
+          id: string
+          message_count: number | null
+          session_id: string
+          success: boolean | null
+        }
+        Insert: {
+          completion_time_seconds?: number | null
+          created_at?: string | null
+          form_type: string
+          id?: string
+          message_count?: number | null
+          session_id: string
+          success?: boolean | null
+        }
+        Update: {
+          completion_time_seconds?: number | null
+          created_at?: string | null
+          form_type?: string
+          id?: string
+          message_count?: number | null
+          session_id?: string
+          success?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_completion_analytics_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "conversational_form_sessions"
             referencedColumns: ["id"]
           },
         ]
