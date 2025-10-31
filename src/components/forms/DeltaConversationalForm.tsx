@@ -257,19 +257,19 @@ export const DeltaConversationalForm = ({
                 </div>
               </div>
             )}
+
+            {/* Field Extraction Preview - Now inside ScrollArea */}
+            {Object.keys(extractedData).length > 0 && (
+              <div className="border-t pt-4 mt-4">
+                <FormFieldExtraction 
+                  extractedData={extractedData}
+                  completionPercentage={completionPercentage}
+                />
+              </div>
+            )}
           </div>
           </ScrollArea>
         </div>
-
-        {/* Field Extraction Preview */}
-        {Object.keys(extractedData).length > 0 && (
-          <div className="border-t p-4 bg-muted/30">
-            <FormFieldExtraction 
-              extractedData={extractedData}
-              completionPercentage={completionPercentage}
-            />
-          </div>
-        )}
 
         {/* Input Area */}
         <div className="border-t p-4 flex-shrink-0 bg-background">
