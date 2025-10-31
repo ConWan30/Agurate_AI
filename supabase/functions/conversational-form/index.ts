@@ -1,138 +1,97 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Input validation schema
-const conversationalFormSchema = z.object({
-  sessionId: z.string().uuid(),
-  message: z.string().min(1).max(5000),
-  formType: z.enum(['field-registration', 'insurance-claim', 'conservation-practices', 'onboarding', 'feedback', 'cooperative-application'])
-});
-
-// Form schema definitions
+// Form schemas define expected output structure
 const FORM_SCHEMAS: Record<string, any> = {
   'field-registration': {
     type: 'object',
     properties: {
-      fieldName: { type: 'string' },
-      cropType: { type: 'string', enum: ['rice', 'soybeans', 'cotton', 'corn'] },
+      name: { type: 'string', description: 'Field name (e.g., North Rice Field)' },
+      crop_type: { type: 'string', enum: ['rice', 'soybeans', 'cotton', 'corn'] },
       acreage: { type: 'number', minimum: 0 },
-      soilType: { type: 'string', enum: ['alluvial', 'claypan', 'mixed'] },
-      locationLat: { type: 'number', minimum: -90, maximum: 90 },
-      locationLng: { type: 'number', minimum: -180, maximum: 180 },
-      plantingDate: { type: 'string' },
-      variety: { type: 'string' },
-      irrigationType: { type: 'string' }
+      location_lat: { type: 'number' },
+      location_lng: { type: 'number' },
+      rice_variety: { type: 'string' },
+      soybean_variety: { type: 'string' },
+      cotton_variety: { type: 'string' },
+      corn_hybrid: { type: 'string' },
+      notes: { type: 'string' }
     },
-    required: ['fieldName', 'cropType', 'acreage']
+    required: ['name', 'crop_type', 'acreage']
   },
   'insurance-claim': {
     type: 'object',
     properties: {
-      fieldId: { type: 'string' },
-      eventType: { type: 'string', enum: ['flood', 'drought', 'hail', 'wind', 'pest', 'disease'] },
-      eventDate: { type: 'string' },
+      field_id: { type: 'string', format: 'uuid' },
+      event_type: { type: 'string', enum: ['flood', 'drought', 'hail', 'wind', 'pest', 'disease'] },
+      event_date: { type: 'string', format: 'date' },
       description: { type: 'string' },
-      estimatedLossPercentage: { type: 'number', minimum: 0, maximum: 100 }
+      estimated_loss_percentage: { type: 'number', minimum: 0, maximum: 100 },
+      assessment_id: { type: 'string', format: 'uuid' }
     },
-    required: ['fieldId', 'eventType', 'eventDate', 'description']
-  },
-  'conservation-practices': {
-    type: 'object',
-    properties: {
-      fieldId: { type: 'string' },
-      coverCrops: { type: 'boolean' },
-      noTill: { type: 'boolean' },
-      cropRotation: { type: 'boolean' },
-      bufferStrips: { type: 'boolean' },
-      precisionFertilization: { type: 'boolean' }
-    },
-    required: ['fieldId']
+    required: ['field_id', 'event_type', 'event_date', 'description']
   }
 };
 
 // System prompts for each form type
 const SYSTEM_PROMPTS: Record<string, string> = {
-  'field-registration': `You are Delta Intelligence, helping a Louisiana Delta farmer register a new field. Be conversational, friendly, and use farming terminology.
+  'field-registration': `You are Delta Intelligence, an AI assistant specialized in Louisiana Delta agriculture. You're helping a farmer register a new field in AgurateAI.
 
-Your job is to gather field information through natural conversation:
-- Field Name (required)
-- Crop Type: rice, soybeans, cotton, or corn (required)
-- Acreage (required)
-- Soil Type: alluvial, claypan, or mixed (optional)
-- Planting Date (optional)
-- Variety (optional, based on crop type)
-- Location coordinates (optional)
-- Irrigation type (optional)
+Be conversational, friendly, and use farming terminology. Reference LSU AgCenter research when relevant.
 
-CONVERSATION GUIDELINES:
-- Ask ONE question at a time
-- Be encouraging and supportive
-- Reference LSU AgCenter research when relevant
-- Use Louisiana Delta farming terminology
-- If farmer provides multiple pieces of info at once, acknowledge all and ask about what's missing
-- Celebrate progress: "Great! I've got your field name..."
+Your goal: Extract the following information through natural conversation:
+- Field name (what they call it)
+- Crop type (rice, soybeans, cotton, or corn)
+- Acreage (size of field)
+- Variety (specific variety based on crop type)
+- Location (GPS coordinates if available)
+- Any additional notes
 
-CONTEXT AWARENESS:
-- Reference existing fields if farmer has them
-- Suggest varieties based on soil type and LSU recommendations
-- Auto-fill location if GPS available
+Context awareness:
+- If the farmer has existing fields, reference them ("I see you have South Rice Field...")
+- Suggest similar setups based on their farm patterns
+- Use community averages for guidance ("Most Morehouse Parish rice farmers...")
 
-RESPONSE FORMAT:
-Always return JSON with:
+Response format:
+Always respond with valid JSON in this structure:
 {
-  "message": "Your conversational response to the farmer",
-  "extractedData": { ... fields extracted so far ... },
-  "completionPercentage": 0-100,
-  "nextQuestion": "What should I ask next?",
-  "suggestions": ["Quick reply option 1", "Quick reply option 2"]
+  "message": "Your conversational response to the user",
+  "extracted_data": { "name": "value", "crop_type": "rice", ... },
+  "completion_percentage": 60,
+  "next_question": "What would you like to plant in this field?",
+  "suggestions": ["Rice", "Soybeans", "Cotton", "Corn"]
 }`,
   
-  'insurance-claim': `You are Delta Intelligence, helping a Louisiana Delta farmer document an insurance claim. Be empathetic - farmers are stressed when filing claims.
+  'insurance-claim': `You are Delta Intelligence helping a Louisiana Delta farmer document an insurance claim for crop damage.
 
-Your job is to gather claim information:
-- Which field was affected? (required)
-- What type of event? (flood, drought, hail, wind, pest, disease) (required)
-- When did it happen? (required)
-- Describe the damage (required)
-- Estimated loss percentage (required)
+Be empathetic and thorough. This is important for their livelihood.
 
-CONVERSATION GUIDELINES:
-- Be empathetic and supportive ("I'm sorry to hear about the damage...")
-- Ask ONE question at a time
-- Help farmers describe damage accurately
-- Reference any existing assessments that might support the claim
-- Explain what documentation will be needed
+Your goal: Extract the following information:
+- Which field was affected
+- Type of damage (flood, drought, hail, wind, pest, disease)
+- When it happened
+- Description of damage
+- Estimated loss percentage
+- Link to any relevant crop assessments
 
-RESPONSE FORMAT:
-Always return JSON with extractedData, message, completionPercentage, nextQuestion, suggestions.`,
-  
-  'conservation-practices': `You are Delta Intelligence, helping a Louisiana Delta farmer track conservation practices. Be educational about the benefits.
+Context awareness:
+- Reference the farmer's existing fields
+- Suggest linking recent assessments with poor health scores
+- Guide them on what insurance companies need to see
 
-Your job is to gather conservation practice information:
-- Which field? (required)
-- Cover crops? (yes/no)
-- No-till farming? (yes/no)
-- Crop rotation? (yes/no)
-- Buffer strips? (yes/no)
-- Precision fertilization? (yes/no)
-
-CONVERSATION GUIDELINES:
-- Explain benefits of each practice (reference LSU AgCenter research)
-- Ask about one practice at a time
-- Celebrate when farmers adopt practices
-- Mention ROI and environmental benefits
-
-RESPONSE FORMAT:
-Always return JSON with extractedData, message, completionPercentage, nextQuestion, suggestions.`
+Response format:
+{
+  "message": "Your empathetic, helpful response",
+  "extracted_data": { "field_id": "uuid", "event_type": "flood", ... },
+  "completion_percentage": 40,
+  "next_question": "When did this damage occur?",
+  "suggestions": ["Last week", "2 weeks ago", "Last month"]
+}`
 };
 
 serve(async (req) => {
@@ -141,100 +100,67 @@ serve(async (req) => {
   }
 
   try {
-    const rawBody = await req.json();
-    const validation = conversationalFormSchema.safeParse(rawBody);
-    
-    if (!validation.success) {
-      return new Response(
-        JSON.stringify({ 
-          error: "Invalid input data",
-          details: validation.error.errors 
-        }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    const { sessionId, message, formType } = await req.json();
+
+    if (!sessionId || !message || !formType) {
+      throw new Error('Missing required parameters');
     }
 
-    const { sessionId, message, formType } = validation.data;
-    
-    const authHeader = req.headers.get('authorization');
+    // Create Supabase client with user's auth
+    const authHeader = req.headers.get('Authorization');
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader! } } }
     );
 
-    // Get user context
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    
-    if (!user) {
-      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
-    }
+    // Get user
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !user) throw new Error('Unauthorized');
 
-    // Get session and conversation history
-    const { data: session } = await supabaseClient
+    // Get session
+    const { data: session, error: sessionError } = await supabaseClient
       .from('conversational_form_sessions')
       .select('*')
       .eq('id', sessionId)
-      .eq('user_id', user.id)
       .single();
 
-    if (!session) {
-      return new Response('Session not found', { status: 404, headers: corsHeaders });
-    }
+    if (sessionError || !session) throw new Error('Session not found');
 
-    const { data: messages } = await supabaseClient
+    // Get conversation history
+    const { data: messages, error: messagesError } = await supabaseClient
       .from('conversational_form_messages')
       .select('*')
       .eq('session_id', sessionId)
       .order('created_at', { ascending: true });
 
-    // Gather user context (fields, assessments)
+    if (messagesError) throw new Error('Failed to fetch messages');
+
+    // Get user context (fields, assessments, etc.)
     const { data: fields } = await supabaseClient
       .from('fields')
-      .select('id, name, crop_type, acreage, location_lat, location_lng')
+      .select('*')
       .eq('user_id', user.id);
 
-    const { data: recentAssessments } = await supabaseClient
-      .from('assessments')
-      .select('health_score, stress_level, field:fields(name, crop_type)')
-      .order('analyzed_at', { ascending: false })
-      .limit(3);
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-    // Build context prompt
-    let contextPrompt = '\n\nUSER CONTEXT:\n';
-    
-    if (fields && fields.length > 0) {
-      contextPrompt += `Existing Fields:\n${fields.map((f: any) => 
-        `- ${f.name}: ${f.acreage} acres of ${f.crop_type}`
-      ).join('\n')}\n`;
-    }
+    // Build context for AI
+    const contextSummary = {
+      farmName: profile?.farm_name,
+      existingFields: fields?.map((f: any) => ({
+        id: f.id,
+        name: f.name,
+        cropType: f.crop_type,
+        acreage: f.acreage
+      })) || [],
+      extractedSoFar: session.extracted_data || {}
+    };
 
-    if (recentAssessments && recentAssessments.length > 0) {
-      contextPrompt += `\nRecent Assessments:\n${recentAssessments.map((a: any) =>
-        `- ${a.field?.name}: Health ${a.health_score}/100, ${a.stress_level} stress`
-      ).join('\n')}\n`;
-    }
-
-    contextPrompt += `\nCurrent Form Progress:\n`;
-    contextPrompt += `- Extracted Data: ${JSON.stringify(session.extracted_data || {})}\n`;
-    contextPrompt += `- Completion: ${session.completion_percentage}%\n`;
-
-    // Build conversation history
-    const conversationHistory = (messages || []).map((msg: any) => ({
-      role: msg.role,
-      content: msg.content
-    }));
-
-    // Add user's new message
-    conversationHistory.push({
-      role: 'user',
-      content: message
-    });
-
-    // Save user message to database
+    // Save user message
     await supabaseClient
       .from('conversational_form_messages')
       .insert({
@@ -243,15 +169,17 @@ serve(async (req) => {
         content: message
       });
 
-    // Get schema for this form type
-    const schema = FORM_SCHEMAS[formType];
-    const systemPrompt = SYSTEM_PROMPTS[formType] || SYSTEM_PROMPTS['field-registration'];
+    // Build conversation history for AI
+    const conversationHistory = messages.map((m: any) => ({
+      role: m.role === 'user' ? 'user' : 'assistant',
+      content: m.content
+    }));
 
-    // Call AI with structured output
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Call Lovable AI Gateway
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -259,73 +187,70 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: systemPrompt + contextPrompt + `\n\nSCHEMA:\n${JSON.stringify(schema, null, 2)}\n\nIMPORTANT: Return valid JSON only.`
+            content: `${SYSTEM_PROMPTS[formType] || SYSTEM_PROMPTS['field-registration']}
+
+CONTEXT:
+${JSON.stringify(contextSummary, null, 2)}
+
+SCHEMA:
+${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], null, 2)}` 
           },
-          ...conversationHistory
+          ...conversationHistory,
+          { role: 'user', content: message }
         ],
         temperature: 0.7,
-        response_format: { type: 'json_object' }
       }),
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+    if (!aiResponse.ok) {
+      if (aiResponse.status === 429) {
+        throw new Error('Rate limit exceeded. Please try again in a moment.');
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'Payment required. Please add credits to your workspace.' }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+      if (aiResponse.status === 402) {
+        throw new Error('AI service quota exceeded. Please contact support.');
       }
-      const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
-      return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      throw new Error('AI service error');
     }
 
-    const aiResponse = await response.json();
-    const aiMessage = aiResponse.choices[0].message.content;
-    
-    // Parse AI response
+    const aiData = await aiResponse.json();
+    const aiMessage = aiData.choices[0]?.message?.content || '';
+
+    // Parse AI response (expect JSON)
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(aiMessage);
     } catch {
+      // If AI didn't return JSON, wrap it
       parsedResponse = {
         message: aiMessage,
-        extractedData: session.extracted_data || {},
-        completionPercentage: session.completion_percentage || 0,
-        nextQuestion: null,
-        suggestions: []
+        extracted_data: {},
+        completion_percentage: 0,
+        next_question: null
       };
     }
 
-    // Calculate completion percentage
-    const requiredFields = schema.required || [];
-    const extractedFields = Object.keys(parsedResponse.extractedData || {});
-    const completionPercentage = requiredFields.length > 0 
-      ? Math.round((extractedFields.filter((f: string) => requiredFields.includes(f)).length / requiredFields.length) * 100)
-      : 0;
+    // Update extracted data
+    const updatedData = {
+      ...session.extracted_data,
+      ...parsedResponse.extracted_data
+    };
 
-    // Update session with extracted data
-    const { error: updateError } = await supabaseClient
+    // Calculate completion percentage based on required fields
+    const schema = FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'];
+    const requiredFields = schema.required || [];
+    const completedFields = requiredFields.filter((field: string) => {
+      return updatedData[field] !== undefined && updatedData[field] !== null && updatedData[field] !== '';
+    });
+    const completionPercentage = Math.round((completedFields.length / requiredFields.length) * 100);
+
+    // Update session
+    await supabaseClient
       .from('conversational_form_sessions')
       .update({
-        extracted_data: parsedResponse.extractedData,
-        completion_percentage: completionPercentage,
-        updated_at: new Date().toISOString()
+        extracted_data: updatedData,
+        completion_percentage: completionPercentage
       })
       .eq('id', sessionId);
-
-    if (updateError) {
-      console.error('Error updating session:', updateError);
-    }
 
     // Save assistant message
     await supabaseClient
@@ -333,27 +258,27 @@ serve(async (req) => {
       .insert({
         session_id: sessionId,
         role: 'assistant',
-        content: parsedResponse.message,
-        field_mapping: JSON.stringify(parsedResponse.extractedData)
+        content: parsedResponse.message || aiMessage,
+        field_mapping: parsedResponse.extracted_data ? JSON.stringify(parsedResponse.extracted_data) : null
       });
 
-    return new Response(JSON.stringify({
-      message: parsedResponse.message,
-      extractedData: parsedResponse.extractedData,
-      completionPercentage,
-      nextQuestion: parsedResponse.nextQuestion,
-      suggestions: parsedResponse.suggestions || [],
-      isComplete: completionPercentage >= 100
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({
+        message: parsedResponse.message || aiMessage,
+        extracted_data: updatedData,
+        completion_percentage: completionPercentage,
+        next_question: parsedResponse.next_question,
+        suggestions: parsedResponse.suggestions || []
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
 
-  } catch (error: any) {
-    console.error('Conversational form error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+  } catch (error) {
+    console.error('Error in conversational-form:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });

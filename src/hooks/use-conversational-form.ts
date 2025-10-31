@@ -37,9 +37,14 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
   // Create new session
   const createSessionMutation = useMutation({
     mutationFn: async () => {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { data, error } = await (supabase as any)
         .from('conversational_form_sessions')
         .insert({
+          user_id: user.id,
           form_type: formType,
           status: 'active',
           context_data: contextData || {},
