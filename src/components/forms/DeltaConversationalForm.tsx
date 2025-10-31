@@ -179,9 +179,10 @@ export const DeltaConversationalForm = ({
         </div>
       </CardHeader>
 
-      <CardContent className="p-0 flex flex-col h-[600px]">
+      <CardContent className="p-0 flex flex-col" style={{ height: '600px' }}>
         {/* Messages Area */}
-        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full p-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.map((message, index) => (
               <ConversationalFormMessage
@@ -208,7 +209,8 @@ export const DeltaConversationalForm = ({
               </div>
             )}
           </div>
-        </ScrollArea>
+          </ScrollArea>
+        </div>
 
         {/* Field Extraction Preview */}
         {Object.keys(extractedData).length > 0 && (
