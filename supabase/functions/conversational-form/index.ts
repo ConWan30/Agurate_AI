@@ -378,13 +378,13 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
       .insert({
         session_id: sessionId,
         role: 'assistant',
-        content: parsedResponse.message || aiMessage,
+        content: parsedResponse.message || parsedResponse.next_question || aiMessage,
         field_mapping: parsedResponse.extracted_data ? JSON.stringify(parsedResponse.extracted_data) : null
       });
 
     return new Response(
       JSON.stringify({
-        message: parsedResponse.message || aiMessage,
+        message: parsedResponse.message || parsedResponse.next_question || aiMessage,
         extracted_data: updatedData,
         completion_percentage: completionPercentage,
         next_question: parsedResponse.next_question,
