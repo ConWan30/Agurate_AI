@@ -352,7 +352,8 @@ export const DeltaConversationalForm = ({
                   disabled={isSendingMessage}
                   maxLength={2000}
                   rows={1}
-                  className="flex-1 resize-none bg-transparent border-none outline-none text-base md:text-sm placeholder:text-muted-foreground disabled:opacity-50 min-h-[40px]"
+                  className="flex-1 resize-none bg-transparent border-none text-base md:text-sm placeholder:text-muted-foreground disabled:opacity-50 min-h-[40px] focus:outline-none focus:ring-0 visible"
+                  style={{ visibility: 'visible' }}
                 />
 
                 {/* Character Counter */}
