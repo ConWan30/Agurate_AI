@@ -181,8 +181,8 @@ export const DeltaConversationalForm = ({
   }
 
   return (
-    <Card className={cn("w-full flex flex-col", className)}>
-      <CardHeader className="border-b space-y-4">
+    <Card className={cn("w-full flex flex-col max-h-[90vh]", className)}>
+      <CardHeader className="border-b space-y-4 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
@@ -221,11 +221,11 @@ export const DeltaConversationalForm = ({
         </div>
       </CardHeader>
 
-      <CardContent className="p-0 flex flex-col h-[calc(100vh-400px)] md:h-[600px]">
+      <CardContent className="p-0 flex flex-col max-h-[70vh]">
         {/* Messages Area */}
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto overscroll-behavior-contain px-4 md:px-6 py-6 space-y-6 scroll-smooth bg-gradient-to-b from-background to-muted/10"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-behavior-contain px-4 md:px-6 py-6 space-y-6 scroll-smooth bg-gradient-to-b from-background to-muted/10"
           style={{
             scrollbarWidth: 'thin',
             scrollbarColor: 'rgba(16, 185, 129, 0.3) transparent'
