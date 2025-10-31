@@ -9,6 +9,7 @@ import { BetaWelcomeBanner } from "@/components/BetaWelcomeBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { SuccessStoryPrompt } from "@/components/SuccessStoryPrompt";
 import { BetaConversionBanner } from "@/components/BetaConversionBanner";
+import { DailyBriefingCard } from "@/components/DailyBriefingCard";
 import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon, BarChart3, Droplets, GraduationCap, Network, Microscope } from "lucide-react";
 import { WeatherAlerts } from "@/components/WeatherAlerts";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -210,6 +211,9 @@ export default function Dashboard() {
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl animate-float" style={{ animationDelay: '1s' }} aria-hidden="true"></div>
           <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }} aria-hidden="true"></div>
         </div>
+
+        {/* Daily Briefing - Priority Enhancement #6 */}
+        {!isDemoMode && fields.length > 0 && <DailyBriefingCard />}
 
         {/* Core Features - All Integrations */}
         <div>

@@ -9,6 +9,7 @@ import { Upload as UploadIcon, Loader2, Image as ImageIcon } from "lucide-react"
 import { useNavigate } from "react-router-dom";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import bgCottonField from "@/assets/bg-cotton-field.jpg";
+import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
 
 interface Field {
   id: string;
@@ -161,9 +162,18 @@ export default function Upload() {
   };
 
   const performAIAnalysis = async (imageUrl: string, cropType: string, location: string, fieldId: string, mediaType: 'image' | 'video') => {
-    // Call the AI edge function with two-step analysis
+    // ✅ UNIFIED AI: Gather context before analysis
+    const unifiedContext = await gatherUnifiedContext(fieldId);
+    
+    // Call the AI edge function with unified context
     const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
-      body: { imageUrl, cropType, location, mediaType }
+      body: { 
+        imageUrl, 
+        cropType, 
+        location, 
+        mediaType,
+        unifiedContext // Include intelligence pool data
+      }
     });
 
     if (aiError) throw aiError;
@@ -211,6 +221,9 @@ export default function Upload() {
     const { error: recError } = await supabase.from("recommendations").insert(recommendations);
 
     if (recError) throw recError;
+
+    // ✅ UNIFIED AI: Enrich intelligence pool after analysis
+    await enrichUnifiedContext(fieldId, aiResult);
   };
 
   return (

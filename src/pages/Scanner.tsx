@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import TutorialTooltip from '@/components/TutorialTooltip';
 import { useHaptics } from '@/hooks/use-haptics';
 import { useGlobalKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
 
 interface Field {
   id: string;
@@ -181,12 +182,16 @@ export default function Scanner() {
         .from('crop-images')
         .getPublicUrl(fileName);
 
-      // Call analyze-crop edge function
+      // ✅ UNIFIED AI: Gather context before analysis
+      const unifiedContext = await gatherUnifiedContext(selectedFieldId);
+
+      // Call analyze-crop edge function with unified context
       const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
         body: {
           imageUrl: publicUrl,
           cropType: selectedField.crop_type,
-          fieldId: selectedFieldId
+          fieldId: selectedFieldId,
+          unifiedContext // Include intelligence pool data
         }
       });
 
@@ -213,6 +218,9 @@ export default function Scanner() {
         .single();
 
       if (dbError) throw dbError;
+
+      // ✅ UNIFIED AI: Enrich intelligence pool after analysis
+      await enrichUnifiedContext(selectedFieldId, aiResult);
 
       triggerHaptic('success');
       toast.success('Analysis complete!');

@@ -13,6 +13,7 @@ import { useDeltaConversations, type Message } from '@/hooks/useDeltaConversatio
 import { formatDistanceToNow } from 'date-fns';
 import { DeltaChatInput } from '@/components/DeltaChatInput';
 import { PredictiveQuestions } from '@/components/PredictiveQuestions';
+import { gatherUnifiedContext, formatContextForAI } from '@/lib/unified-ai-intelligence';
 
 export default function DeltaIntelligence() {
   const {
@@ -113,6 +114,24 @@ export default function DeltaIntelligence() {
     setIsLoading(true);
 
     try {
+      // ✅ UNIFIED AI: Gather context for Delta Intelligence
+      let unifiedContext = null;
+      if (fieldContext?.recentAssessment) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: fields } = await supabase
+            .from('fields')
+            .select('id')
+            .eq('user_id', user.id)
+            .limit(1)
+            .single();
+          
+          if (fields) {
+            unifiedContext = await gatherUnifiedContext(fields.id);
+          }
+        }
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delta-chat`, {
         method: 'POST',
@@ -120,7 +139,10 @@ export default function DeltaIntelligence() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session?.access_token}`,
         },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ 
+          messages: newMessages,
+          unifiedContext: unifiedContext ? formatContextForAI(unifiedContext) : null
+        }),
       });
 
       if (!response.ok) {
