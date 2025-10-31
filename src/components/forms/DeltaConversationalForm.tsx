@@ -36,6 +36,7 @@ export const DeltaConversationalForm = ({
 }: DeltaConversationalFormProps) => {
   const [inputValue, setInputValue] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   const {
     session,
@@ -68,6 +69,15 @@ export const DeltaConversationalForm = ({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isSendingMessage]);
+
+  // Auto-focus input when form is ready
+  useEffect(() => {
+    if (!isLoadingSession && !isCreatingSession && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isLoadingSession, isCreatingSession]);
 
   // Handle completion
   useEffect(() => {
@@ -227,6 +237,7 @@ export const DeltaConversationalForm = ({
                 disabled={isSendingMessage}
               />
               <Input
+                ref={inputRef}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -234,6 +245,7 @@ export const DeltaConversationalForm = ({
                 disabled={isSendingMessage}
                 className="flex-1"
                 maxLength={2000}
+                autoFocus
               />
               <Button
                 onClick={handleSend}
