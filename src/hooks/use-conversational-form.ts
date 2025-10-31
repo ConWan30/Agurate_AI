@@ -129,6 +129,7 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
       return data;
     },
     onSuccess: () => {
+      console.log('✅ Message sent successfully, invalidating queries');
       queryClient.invalidateQueries({ queryKey: ['conversational-form-session', sessionId] });
       queryClient.invalidateQueries({ queryKey: ['conversational-form-messages', sessionId] });
     },
@@ -190,7 +191,10 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
     // Messages
     messages,
     isLoadingMessages,
-    sendMessage: sendMessageMutation.mutate,
+    sendMessage: (message: string) => {
+      console.log('📤 Sending message to edge function:', { sessionId, message });
+      sendMessageMutation.mutate(message);
+    },
     isSendingMessage: sendMessageMutation.isPending,
     
     // Completion

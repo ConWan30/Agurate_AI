@@ -35,7 +35,7 @@ export const DeltaConversationalForm = ({
   className
 }: DeltaConversationalFormProps) => {
   const [inputValue, setInputValue] = useState('');
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
   const {
@@ -65,8 +65,12 @@ export const DeltaConversationalForm = ({
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (scrollAreaRef.current) {
+      // ScrollArea contains a viewport div that we need to scroll
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (viewport) {
+        viewport.scrollTop = viewport.scrollHeight;
+      }
     }
   }, [messages, isSendingMessage]);
 
@@ -82,13 +86,16 @@ export const DeltaConversationalForm = ({
   // Handle completion
   useEffect(() => {
     if (isComplete && session && !session.completed_at) {
+      console.log('🎉 Form completion triggered:', { completion: completionPercentage, extractedData });
       completeSession();
       onComplete(extractedData);
     }
-  }, [isComplete, session, completeSession, extractedData]);
+  }, [isComplete, session, completeSession, extractedData, completionPercentage]);
 
   const handleSend = () => {
     if (!inputValue.trim() || isSendingMessage) return;
+    
+    console.log('💬 Sending message:', inputValue);
     
     // Validate and sanitize input
     try {
@@ -182,7 +189,7 @@ export const DeltaConversationalForm = ({
       <CardContent className="p-0 flex flex-col flex-1 min-h-0">
         {/* Messages Area */}
         <div className="flex-1 overflow-hidden min-h-0">
-          <ScrollArea className="h-full p-4" ref={scrollRef}>
+          <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
           <div className="space-y-4">
             {messages.map((message, index) => (
               <ConversationalFormMessage
