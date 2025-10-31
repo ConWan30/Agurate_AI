@@ -12,7 +12,7 @@ const FORM_SCHEMAS: Record<string, any> = {
     type: 'object',
     properties: {
       name: { type: 'string', description: 'Field name (e.g., North Rice Field)' },
-      crop_type: { type: 'string', enum: ['rice', 'soybeans', 'cotton', 'corn'] },
+      crop_type: { type: 'string', enum: ['rice', 'soybean', 'cotton', 'corn'] },
       acreage: { type: 'number', minimum: 0 },
       location_lat: { type: 'number' },
       location_lng: { type: 'number' },
@@ -71,7 +71,7 @@ Be conversational, friendly, and use farming terminology. Reference LSU AgCenter
 
 Your goal: Extract the following information through natural conversation:
 - Field name (what they call it)
-- Crop type (rice, soybeans, cotton, or corn)
+- Crop type (rice, soybean, cotton, or corn) - IMPORTANT: Use "soybean" not "soybeans"
 - Acreage (size of field)
 - Variety (specific variety based on crop type)
 - Location (GPS coordinates if available)
@@ -89,7 +89,7 @@ Always respond with valid JSON in this structure:
   "extracted_data": { "name": "value", "crop_type": "rice", ... },
   "completion_percentage": 60,
   "next_question": "What would you like to plant in this field?",
-  "suggestions": ["Rice", "Soybeans", "Cotton", "Corn"]
+  "suggestions": ["Rice", "Soybean", "Cotton", "Corn"]
 }`,
   
   'insurance-claim': `You are Delta Intelligence helping a Louisiana Delta farmer document an insurance claim for crop damage.
