@@ -57,14 +57,40 @@ serve(async (req) => {
       });
     }
 
-    // Verify field ownership
-    const { data: field, error: fieldError } = await supabase
-      .from('fields')
-      .select('user_id')
-      .eq('id', fieldId)
-      .single();
+    // Gather comprehensive field and community context
+    const [fieldData, fieldAssessments, communityPractices, weatherData] = await Promise.all([
+      supabase
+        .from('fields')
+        .select('*')
+        .eq('id', fieldId)
+        .single()
+        .then(res => res.data),
+      
+      supabase
+        .from('assessments')
+        .select('health_score, analyzed_at')
+        .eq('field_id', fieldId)
+        .order('analyzed_at', { ascending: false })
+        .limit(30)
+        .then(res => res.data || []),
+      
+      supabase
+        .from('conservation_adoption_metrics')
+        .select('*')
+        .eq('practice_type', practiceType)
+        .order('total_adopters', { ascending: false })
+        .limit(5)
+        .then(res => res.data || []),
+      
+      supabase
+        .from('weather_events')
+        .select('*')
+        .order('event_date', { ascending: false })
+        .limit(10)
+        .then(res => res.data || [])
+    ]);
 
-    if (fieldError || !field || field.user_id !== user.id) {
+    if (!fieldData || fieldData.user_id !== user.id) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -76,21 +102,47 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
+    // Calculate field health trend
+    const healthTrend = fieldAssessments.length >= 5
+      ? (fieldAssessments.slice(0, 5).reduce((sum, a) => sum + a.health_score, 0) / 5) - 
+        (fieldAssessments.slice(-5).reduce((sum, a) => sum + a.health_score, 0) / 5)
+      : 0;
+
     const aiPrompt = `You are AgurateAI's conservation prediction engine for Louisiana Delta farming.
 
-Field History: ${JSON.stringify(fieldHistory)}
+UNIFIED INTELLIGENCE CONTEXT:
+
+Field Profile:
+- Crop: ${fieldData.crop_type}
+- Acreage: ${fieldData.acreage}
+- Soil Type: ${fieldData.soil_type}
+- Health Trend: ${healthTrend > 0 ? `+${healthTrend.toFixed(1)}%` : `${healthTrend.toFixed(1)}%`}
+
 Conservation Practice: ${practiceType}
-Weather Forecast: ${JSON.stringify(weatherForecast)}
 
-Generate predictive conservation impact analysis:
-1. Calculate current annual savings ($/year)
-2. Predict 1-year impact (accounting for soil improvement trajectory)
-3. Predict 5-year impact (compounding benefits, soil health restoration)
-4. Calculate climate benefit factor (0-1 scale, carbon sequestration)
+Historical Field Performance (30 assessments):
+Average Health: ${fieldAssessments.length > 0 ? (fieldAssessments.reduce((sum, a) => sum + a.health_score, 0) / fieldAssessments.length).toFixed(1) : 'N/A'}
+
+Community Adoption Data (${practiceType}):
+${communityPractices.map(p => `- ${p.total_adopters} farmers: Avg savings $${p.average_annual_savings}, Success: ${(p.success_rate * 100).toFixed(0)}%`).join('\n')}
+
+Weather Context (Recent Events):
+${weatherData.slice(0, 5).map(w => `- ${w.event_type}: ${w.event_date}`).join('\n')}
+
+LSU AgCenter Research:
+- No-till: $8-12/acre fuel savings, +15-20% soil moisture
+- Cover crops: $15-30/acre nitrogen credit
+- Precision fertilization: 10-20% input savings
+
+TASK: Generate predictive conservation impact analysis:
+1. Calculate REALISTIC current annual savings ($/year) based on acreage and practice
+2. Predict 1-year impact (account for initial soil improvement)
+3. Predict 5-year impact (compounding benefits, full soil health restoration)
+4. Climate benefit factor (0-1 scale, carbon sequestration potential)
 5. Soil health improvement trajectory (0-1 scale)
-6. Confidence score based on data quality (0-1 scale)
+6. Confidence score based on community data quality (0-1 scale)
 
-Return JSON with numeric values and brief reasoning.`;
+Return JSON with: current_impact, predicted_impact_1_year, predicted_impact_5_year, climate_factor, soil_health_improvement, confidence_score.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

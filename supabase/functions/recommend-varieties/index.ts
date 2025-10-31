@@ -65,14 +65,41 @@ serve(async (req) => {
       });
     }
 
-    // Verify field ownership
-    const { data: field, error: fieldError } = await supabase
-      .from('fields')
-      .select('user_id')
-      .eq('id', fieldId)
-      .single();
+    // Gather comprehensive field context
+    const [fieldData, fieldAssessments, communityInsights, conservationData] = await Promise.all([
+      supabase
+        .from('fields')
+        .select('*')
+        .eq('id', fieldId)
+        .single()
+        .then(res => res.data),
+      
+      supabase
+        .from('assessments')
+        .select('health_score, stress_level, symptoms, analyzed_at')
+        .eq('field_id', fieldId)
+        .order('analyzed_at', { ascending: false })
+        .limit(20)
+        .then(res => res.data || []),
+      
+      supabase
+        .from('best_practices_network')
+        .select('*')
+        .eq('crop_type', cropType)
+        .order('adoption_count', { ascending: false })
+        .limit(5)
+        .then(res => res.data || []),
+      
+      supabase
+        .from('conservation_predictions')
+        .select('*')
+        .eq('field_id', fieldId)
+        .order('predicted_date', { ascending: false })
+        .limit(3)
+        .then(res => res.data || [])
+    ]);
 
-    if (fieldError || !field || field.user_id !== user.id) {
+    if (!fieldData || fieldData.user_id !== user.id) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -86,24 +113,48 @@ serve(async (req) => {
 
     const lsuVarieties = LSU_VARIETIES[cropType as keyof typeof LSU_VARIETIES] || [];
 
+    // Calculate field performance metrics
+    const avgHealth = fieldAssessments.length > 0
+      ? fieldAssessments.reduce((sum, a) => sum + (a.health_score || 0), 0) / fieldAssessments.length
+      : 0;
+    
+    const diseaseSymptoms = fieldAssessments
+      .filter(a => a.symptoms)
+      .flatMap(a => Array.isArray(a.symptoms) ? a.symptoms : []);
+
     const aiPrompt = `You are AgurateAI's variety recommendation engine, trained on LSU AgCenter breeding research.
 
-Field Conditions:
+UNIFIED INTELLIGENCE CONTEXT:
+
+Field Profile:
 - Crop: ${cropType}
+- Acreage: ${fieldData.acreage}
+- Soil Type: ${fieldData.soil_type}
 - Current Variety: ${currentVariety}
-- Field History: ${JSON.stringify(fieldHistory)}
-- Disease Pressure: ${JSON.stringify(diseasePressure)}
+- Average Health Score: ${avgHealth.toFixed(1)}
 
-LSU Recommended Varieties: ${lsuVarieties.join(', ')}
+Historical Performance (Last 20 Assessments):
+${fieldAssessments.map((a, i) => `  ${i + 1}. Health: ${a.health_score}, Stress: ${a.stress_level}`).join('\n')}
 
-Generate variety recommendation:
-1. Recommend best LSU variety for this field
-2. Calculate expected improvement percentage
-3. Risk assessment (low/medium/high)
-4. List specific benefits (disease resistance, yield, input efficiency)
-5. Provide LSU research citations
+Disease Pressure Patterns:
+${diseaseSymptoms.length > 0 ? diseaseSymptoms.slice(0, 10).join(', ') : 'No significant disease pressure'}
 
-Return JSON with recommendation details.`;
+Community Intelligence (Best Performing Varieties):
+${communityInsights.map(c => `- ${c.practice_name}: ${c.success_rate}% success, ${c.adoption_count} farmers`).join('\n')}
+
+Conservation Context:
+${conservationData.length > 0 ? `Soil health trending ${conservationData[0].soil_health_improvement > 0.5 ? 'upward' : 'stable'}` : 'No conservation data'}
+
+LSU AgCenter Approved Varieties: ${lsuVarieties.join(', ')}
+
+TASK: Recommend the BEST LSU variety for this specific field based on:
+1. Historical health patterns
+2. Disease resistance needs
+3. Soil type compatibility
+4. Community success rates
+5. Expected yield improvement (%)
+
+Return JSON with: recommended_variety, expected_improvement (decimal), risk_assessment (low/medium/high), lsu_research_basis (array of citations).`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

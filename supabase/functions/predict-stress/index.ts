@@ -75,18 +75,40 @@ serve(async (req) => {
     
     console.log('User authenticated successfully:', user.id);
 
-    // Fetch historical assessments
-    const { data: assessments, error: assessError } = await supabaseClient
-      .from('assessment_details')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('analyzed_at', { ascending: false })
-      .limit(50);
+    // Gather comprehensive context data
+    const [assessments, weatherEvents, waterStress, communityInsights] = await Promise.all([
+      supabaseClient
+        .from('assessment_details')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('analyzed_at', { ascending: false })
+        .limit(50)
+        .then(res => res.data || []),
+      
+      supabaseClient
+        .from('weather_events')
+        .select('*')
+        .order('event_date', { ascending: false })
+        .limit(10)
+        .then(res => res.data || []),
+      
+      supabaseClient
+        .from('water_stress_intelligence')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('measurement_date', { ascending: false })
+        .limit(10)
+        .then(res => res.data || []),
+      
+      supabaseClient
+        .from('community_intelligence')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5)
+        .then(res => res.data || [])
+    ]);
 
-    if (assessError) {
-      console.error('Error fetching assessments:', assessError);
-      throw assessError;
-    }
+    const assessError = !assessments;
 
     if (!assessments || assessments.length < 3) {
       return new Response(
@@ -99,19 +121,12 @@ serve(async (req) => {
       );
     }
 
-    // Fetch recent weather events
-    const { data: weatherEvents } = await supabaseClient
-      .from('weather_events')
-      .select('*')
-      .order('event_date', { ascending: false })
-      .limit(10);
-
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Prepare data summary for AI
+    // Prepare enhanced data summary for AI with unified context
     const recentAssessments = assessments.slice(0, 10).map(a => ({
       date: a.analyzed_at,
       crop: a.crop_type,
@@ -120,6 +135,19 @@ serve(async (req) => {
       temp: a.weather_temp_f,
       precip: a.weather_precipitation_mm,
       symptoms: a.symptoms
+    }));
+
+    const waterStressSummary = waterStress.map(w => ({
+      date: w.measurement_date,
+      stress_index: w.stress_index,
+      soil_moisture: w.soil_moisture_percent,
+      irrigation_needed: w.irrigation_recommendation
+    }));
+
+    const communityPatterns = communityInsights.map(c => ({
+      pattern_type: c.pattern_type,
+      insight: c.insight_summary,
+      confidence: c.confidence_score
     }));
 
     // Generate predictions using Lovable AI
@@ -134,17 +162,33 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an agricultural AI analyzing crop stress patterns in Louisiana's Delta region. 
+            content: `You are AgurateAI's predictive stress analysis engine for Louisiana Delta farming.
 Current date: ${new Date().toISOString().split('T')[0]}
-Analyze historical assessment data and predict crop stress for the next ${days} days.
-Consider: heat stress (>90°F), water stress, disease patterns, and Louisiana's climate.`
+
+UNIFIED INTELLIGENCE CONTEXT:
+- Historical crop health patterns from field assessments
+- Water stress intelligence and irrigation data
+- Community-wide patterns and early warnings
+- Regional weather event correlations
+
+Analyze all available data streams to predict crop stress for the next ${days} days.
+Consider: heat stress (>90°F), water stress, disease patterns, Louisiana's climate, and community intelligence.`
           },
           {
             role: 'user',
-            content: `Historical assessments: ${JSON.stringify(recentAssessments)}
-Recent weather: ${JSON.stringify(weatherEvents || [])}
+            content: `UNIFIED CONTEXT DATA:
 
-Generate ${days}-day forecast predicting crop stress levels. Return JSON only.`
+Historical Assessments (Last 10): ${JSON.stringify(recentAssessments)}
+
+Water Stress Intelligence: ${JSON.stringify(waterStressSummary)}
+
+Community Patterns: ${JSON.stringify(communityPatterns)}
+
+Recent Weather Events: ${JSON.stringify(weatherEvents || [])}
+
+TASK: Generate ${days}-day forecast predicting crop stress levels using ALL context sources. 
+Leverage community patterns for early warning signals and water stress data for irrigation timing.
+Return JSON only with structured predictions.`
           }
         ],
         tools: [
