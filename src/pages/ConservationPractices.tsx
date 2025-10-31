@@ -210,7 +210,7 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
 
       {/* Conversational Form Dialog */}
       <Dialog open={conversationalOpen} onOpenChange={setConversationalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0" hideCloseButton>
           <DeltaConversationalForm
             formType="conservation-practices"
             context={{ fieldId: selectedFieldId }}

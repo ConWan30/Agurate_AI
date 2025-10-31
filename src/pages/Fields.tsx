@@ -248,7 +248,7 @@ export default function Fields() {
                 Add Field with Delta AI
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] p-0">
+            <DialogContent className="max-w-2xl max-h-[90vh] p-0" hideCloseButton>
               <DeltaConversationalForm
                 formType="field-registration"
                 onComplete={handleConversationalComplete}
@@ -272,7 +272,7 @@ export default function Fields() {
               Add Field with Delta AI
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-full max-h-[90vh] p-0 m-4">
+          <DialogContent className="max-w-full max-h-[90vh] p-0 m-4" hideCloseButton>
             <DeltaConversationalForm
               formType="field-registration"
               onComplete={handleConversationalComplete}

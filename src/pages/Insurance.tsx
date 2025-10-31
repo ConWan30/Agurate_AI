@@ -159,7 +159,7 @@ export default function Insurance() {
                   Create Claim with Delta AI
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] p-0">
+              <DialogContent className="max-w-2xl max-h-[90vh] p-0" hideCloseButton>
                 <DeltaConversationalForm
                   formType="insurance-claim"
                   onComplete={handleConversationalComplete}
