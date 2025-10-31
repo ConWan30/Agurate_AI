@@ -179,9 +179,9 @@ export const DeltaConversationalForm = ({
         </div>
       </CardHeader>
 
-      <CardContent className="p-0 flex flex-col" style={{ height: '600px' }}>
+      <CardContent className="p-0 flex flex-col" style={{ height: '600px', maxHeight: '600px' }}>
         {/* Messages Area */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden min-h-0">
           <ScrollArea className="h-full p-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.map((message, index) => (
@@ -223,7 +223,7 @@ export const DeltaConversationalForm = ({
         )}
 
         {/* Input Area */}
-        <div className="border-t p-4">
+        <div className="border-t p-4 flex-shrink-0 bg-background">
           {isComplete ? (
             <div className="text-center py-4">
               <CheckCircle2 className="h-12 w-12 text-primary mx-auto mb-2" />
