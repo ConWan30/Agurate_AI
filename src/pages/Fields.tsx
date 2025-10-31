@@ -185,35 +185,62 @@ export default function Fields() {
   };
 
   const handleConversationalComplete = async (extractedData: any) => {
+    console.log('🎯 Conversational form completed with data:', extractedData);
     setLoading(true);
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Map the extracted data to field schema
       const fieldData = {
         user_id: user.id,
         name: extractedData.name || extractedData.fieldName,
-        crop_type: extractedData.cropType || extractedData.crop_type,
+        crop_type: extractedData.crop_type || extractedData.cropType,
         acreage: parseFloat(extractedData.acreage),
         location_lat: extractedData.location_lat ? parseFloat(extractedData.location_lat) : null,
         location_lng: extractedData.location_lng ? parseFloat(extractedData.location_lng) : null,
         notes: extractedData.notes || null,
       };
 
-      const { error } = await supabase.from("fields").insert(fieldData);
-      if (error) throw error;
+      console.log('💾 Inserting field with data:', fieldData);
+
+      // Validate required fields
+      if (!fieldData.name) {
+        throw new Error("Field name is required");
+      }
+      if (!fieldData.crop_type) {
+        throw new Error("Crop type is required");
+      }
+      if (!fieldData.acreage || isNaN(fieldData.acreage)) {
+        throw new Error("Valid acreage is required");
+      }
+
+      const { data: insertedField, error } = await supabase
+        .from("fields")
+        .insert(fieldData)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('❌ Database error:', error);
+        throw error;
+      }
+
+      console.log('✅ Field created successfully:', insertedField);
 
       toast({ 
         title: "🎉 Field registered successfully!",
-        description: "Delta Intelligence made it easy for you."
+        description: `${fieldData.name} has been added to your fields.`
       });
 
       setConversationalDialogOpen(false);
       fetchFields();
     } catch (error: any) {
+      console.error('❌ Error in handleConversationalComplete:', error);
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Error creating field",
+        description: error.message || "Failed to create field. Please try again.",
         variant: "destructive",
       });
     } finally {
