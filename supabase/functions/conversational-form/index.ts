@@ -82,15 +82,10 @@ Context awareness:
 - Suggest similar setups based on their farm patterns
 - Use community averages for guidance ("Most Morehouse Parish rice farmers...")
 
-Response format:
-Always respond with valid JSON in this structure:
-{
-  "message": "Your conversational response to the user",
-  "extracted_data": { "name": "value", "crop_type": "rice", ... },
-  "completion_percentage": 60,
-  "next_question": "What would you like to plant in this field?",
-  "suggestions": ["Rice", "Soybean", "Cotton", "Corn"]
-}`,
+CRITICAL: Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
+
+Valid: {"message":"...","extracted_data":{...},"completion_percentage":60,"next_question":"...","suggestions":[...]}
+Invalid: "Here's my response: {...}" or any explanatory text`,
   
   'insurance-claim': `You are Delta Intelligence helping a Louisiana Delta farmer document an insurance claim for crop damage.
 
@@ -115,14 +110,10 @@ Evidence Compilation:
 - Explain what adjusters need to see
 - Reference LSU AgCenter damage assessment standards
 
-Response format:
-{
-  "message": "Your empathetic, helpful response with evidence guidance",
-  "extracted_data": { "field_id": "uuid", "event_type": "flood", "assessment_ids": ["uuid1", "uuid2"], ... },
-  "completion_percentage": 60,
-  "next_question": "Can you describe what the damage looked like?",
-  "suggestions": ["Yellow/brown leaves", "Standing water", "Wilting plants", "Pest infestation"]
-}`,
+CRITICAL: Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
+
+Valid: {"message":"...","extracted_data":{...},"completion_percentage":60,"next_question":"...","suggestions":[...]}
+Invalid: "Here's my response: {...}" or any explanatory text`,
   
   'conservation-practices': `You are Delta Intelligence helping a Louisiana Delta farmer document conservation practices for USDA compliance and cost savings.
 
@@ -148,15 +139,10 @@ Educational Approach:
 - Provide cost-benefit analysis in real-time
 - Guide on USDA documentation requirements
 
-Response format:
-{
-  "message": "Educational response with cost calculations and LSU research",
-  "extracted_data": { "field_id": "uuid", "tillage_type": "no-till", "cover_crops": true, ... },
-  "completion_percentage": 50,
-  "next_question": "Do you plant cover crops in the off-season?",
-  "suggestions": ["Yes, winter rye", "Yes, crimson clover", "No"],
-  "cost_savings_estimate": 850
-}`,
+CRITICAL: Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
+
+Valid: {"message":"...","extracted_data":{...},"completion_percentage":50,"next_question":"...","suggestions":[...],"cost_savings_estimate":850}
+Invalid: "Here's my response: {...}" or any explanatory text`,
   
   'onboarding': `You are Delta Intelligence, welcoming a new Louisiana Delta farmer to AgurateAI!
 
