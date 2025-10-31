@@ -63,7 +63,9 @@ export default function Dashboard() {
           .single();
         
         if (data && !data.onboarding_completed) {
-          setShowOnboarding(true);
+          // Redirect to onboarding page
+          window.location.href = '/onboarding';
+          return;
         }
       }
     };

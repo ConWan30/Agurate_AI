@@ -34,6 +34,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Install = lazy(() => import("./pages/Install"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const LSUResearchers = lazy(() => import("./pages/LSUResearchers"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const ConservationPractices = lazy(() => import("./pages/ConservationPractices"));
 
 const queryClient = new QueryClient();
 
@@ -123,6 +125,7 @@ const App = () => (
             <Route path="/install" element={<main id="main-content"><Install /></main>} />
             <Route path="/auth" element={<main id="main-content"><Auth /></main>} />
             <Route path="/reset-password" element={<main id="main-content"><ResetPassword /></main>} />
+            <Route path="/onboarding" element={<ProtectedRoute><main id="main-content"><Onboarding /></main></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
           <Route path="/beta-metrics" element={<ProtectedRoute><Layout><BetaMetrics /></Layout></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Layout><Upload /></Layout></ProtectedRoute>} />
@@ -140,6 +143,7 @@ const App = () => (
           <Route path="/delta-intelligence" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><Layout><Analytics /></Layout></ProtectedRoute>} />
           <Route path="/lsu-researchers" element={<ProtectedRoute><Layout><LSUResearchers /></Layout></ProtectedRoute>} />
+          <Route path="/conservation-practices" element={<ProtectedRoute><Layout><ConservationPractices /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
           {/* Demo routes for screenshots - bypasses authentication */}
           <Route path="/demo/auth" element={<Auth />} />

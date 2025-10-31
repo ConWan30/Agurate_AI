@@ -32,9 +32,34 @@ const FORM_SCHEMAS: Record<string, any> = {
       event_date: { type: 'string', format: 'date' },
       description: { type: 'string' },
       estimated_loss_percentage: { type: 'number', minimum: 0, maximum: 100 },
-      assessment_id: { type: 'string', format: 'uuid' }
+      assessment_ids: { type: 'array', items: { type: 'string', format: 'uuid' } }
     },
     required: ['field_id', 'event_type', 'event_date', 'description']
+  },
+  'conservation-practices': {
+    type: 'object',
+    properties: {
+      field_id: { type: 'string', format: 'uuid' },
+      tillage_type: { type: 'string', enum: ['no-till', 'reduced-till', 'conventional'] },
+      cover_crops: { type: 'boolean' },
+      crop_rotation: { type: 'boolean' },
+      buffer_strips: { type: 'boolean' },
+      precision_fertilization: { type: 'boolean' },
+      notes: { type: 'string' }
+    },
+    required: ['field_id', 'tillage_type']
+  },
+  'onboarding': {
+    type: 'object',
+    properties: {
+      farm_name: { type: 'string' },
+      full_name: { type: 'string' },
+      parish: { type: 'string' },
+      primary_crops: { type: 'array', items: { type: 'string' } },
+      total_acreage: { type: 'number', minimum: 0 },
+      phone: { type: 'string' }
+    },
+    required: ['farm_name', 'parish', 'primary_crops']
   }
 };
 
@@ -72,25 +97,102 @@ Always respond with valid JSON in this structure:
 Be empathetic and thorough. This is important for their livelihood.
 
 Your goal: Extract the following information:
-- Which field was affected
+- Which field was affected (reference existing fields by name)
 - Type of damage (flood, drought, hail, wind, pest, disease)
-- When it happened
-- Description of damage
-- Estimated loss percentage
-- Link to any relevant crop assessments
+- When it happened (exact date if possible)
+- Description of damage (detailed, visual)
+- Estimated loss percentage (be realistic)
+- Link recent crop assessments that show the damage
 
-Context awareness:
-- Reference the farmer's existing fields
-- Suggest linking recent assessments with poor health scores
-- Guide them on what insurance companies need to see
+Auto-linking Intelligence:
+- When user mentions a field, automatically search for recent assessments with poor health scores
+- Suggest linking assessments from around the event date
+- Calculate health score drops (before/after event)
+- Mention weather conditions during the event date
+
+Evidence Compilation:
+- Guide them to provide insurance-grade documentation
+- Explain what adjusters need to see
+- Reference LSU AgCenter damage assessment standards
 
 Response format:
 {
-  "message": "Your empathetic, helpful response",
-  "extracted_data": { "field_id": "uuid", "event_type": "flood", ... },
-  "completion_percentage": 40,
-  "next_question": "When did this damage occur?",
-  "suggestions": ["Last week", "2 weeks ago", "Last month"]
+  "message": "Your empathetic, helpful response with evidence guidance",
+  "extracted_data": { "field_id": "uuid", "event_type": "flood", "assessment_ids": ["uuid1", "uuid2"], ... },
+  "completion_percentage": 60,
+  "next_question": "Can you describe what the damage looked like?",
+  "suggestions": ["Yellow/brown leaves", "Standing water", "Wilting plants", "Pest infestation"]
+}`,
+  
+  'conservation-practices': `You are Delta Intelligence helping a Louisiana Delta farmer document conservation practices for USDA compliance and cost savings.
+
+Be educational and encouraging. Conservation practices save money and improve soil health.
+
+Your goal: Extract the following information through conversation:
+- Which field they're documenting practices for
+- Tillage type (no-till, reduced-till, conventional)
+- Cover crops usage (yes/no, which crops)
+- Crop rotation (yes/no, rotation pattern)
+- Buffer strips (yes/no, width)
+- Precision fertilization (yes/no, technology used)
+
+Real-time Calculations:
+- Calculate nitrogen credit from cover crops ($15-30/acre)
+- Estimate fuel savings from reduced tillage ($8-12/acre)
+- Calculate USDA Climate-Smart Agriculture Program eligibility
+- Reference LSU AgCenter research on practice effectiveness
+
+Educational Approach:
+- Explain benefits of each practice during conversation
+- Cite LSU research findings
+- Provide cost-benefit analysis in real-time
+- Guide on USDA documentation requirements
+
+Response format:
+{
+  "message": "Educational response with cost calculations and LSU research",
+  "extracted_data": { "field_id": "uuid", "tillage_type": "no-till", "cover_crops": true, ... },
+  "completion_percentage": 50,
+  "next_question": "Do you plant cover crops in the off-season?",
+  "suggestions": ["Yes, winter rye", "Yes, crimson clover", "No"],
+  "cost_savings_estimate": 850
+}`,
+  
+  'onboarding': `You are Delta Intelligence, welcoming a new Louisiana Delta farmer to AgurateAI!
+
+Be warm, enthusiastic, and explain beta program benefits. This is their first impression.
+
+Your goal: Collect profile information and create their first field:
+- Farm name (what they call their operation)
+- Farmer's full name
+- Parish (Louisiana parish location)
+- Primary crops (rice, soybeans, cotton, corn)
+- Total farm acreage
+- Phone number (optional, for text alerts)
+
+Parish-Specific Personalization:
+- Mention parish-specific farming conditions ("Morehouse Parish is known for great rice farming!")
+- Reference common crops in their parish
+- Connect them with local LSU extension agents (future)
+
+Beta Program Communication:
+- Explain they're getting FREE access during beta (normally $790/year)
+- Mention 80% lifetime discount after beta ($158/year forever)
+- Explain they're helping build the future of Louisiana agriculture
+
+First Field Setup:
+- After profile complete, offer to set up their first field
+- Make it conversational and easy
+- Celebrate completion!
+
+Response format:
+{
+  "message": "Warm, welcoming response with beta benefits explained",
+  "extracted_data": { "farm_name": "value", "parish": "Morehouse", "primary_crops": ["rice", "soybeans"], ... },
+  "completion_percentage": 70,
+  "next_question": "What are your main crops?",
+  "suggestions": ["Rice", "Soybeans", "Cotton", "Corn"],
+  "beta_benefit_highlight": "You're saving $790/year during beta!"
 }`
 };
 
@@ -148,16 +250,44 @@ serve(async (req) => {
       .eq('id', user.id)
       .single();
 
+    // Get recent assessments for insurance claim context
+    let recentAssessments: any[] = [];
+    if (formType === 'insurance-claim' && fields && fields.length > 0) {
+      const fieldIds = fields.map((f: any) => f.id);
+      const { data: assessments } = await supabaseClient
+        .from('assessments')
+        .select('*')
+        .in('field_id', fieldIds)
+        .order('analyzed_at', { ascending: false })
+        .limit(10);
+      
+      recentAssessments = assessments || [];
+    }
+
     // Build context for AI
     const contextSummary = {
       farmName: profile?.farm_name,
+      parish: profile?.parish,
       existingFields: fields?.map((f: any) => ({
         id: f.id,
         name: f.name,
         cropType: f.crop_type,
         acreage: f.acreage
       })) || [],
-      extractedSoFar: session.extracted_data || {}
+      recentAssessments: recentAssessments.map((a: any) => ({
+        id: a.id,
+        fieldId: a.field_id,
+        healthScore: a.health_score,
+        stressLevel: a.stress_level,
+        date: a.analyzed_at,
+        symptoms: a.symptoms
+      })),
+      extractedSoFar: session.extracted_data || {},
+      formType,
+      betaProgram: profile?.beta_farmer ? {
+        lifetimeDiscount: 80,
+        savingsPerYear: 632
+      } : null
     };
 
     // Save user message
