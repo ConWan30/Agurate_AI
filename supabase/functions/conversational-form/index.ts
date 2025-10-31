@@ -107,39 +107,60 @@ EXAMPLE CORRECT RESPONSE:
   
   'insurance-claim': `You are Delta Intelligence helping a Louisiana Delta farmer document an insurance claim for crop damage.
 
-Be empathetic and thorough. This is important for their livelihood.
+Be empathetic, thorough, and leverage ALL unified intelligence context. This is critical for their livelihood.
 
-Your goal: Extract the following information:
-- Which field was affected (reference existing fields by name)
-- Type of damage (flood, drought, hail, wind, pest, disease)
-- When it happened (exact date if possible)
-- Description of damage (detailed, visual)
-- Estimated loss percentage (be realistic)
-- Link recent crop assessments that show the damage
+UNIFIED INTELLIGENCE AWARENESS:
+- You have access to recent field assessments with health scores and stress levels
+- You know recent weather events (floods, droughts, hail, etc.) in their area
+- You can correlate health score drops with weather events
+- You can auto-suggest assessments from around the event date as evidence
 
-Auto-linking Intelligence:
-- When user mentions a field, automatically search for recent assessments with poor health scores
-- Suggest linking assessments from around the event date
-- Calculate health score drops (before/after event)
-- Mention weather conditions during the event date
+Your goal: Extract comprehensive claim documentation:
+1. Field identification (reference existing fields by name)
+2. Damage type (flood, drought, hail, wind, pest, disease)
+3. Event date (cross-reference with weather intelligence)
+4. Detailed damage description (visual, extent, progression)
+5. Estimated loss percentage (realistic, based on assessment data)
+6. Link relevant crop assessments as photo evidence
+7. Weather correlation (if recent weather events match)
 
-Evidence Compilation:
-- Guide them to provide insurance-grade documentation
-- Explain what adjusters need to see
-- Reference LSU AgCenter damage assessment standards
+INTELLIGENT AUTO-LINKING:
+- When user mentions a field and event date:
+  * Auto-search assessments from ±7 days of event date
+  * Identify assessments with health scores <70 (moderate to severe stress)
+  * Calculate health score drops (compare before/after event)
+  * Auto-suggest these as evidence: "I found 3 assessments from your North Rice Field around that time showing 45% health score. Should I link these as evidence?"
+
+- Weather event correlation:
+  * If recent weather events match the claimed event type and date, mention it
+  * Example: "I see we had a major flood event on July 15th in Morehouse Parish. Is this what affected your field?"
+
+EVIDENCE COMPILATION INTELLIGENCE:
+- Guide them on insurance-grade documentation standards
+- Explain what crop adjusters need (LSU AgCenter damage assessment protocols)
+- Suggest additional evidence if claim seems weak
+- Calculate estimated dollar loss based on acreage × crop price × loss percentage
+
+COMMUNITY CONTEXT:
+- If multiple farmers in their cooperative have similar claims, mention it (validates their claim)
+- Reference typical loss percentages for similar events in Louisiana Delta
 
 CRITICAL JSON FORMAT REQUIREMENTS:
 1. Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
-2. The "message" field is REQUIRED and must contain your conversational response to the farmer
-3. The "next_question" field should contain a brief prompt for what to ask next (optional)
+2. The "message" field is REQUIRED and contains your empathetic, intelligent response
+3. Use unified intelligence context to provide specific, actionable guidance
+4. Auto-suggest linked assessments when you identify relevant ones
 
 REQUIRED FORMAT:
 {
-  "message": "Your full conversational response that will be shown to the farmer",
+  "message": "Your full conversational response leveraging unified intelligence",
   "extracted_data": {...},
   "completion_percentage": 60,
   "next_question": "Brief next question prompt",
-  "suggestions": [...]
+  "suggestions": [...],
+  "auto_linked_assessments": ["assessment_id_1", "assessment_id_2"],
+  "weather_correlation": "Match found: Flood event on 2025-07-15",
+  "estimated_loss_dollars": 12500
 }`,
   
   'conservation-practices': `You are Delta Intelligence helping a Louisiana Delta farmer document conservation practices for USDA compliance and cost savings.
@@ -278,30 +299,69 @@ serve(async (req) => {
       .eq('id', user.id)
       .single();
 
-    // Get recent assessments for insurance claim context
+    // Gather comprehensive unified intelligence context
     let recentAssessments: any[] = [];
-    if (formType === 'insurance-claim' && fields && fields.length > 0) {
+    let weatherEvents: any[] = [];
+    let communityInsights: any[] = [];
+    let varietyRecommendations: any[] = [];
+    
+    if (fields && fields.length > 0) {
       const fieldIds = fields.map((f: any) => f.id);
-      const { data: assessments } = await supabaseClient
-        .from('assessments')
-        .select('*')
-        .in('field_id', fieldIds)
-        .order('analyzed_at', { ascending: false })
-        .limit(10);
       
-      recentAssessments = assessments || [];
+      // Parallel context gathering
+      const [assessmentsRes, weatherRes, communityRes, varietyRes] = await Promise.all([
+        supabaseClient
+          .from('assessments')
+          .select('*')
+          .in('field_id', fieldIds)
+          .order('analyzed_at', { ascending: false })
+          .limit(10),
+        
+        supabaseClient
+          .from('weather_events')
+          .select('*')
+          .order('event_date', { ascending: false })
+          .limit(5),
+        
+        supabaseClient
+          .from('best_practices_network')
+          .select('*')
+          .order('adoption_count', { ascending: false })
+          .limit(5),
+        
+        supabaseClient
+          .from('variety_recommendations')
+          .select('*')
+          .in('field_id', fieldIds)
+          .order('recommendation_date', { ascending: false })
+          .limit(3)
+      ]);
+      
+      recentAssessments = assessmentsRes.data || [];
+      weatherEvents = weatherRes.data || [];
+      communityInsights = communityRes.data || [];
+      varietyRecommendations = varietyRes.data || [];
     }
 
-    // Build context for AI
+    // Build enhanced unified intelligence context for AI
     const contextSummary = {
+      // Farm Profile
       farmName: profile?.farm_name,
       parish: profile?.parish,
+      totalAcreage: profile?.total_acreage,
+      primaryCrops: profile?.primary_crops,
+      
+      // Existing Fields
       existingFields: fields?.map((f: any) => ({
         id: f.id,
         name: f.name,
         cropType: f.crop_type,
-        acreage: f.acreage
+        acreage: f.acreage,
+        soilType: f.soil_type,
+        plantingDate: f.planting_date
       })) || [],
+      
+      // Recent Crop Health
       recentAssessments: recentAssessments.map((a: any) => ({
         id: a.id,
         fieldId: a.field_id,
@@ -310,8 +370,36 @@ serve(async (req) => {
         date: a.analyzed_at,
         symptoms: a.symptoms
       })),
+      
+      // Weather Intelligence
+      recentWeatherEvents: weatherEvents.map((w: any) => ({
+        eventType: w.event_type,
+        date: w.event_date,
+        severity: w.severity,
+        impact: w.impact_description
+      })),
+      
+      // Community Intelligence
+      communityBestPractices: communityInsights.map((c: any) => ({
+        practice: c.practice_name,
+        adopters: c.adoption_count,
+        successRate: c.success_rate,
+        avgSavings: c.average_savings
+      })),
+      
+      // Variety Intelligence
+      varietyRecommendations: varietyRecommendations.map((v: any) => ({
+        cropType: v.crop_type,
+        recommended: v.recommended_variety,
+        current: v.current_variety,
+        expectedImprovement: v.expected_improvement
+      })),
+      
+      // Session State
       extractedSoFar: session.extracted_data || {},
       formType,
+      
+      // Beta Program
       betaProgram: profile?.beta_farmer ? {
         lifetimeDiscount: 80,
         savingsPerYear: 632
