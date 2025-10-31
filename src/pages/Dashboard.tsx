@@ -10,6 +10,7 @@ import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { SuccessStoryPrompt } from "@/components/SuccessStoryPrompt";
 import { BetaConversionBanner } from "@/components/BetaConversionBanner";
 import { DailyBriefingCard } from "@/components/DailyBriefingCard";
+import { ROICalculatorCard } from "@/components/ROICalculatorCard";
 import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon, BarChart3, Droplets, GraduationCap, Network, Microscope } from "lucide-react";
 import { WeatherAlerts } from "@/components/WeatherAlerts";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -214,6 +215,9 @@ export default function Dashboard() {
 
         {/* Daily Briefing - Priority Enhancement #6 */}
         {!isDemoMode && fields.length > 0 && <DailyBriefingCard />}
+
+        {/* ROI Calculator - Treatment Value Analysis */}
+        {!isDemoMode && fields.length > 0 && <ROICalculatorCard />}
 
         {/* Core Features - All Integrations */}
         <div>

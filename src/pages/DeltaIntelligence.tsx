@@ -13,7 +13,7 @@ import { useDeltaConversations, type Message } from '@/hooks/useDeltaConversatio
 import { formatDistanceToNow } from 'date-fns';
 import { DeltaChatInput } from '@/components/DeltaChatInput';
 import { PredictiveQuestions } from '@/components/PredictiveQuestions';
-import { gatherUnifiedContext, formatContextForAI } from '@/lib/unified-ai-intelligence';
+import { gatherUnifiedContext, formatContextForAI, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
 
 export default function DeltaIntelligence() {
   const {

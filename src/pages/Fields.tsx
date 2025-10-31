@@ -21,6 +21,9 @@ import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalForm";
 import { Sparkles } from "lucide-react";
+import { VarietyRecommendationCard } from "@/components/VarietyRecommendationCard";
+import { VarietyRecommendation } from "@/types/enhanced-features";
+import { useQuery } from "@tanstack/react-query";
 
 interface Field {
   id: string;
@@ -50,6 +53,34 @@ export default function Fields() {
   
   // Enable keyboard shortcuts
   useGlobalKeyboardShortcuts();
+
+  // Fetch variety recommendations
+  const { data: varietyRecommendations } = useQuery({
+    queryKey: ['variety-recommendations'],
+    queryFn: async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return [];
+
+        const response = await (supabase as any)
+          .from('variety_recommendations')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('recommendation_date', { ascending: false })
+          .limit(3);
+
+        if (response.error) {
+          console.error('Error fetching variety recommendations:', response.error);
+          return [];
+        }
+        return response.data as VarietyRecommendation[];
+      } catch (err) {
+        console.error(err);
+        return [];
+      }
+    },
+    enabled: !isDemoMode
+  }) as { data: VarietyRecommendation[] | undefined };
 
   const [formData, setFormData] = useState({
     name: "",
@@ -286,6 +317,27 @@ export default function Fields() {
         </div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
       </div>
+
+      {/* Variety Recommendations */}
+      {varietyRecommendations && varietyRecommendations.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold">LSU Variety Recommendations for Your Fields</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {varietyRecommendations.map((recommendation) => (
+              <VarietyRecommendationCard 
+                key={recommendation.id} 
+                recommendation={recommendation}
+                onAdopt={() => {
+                  toast({ 
+                    title: "Variety Noted",
+                    description: `${recommendation.recommended_variety} saved to your field records.`
+                  });
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Mobile Add Button */}
       <div className="md:hidden">

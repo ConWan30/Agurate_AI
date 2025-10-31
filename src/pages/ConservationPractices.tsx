@@ -9,10 +9,39 @@ import { toast } from 'sonner';
 import { Sprout, TrendingUp, DollarSign } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import bgHandsSoil from '@/assets/bg-hands-soil.jpg';
+import { ConservationPredictionCard } from '@/components/ConservationPredictionCard';
+import { ConservationPrediction } from '@/types/enhanced-features';
 
 export default function ConservationPractices() {
   const [conversationalOpen, setConversationalOpen] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
+
+  // Fetch conservation predictions
+  const { data: predictions } = useQuery({
+    queryKey: ['conservation-predictions'],
+    queryFn: async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return [];
+
+        const response = await (supabase as any)
+          .from('conservation_predictions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('predicted_date', { ascending: false })
+          .limit(3);
+
+        if (response.error) {
+          console.error('Error fetching predictions:', response.error);
+          return [];
+        }
+        return response.data as ConservationPrediction[];
+      } catch (err) {
+        console.error(err);
+        return [];
+      }
+    }
+  }) as { data: ConservationPrediction[] | undefined };
 
   // Fetch user fields
   const { data: fields = [] } = useQuery({
@@ -124,6 +153,21 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
             </CardHeader>
           </Card>
         </div>
+
+        {/* Conservation Predictions */}
+        {predictions && predictions.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Your Conservation Impact Predictions</h2>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {predictions.map((prediction) => (
+                <ConservationPredictionCard 
+                  key={prediction.id} 
+                  prediction={prediction} 
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Fields List */}
         <Card>
