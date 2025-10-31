@@ -144,7 +144,7 @@ export const DeltaConversationalForm = ({
   }
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn("w-full flex flex-col max-h-[85vh]", className)}>
       <CardHeader className="border-b">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -179,7 +179,7 @@ export const DeltaConversationalForm = ({
         </div>
       </CardHeader>
 
-      <CardContent className="p-0 flex flex-col" style={{ height: '600px', maxHeight: '600px' }}>
+      <CardContent className="p-0 flex flex-col flex-1 min-h-0">
         {/* Messages Area */}
         <div className="flex-1 overflow-hidden min-h-0">
           <ScrollArea className="h-full p-4" ref={scrollRef}>
