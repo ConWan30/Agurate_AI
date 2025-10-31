@@ -19,6 +19,8 @@ import { SwipeableCard } from "@/components/ui/swipeable-card";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { EmptyState } from "@/components/ui/empty-state";
+import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalForm";
+import { Sparkles } from "lucide-react";
 
 interface Field {
   id: string;
@@ -42,6 +44,7 @@ export default function Fields() {
   const [fields, setFields] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [conversationalDialogOpen, setConversationalDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<Field | null>(null);
   const { toast } = useToast();
   
@@ -181,6 +184,43 @@ export default function Fields() {
     setEditingField(null);
   };
 
+  const handleConversationalComplete = async (extractedData: any) => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const fieldData = {
+        user_id: user.id,
+        name: extractedData.name || extractedData.fieldName,
+        crop_type: extractedData.cropType || extractedData.crop_type,
+        acreage: parseFloat(extractedData.acreage),
+        location_lat: extractedData.location_lat ? parseFloat(extractedData.location_lat) : null,
+        location_lng: extractedData.location_lng ? parseFloat(extractedData.location_lng) : null,
+        notes: extractedData.notes || null,
+      };
+
+      const { error } = await supabase.from("fields").insert(fieldData);
+      if (error) throw error;
+
+      toast({ 
+        title: "🎉 Field registered successfully!",
+        description: "Delta Intelligence made it easy for you."
+      });
+
+      setConversationalDialogOpen(false);
+      fetchFields();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <PullToRefresh onRefresh={fetchFields}>
       <div className="space-y-8">
@@ -198,19 +238,39 @@ export default function Fields() {
             <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">My Fields</h1>
             <p className="text-white/90 text-base md:text-lg">Manage your farm fields and crop types</p>
           </div>
-          <Dialog
-            open={dialogOpen}
-            onOpenChange={(open) => {
-              setDialogOpen(open);
-              if (!open) resetForm();
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button variant="secondary" size="lg" className="gap-2 hidden md:flex">
-                <Plus className="h-4 w-4" />
-                Add Field
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog
+              open={conversationalDialogOpen}
+              onOpenChange={setConversationalDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button variant="default" size="lg" className="gap-2 hidden md:flex">
+                  <Sparkles className="h-4 w-4" />
+                  Quick Add with AI
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] p-0">
+                <DeltaConversationalForm
+                  formType="field-registration"
+                  onComplete={handleConversationalComplete}
+                  onAbandon={() => setConversationalDialogOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog
+              open={dialogOpen}
+              onOpenChange={(open) => {
+                setDialogOpen(open);
+                if (!open) resetForm();
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button variant="secondary" size="lg" className="gap-2 hidden md:flex">
+                  <Plus className="h-4 w-4" />
+                  Add Field
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>{editingField ? "Edit Field" : "Add New Field"}</DialogTitle>
@@ -306,12 +366,32 @@ export default function Fields() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
       {/* Mobile Add Button */}
-      <div className="md:hidden">
+      <div className="md:hidden space-y-3">
+        <Dialog
+          open={conversationalDialogOpen}
+          onOpenChange={setConversationalDialogOpen}
+        >
+          <DialogTrigger asChild>
+            <Button className="w-full gap-2" size="lg">
+              <Sparkles className="h-4 w-4" />
+              Quick Add with AI
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-full max-h-[90vh] p-0 m-4">
+            <DeltaConversationalForm
+              formType="field-registration"
+              onComplete={handleConversationalComplete}
+              onAbandon={() => setConversationalDialogOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
+
         <Dialog
           open={dialogOpen}
           onOpenChange={(open) => {
@@ -320,9 +400,9 @@ export default function Fields() {
           }}
         >
           <DialogTrigger asChild>
-            <Button className="w-full gap-2" size="lg">
+            <Button variant="secondary" className="w-full gap-2" size="lg">
               <Plus className="h-4 w-4" />
-              Add Field
+              Add Field (Traditional)
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
