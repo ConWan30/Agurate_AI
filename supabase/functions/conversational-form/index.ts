@@ -343,13 +343,17 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
     }
 
     const aiData = await aiResponse.json();
-    const aiMessage = aiData.choices[0]?.message?.content || '';
+    let aiMessage = aiData.choices[0]?.message?.content || '';
+
+    // Strip markdown code blocks if present (```json ... ```)
+    aiMessage = aiMessage.replace(/```json\s*/g, '').replace(/```\s*/g, '');
 
     // Parse AI response (expect JSON)
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(aiMessage);
-    } catch {
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', aiMessage, parseError);
       // If AI didn't return JSON, wrap it
       parsedResponse = {
         message: aiMessage,
