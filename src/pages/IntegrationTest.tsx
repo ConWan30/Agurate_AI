@@ -102,7 +102,7 @@ export default function IntegrationTest() {
     updateTest('Water Stress Intelligence', 'pending', 'Checking water stress table...');
     try {
       const { data, error } = await (supabase as any)
-        .from('water_stress_intelligence')
+        .from('water_stress_events')
         .select('count')
         .limit(1);
       
