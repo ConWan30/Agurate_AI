@@ -15,8 +15,12 @@ import { InsuranceClaimDetail } from '@/components/InsuranceClaimDetail';
 import { downloadClaimPDF, ClaimData } from '@/lib/pdfGenerator';
 import bgCropDamage from "@/assets/bg-crop-damage.jpg";
 
+import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalForm";
+import { Sparkles } from "lucide-react";
+
 export default function Insurance() {
   const [open, setOpen] = useState(false);
+  const [conversationalOpen, setConversationalOpen] = useState(false);
   const [detailClaimId, setDetailClaimId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
@@ -103,6 +107,30 @@ export default function Insurance() {
     }
   };
 
+  const handleConversationalComplete = async (extractedData: any) => {
+    try {
+      const { error } = await supabase.from('insurance_claims').insert([{
+        field_id: extractedData.fieldId || extractedData.field_id,
+        event_type: extractedData.eventType || extractedData.event_type,
+        event_date: extractedData.eventDate || extractedData.event_date,
+        estimated_loss_percentage: Number(extractedData.estimatedLossPercentage || extractedData.estimated_loss_percentage),
+        description: extractedData.description,
+        status: 'draft'
+      }]);
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
+      toast.success('🎉 Insurance claim created successfully!', {
+        description: 'Delta Intelligence made it easy for you.'
+      });
+      setConversationalOpen(false);
+    } catch (error: any) {
+      toast.error('Failed to create claim', {
+        description: error.message
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -124,73 +152,19 @@ export default function Insurance() {
                 Document crop damage for insurance providers with AI-verified evidence
               </p>
             </div>
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={conversationalOpen} onOpenChange={setConversationalOpen}>
               <DialogTrigger asChild>
-                <Button variant="secondary" size="lg" className="gap-2 hidden md:flex">
-                  <Plus className="h-4 w-4" />
-                  Create Claim
+                <Button variant="default" size="lg" className="gap-2 hidden md:flex">
+                  <Sparkles className="h-4 w-4" />
+                  Create Claim with Delta AI
                 </Button>
               </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create Insurance Claim</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  createClaim.mutate(formData);
-                }} className="space-y-4">
-                  <div>
-                    <Label>Field</Label>
-                    <Select name="field_id" required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select field" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fields?.map(field => (
-                          <SelectItem key={field.id} value={field.id}>
-                            {field.name} ({field.crop_type})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label>Event Type</Label>
-                    <Select name="event_type" required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select event type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="flood">Flood</SelectItem>
-                        <SelectItem value="drought">Drought</SelectItem>
-                        <SelectItem value="hail">Hail</SelectItem>
-                        <SelectItem value="wind">Wind Damage</SelectItem>
-                        <SelectItem value="disease">Disease Outbreak</SelectItem>
-                        <SelectItem value="pest">Pest Infestation</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label>Event Date</Label>
-                    <Input type="date" name="event_date" required />
-                  </div>
-
-                  <div>
-                    <Label>Estimated Loss (%)</Label>
-                    <Input type="number" name="estimated_loss_percentage" min="0" max="100" step="0.1" required />
-                  </div>
-
-                  <div>
-                    <Label>Description</Label>
-                    <Textarea name="description" rows={4} placeholder="Describe the damage and circumstances..." required />
-                  </div>
-
-                  <Button type="submit" className="w-full">Create Claim</Button>
-                </form>
+              <DialogContent className="max-w-2xl max-h-[90vh] p-0">
+                <DeltaConversationalForm
+                  formType="insurance-claim"
+                  onComplete={handleConversationalComplete}
+                  onAbandon={() => setConversationalOpen(false)}
+                />
               </DialogContent>
             </Dialog>
           </div>
@@ -199,9 +173,9 @@ export default function Insurance() {
 
         {/* Mobile Create Button */}
         <div className="md:hidden">
-          <Button onClick={() => setOpen(true)} className="w-full gap-2" size="lg">
-            <Plus className="h-4 w-4" />
-            Create Claim
+          <Button onClick={() => setConversationalOpen(true)} className="w-full gap-2" size="lg">
+            <Sparkles className="h-4 w-4" />
+            Create Claim with Delta AI
           </Button>
         </div>
 

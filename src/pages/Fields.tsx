@@ -238,141 +238,30 @@ export default function Fields() {
             <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">My Fields</h1>
             <p className="text-white/90 text-base md:text-lg">Manage your farm fields and crop types</p>
           </div>
-          <div className="flex gap-2">
-            <Dialog
-              open={conversationalDialogOpen}
-              onOpenChange={setConversationalDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <Button variant="default" size="lg" className="gap-2 hidden md:flex">
-                  <Sparkles className="h-4 w-4" />
-                  Quick Add with AI
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] p-0">
-                <DeltaConversationalForm
-                  formType="field-registration"
-                  onComplete={handleConversationalComplete}
-                  onAbandon={() => setConversationalDialogOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
-
-            <Dialog
-              open={dialogOpen}
-              onOpenChange={(open) => {
-                setDialogOpen(open);
-                if (!open) resetForm();
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button variant="secondary" size="lg" className="gap-2 hidden md:flex">
-                  <Plus className="h-4 w-4" />
-                  Add Field
-                </Button>
-              </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>{editingField ? "Edit Field" : "Add New Field"}</DialogTitle>
-                <DialogDescription>
-                  {editingField
-                    ? "Update your field information"
-                    : "Register a new field for crop monitoring"}
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Field Name *</Label>
-                  <Input
-                    id="name"
-                    placeholder="e.g., North Field"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="crop_type">Crop Type *</Label>
-                  <Select
-                    value={formData.crop_type}
-                    onValueChange={(value) => setFormData({ ...formData, crop_type: value })}
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select crop type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="rice">Rice</SelectItem>
-                      <SelectItem value="soybean">Soybean</SelectItem>
-                      <SelectItem value="cotton">Cotton</SelectItem>
-                      <SelectItem value="corn">Corn</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="acreage">Acreage *</Label>
-                  <Input
-                    id="acreage"
-                    type="number"
-                    step="0.1"
-                    placeholder="e.g., 45.5"
-                    value={formData.acreage}
-                    onChange={(e) => setFormData({ ...formData, acreage: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="lat">Latitude</Label>
-                    <Input
-                      id="lat"
-                      type="number"
-                      step="0.0000001"
-                      placeholder="32.73"
-                      value={formData.location_lat}
-                      onChange={(e) => setFormData({ ...formData, location_lat: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lng">Longitude</Label>
-                    <Input
-                      id="lng"
-                      type="number"
-                      step="0.0000001"
-                      placeholder="-91.76"
-                      value={formData.location_lng}
-                      onChange={(e) => setFormData({ ...formData, location_lng: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Notes</Label>
-                  <Textarea
-                    id="notes"
-                    placeholder="Additional field information..."
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    rows={3}
-                  />
-                </div>
-
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Saving..." : editingField ? "Update Field" : "Add Field"}
-                </Button>
-              </form>
+          <Dialog
+            open={conversationalDialogOpen}
+            onOpenChange={setConversationalDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <Button variant="default" size="lg" className="gap-2 hidden md:flex">
+                <Sparkles className="h-4 w-4" />
+                Add Field with Delta AI
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] p-0">
+              <DeltaConversationalForm
+                formType="field-registration"
+                onComplete={handleConversationalComplete}
+                onAbandon={() => setConversationalDialogOpen(false)}
+              />
             </DialogContent>
           </Dialog>
-          </div>
         </div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
       {/* Mobile Add Button */}
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden">
         <Dialog
           open={conversationalDialogOpen}
           onOpenChange={setConversationalDialogOpen}
@@ -380,7 +269,7 @@ export default function Fields() {
           <DialogTrigger asChild>
             <Button className="w-full gap-2" size="lg">
               <Sparkles className="h-4 w-4" />
-              Quick Add with AI
+              Add Field with Delta AI
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-full max-h-[90vh] p-0 m-4">
@@ -391,118 +280,9 @@ export default function Fields() {
             />
           </DialogContent>
         </Dialog>
-
-        <Dialog
-          open={dialogOpen}
-          onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) resetForm();
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button variant="secondary" className="w-full gap-2" size="lg">
-              <Plus className="h-4 w-4" />
-              Add Field (Traditional)
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>{editingField ? "Edit Field" : "Add New Field"}</DialogTitle>
-              <DialogDescription>
-                {editingField
-                  ? "Update your field information"
-                  : "Register a new field for crop monitoring"}
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name-mobile">Field Name *</Label>
-                <Input
-                  id="name-mobile"
-                  placeholder="e.g., North Field"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="crop_type-mobile">Crop Type *</Label>
-                <Select
-                  value={formData.crop_type}
-                  onValueChange={(value) => setFormData({ ...formData, crop_type: value })}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select crop type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="rice">Rice</SelectItem>
-                    <SelectItem value="soybean">Soybean</SelectItem>
-                    <SelectItem value="cotton">Cotton</SelectItem>
-                    <SelectItem value="corn">Corn</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="acreage-mobile">Acreage *</Label>
-                <Input
-                  id="acreage-mobile"
-                  type="number"
-                  step="0.1"
-                  placeholder="e.g., 45.5"
-                  value={formData.acreage}
-                  onChange={(e) => setFormData({ ...formData, acreage: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="lat-mobile">Latitude</Label>
-                  <Input
-                    id="lat-mobile"
-                    type="number"
-                    step="0.0000001"
-                    placeholder="32.73"
-                    value={formData.location_lat}
-                    onChange={(e) => setFormData({ ...formData, location_lat: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lng-mobile">Longitude</Label>
-                  <Input
-                    id="lng-mobile"
-                    type="number"
-                    step="0.0000001"
-                    placeholder="-91.76"
-                    value={formData.location_lng}
-                    onChange={(e) => setFormData({ ...formData, location_lng: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notes-mobile">Notes</Label>
-                <Textarea
-                  id="notes-mobile"
-                  placeholder="Additional field information..."
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  rows={3}
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Saving..." : editingField ? "Update Field" : "Add Field"}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
       </div>
 
-        {loading && !dialogOpen ? (
+        {loading && !conversationalDialogOpen ? (
           <Card className="field-card">
             <CardContent className="flex items-center justify-center py-16">
               <div className="space-y-4 text-center">
@@ -517,7 +297,7 @@ export default function Fields() {
             title="No Fields Registered"
             description="Register your first field to start monitoring crop health. Add location, crop type, and acreage details."
             actionLabel="Add Your First Field"
-            onAction={() => setDialogOpen(true)}
+            onAction={() => setConversationalDialogOpen(true)}
           />
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
