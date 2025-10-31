@@ -9,7 +9,9 @@ import { Loader2, Send, X, CheckCircle2, Sparkles } from 'lucide-react';
 import { useConversationalForm, FormType } from '@/hooks/use-conversational-form';
 import { ConversationalFormMessage } from './ConversationalFormMessage';
 import { FormFieldExtraction } from './FormFieldExtraction';
+import { VoiceInputButton } from './VoiceInputButton';
 import { cn } from '@/lib/utils';
+import { messageInputSchema, sanitizeInput } from '@/lib/conversational-form-validation';
 
 interface DeltaConversationalFormProps {
   formType: FormType;
@@ -73,13 +75,25 @@ export const DeltaConversationalForm = ({
       completeSession();
       onComplete(extractedData);
     }
-  }, [isComplete, session, completeSession, onComplete, extractedData]);
+  }, [isComplete, session, completeSession, extractedData]);
 
   const handleSend = () => {
     if (!inputValue.trim() || isSendingMessage) return;
     
-    sendMessage(inputValue);
-    setInputValue('');
+    // Validate and sanitize input
+    try {
+      messageInputSchema.parse({ message: inputValue });
+      const sanitizedMessage = sanitizeInput(inputValue);
+      sendMessage(sanitizedMessage);
+      setInputValue('');
+    } catch (error) {
+      console.error('Invalid input:', error);
+    }
+  };
+
+  const handleVoiceTranscript = (transcript: string) => {
+    const sanitizedTranscript = sanitizeInput(transcript);
+    setInputValue(sanitizedTranscript);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -208,6 +222,10 @@ export const DeltaConversationalForm = ({
             </div>
           ) : (
             <div className="flex gap-2">
+              <VoiceInputButton 
+                onTranscript={handleVoiceTranscript}
+                disabled={isSendingMessage}
+              />
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -215,6 +233,7 @@ export const DeltaConversationalForm = ({
                 placeholder="Type your response..."
                 disabled={isSendingMessage}
                 className="flex-1"
+                maxLength={2000}
               />
               <Button
                 onClick={handleSend}
