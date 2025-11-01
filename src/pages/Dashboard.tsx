@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { BetaWelcomeBanner } from "@/components/BetaWelcomeBanner";
+import { BetaWelcomeFlow } from "@/components/BetaWelcomeFlow";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { SuccessStoryPrompt } from "@/components/SuccessStoryPrompt";
 import { BetaConversionBanner } from "@/components/BetaConversionBanner";
@@ -53,6 +54,7 @@ export default function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showSuccessStory, setShowSuccessStory] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Enable keyboard shortcuts
   useGlobalKeyboardShortcuts();
@@ -90,6 +92,8 @@ export default function Dashboard() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      setUserId(user.id);
 
       // Fetch fields
       const { data: fieldsData } = await supabase
@@ -175,6 +179,7 @@ export default function Dashboard() {
       
       <PullToRefresh onRefresh={fetchDashboardData}>
         <div className="space-y-8">
+        {userId && <BetaWelcomeFlow userId={userId} />}
         <BetaWelcomeBanner />
         <BetaConversionBanner />
         {/* Header - Louisiana Agricultural Theme with Background */}

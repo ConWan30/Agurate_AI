@@ -1288,6 +1288,7 @@ export type Database = {
           beta_feedback_provided: boolean | null
           beta_signup_date: string | null
           beta_welcome_dismissed: boolean | null
+          beta_welcome_shown: boolean | null
           created_at: string | null
           email: string | null
           farm_name: string | null
@@ -1309,6 +1310,7 @@ export type Database = {
           beta_feedback_provided?: boolean | null
           beta_signup_date?: string | null
           beta_welcome_dismissed?: boolean | null
+          beta_welcome_shown?: boolean | null
           created_at?: string | null
           email?: string | null
           farm_name?: string | null
@@ -1330,6 +1332,7 @@ export type Database = {
           beta_feedback_provided?: boolean | null
           beta_signup_date?: string | null
           beta_welcome_dismissed?: boolean | null
+          beta_welcome_shown?: boolean | null
           created_at?: string | null
           email?: string | null
           farm_name?: string | null

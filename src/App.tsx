@@ -39,6 +39,7 @@ const ConservationPractices = lazy(() => import("./pages/ConservationPractices")
 const ConversationalFormsAnalytics = lazy(() => import("./pages/ConversationalFormsAnalytics"));
 const IntegrationTest = lazy(() => import("./pages/IntegrationTest"));
 const BetaSignup = lazy(() => import("./pages/BetaSignup"));
+const Tutorials = lazy(() => import("./pages/Tutorials"));
 
 const queryClient = new QueryClient();
 
@@ -151,6 +152,7 @@ const App = () => (
           <Route path="/conservation-practices" element={<ProtectedRoute><Layout><ConservationPractices /></Layout></ProtectedRoute>} />
           <Route path="/conversational-forms-analytics" element={<ProtectedRoute><Layout><ConversationalFormsAnalytics /></Layout></ProtectedRoute>} />
           <Route path="/integration-test" element={<ProtectedRoute><Layout><IntegrationTest /></Layout></ProtectedRoute>} />
+          <Route path="/tutorials" element={<ProtectedRoute><Layout><Tutorials /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
           {/* Demo routes for screenshots - bypasses authentication */}
           <Route path="/demo/auth" element={<Auth />} />
