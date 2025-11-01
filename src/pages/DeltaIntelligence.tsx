@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -261,7 +263,7 @@ export default function DeltaIntelligence() {
                 <Brain className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-1">
+                <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-1">
                   Delta Intelligence AI
                 </h1>
                 <p className="text-white/80 text-sm">LSU AgCenter Research • Louisiana Delta Expertise</p>
@@ -278,8 +280,8 @@ export default function DeltaIntelligence() {
         <Card className="field-card shadow-field border-2">
           <CardHeader className="border-b p-4 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-primary" />
-              <h3 className="font-medium">
+              <Brain className="h-5 w-5 text-primary" aria-hidden="true" />
+              <h3 className="font-heading font-medium">
                 {currentConversationId 
                   ? conversations.find(c => c.id === currentConversationId)?.title || 'Conversation'
                   : 'New Conversation'}
@@ -290,15 +292,16 @@ export default function DeltaIntelligence() {
                 variant="outline"
                 size="sm"
                 onClick={handleNewConversation}
-                className="h-9 px-2 sm:px-3"
+                className="h-9 px-2 sm:px-3 focus-ring"
+                aria-label="Start new conversation"
               >
-                <Plus className="h-4 w-4 sm:mr-2" />
+                <Plus className="h-4 w-4 sm:mr-2" aria-hidden="true" />
                 <span className="hidden sm:inline">New</span>
               </Button>
               <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9 px-2 sm:px-3">
-                    <History className="h-4 w-4 sm:mr-2" />
+                  <Button variant="outline" size="sm" className="h-9 px-2 sm:px-3 focus-ring" aria-label="View conversation history">
+                    <History className="h-4 w-4 sm:mr-2" aria-hidden="true" />
                     <span className="hidden sm:inline">History</span>
                     {conversations.length > 0 && (
                       <Badge variant="secondary" className="ml-1 sm:ml-2 h-5 px-1.5 text-xs">
@@ -427,37 +430,37 @@ export default function DeltaIntelligence() {
 
         {/* Simplified Info Section */}
         <div className="grid md:grid-cols-2 gap-6">
-          <Card className="field-card border-2 hover-lift transition-all">
+          <AnimatedCard delay={100} className="border-2">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg font-heading flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" aria-hidden="true" />
                 Knowledge Base
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-start gap-2">
-                <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
                 <p className="text-sm text-muted-foreground">LSU AgCenter production recommendations</p>
               </div>
               <div className="flex items-start gap-2">
-                <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
                 <p className="text-sm text-muted-foreground">Louisiana-proven crop varieties & soil management</p>
               </div>
               <div className="flex items-start gap-2">
-                <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
                 <p className="text-sm text-muted-foreground">Delta-specific pests, diseases & weather patterns</p>
               </div>
               <div className="flex items-start gap-2">
-                <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
                 <p className="text-sm text-muted-foreground">Your personal field data & assessment history</p>
               </div>
             </CardContent>
-          </Card>
+          </AnimatedCard>
 
-          <Card className="field-card border-2 hover-lift transition-all bg-gradient-to-br from-green-500/5 to-emerald-500/5">
+          <AnimatedCard delay={200} className="border-2 bg-gradient-to-br from-green-500/5 to-emerald-500/5">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <HelpCircle className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-lg font-heading flex items-center gap-2">
+                <HelpCircle className="h-5 w-5 text-health-good" aria-hidden="true" />
                 Example Questions
               </CardTitle>
             </CardHeader>
@@ -475,7 +478,7 @@ export default function DeltaIntelligence() {
                 🌾 "Should I plant cotton after May floods?"
               </p>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         </div>
       </div>
     </div>

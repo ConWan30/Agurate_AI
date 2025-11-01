@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingState } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,7 +92,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Loading profile...</p>
+        <LoadingState message="Loading profile..." />
       </div>
     );
   }
@@ -107,7 +109,7 @@ export default function Profile() {
         }}
       >
         <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+          <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
             Profile Settings
           </h1>
           <p className="text-white/90 text-base md:text-lg max-w-2xl">
@@ -118,14 +120,14 @@ export default function Profile() {
       </div>
 
       <div className="max-w-2xl mx-auto space-y-8">
-        <Card className="field-card">
+        <AnimatedCard>
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-primary/10">
-                <User className="h-8 w-8 text-primary" />
+                <User className="h-8 w-8 text-primary" aria-hidden="true" />
               </div>
               <div>
-                <CardTitle>Account Information</CardTitle>
+                <CardTitle className="font-heading">Account Information</CardTitle>
                 <CardDescription>Update your personal details</CardDescription>
               </div>
             </div>
@@ -178,16 +180,16 @@ export default function Profile() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={saving}>
+              <Button type="submit" className="w-full focus-ring" disabled={saving}>
                 {saving ? "Saving..." : "Save Changes"}
               </Button>
             </form>
           </CardContent>
-        </Card>
+        </AnimatedCard>
 
-        <Card className="field-card">
+        <AnimatedCard delay={100}>
           <CardHeader>
-            <CardTitle>About AgurateAI</CardTitle>
+            <CardTitle className="font-heading">About AgurateAI</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>
@@ -200,7 +202,7 @@ export default function Profile() {
               <strong>Version:</strong> 1.0.0 (MVP)
             </p>
           </CardContent>
-        </Card>
+        </AnimatedCard>
       </div>
     </div>
   );

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingState } from "@/components/ui/loading-state";
+import { AgriculturalBadge } from "@/components/ui/agricultural-badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -200,7 +203,7 @@ export default function Dashboard() {
               variant="secondary" 
               size="sm" 
               onClick={() => setShowTutorial(true)}
-              className="gap-2 min-h-[44px] bg-white/20 hover:bg-white/30 backdrop-blur-sm border-white/30"
+              className="gap-2 min-h-[44px] bg-white/20 hover:bg-white/30 backdrop-blur-sm border-white/30 focus-ring"
               aria-label="Open interactive tutorial"
             >
               <Lightbulb className="h-4 w-4" aria-hidden="true" />
@@ -229,19 +232,19 @@ export default function Dashboard() {
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {/* 1. AI Crop Scanner */}
-            <Link to="/upload" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/upload" className="group focus-ring rounded-xl">
+              <AnimatedCard hover className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Scan className="h-6 w-6 text-white" />
+                    <Scan className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">AI Crop Scanner</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     Instant 95%+ accurate health analysis
                   </p>
-                  <Badge variant="default" className="text-xs">Core</Badge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 2. Predictive Analytics */}
@@ -598,25 +601,25 @@ export default function Dashboard() {
                           {getStressIcon(assessment.stress_level)}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-display font-bold text-xl mb-1 group-hover:text-primary transition-colors">{assessment.field.name}</h3>
+                          <h3 className="font-heading font-bold text-xl mb-1 group-hover:text-primary transition-colors">{assessment.field.name}</h3>
                           <p className="text-sm text-muted-foreground capitalize">
-                            {assessment.field.crop_type} • {format(new Date(assessment.created_at), "MMM d, yyyy")}
+                            {assessment.field.crop_type} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy")}</time>
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-6">
                         <div className="text-right">
-                          <p className="text-3xl font-display font-bold text-primary">
+                          <p className="text-3xl font-mono font-bold text-primary">
                             <AnimatedCounter value={Math.round((assessment.health_score || 0) * 100)} suffix="%" />
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">Health Score</p>
                         </div>
-                        <Badge 
-                          variant={getStressBadgeVariant(assessment.stress_level)}
-                          className={`${getStressBadgeClass(assessment.stress_level)} text-base px-4 py-2 font-semibold`}
+                        <AgriculturalBadge
+                          type={assessment.stress_level?.toLowerCase() === 'healthy' ? 'healthy' : assessment.stress_level?.toLowerCase() === 'moderate' ? 'moderate' : 'severe'}
+                          className="text-base px-4 py-2 font-semibold"
                         >
                           {assessment.stress_level.charAt(0).toUpperCase() + assessment.stress_level.slice(1)}
-                        </Badge>
+                        </AgriculturalBadge>
                       </div>
                     </div>
                   </CardContent>

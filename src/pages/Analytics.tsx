@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingState } from "@/components/ui/loading-state";
+import { AgriculturalBadge } from "@/components/ui/agricultural-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, TrendingUp, Activity, Droplets } from "lucide-react";
@@ -154,9 +157,9 @@ export default function Analytics() {
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-3">
             <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm">
-              <BarChart3 className="h-6 w-6 text-white" />
+              <BarChart3 className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-white">
+            <h1 className="text-3xl md:text-4xl font-heading font-bold text-white">
               Advanced Analytics
             </h1>
           </div>
@@ -170,23 +173,23 @@ export default function Analytics() {
       {/* Analytics Tabs */}
       <Tabs defaultValue="trends" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto gap-2 bg-muted/50 p-2">
-          <TabsTrigger value="trends" className="gap-2 data-[state=active]:gradient-delta data-[state=active]:text-white">
-            <TrendingUp className="h-4 w-4" />
+          <TabsTrigger value="trends" className="gap-2 data-[state=active]:gradient-delta data-[state=active]:text-white focus-ring">
+            <TrendingUp className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">Health Trends</span>
             <span className="sm:hidden">Trends</span>
           </TabsTrigger>
-          <TabsTrigger value="yield" className="gap-2 data-[state=active]:gradient-harvest data-[state=active]:text-white">
-            <Activity className="h-4 w-4" />
+          <TabsTrigger value="yield" className="gap-2 data-[state=active]:gradient-harvest data-[state=active]:text-white focus-ring">
+            <Activity className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">Yield Forecast</span>
             <span className="sm:hidden">Yield</span>
           </TabsTrigger>
-          <TabsTrigger value="comparison" className="gap-2 data-[state=active]:gradient-sky data-[state=active]:text-white">
-            <BarChart3 className="h-4 w-4" />
+          <TabsTrigger value="comparison" className="gap-2 data-[state=active]:gradient-sky data-[state=active]:text-white focus-ring">
+            <BarChart3 className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">Field Compare</span>
             <span className="sm:hidden">Compare</span>
           </TabsTrigger>
-          <TabsTrigger value="weather" className="gap-2 data-[state=active]:gradient-earth data-[state=active]:text-white">
-            <Droplets className="h-4 w-4" />
+          <TabsTrigger value="weather" className="gap-2 data-[state=active]:gradient-earth data-[state=active]:text-white focus-ring">
+            <Droplets className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">Weather Impact</span>
             <span className="sm:hidden">Weather</span>
           </TabsTrigger>
@@ -194,9 +197,9 @@ export default function Analytics() {
 
         {/* Time-series Health Trends */}
         <TabsContent value="trends" className="space-y-6">
-          <Card className="field-card">
+          <AnimatedCard>
             <CardHeader>
-              <CardTitle className="font-display">Crop Health Over Time</CardTitle>
+              <CardTitle className="font-heading">Crop Health Over Time</CardTitle>
               <CardDescription>30-day rolling health score analysis</CardDescription>
             </CardHeader>
             <CardContent>
@@ -224,20 +227,20 @@ export default function Analytics() {
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         </TabsContent>
 
         {/* Yield Predictions */}
         <TabsContent value="yield" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
-            {fields.map((field) => (
-              <Card key={field.id} className="field-card border-2 hover:border-primary/50 transition-colors">
+            {fields.map((field, idx) => (
+              <AnimatedCard key={field.id} delay={idx * 100} className="border-2 hover:border-primary/50">
                 <CardHeader>
-                  <CardTitle className="font-display flex items-center justify-between">
+                  <CardTitle className="font-heading flex items-center justify-between">
                     {field.name}
-                    <Badge variant={field.avgHealth > 80 ? "default" : field.avgHealth > 60 ? "outline" : "destructive"}>
+                    <AgriculturalBadge type={field.avgHealth > 80 ? "healthy" : field.avgHealth > 60 ? "moderate" : "severe"}>
                       {field.avgHealth}% Health
-                    </Badge>
+                    </AgriculturalBadge>
                   </CardTitle>
                   <CardDescription className="capitalize">{field.crop_type}</CardDescription>
                 </CardHeader>
@@ -252,8 +255,8 @@ export default function Analytics() {
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Trend</p>
                       <div className="flex items-center gap-2">
-                        <TrendingUp className={`h-5 w-5 ${field.trend >= 0 ? 'text-success' : 'text-destructive'}`} />
-                        <p className={`text-2xl font-bold ${field.trend >= 0 ? 'text-success' : 'text-destructive'}`}>
+                        <TrendingUp className={`h-5 w-5 ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`} aria-hidden="true" />
+                        <p className={`text-2xl font-mono font-bold ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`}>
                           {field.trend >= 0 ? '+' : ''}{field.trend}%
                         </p>
                       </div>
@@ -263,16 +266,16 @@ export default function Analytics() {
                     <p className="text-sm text-muted-foreground">Based on AI analysis of current health, weather patterns, and historical data</p>
                   </div>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             ))}
           </div>
         </TabsContent>
 
         {/* Field Comparison */}
         <TabsContent value="comparison" className="space-y-6">
-          <Card className="field-card">
+          <AnimatedCard>
             <CardHeader>
-              <CardTitle className="font-display">Multi-Field Performance</CardTitle>
+              <CardTitle className="font-heading">Multi-Field Performance</CardTitle>
               <CardDescription>Compare health scores across all registered fields</CardDescription>
             </CardHeader>
             <CardContent>
@@ -287,14 +290,14 @@ export default function Analytics() {
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         </TabsContent>
 
         {/* Weather Impact */}
         <TabsContent value="weather" className="space-y-6">
-          <Card className="field-card">
+          <AnimatedCard>
             <CardHeader>
-              <CardTitle className="font-display">Weather Correlation Analysis</CardTitle>
+              <CardTitle className="font-heading">Weather Correlation Analysis</CardTitle>
               <CardDescription>Health score vs. temperature & precipitation</CardDescription>
             </CardHeader>
             <CardContent>
@@ -336,7 +339,7 @@ export default function Analytics() {
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         </TabsContent>
       </Tabs>
     </div>
