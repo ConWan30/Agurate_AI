@@ -17,6 +17,7 @@ import { CooperativeInviteDialog } from '@/components/CooperativeInviteDialog';
 import { CommunityInsightsCard } from '@/components/CommunityInsightsCard';
 import { BestPractice } from '@/types/enhanced-features';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TutorialTooltip from '@/components/TutorialTooltip';
 import {
   Select,
   SelectContent,
@@ -192,7 +193,17 @@ export default function Cooperatives() {
 
   return (
     <div className="space-y-8">
-      <div 
+      <TutorialTooltip
+        steps={[
+          { id: "welcome", title: "Welcome to Cooperatives!", content: "Join or create farming networks to share insights with neighboring farms", position: "bottom" },
+          { id: "create", title: "Create Cooperative", content: "Start your own multi-farm network for collaborative intelligence", position: "bottom" },
+          { id: "stats", title: "View Stats", content: "See aggregate health data, total acreage, and member insights", position: "bottom" },
+          { id: "insights", title: "Community Insights", content: "Access shared best practices and early disease outbreak warnings", position: "bottom" },
+          { id: "invite", title: "Invite Members", content: "Grow your cooperative with email invitations for better analytics", position: "bottom" }
+        ]}
+        storageKey="tutorial-cooperatives-shown"
+      />
+      <div
         className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(45, 106, 79, 0.92) 0%, rgba(27, 64, 48, 0.88) 100%), url(${bgCooperativeCommunity})`,

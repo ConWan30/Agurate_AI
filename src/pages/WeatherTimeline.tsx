@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { Cloud, CloudRain, Sun, Wind, Droplets, AlertTriangle, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import TutorialTooltip from '@/components/TutorialTooltip';
 import bgWeatherStation from "@/assets/bg-weather-station.jpg";
 
 interface Assessment {
@@ -109,8 +110,17 @@ export default function WeatherTimeline() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
+      <TutorialTooltip
+        steps={[
+          { id: "welcome", title: "Weather Timeline", content: "Visualize how weather impacts crop health over 30 days", position: "bottom" },
+          { id: "chart", title: "Health & Weather Chart", content: "Green line = crop health, Blue/Red = temperature and rainfall trends", position: "bottom" },
+          { id: "events", title: "Weather Events", content: "See correlations between weather events and health drops", position: "bottom" },
+          { id: "assessments", title: "Recent Assessments", content: "Quick access to your scan history with GPS tags", position: "bottom" }
+        ]}
+        storageKey="tutorial-weather-timeline-shown"
+      />
       {/* Hero Header */}
-      <div 
+      <div
         className="py-12 mb-8 relative overflow-hidden"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(71, 85, 105, 0.92) 0%, rgba(51, 65, 85, 0.88) 100%), url(${bgWeatherStation})`,

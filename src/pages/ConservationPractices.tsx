@@ -11,6 +11,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Sprout, TrendingUp, DollarSign } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import TutorialTooltip from '@/components/TutorialTooltip';
 import bgHandsSoil from '@/assets/bg-hands-soil.jpg';
 import { ConservationPredictionCard } from '@/components/ConservationPredictionCard';
 import { ConservationPrediction } from '@/types/enhanced-features';
@@ -100,8 +101,17 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
 
   return (
     <div className="min-h-screen">
+      <TutorialTooltip
+        steps={[
+          { id: "welcome", title: "Conservation Practices", content: "Document conservation practices for USDA compliance and ROI tracking", position: "bottom" },
+          { id: "delta-ai", title: "Delta AI Assistant", content: "Use conversational form for easy documentation of your practices", position: "bottom" },
+          { id: "predictions", title: "Predictive Analytics", content: "See future savings and environmental impact from conservation", position: "bottom" },
+          { id: "field-tracking", title: "Field-by-Field", content: "Monitor practices and performance for each field independently", position: "bottom" }
+        ]}
+        storageKey="tutorial-conservation-shown"
+      />
       {/* Hero Section */}
-      <div 
+      <div
         className="relative h-[400px] bg-cover bg-center"
         style={{ backgroundImage: `url(${bgHandsSoil})` }}
       >

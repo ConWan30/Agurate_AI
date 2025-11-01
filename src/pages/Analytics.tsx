@@ -9,6 +9,7 @@ import { BarChart3, TrendingUp, Activity, Droplets } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { format, subDays } from "date-fns";
+import TutorialTooltip from "@/components/TutorialTooltip";
 import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
 
 interface FieldData {
@@ -145,8 +146,17 @@ export default function Analytics() {
 
   return (
     <div className="space-y-6 pb-8">
+      <TutorialTooltip
+        steps={[
+          { id: "welcome", title: "Your Farming Dashboard", content: "Track performance across all fields with comprehensive analytics", position: "bottom" },
+          { id: "comparison", title: "Field Comparison", content: "Identify which fields perform best and which need attention", position: "bottom" },
+          { id: "treatment", title: "Treatment Effectiveness", content: "Measure ROI on your interventions and optimize spending", position: "bottom" },
+          { id: "export", title: "Export Reports", content: "Download data for insurance claims or USDA compliance", position: "bottom" }
+        ]}
+        storageKey="tutorial-analytics-shown"
+      />
       {/* Hero Header */}
-      <div 
+      <div
         className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(45, 106, 79, 0.90) 0%, rgba(27, 64, 48, 0.85) 100%), url(${bgFieldAerial})`,

@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, GraduationCap, BookOpen } from 'lucide-react';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { EmptyState } from '@/components/ui/empty-state';
+import TutorialTooltip from '@/components/TutorialTooltip';
 import bgLsuResearch from '@/assets/bg-lsu-research.jpg';
 
 export default function LSUResearchers() {
@@ -56,8 +57,17 @@ export default function LSUResearchers() {
 
   return (
     <div className="space-y-8">
+      <TutorialTooltip
+        steps={[
+          { id: "welcome", title: "LSU AgCenter Experts", content: "Connect with Louisiana agricultural experts for specialized support", position: "bottom" },
+          { id: "browse", title: "Browse Researchers", content: "Filter by expertise area (rice, soybeans, pests, soil science)", position: "bottom" },
+          { id: "ask", title: "Ask Questions", content: "Submit inquiries directly to experts with your field photos", position: "bottom" },
+          { id: "publications", title: "Research Library", content: "Access LSU studies relevant to your crops and region", position: "bottom" }
+        ]}
+        storageKey="tutorial-lsu-researchers-shown"
+      />
       {/* Header */}
-      <div 
+      <div
         className="relative overflow-hidden rounded-2xl p-8 text-white shadow-glow"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(16, 185, 129, 0.92) 0%, rgba(5, 150, 105, 0.88) 100%), url(${bgLsuResearch})`,

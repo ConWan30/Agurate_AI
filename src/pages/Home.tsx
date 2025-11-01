@@ -4,6 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { AgriculturalBadge } from "@/components/ui/agricultural-badge";
 import { Link } from "react-router-dom";
 import { BetaCountdown } from "@/components/BetaCountdown";
+import { TestimonialCard } from "@/components/TestimonialCard";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Sprout, 
   Brain, 
@@ -41,6 +44,19 @@ export default function Home() {
   const { ref: featuresRef, isIntersecting: featuresVisible } = useIntersectionObserver({ threshold: 0.1 });
   const { ref: benefitsRef, isIntersecting: benefitsVisible } = useIntersectionObserver({ threshold: 0.1 });
   const { ref: testimonialsRef, isIntersecting: testimonialsVisible } = useIntersectionObserver({ threshold: 0.1 });
+
+  const { data: dbTestimonials } = useQuery({
+    queryKey: ['testimonials'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('farmer_testimonials')
+        .select('*')
+        .eq('approved', true)
+        .order('created_at', { ascending: false })
+        .limit(3);
+      return data || [];
+    }
+  });
 
   const features = [
     {
@@ -478,27 +494,39 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <Card 
-                key={index}
-                className={`border-2 hover:border-primary transition-all duration-500 hover-lift ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <CardContent className="p-8">
-                  <Quote className="h-10 w-10 text-primary mb-4 opacity-50" aria-hidden="true" />
-                  <p className="text-muted-foreground mb-6 leading-relaxed italic">"{testimonial.quote}"</p>
-                  <div className="flex items-center justify-between pt-4 border-t">
-                    <div>
-                      <p className="font-bold">{testimonial.author}</p>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+            {dbTestimonials && dbTestimonials.length > 0 ? (
+              dbTestimonials.map((testimonial, index) => (
+                <div 
+                  key={testimonial.id}
+                  className={`transition-all duration-500 ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <TestimonialCard testimonial={testimonial} />
+                </div>
+              ))
+            ) : (
+              testimonials.map((testimonial, index) => (
+                <Card 
+                  key={index}
+                  className={`border-2 hover:border-primary transition-all duration-500 hover-lift ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <CardContent className="p-8">
+                    <Quote className="h-10 w-10 text-primary mb-4 opacity-50" aria-hidden="true" />
+                    <p className="text-muted-foreground mb-6 leading-relaxed italic">"{testimonial.quote}"</p>
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <div>
+                        <p className="font-bold">{testimonial.author}</p>
+                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                      </div>
+                      <Badge variant="outline" className="text-success border-success">
+                        {testimonial.stat}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className="text-success border-success">
-                      {testimonial.stat}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </section>

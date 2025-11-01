@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Scan, TrendingUp, Brain, FileText, CheckCircle2, ArrowRight, X, AlertTriangle, Sprout, Cloud, Zap, Target, Compass, MapPin } from 'lucide-react';
+import { Scan, TrendingUp, Brain, FileText, CheckCircle2, ArrowRight, X, AlertTriangle, Sprout, Cloud, Zap, Target, Compass, MapPin, Users, Leaf, GraduationCap, BarChart3 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useTutorialTracking } from '@/hooks/use-tutorial-tracking';
 
 interface InteractiveTutorialProps {
   open: boolean;
@@ -16,7 +19,17 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
   const [step, setStep] = useState(0);
   const [scanProgress, setScanProgress] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [startTime, setStartTime] = useState(Date.now());
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const { trackEvent } = useTutorialTracking('interactive');
+
+  useEffect(() => {
+    if (open) {
+      trackEvent('welcome', 'started');
+      setStartTime(Date.now());
+    }
+  }, [open]);
 
   // Simulate scanning animation
   useEffect(() => {
@@ -420,6 +433,173 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </div>
         </div>
       ),
+      action: 'Next: Field Maps'
+    },
+    {
+      icon: MapPin,
+      title: 'Core Feature #5: Interactive Field Maps',
+      description: 'Visualize crop health across your entire operation',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Every assessment James makes is <span className="font-bold">GPS-tagged automatically</span>, 
+            creating a living map of his 400-acre operation.
+          </p>
+          <Card className="border-primary/30 bg-gradient-to-br from-green-500/5 to-blue-500/5">
+            <CardContent className="p-4 space-y-3">
+              <div className="grid grid-cols-3 gap-2">
+                <div className="text-center p-2 bg-green-500/10 rounded border border-green-500/30">
+                  <MapPin className="h-5 w-5 text-green-600 mx-auto mb-1" />
+                  <p className="text-xs font-medium">Healthy: 72%</p>
+                </div>
+                <div className="text-center p-2 bg-yellow-500/10 rounded border border-yellow-500/30">
+                  <MapPin className="h-5 w-5 text-yellow-600 mx-auto mb-1" />
+                  <p className="text-xs font-medium">Moderate: 23%</p>
+                </div>
+                <div className="text-center p-2 bg-red-500/10 rounded border border-red-500/30">
+                  <MapPin className="h-5 w-5 text-red-600 mx-auto mb-1" />
+                  <p className="text-xs font-medium">Severe: 5%</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">Heat map shows Section B needs immediate attention</p>
+            </CardContent>
+          </Card>
+        </div>
+      ),
+      action: 'Next: Weather Timeline'
+    },
+    {
+      icon: Cloud,
+      title: 'Core Feature #6: Weather Timeline',
+      description: 'Understand environmental impact on crop health',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            AgurateAI correlates <span className="font-bold">every assessment with weather patterns</span>, 
+            revealing cause-and-effect relationships James never saw before.
+          </p>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2 p-2 bg-muted rounded">
+              <span>June 8: Heat wave (98°F)</span>
+              <ArrowRight className="h-4 w-4" />
+              <span className="text-destructive">Health dropped 32%</span>
+            </div>
+            <div className="flex items-center gap-2 p-2 bg-muted rounded">
+              <span>June 15: Rainfall (2.3")</span>
+              <ArrowRight className="h-4 w-4" />
+              <span className="text-primary">Health recovered 18%</span>
+            </div>
+          </div>
+        </div>
+      ),
+      action: 'Next: Cooperatives'
+    },
+    {
+      icon: Users,
+      title: 'Core Feature #7: Community Intelligence',
+      description: 'Shared wisdom across Louisiana Delta farms',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            James joins <span className="font-bold">Delta Farmers Co-op</span> with 24 neighboring farms. 
+            Anonymous data sharing creates early warning systems.
+          </p>
+          <Card className="border-primary/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5">
+            <CardContent className="p-4">
+              <p className="font-semibold mb-2 text-sm">🚨 Early Outbreak Alert:</p>
+              <p className="text-xs text-muted-foreground">
+                "3 farms within 10 miles detected <span className="font-bold text-destructive">rice blast fungus</span>. 
+                Check your fields immediately. LSU recommends preventative fungicide application."
+              </p>
+              <Badge className="mt-2 text-xs">Saved James from 40% yield loss</Badge>
+            </CardContent>
+          </Card>
+        </div>
+      ),
+      action: 'Next: Conservation'
+    },
+    {
+      icon: Leaf,
+      title: 'Core Feature #8: Conservation Tracking',
+      description: 'Sustainable farming meets profitability',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            James tracks his <span className="font-bold">conservation practices</span> for USDA compliance 
+            while AgurateAI predicts cost savings over 5 years.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="border-green-500/30 bg-green-500/5">
+              <CardContent className="p-3 text-center">
+                <p className="text-xs text-muted-foreground mb-1">No-Till + Cover Crops</p>
+                <p className="text-2xl font-bold text-green-600">$38/acre</p>
+                <p className="text-xs text-muted-foreground">Year 1 savings</p>
+              </CardContent>
+            </Card>
+            <Card className="border-green-500/30 bg-green-500/5">
+              <CardContent className="p-3 text-center">
+                <p className="text-xs text-muted-foreground mb-1">5-Year Total</p>
+                <p className="text-2xl font-bold text-green-600">$15,200</p>
+                <p className="text-xs text-muted-foreground">Projected savings</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      ),
+      action: 'Next: LSU Experts'
+    },
+    {
+      icon: GraduationCap,
+      title: 'Core Feature #9: LSU AgCenter Access',
+      description: 'Direct line to Louisiana agricultural experts',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            When AI isn't enough, James connects directly with <span className="font-bold">LSU AgCenter researchers</span> 
+            specializing in Delta crops.
+          </p>
+          <Card className="border-primary/30 bg-gradient-to-br from-blue-500/5 to-purple-500/5">
+            <CardContent className="p-4">
+              <p className="font-semibold mb-2 text-sm">🎓 Expert Available:</p>
+              <p className="text-sm font-medium mb-1">Dr. Sarah Martinez</p>
+              <p className="text-xs text-muted-foreground">
+                Rice Pathology Specialist • 15 years Louisiana Delta research
+              </p>
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                "I can review your field photos and provide customized treatment plans 
+                based on your specific soil conditions and planting date."
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      ),
+      action: 'Next: Analytics'
+    },
+    {
+      icon: BarChart3,
+      title: 'Core Feature #10: Comprehensive Analytics',
+      description: 'Data-driven insights for better decisions',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            James reviews his <span className="font-bold">complete farming dashboard</span>, 
+            tracking field performance, treatment effectiveness, and ROI.
+          </p>
+          <div className="space-y-2">
+            <div className="p-3 bg-primary/5 rounded border border-primary/20">
+              <p className="text-sm font-semibold mb-1">This Season's Impact:</p>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div><span className="font-bold">127</span> assessments</div>
+                <div><span className="font-bold">$8,247</span> saved</div>
+                <div><span className="font-bold">4</span> outbreaks prevented</div>
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground italic">
+            "AgurateAI paid for itself in the first month." - James Collins
+          </p>
+        </div>
+      ),
       action: 'Start Using AgurateAI'
     }
   ];
@@ -428,106 +608,88 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
   const Icon = currentStep.icon;
 
   const handleNext = () => {
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    trackEvent(`step-${step}`, 'completed', timeSpent);
+    
     if (step < steps.length - 1) {
       setStep(step + 1);
+      setStartTime(Date.now());
     } else {
+      trackEvent('all', 'completed', timeSpent);
       onOpenChange(false);
       setStep(0);
     }
   };
 
   const handleSkip = () => {
+    trackEvent(`step-${step}`, 'skipped');
     onOpenChange(false);
     setStep(0);
   };
 
+  const tutorialContent = (
+    <>
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="relative h-14 w-14 rounded-xl gradient-delta shadow-glow flex items-center justify-center">
+            <Icon className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">{currentStep.title}</h2>
+            <p className="text-sm text-muted-foreground mt-1">{currentStep.description}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6">{currentStep.content}</div>
+
+      <div className="space-y-3 mb-6">
+        <div className="flex items-center justify-center gap-2">
+          {steps.map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-2 rounded-full transition-all ${
+                idx === step ? 'w-12 bg-primary' : idx < step ? 'w-8 bg-primary/60' : 'w-6 bg-muted'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-4 border-t">
+        <Button variant="ghost" onClick={handleSkip}>
+          <X className="h-4 w-4 mr-2" />
+          {step === steps.length - 1 ? 'Close' : 'Skip'}
+        </Button>
+        <div className="flex gap-2">
+          {step > 0 && (
+            <Button variant="outline" onClick={() => setStep(step - 1)}>
+              ← Back
+            </Button>
+          )}
+          <Button onClick={handleNext} className="gradient-delta text-white">
+            {currentStep.action}
+            {step < steps.length - 1 && <ArrowRight className="h-4 w-4 ml-2" />}
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent className="max-h-[90vh] px-4 pb-4">
+          {tutorialContent}
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative h-14 w-14 rounded-xl gradient-delta shadow-glow flex items-center justify-center animate-fade-in">
-                <Icon className="h-7 w-7 text-white" />
-                {/* Ambient glow animation */}
-                <div className="absolute inset-0 rounded-xl bg-primary/20 animate-pulse" />
-              </div>
-              <div className="animate-fade-in stagger-1">
-                <DialogTitle className="text-2xl">{currentStep.title}</DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">{currentStep.description}</p>
-              </div>
-            </div>
-          </div>
-        </DialogHeader>
-
-        <div className="mt-6 animate-fade-in stagger-2">
-          {currentStep.content}
-        </div>
-
-        {/* Enhanced Progress Indicators with Labels */}
-        <div className="mt-8 space-y-3">
-          <div className="flex items-center justify-center gap-2">
-            {steps.map((stepItem, idx) => (
-              <div
-                key={idx}
-                className={`relative h-2 rounded-full transition-all duration-500 ${
-                  idx === step 
-                    ? 'w-12 bg-primary shadow-glow' 
-                    : idx < step 
-                    ? 'w-8 bg-primary/60' 
-                    : 'w-6 bg-muted'
-                }`}
-              >
-                {idx === step && (
-                  <div className="absolute inset-0 rounded-full bg-primary animate-pulse" />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <span className={step >= 0 ? 'text-primary font-medium' : ''}>Welcome</span>
-            <span>→</span>
-            <span className={step >= 1 ? 'text-primary font-medium' : ''}>Scanner</span>
-            <span>→</span>
-            <span className={step >= 2 ? 'text-primary font-medium' : ''}>Predictions</span>
-            <span>→</span>
-            <span className={step >= 3 ? 'text-primary font-medium' : ''}>AI Advisor</span>
-            <span>→</span>
-            <span className={step >= 4 ? 'text-primary font-medium' : ''}>Insurance</span>
-            <span>→</span>
-            <span className={step >= 5 ? 'text-primary font-medium' : ''}>Impact</span>
-          </div>
-        </div>
-
-        {/* Enhanced Actions */}
-        <div className="flex items-center justify-between mt-6 pt-6 border-t">
-          <Button 
-            variant="ghost" 
-            onClick={handleSkip} 
-            className="gap-2 hover:text-destructive transition-colors"
-          >
-            <X className="h-4 w-4" />
-            {step === steps.length - 1 ? 'Close' : 'Skip Tour'}
-          </Button>
-          <div className="flex items-center gap-3">
-            {step > 0 && (
-              <Button 
-                variant="outline" 
-                onClick={() => setStep(step - 1)}
-                className="gap-2 hover-lift"
-              >
-                ← Back
-              </Button>
-            )}
-            <Button 
-              onClick={handleNext} 
-              className="gap-2 gradient-delta text-white hover-lift shadow-field"
-            >
-              {currentStep.action}
-              {step < steps.length - 1 && <ArrowRight className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
+        {tutorialContent}
       </DialogContent>
     </Dialog>
   );
