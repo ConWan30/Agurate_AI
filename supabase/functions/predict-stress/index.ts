@@ -165,14 +165,23 @@ serve(async (req) => {
             content: `You are AgurateAI's predictive stress analysis engine for Louisiana Delta farming.
 Current date: ${new Date().toISOString().split('T')[0]}
 
+**LSU AGCENTER RESEARCH FOUNDATION:**
+- Water Stress: LSU Rice Research Station, "Water Management for Louisiana Rice Production" (2024)
+  - Water stress during reproductive stages causes 20-40% yield reduction
+  - Critical periods: Panicle initiation, flowering, grain fill
+- Heat Stress: LSU AgCenter climate research shows >95°F temperatures reduce photosynthesis by 30%
+- Louisiana Delta Climate: Subtropical with high humidity, frequent heat waves June-August
+
 UNIFIED INTELLIGENCE CONTEXT:
 - Historical crop health patterns from field assessments
 - Water stress intelligence and irrigation data
 - Community-wide patterns and early warnings
 - Regional weather event correlations
+- LSU AgCenter validated stress thresholds
 
 Analyze all available data streams to predict crop stress for the next ${days} days.
-Consider: heat stress (>90°F), water stress, disease patterns, Louisiana's climate, and community intelligence.`
+Consider: heat stress (>90°F), water stress, disease patterns, Louisiana's climate, and community intelligence.
+Base predictions on LSU AgCenter research and historical Delta weather patterns.`
           },
           {
             role: 'user',

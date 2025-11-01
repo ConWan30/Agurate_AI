@@ -3,6 +3,9 @@ project_id = "rkfvefhjyuyhjmcljzev"
 [functions.analyze-crop]
 verify_jwt = true
 
+[functions.setup-demo-account]
+verify_jwt = false
+
 [functions.ar-analyze]
 verify_jwt = true
 
