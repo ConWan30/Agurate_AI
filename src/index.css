@@ -417,4 +417,34 @@ section {
     background-size: 200% 200%;
     animation: field-shimmer 8s ease infinite;
   }
+
+  /* Agricultural texture pattern (subtle) */
+  .agricultural-texture {
+    background-image: 
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 2px,
+        hsl(var(--primary) / 0.01) 2px,
+        hsl(var(--primary) / 0.01) 4px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        hsl(var(--primary) / 0.01) 2px,
+        hsl(var(--primary) / 0.01) 4px
+      );
+  }
+
+  /* Field row pattern (very subtle, like crop rows) */
+  .crop-rows {
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 20px,
+      hsl(var(--primary) / 0.02) 20px,
+      hsl(var(--primary) / 0.02) 21px
+    );
+  }
 }

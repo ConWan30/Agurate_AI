@@ -119,11 +119,11 @@ export default function Dashboard() {
     const normalized = stressLevel?.toLowerCase();
     switch (normalized) {
       case "healthy":
-        return <CheckCircle2 className="h-5 w-5 text-primary" />;
+        return <CheckCircle2 className="h-5 w-5 text-health-good" />;
       case "moderate":
-        return <AlertTriangle className="h-5 w-5 text-accent" />;
+        return <AlertTriangle className="h-5 w-5 text-health-moderate" />;
       case "severe":
-        return <AlertCircle className="h-5 w-5 text-destructive" />;
+        return <AlertCircle className="h-5 w-5 text-health-severe" />;
       default:
         return <CheckCircle2 className="h-5 w-5 text-muted-foreground" />;
     }
@@ -189,7 +189,7 @@ export default function Dashboard() {
               <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30 backdrop-blur-sm">
                 🌾 Morehouse Parish Precision Agriculture
               </Badge>
-              <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3 drop-shadow-lg">
+              <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3 drop-shadow-lg">
                 Welcome to Your Farm Dashboard
               </h1>
               <p className="text-white text-base md:text-lg max-w-2xl drop-shadow">
@@ -223,7 +223,7 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-display font-bold">Core Features</h2>
+              <h2 className="text-2xl font-heading font-bold">Core Features</h2>
               <p className="text-sm text-muted-foreground mt-1">Comprehensive AI-powered precision agriculture platform</p>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default function Dashboard() {
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
                     <Scan className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">AI Crop Scanner</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">AI Crop Scanner</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     Instant 95%+ accurate health analysis
                   </p>
