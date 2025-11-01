@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedCard } from "@/components/ui/animated-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -380,19 +381,23 @@ export default function Fields() {
           />
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {fields.map((field) => (
+            {fields.map((field, index) => (
               <SwipeableCard key={field.id}>
-                <Card className="field-card border-2">
+                <AnimatedCard 
+                  delay={index * 50}
+                  hover={true}
+                  className="border-2"
+                >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <img
                         src={cropIcons[field.crop_type]}
-                        alt={field.crop_type}
+                        alt={`${field.crop_type} crop icon`}
                         className="h-12 w-12 object-contain"
                       />
                       <div>
-                        <CardTitle className="text-xl">{field.name}</CardTitle>
+                        <CardTitle className="text-xl font-heading">{field.name}</CardTitle>
                         <CardDescription className="capitalize">
                           {field.crop_type}
                         </CardDescription>
@@ -403,6 +408,8 @@ export default function Fields() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleEdit(field)}
+                        aria-label={`Edit ${field.name}`}
+                        className="focus-ring"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -410,6 +417,8 @@ export default function Fields() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDelete(field.id)}
+                        aria-label={`Delete ${field.name}`}
+                        className="focus-ring"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -420,12 +429,12 @@ export default function Fields() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Acreage:</span>
-                      <span className="font-medium">{field.acreage} acres</span>
+                      <span className="font-mono font-medium">{field.acreage} acres</span>
                     </div>
                     {field.location_lat && field.location_lng && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
-                        <span className="font-medium text-xs">
+                        <span className="font-mono font-medium text-xs">
                           {field.location_lat.toFixed(4)}, {field.location_lng.toFixed(4)}
                         </span>
                       </div>
@@ -437,7 +446,7 @@ export default function Fields() {
                     )}
                   </div>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
               </SwipeableCard>
             ))}
           </div>

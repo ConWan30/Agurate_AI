@@ -335,6 +335,65 @@ section {
     @apply animate-shimmer;
   }
 
+  /* Hover scale (smooth interactive elements) */
+  .hover-scale {
+    @apply transition-transform duration-200 ease-out hover:scale-105;
+  }
+
+  /* Focus states (accessibility) */
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+
+  /* Bounce in animation (success states) */
+  .bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  @keyframes bounceIn {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Fade in animation */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Pulse gentle (loading indicators) */
+  .pulse-gentle {
+    animation: pulseGentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulseGentle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
   /* Stagger animation delays */
   .stagger-1 {
     animation-delay: 0.05s;
@@ -446,5 +505,12 @@ section {
       hsl(var(--primary) / 0.02) 20px,
       hsl(var(--primary) / 0.02) 21px
     );
+  }
+
+  /* Field boundary pattern (subtle grid) */
+  .field-boundary {
+    background-image: 
+      repeating-linear-gradient(0deg, hsl(var(--border) / 0.1) 0px, transparent 1px, transparent 20px),
+      repeating-linear-gradient(90deg, hsl(var(--border) / 0.1) 0px, transparent 1px, transparent 20px);
   }
 }

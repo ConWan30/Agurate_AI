@@ -30,6 +30,7 @@ import {
 import heroFields from "@/assets/hero-fields.jpg";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { AnimatedCard } from "@/components/ui/animated-card";
 import { TrustIndicators } from "@/components/TrustIndicators";
 import { LSUPartnershipSection } from "@/components/LSUPartnershipSection";
 import { ComparisonSection } from "@/components/ComparisonSection";
@@ -203,13 +204,22 @@ export default function Home() {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/auth">
-                <Button size="lg" className="w-full sm:w-auto bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 text-lg px-8 py-6 shadow-glow hover:shadow-field transition-all hover-lift">
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 text-lg px-8 py-6 shadow-glow hover:shadow-field transition-all hover-lift focus-ring"
+                  aria-label="Join AgurateAI Free Beta Program"
+                >
                   Join Free Beta
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </Link>
               <Link to="/how-it-works">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto glass border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 text-lg px-8 py-6">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="w-full sm:w-auto glass border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 text-lg px-8 py-6 focus-ring"
+                  aria-label="Learn more about AgurateAI"
+                >
                   Learn More
                 </Button>
               </Link>
@@ -276,19 +286,20 @@ export default function Home() {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Card 
+                <AnimatedCard 
                   key={index}
-                  className={`border-2 hover:border-primary transition-all duration-500 hover-lift group ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                  style={{ transitionDelay: `${index * 50}ms` }}
+                  delay={index * 50}
+                  hover={true}
+                  className="border-2"
                 >
                   <CardContent className="p-6">
                     <div className={`flex items-center justify-center h-14 w-14 rounded-2xl ${feature.color} shadow-glow mb-4 group-hover:scale-110 transition-transform duration-300`}>
                       <Icon className="h-7 w-7 text-primary-foreground" aria-hidden="true" />
                     </div>
-                    <h3 className="text-xl font-display font-bold mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
+                    <h3 className="text-xl font-heading font-bold mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                   </CardContent>
-                </Card>
+                </AnimatedCard>
               );
             })}
           </div>
