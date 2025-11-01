@@ -48,26 +48,26 @@ export function DetailedAnalysisTabs({
 }: DetailedAnalysisTabsProps) {
   return (
     <Tabs defaultValue="health" className="w-full">
-      <TabsList className="grid w-full grid-cols-5">
-        <TabsTrigger value="health">
-          <Heart className="h-4 w-4 mr-2" />
-          Health
+      <TabsList className="grid w-full grid-cols-5 gap-1 h-auto p-1">
+        <TabsTrigger value="health" className="flex-col gap-1 h-auto py-2">
+          <Heart className="h-4 w-4" />
+          <span className="text-xs">Health</span>
         </TabsTrigger>
-        <TabsTrigger value="diseases">
-          <Bug className="h-4 w-4 mr-2" />
-          Issues
+        <TabsTrigger value="diseases" className="flex-col gap-1 h-auto py-2">
+          <Bug className="h-4 w-4" />
+          <span className="text-xs">Issues</span>
         </TabsTrigger>
-        <TabsTrigger value="nutrients">
-          <Sprout className="h-4 w-4 mr-2" />
-          Nutrients
+        <TabsTrigger value="nutrients" className="flex-col gap-1 h-auto py-2">
+          <Sprout className="h-4 w-4" />
+          <span className="text-xs">Nutrients</span>
         </TabsTrigger>
-        <TabsTrigger value="growth">
-          <Leaf className="h-4 w-4 mr-2" />
-          Growth
+        <TabsTrigger value="growth" className="flex-col gap-1 h-auto py-2">
+          <Leaf className="h-4 w-4" />
+          <span className="text-xs">Growth</span>
         </TabsTrigger>
-        <TabsTrigger value="environment">
-          <Cloud className="h-4 w-4 mr-2" />
-          Environment
+        <TabsTrigger value="environment" className="flex-col gap-1 h-auto py-2">
+          <Cloud className="h-4 w-4" />
+          <span className="text-xs">Environment</span>
         </TabsTrigger>
       </TabsList>
 
