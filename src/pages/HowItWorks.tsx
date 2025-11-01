@@ -1,4 +1,4 @@
-import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap, ArrowRight, ArrowLeft, Database, GitBranch, Network } from 'lucide-react';
+import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap, ArrowRight, ArrowLeft, Database, GitBranch, Network, DollarSign, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MagneticButton } from '@/components/ui/magnetic-button';
@@ -90,6 +90,65 @@ export default function HowItWorks() {
       scenario: 'Historical analysis shows optimal planting window for your specific field',
       impact: 'Plant at peak time for soil/weather conditions',
       savings: '10-20% yield increase'
+    }
+  ];
+
+  const enhancedFeatures = [
+    {
+      icon: DollarSign,
+      title: 'Automated ROI Calculator',
+      description: 'AI calculates real-time return on investment for every recommendation, factoring in treatment costs, yield protection, and market prices',
+      benefit: '$8K-20K annual savings documented',
+      color: 'bg-green-500/10 text-green-700 border-green-500/20'
+    },
+    {
+      icon: Brain,
+      title: 'Daily AI Briefing',
+      description: 'Wake up to personalized field intelligence: overnight weather impacts, urgent actions needed, and 7-day stress forecasts delivered to your dashboard',
+      benefit: '10 minutes saved daily',
+      color: 'bg-blue-500/10 text-blue-700 border-blue-500/20'
+    },
+    {
+      icon: FileText,
+      title: 'Conversational Forms',
+      description: 'Just talk to your phone—AI extracts field data, planting dates, and crop varieties from natural conversation. Voice-to-data in seconds',
+      benefit: '80% faster data entry',
+      color: 'bg-purple-500/10 text-purple-700 border-purple-500/20'
+    },
+    {
+      icon: Cloud,
+      title: 'Water Stress Intelligence',
+      description: 'Predictive irrigation alerts using soil moisture patterns, weather forecasts, and crop-specific water needs. Prevent stress before it starts',
+      benefit: '25% water savings',
+      color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20'
+    },
+    {
+      icon: TrendingUp,
+      title: 'Variety Performance Tracking',
+      description: 'Compare rice, soybean, cotton, and corn varieties against LSU recommendations. AI matches your soil type and climate to top-performing cultivars',
+      benefit: '12-18% yield increase',
+      color: 'bg-orange-500/10 text-orange-700 border-orange-500/20'
+    },
+    {
+      icon: Network,
+      title: 'Community Intelligence',
+      description: 'Anonymous farmer network shares disease outbreaks, treatment successes, and yield trends. Early warnings when pests hit neighboring farms',
+      benefit: '3-7 day early alerts',
+      color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
+    },
+    {
+      icon: Layers,
+      title: 'Conservation Practice ROI',
+      description: 'Track cover crops, no-till, and precision fertilization impact on soil health, input costs, and yield. AI predicts long-term financial benefits',
+      benefit: '$40-120/acre savings',
+      color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'
+    },
+    {
+      icon: MapPin,
+      title: 'LSU Researcher Access',
+      description: 'AI matches your crop issue to the right LSU AgCenter specialist. Direct contact info for pathologists, soil scientists, and extension agents',
+      benefit: 'Expert help in <24hrs',
+      color: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20'
     }
   ];
 
@@ -355,6 +414,52 @@ export default function HowItWorks() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+        </section>
+
+        {/* Enhanced Features Showcase */}
+        <section className="space-y-8">
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+              <Sparkles className="h-3 w-3 mr-1" />
+              Enhanced Intelligence
+            </Badge>
+            <h2 className="text-4xl font-display font-bold">8 Game-Changing Features</h2>
+            <p className="text-lg text-muted-foreground">
+              Every feature designed to save Louisiana Delta farmers time, money, and stress
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {enhancedFeatures.map((feature, idx) => {
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
+              
+              return (
+                <Card 
+                  key={idx} 
+                  ref={ref}
+                  className={`field-card hover-lift border-2 ${hasIntersected ? 'animate-fade-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
+                >
+                  <CardHeader>
+                    <div className={`inline-flex h-12 w-12 rounded-xl ${feature.color} items-center justify-center mb-3`}>
+                      <feature.icon className="h-6 w-6" />
+                    </div>
+                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </p>
+                    <div className="pt-2 border-t">
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
+                        ✨ {feature.benefit}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </section>
 
