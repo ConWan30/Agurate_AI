@@ -107,13 +107,13 @@ export default function Tutorials() {
   };
 
   const startTutorial = (id: string, route?: string) => {
-    // Clear tutorial completion for replay
-    localStorage.removeItem(`tutorial-${id}-completed`);
-    
     if (id === 'interactive') {
       setShowInteractiveTutorial(true);
     } else if (route) {
-      navigate(route);
+      // Clear tutorial tooltip for destination page to trigger it
+      localStorage.removeItem(`tutorial-${route.replace('/', '')}-shown`);
+      // Navigate with tutorial state
+      navigate(route, { state: { startTutorial: true } });
     }
   };
 

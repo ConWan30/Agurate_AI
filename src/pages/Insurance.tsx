@@ -19,6 +19,7 @@ import bgCropDamage from "@/assets/bg-crop-damage.jpg";
 
 import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalForm";
 import { Sparkles } from "lucide-react";
+import TutorialTooltip from '@/components/TutorialTooltip';
 
 export default function Insurance() {
   const [open, setOpen] = useState(false);
@@ -133,11 +134,38 @@ export default function Insurance() {
     }
   };
 
+  const tutorialSteps = [
+    {
+      target: 'insurance-header',
+      id: 'header',
+      title: 'Step 1: Insurance Claims',
+      content: 'Document crop damage with GPS-stamped photos for faster insurance claims.',
+      position: 'bottom' as const,
+    },
+    {
+      target: 'create-claim',
+      id: 'create',
+      title: 'Step 2: Create Claim',
+      content: 'Click "Create Claim" to start documenting damage - link field assessments as evidence.',
+      position: 'bottom' as const,
+    },
+    {
+      target: 'claims-list',
+      id: 'list',
+      title: 'Step 3: Export & Submit',
+      content: 'Export claims to PDF with all evidence photos and GPS data for your adjuster!',
+      position: 'top' as const,
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-subtle pb-24">
+    <>
+      <TutorialTooltip steps={tutorialSteps} storageKey="insurance-tutorial-shown" />
+      <div className="min-h-screen bg-gradient-subtle pb-24">
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
         {/* Hero Header */}
         <div 
+          id="insurance-header"
           className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-delta-mist"
           style={{
             backgroundImage: `linear-gradient(135deg, rgba(185, 28, 28, 0.90) 0%, rgba(153, 27, 27, 0.88) 100%), url(${bgCropDamage})`,
@@ -364,6 +392,7 @@ export default function Insurance() {
           />
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

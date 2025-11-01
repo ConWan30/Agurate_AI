@@ -16,6 +16,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { DeltaChatInput } from '@/components/DeltaChatInput';
 import { PredictiveQuestions } from '@/components/PredictiveQuestions';
 import { gatherUnifiedContext, formatContextForAI, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
+import TutorialTooltip from '@/components/TutorialTooltip';
 
 export default function DeltaIntelligence() {
   const {
@@ -245,11 +246,45 @@ export default function DeltaIntelligence() {
     setIsHistoryOpen(false);
   };
 
+  const tutorialSteps = [
+    {
+      target: 'delta-header',
+      id: 'header',
+      title: 'Step 1: Your AI Advisor',
+      content: 'Delta Intelligence is your 24/7 Louisiana farming expert powered by LSU AgCenter research.',
+      position: 'bottom' as const,
+    },
+    {
+      target: 'predictive-questions',
+      id: 'questions',
+      title: 'Step 2: Quick Questions',
+      content: 'Click any suggested question for instant field-specific advice based on your data.',
+      position: 'top' as const,
+    },
+    {
+      target: 'chat-input',
+      id: 'chat',
+      title: 'Step 3: Ask Anything',
+      content: 'Type your farming questions and get LSU-backed recommendations tailored to Louisiana Delta!',
+      position: 'top' as const,
+    },
+    {
+      target: 'history-button',
+      id: 'history',
+      title: 'Step 4: Conversation History',
+      content: 'Review past conversations and keep track of all your farming insights.',
+      position: 'bottom' as const,
+    },
+  ];
+
   return (
-    <div className="min-h-screen pb-24">
+    <>
+      <TutorialTooltip steps={tutorialSteps} storageKey="delta-intelligence-tutorial-shown" />
+      <div className="min-h-screen pb-24">
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
         {/* Streamlined Hero Header with Background */}
         <div 
+          id="delta-header"
           className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-delta-mist"
           style={{
             backgroundImage: `linear-gradient(135deg, rgba(109, 40, 217, 0.92) 0%, rgba(79, 70, 229, 0.88) 100%), url(${bgSoybeanResearch})`,
@@ -482,6 +517,7 @@ export default function DeltaIntelligence() {
           </AnimatedCard>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -9,6 +9,7 @@ import { MapPin, Activity } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import FieldMapLeaflet from '@/components/FieldMapLeaflet';
 import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
+import TutorialTooltip from '@/components/TutorialTooltip';
 
 interface Field {
   id: string;
@@ -98,10 +99,37 @@ export default function FieldMap() {
     }
   };
 
+  const tutorialSteps = [
+    {
+      target: 'field-map-header',
+      id: 'header',
+      title: 'Step 1: Interactive Map',
+      content: 'Visualize all your fields and assessments on an interactive GPS map.',
+      position: 'bottom' as const,
+    },
+    {
+      target: 'map-view',
+      id: 'map',
+      title: 'Step 2: Color-Coded Health',
+      content: 'Click markers to see health scores - green (healthy), yellow (moderate), red (severe).',
+      position: 'top' as const,
+    },
+    {
+      target: 'field-stats',
+      id: 'stats',
+      title: 'Step 3: Field Stats',
+      content: 'View total acreage and assessment history for spatial insights!',
+      position: 'top' as const,
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-subtle pb-24">
+    <>
+      <TutorialTooltip steps={tutorialSteps} storageKey="field-map-tutorial-shown" />
+      <div className="min-h-screen bg-gradient-subtle pb-24">
       {/* Hero Header */}
       <div 
+        id="field-map-header"
         className="py-12 mb-8 relative overflow-hidden"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(22, 163, 74, 0.92) 0%, rgba(21, 128, 61, 0.88) 100%), url(${bgFieldAerial})`,
@@ -246,6 +274,7 @@ export default function FieldMap() {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -15,6 +15,7 @@ import { PredictiveModel } from '@/types/enhanced-features';
 import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
 import { EnhancedPageHeader } from '@/components/EnhancedPageHeader';
+import TutorialTooltip from '@/components/TutorialTooltip';
 
 interface Prediction {
   day: number;
@@ -156,16 +157,44 @@ export default function Predictions() {
     }
   };
 
+  const tutorialSteps = [
+    {
+      target: 'predictions-header',
+      id: 'header',
+      title: 'Step 1: 7-Day Predictions',
+      content: 'Get AI-powered stress predictions for the next 7 days based on weather and historical data.',
+      position: 'bottom' as const,
+    },
+    {
+      target: 'field-selector',
+      id: 'field-select',
+      title: 'Step 2: Enhanced Forecasts',
+      content: 'Select a field to see 30-day enhanced predictions with conservation impact analysis.',
+      position: 'bottom' as const,
+    },
+    {
+      target: 'prediction-cards',
+      id: 'predictions',
+      title: 'Step 3: Daily Breakdown',
+      content: 'Review daily risk levels and recommendations to take proactive action!',
+      position: 'top' as const,
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-subtle pb-24">
+    <>
+      <TutorialTooltip steps={tutorialSteps} storageKey="predictions-tutorial-shown" />
+      <div className="min-h-screen bg-gradient-subtle pb-24">
       {/* Enhanced Page Header */}
-      <EnhancedPageHeader
-        icon={TrendingUp}
-        badge={{ icon: Sparkles, text: "Unified AI Intelligence" }}
-        title="Predictive Analytics"
-        description="AI-powered forecasts combining crop analysis, weather patterns, conservation practices, and community intelligence for 7-30 day predictions"
-        gradient="delta"
-      />
+      <div id="predictions-header">
+        <EnhancedPageHeader
+          icon={TrendingUp}
+          badge={{ icon: Sparkles, text: "Unified AI Intelligence" }}
+          title="Predictive Analytics"
+          description="AI-powered forecasts combining crop analysis, weather patterns, conservation practices, and community intelligence for 7-30 day predictions"
+          gradient="delta"
+        />
+      </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-8">
 
@@ -217,11 +246,11 @@ export default function Predictions() {
         )}
 
         {/* 7-Day Stress Predictions */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Cloud className="h-5 w-5 text-primary" aria-hidden="true" />
-              <h2 className="text-2xl font-heading font-bold">7-Day Stress Forecast</h2>
-            </div>
+        <div id="prediction-cards" className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Cloud className="h-5 w-5 text-primary" aria-hidden="true" />
+            <h2 className="text-2xl font-heading font-bold">7-Day Stress Forecast</h2>
+          </div>
 
         {isLoading ? (
           <Card className="field-card">
@@ -405,6 +434,7 @@ export default function Predictions() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
