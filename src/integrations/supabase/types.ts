@@ -62,13 +62,6 @@ export type Database = {
             foreignKeyName: "ai_intelligence_pool_field_id_fkey"
             columns: ["field_id"]
             isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
-          {
-            foreignKeyName: "ai_intelligence_pool_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
             referencedRelation: "fields"
             referencedColumns: ["id"]
           },
@@ -103,13 +96,6 @@ export type Database = {
           lsu_research_basis?: string[]
         }
         Relationships: [
-          {
-            foreignKeyName: "analytics_insights_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
           {
             foreignKeyName: "analytics_insights_field_id_fkey"
             columns: ["field_id"]
@@ -208,13 +194,6 @@ export type Database = {
           weather_temp_f?: number | null
         }
         Relationships: [
-          {
-            foreignKeyName: "assessments_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
           {
             foreignKeyName: "assessments_field_id_fkey"
             columns: ["field_id"]
@@ -423,13 +402,6 @@ export type Database = {
             foreignKeyName: "community_insights_field_id_fkey"
             columns: ["field_id"]
             isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
-          {
-            foreignKeyName: "community_insights_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
             referencedRelation: "fields"
             referencedColumns: ["id"]
           },
@@ -503,13 +475,6 @@ export type Database = {
           soil_health_improvement?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "conservation_predictions_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
           {
             foreignKeyName: "conservation_predictions_field_id_fkey"
             columns: ["field_id"]
@@ -790,13 +755,6 @@ export type Database = {
           water_stress_score?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "dirt_referral_metrics_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
           {
             foreignKeyName: "dirt_referral_metrics_field_id_fkey"
             columns: ["field_id"]
@@ -1125,13 +1083,6 @@ export type Database = {
             foreignKeyName: "insurance_claims_field_id_fkey"
             columns: ["field_id"]
             isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
-          {
-            foreignKeyName: "insurance_claims_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
             referencedRelation: "fields"
             referencedColumns: ["id"]
           },
@@ -1299,13 +1250,6 @@ export type Database = {
           prediction_horizon?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "predictive_models_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
           {
             foreignKeyName: "predictive_models_field_id_fkey"
             columns: ["field_id"]
@@ -1605,13 +1549,6 @@ export type Database = {
             foreignKeyName: "variety_performance_metrics_field_id_fkey"
             columns: ["field_id"]
             isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
-          {
-            foreignKeyName: "variety_performance_metrics_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
             referencedRelation: "fields"
             referencedColumns: ["id"]
           },
@@ -1656,13 +1593,6 @@ export type Database = {
           risk_assessment?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "variety_recommendations_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
           {
             foreignKeyName: "variety_recommendations_field_id_fkey"
             columns: ["field_id"]
@@ -1744,13 +1674,6 @@ export type Database = {
             foreignKeyName: "water_stress_events_field_id_fkey"
             columns: ["field_id"]
             isOneToOne: false
-            referencedRelation: "assessment_details"
-            referencedColumns: ["field_id"]
-          },
-          {
-            foreignKeyName: "water_stress_events_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
             referencedRelation: "fields"
             referencedColumns: ["id"]
           },
@@ -1809,13 +1732,23 @@ export type Database = {
           image_url: string | null
           location_lat: number | null
           location_lng: number | null
+          photo_location_lat: number | null
+          photo_location_lng: number | null
           stress_level: string | null
           symptoms: string[] | null
           user_id: string | null
           weather_precipitation_mm: number | null
           weather_temp_f: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "assessments_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       beta_metrics: {
         Row: {
