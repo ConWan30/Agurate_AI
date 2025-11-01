@@ -14,6 +14,12 @@ import { SwipeableCard } from "@/components/ui/swipeable-card";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AnalysisExecutiveSummary } from "@/components/analysis/AnalysisExecutiveSummary";
+import { ActionCenter } from "@/components/analysis/ActionCenter";
+import { DiseasePestDetection } from "@/components/analysis/DiseasePestDetection";
+import { EconomicImpact } from "@/components/analysis/EconomicImpact";
+import { HistoricalTrend } from "@/components/analysis/HistoricalTrend";
+import { DetailedAnalysisTabs } from "@/components/analysis/DetailedAnalysisTabs";
 
 interface Assessment {
   id: string;
@@ -260,260 +266,128 @@ export default function History() {
 
         {/* Assessment Detail Dialog */}
         <Dialog open={!!selectedAssessment} onOpenChange={() => setSelectedAssessment(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
             {selectedAssessment && (
               <>
                 <DialogHeader>
-                  <DialogTitle className="text-2xl">
-                    {selectedAssessment.field.name} - Assessment Results
+                  <DialogTitle className="text-2xl flex items-center gap-3">
+                    {getStressIcon(selectedAssessment.stress_level)}
+                    {selectedAssessment.field.name} - Comprehensive Analysis
                   </DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-6">
                   {/* Image with Progressive Loading */}
-                  <div className="rounded-lg overflow-hidden">
+                  <div className="rounded-lg overflow-hidden shadow-lg">
                     <ProgressiveImage
                       src={selectedAssessment.image_url}
                       alt="Crop assessment"
-                      className="w-full h-64 object-cover"
+                      className="w-full h-80 object-cover"
                     />
                   </div>
 
-                  {/* Health Metrics */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm text-muted-foreground">Health Score</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex items-center gap-2">
-                          {getStressIcon(selectedAssessment.stress_level)}
-                          <span className="text-3xl font-bold">
-                            {Math.round((selectedAssessment.health_score || 0) * 100)}
-                          </span>
-                          <span className="text-muted-foreground">/100</span>
-                        </div>
-                      </CardContent>
-                    </Card>
+                  {/* Executive Summary */}
+                  <AnalysisExecutiveSummary
+                    healthScore={(selectedAssessment.health_score || 0) * 100}
+                    stressLevel={selectedAssessment.stress_level}
+                    condition={selectedAssessment.stress_level}
+                    yieldImpact={selectedAssessment.estimated_yield_impact_percent || 0}
+                    diseaseCount={selectedAssessment.disease_identified?.length || 0}
+                    diseasePressure={(selectedAssessment.severity_ratings?.disease_pressure as any) || "none"}
+                    pestCount={selectedAssessment.pest_identified?.length || 0}
+                    pestPressure={(selectedAssessment.severity_ratings?.pest_pressure as any) || "none"}
+                    nutrientDeficiencies={
+                      (selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ? 1 : 0) +
+                      (selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ? 1 : 0) +
+                      (selectedAssessment.nutrient_deficiencies?.potassium?.detected ? 1 : 0) +
+                      (selectedAssessment.nutrient_deficiencies?.other?.length || 0)
+                    }
+                    highestNutrientSeverity={
+                      selectedAssessment.nutrient_deficiencies?.nitrogen?.severity === "severe" ||
+                      selectedAssessment.nutrient_deficiencies?.phosphorus?.severity === "severe" ||
+                      selectedAssessment.nutrient_deficiencies?.potassium?.severity === "severe"
+                        ? "severe"
+                        : selectedAssessment.nutrient_deficiencies?.nitrogen?.severity === "moderate" ||
+                          selectedAssessment.nutrient_deficiencies?.phosphorus?.severity === "moderate" ||
+                          selectedAssessment.nutrient_deficiencies?.potassium?.severity === "moderate"
+                        ? "moderate"
+                        : selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ||
+                          selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ||
+                          selectedAssessment.nutrient_deficiencies?.potassium?.detected
+                        ? "mild"
+                        : "none"
+                    }
+                    criticalIssue={
+                      (selectedAssessment.health_score || 0) * 100 < 50
+                        ? "Severe crop stress"
+                        : (selectedAssessment.severity_ratings?.disease_pressure === "severe" ||
+                            selectedAssessment.severity_ratings?.disease_pressure === "high")
+                        ? "High disease pressure"
+                        : undefined
+                    }
+                    topRecommendation={selectedAssessment.recommendations?.[0]?.recommendation_text}
+                  />
 
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm text-muted-foreground">Confidence</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">
-                          {Math.round((selectedAssessment.confidence_score || 0) * 100)}%
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Enhanced Analysis Section */}
-                  {selectedAssessment.detailed_visual_analysis && (
-                    <Card className="bg-primary/5 border-primary/20">
-                      <CardHeader>
-                        <CardTitle className="text-lg">Detailed Visual Analysis</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm leading-relaxed">{selectedAssessment.detailed_visual_analysis}</p>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Growth & Field Metrics */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {selectedAssessment.growth_stage && (
-                      <Card>
-                        <CardContent className="pt-4">
-                          <p className="text-xs text-muted-foreground mb-1">Growth Stage</p>
-                          <p className="text-lg font-semibold">{selectedAssessment.growth_stage}</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                    {selectedAssessment.canopy_coverage_percent !== undefined && (
-                      <Card>
-                        <CardContent className="pt-4">
-                          <p className="text-xs text-muted-foreground mb-1">Canopy Coverage</p>
-                          <p className="text-lg font-semibold">{Math.round(selectedAssessment.canopy_coverage_percent)}%</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                    {selectedAssessment.field_uniformity_score !== undefined && (
-                      <Card>
-                        <CardContent className="pt-4">
-                          <p className="text-xs text-muted-foreground mb-1">Field Uniformity</p>
-                          <p className="text-lg font-semibold">{Math.round(selectedAssessment.field_uniformity_score * 100)}%</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                    {selectedAssessment.plant_density_assessment && (
-                      <Card>
-                        <CardContent className="pt-4">
-                          <p className="text-xs text-muted-foreground mb-1">Plant Density</p>
-                          <p className="text-lg font-semibold capitalize">{selectedAssessment.plant_density_assessment.replace('_', ' ')}</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-
-                  {/* Yield Impact */}
-                  {selectedAssessment.estimated_yield_impact_percent !== undefined && (
-                    <Card className={selectedAssessment.estimated_yield_impact_percent > 10 ? "border-destructive/50 bg-destructive/5" : "border-warning/50 bg-warning/5"}>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-1">Estimated Yield Impact</p>
-                            <p className="text-2xl font-bold">{Math.abs(Math.round(selectedAssessment.estimated_yield_impact_percent))}% {selectedAssessment.estimated_yield_impact_percent > 0 ? 'Loss' : 'Gain'}</p>
-                          </div>
-                          <AlertTriangle className={`h-8 w-8 ${selectedAssessment.estimated_yield_impact_percent > 10 ? 'text-destructive' : 'text-warning'}`} />
-                        </div>
-                      </CardContent>
-                    </Card>
+                  {/* Action Center with Recommendations */}
+                  {selectedAssessment.recommendations.length > 0 && (
+                    <ActionCenter
+                      recommendations={selectedAssessment.recommendations.map(rec => ({
+                        ...rec,
+                        reasoning: rec.category ? `${rec.category.replace(/_/g, " ")} recommendation based on field analysis` : undefined
+                      }))}
+                      onSetReminder={(rec) => {
+                        toast({ title: "Reminder feature coming soon!" });
+                      }}
+                      onShare={(rec) => {
+                        if (navigator.share) {
+                          navigator.share({
+                            title: "Crop Recommendation",
+                            text: rec.recommendation_text
+                          });
+                        } else {
+                          toast({ title: "Share feature not supported on this device" });
+                        }
+                      }}
+                    />
                   )}
 
                   {/* Disease & Pest Detection */}
-                  {(selectedAssessment.disease_identified && selectedAssessment.disease_identified.length > 0) || 
-                   (selectedAssessment.pest_identified && selectedAssessment.pest_identified.length > 0) ? (
-                    <Card className="border-destructive/30 bg-destructive/5">
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          <AlertCircle className="h-5 w-5 text-destructive" />
-                          Detected Issues
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        {selectedAssessment.disease_identified && selectedAssessment.disease_identified.length > 0 && (
-                          <div>
-                            <p className="text-sm font-semibold mb-2">Diseases:</p>
-                            <div className="flex flex-wrap gap-2">
-                              {selectedAssessment.disease_identified.map((disease, idx) => (
-                                <Badge key={idx} variant="destructive">{disease}</Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {selectedAssessment.pest_identified && selectedAssessment.pest_identified.length > 0 && (
-                          <div>
-                            <p className="text-sm font-semibold mb-2">Pests:</p>
-                            <div className="flex flex-wrap gap-2">
-                              {selectedAssessment.pest_identified.map((pest, idx) => (
-                                <Badge key={idx} variant="destructive">{pest}</Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ) : null}
+                  <DiseasePestDetection
+                    diseases={selectedAssessment.disease_identified?.map(name => ({
+                      name,
+                      severity: "moderate" as const,
+                      description: `${name} detected in field analysis`
+                    }))}
+                    pests={selectedAssessment.pest_identified?.map(name => ({
+                      name,
+                      severity: "moderate" as const,
+                      description: `${name} detected in field analysis`
+                    }))}
+                  />
 
-                  {/* Nutrient Deficiencies */}
-                  {selectedAssessment.nutrient_deficiencies && (
-                    <>
-                      {(selectedAssessment.nutrient_deficiencies.nitrogen?.detected || 
-                        selectedAssessment.nutrient_deficiencies.phosphorus?.detected || 
-                        selectedAssessment.nutrient_deficiencies.potassium?.detected ||
-                        selectedAssessment.nutrient_deficiencies.other?.length > 0) && (
-                        <Card className="border-warning/30 bg-warning/5">
-                          <CardHeader>
-                            <CardTitle className="text-lg">Nutrient Deficiencies</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                              {selectedAssessment.nutrient_deficiencies.nitrogen?.detected && (
-                                <div className="p-3 bg-background rounded-lg">
-                                  <p className="text-sm font-semibold">Nitrogen (N)</p>
-                                  <Badge variant={selectedAssessment.nutrient_deficiencies.nitrogen.severity === 'severe' ? 'destructive' : 'outline'}>
-                                    {selectedAssessment.nutrient_deficiencies.nitrogen.severity}
-                                  </Badge>
-                                </div>
-                              )}
-                              {selectedAssessment.nutrient_deficiencies.phosphorus?.detected && (
-                                <div className="p-3 bg-background rounded-lg">
-                                  <p className="text-sm font-semibold">Phosphorus (P)</p>
-                                  <Badge variant={selectedAssessment.nutrient_deficiencies.phosphorus.severity === 'severe' ? 'destructive' : 'outline'}>
-                                    {selectedAssessment.nutrient_deficiencies.phosphorus.severity}
-                                  </Badge>
-                                </div>
-                              )}
-                              {selectedAssessment.nutrient_deficiencies.potassium?.detected && (
-                                <div className="p-3 bg-background rounded-lg">
-                                  <p className="text-sm font-semibold">Potassium (K)</p>
-                                  <Badge variant={selectedAssessment.nutrient_deficiencies.potassium.severity === 'severe' ? 'destructive' : 'outline'}>
-                                    {selectedAssessment.nutrient_deficiencies.potassium.severity}
-                                  </Badge>
-                                </div>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </>
+                  {/* Economic Impact */}
+                  {selectedAssessment.estimated_yield_impact_percent !== undefined && (
+                    <EconomicImpact
+                      yieldImpact={selectedAssessment.estimated_yield_impact_percent}
+                      cropType={selectedAssessment.field.crop_type}
+                    />
                   )}
 
-                  {/* Severity Ratings */}
-                  {selectedAssessment.severity_ratings && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Severity Assessment</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          {selectedAssessment.severity_ratings.disease_pressure && selectedAssessment.severity_ratings.disease_pressure !== 'none' && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">Disease Pressure:</span>
-                              <Badge variant={selectedAssessment.severity_ratings.disease_pressure === 'severe' || selectedAssessment.severity_ratings.disease_pressure === 'high' ? 'destructive' : 'outline'}>
-                                {selectedAssessment.severity_ratings.disease_pressure}
-                              </Badge>
-                            </div>
-                          )}
-                          {selectedAssessment.severity_ratings.pest_pressure && selectedAssessment.severity_ratings.pest_pressure !== 'none' && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">Pest Pressure:</span>
-                              <Badge variant={selectedAssessment.severity_ratings.pest_pressure === 'severe' || selectedAssessment.severity_ratings.pest_pressure === 'high' ? 'destructive' : 'outline'}>
-                                {selectedAssessment.severity_ratings.pest_pressure}
-                              </Badge>
-                            </div>
-                          )}
-                          {selectedAssessment.severity_ratings.environmental_stress && selectedAssessment.severity_ratings.environmental_stress !== 'none' && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">Environmental Stress:</span>
-                              <Badge variant={selectedAssessment.severity_ratings.environmental_stress === 'severe' || selectedAssessment.severity_ratings.environmental_stress === 'high' ? 'destructive' : 'outline'}>
-                                {selectedAssessment.severity_ratings.environmental_stress}
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Root Health Indicators */}
-                  {selectedAssessment.root_health_indicators && selectedAssessment.root_health_indicators.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-3">Root Health Indicators</h3>
-                      <ul className="space-y-2">
-                        {selectedAssessment.root_health_indicators.map((indicator, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-primary mt-1">•</span>
-                            <span className="text-sm">{indicator}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Symptoms */}
-                  <div>
-                    <h3 className="font-semibold mb-3">Observed Symptoms</h3>
-                    <ul className="space-y-2">
-                      {selectedAssessment.symptoms.map((symptom, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="text-primary mt-1">•</span>
-                          <span>{symptom}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {/* Detailed Analysis Tabs */}
+                  <DetailedAnalysisTabs
+                    healthScore={(selectedAssessment.health_score || 0) * 100}
+                    stressLevel={selectedAssessment.stress_level}
+                    growthStage={selectedAssessment.growth_stage}
+                    canopyCoverage={selectedAssessment.canopy_coverage_percent}
+                    plantDensity={selectedAssessment.plant_density_assessment}
+                    fieldUniformity={selectedAssessment.field_uniformity_score}
+                    diseases={selectedAssessment.disease_identified}
+                    pests={selectedAssessment.pest_identified}
+                    nutrientDeficiencies={selectedAssessment.nutrient_deficiencies}
+                    environmentalStress={selectedAssessment.severity_ratings?.environmental_stress}
+                    rootHealthIndicators={selectedAssessment.root_health_indicators}
+                    detailedVisualAnalysis={selectedAssessment.detailed_visual_analysis}
+                  />
 
                   {/* Weather Conditions */}
                   <Card className="bg-muted/50">
@@ -534,27 +408,18 @@ export default function History() {
                     </CardContent>
                   </Card>
 
-                  {/* Recommendations */}
-                  {selectedAssessment.recommendations.length > 0 && (
+                  {/* Symptoms */}
+                  {selectedAssessment.symptoms && selectedAssessment.symptoms.length > 0 && (
                     <div>
-                      <h3 className="font-semibold mb-3">Recommendations</h3>
-                      <div className="space-y-3">
-                        {selectedAssessment.recommendations.map((rec) => (
-                          <Card key={rec.id}>
-                            <CardContent className="pt-4">
-                              <div className="flex items-start justify-between gap-4">
-                                <p className="flex-1">{rec.recommendation_text}</p>
-                                <Badge variant={getPriorityColor(rec.priority)}>
-                                  {rec.priority}
-                                </Badge>
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-2 capitalize">
-                                {rec.category.replace("_", " ")}
-                              </p>
-                            </CardContent>
-                          </Card>
+                      <h3 className="font-semibold mb-3">Observed Symptoms</h3>
+                      <ul className="space-y-2">
+                        {selectedAssessment.symptoms.map((symptom, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <span>{symptom}</span>
+                          </li>
                         ))}
-                      </div>
+                      </ul>
                     </div>
                   )}
 
