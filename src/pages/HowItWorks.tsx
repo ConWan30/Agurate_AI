@@ -1,5 +1,6 @@
 import { Camera, Cloud, Brain, FileText, TrendingUp, Layers, MapPin, Zap, ArrowRight, ArrowLeft, Database, GitBranch, Network, DollarSign, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 import { useNavigate, Link } from 'react-router-dom';
@@ -183,7 +184,7 @@ export default function HowItWorks() {
             <Zap className="h-3 w-3 mr-1" />
             AI Transparency
           </Badge>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-primary-foreground drop-shadow-lg">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-primary-foreground drop-shadow-lg">
             How AgurateAI Works
           </h1>
           <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto leading-relaxed">
@@ -201,20 +202,20 @@ export default function HowItWorks() {
               <Network className="h-3 w-3 mr-1" />
               Unified AI Intelligence
             </Badge>
-            <h2 className="text-4xl font-display font-bold">Synergistic Data Flow</h2>
+            <h2 className="text-4xl font-heading font-bold">Synergistic Data Flow</h2>
             <p className="text-lg text-muted-foreground">
               Unlike traditional AI that analyzes each photo in isolation, AgurateAI creates a <strong>circular intelligence network</strong> where every data point enhances every other analysis
             </p>
           </div>
 
           {/* Central Intelligence Pool Diagram */}
-          <Card className="field-card border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+          <AnimatedCard className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
             <CardContent className="p-8">
               <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary/20 mb-4">
-                  <Database className="h-10 w-10 text-primary" />
+                  <Database className="h-10 w-10 text-primary" aria-hidden="true" />
                 </div>
-                <h3 className="text-2xl font-display font-bold mb-2">Central AI Intelligence Pool</h3>
+                <h3 className="text-2xl font-heading font-bold mb-2">Central AI Intelligence Pool</h3>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
                   Every analysis feeds insights into a unified context that makes all future analyses exponentially smarter
                 </p>
@@ -230,14 +231,14 @@ export default function HowItWorks() {
                   { icon: Brain, label: 'Predictive Analytics Feed', desc: 'Yield trajectories & risk forecasts' }
                 ].map((item, idx) => (
                   <div key={idx} className="text-center p-4 bg-background/50 rounded-lg border">
-                    <item.icon className="h-8 w-8 mx-auto mb-3 text-primary" />
-                    <h4 className="font-semibold mb-1 text-sm">{item.label}</h4>
+                    <item.icon className="h-8 w-8 mx-auto mb-3 text-primary" aria-hidden="true" />
+                    <h4 className="font-heading font-semibold mb-1 text-sm">{item.label}</h4>
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
                 ))}
               </div>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         </section>
 
         {/* Enhanced AI Pipeline */}
@@ -247,7 +248,7 @@ export default function HowItWorks() {
               <Brain className="h-3 w-3 mr-1" />
               Context-Aware Analysis
             </Badge>
-            <h2 className="text-4xl font-display font-bold">Enhanced Gemini Vision</h2>
+            <h2 className="text-4xl font-heading font-bold">Enhanced Gemini Vision</h2>
             <p className="text-lg text-muted-foreground">
               Every crop photo analysis is enriched with comprehensive field intelligence
             </p>
@@ -275,7 +276,7 @@ export default function HowItWorks() {
                             <div className="flex-shrink-0">
                               <div className="relative">
                                 <div className={`h-16 w-16 rounded-2xl ${step.color} flex flex-col items-center justify-center shadow-field group-hover:scale-110 transition-transform`}>
-                                  <step.icon className="h-7 w-7 mb-1" />
+                                  <step.icon className="h-7 w-7 mb-1" aria-hidden="true" />
                                   <span className="text-xs font-bold">{idx + 1}</span>
                                 </div>
                               </div>
@@ -283,12 +284,12 @@ export default function HowItWorks() {
 
                             {/* Content */}
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-xl font-display font-bold mb-2">{step.title}</h3>
+                              <h3 className="text-xl font-heading font-bold mb-2">{step.title}</h3>
                               <p className="text-muted-foreground leading-relaxed mb-3">
                                 {step.description}
                               </p>
                               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg border text-xs font-mono">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
                                 {step.tech}
                               </div>
                             </div>

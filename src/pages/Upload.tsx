@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingState } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -238,7 +240,7 @@ export default function Upload() {
         }}
       >
         <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+          <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
             Upload Crop Image
           </h1>
           <p className="text-white/90 text-base md:text-lg max-w-2xl">
@@ -250,20 +252,20 @@ export default function Upload() {
 
       <div className="max-w-2xl mx-auto space-y-6">
         {fields.length === 0 ? (
-          <Card className="field-card border-dashed border-2">
+          <AnimatedCard className="border-dashed border-2">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="flex items-center justify-center h-20 w-20 rounded-2xl gradient-sky shadow-glow mx-auto mb-4">
-                <ImageIcon className="h-10 w-10 text-white" />
+                <ImageIcon className="h-10 w-10 text-white" aria-hidden="true" />
               </div>
-              <h3 className="text-xl font-display font-semibold mb-2">No fields available</h3>
+              <h3 className="text-xl font-heading font-semibold mb-2">No fields available</h3>
               <p className="text-muted-foreground mb-4">Add a field first to analyze crops</p>
-              <Button onClick={() => navigate("/fields")} size="lg">Go to My Fields</Button>
+              <Button onClick={() => navigate("/fields")} size="lg" className="focus-ring">Go to My Fields</Button>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         ) : (
-          <Card className="field-card">
+          <AnimatedCard>
             <CardHeader>
-              <CardTitle className="text-2xl font-display">New Assessment</CardTitle>
+              <CardTitle className="text-2xl font-heading">New Assessment</CardTitle>
               <CardDescription>Upload a crop image for AI analysis</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -349,18 +351,19 @@ export default function Upload() {
               {/* Analyze Button */}
               <Button
                 onClick={handleAnalyze}
-                className="w-full"
+                className="w-full focus-ring"
                 disabled={!selectedFile || !selectedField || uploading || analyzing}
                 size="lg"
+                aria-label="Analyze crop health"
               >
                 {uploading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                     Uploading...
                   </>
                 ) : analyzing ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                     Analyzing with AI...
                   </>
                 ) : (
@@ -377,7 +380,7 @@ export default function Upload() {
                 </div>
               )}
             </CardContent>
-          </Card>
+          </AnimatedCard>
         )}
       </div>
     </div>

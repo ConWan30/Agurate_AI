@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { LSUResearcher } from '@/types/enhanced-features';
 import { LSUResearcherContactCard } from '@/components/LSUResearcherContactCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LoadingState } from '@/components/ui/loading-state';
+import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Search, GraduationCap, BookOpen } from 'lucide-react';
@@ -46,11 +49,7 @@ export default function LSUResearchers() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <SkeletonCard />
-        <div className="grid gap-6 md:grid-cols-2">
-          <SkeletonCard />
-          <SkeletonCard />
-        </div>
+        <LoadingState message="Loading LSU AgCenter researchers..." />
       </div>
     );
   }
@@ -69,13 +68,13 @@ export default function LSUResearchers() {
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm">
-              <GraduationCap className="h-6 w-6" />
+              <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </div>
             <Badge variant="secondary" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
               LSU AgCenter Partnership
             </Badge>
           </div>
-          <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">
+          <h1 className="text-3xl md:text-4xl font-heading font-bold mb-3">
             LSU AgCenter Researchers
           </h1>
           <p className="text-lg text-white/90 max-w-2xl">
@@ -86,24 +85,25 @@ export default function LSUResearchers() {
       </div>
 
       {/* Search */}
-      <Card>
+      <AnimatedCard>
         <CardContent className="p-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
             <Input
               type="text"
               placeholder="Search by name, expertise, or department..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 focus-ring"
+              aria-label="Search researchers"
             />
           </div>
         </CardContent>
-      </Card>
+      </AnimatedCard>
 
       {/* Researchers Grid */}
       <div>
-        <h2 className="text-2xl font-display font-bold mb-6">Available Researchers</h2>
+        <h2 className="text-2xl font-heading font-bold mb-6">Available Researchers</h2>
         {filteredResearchers.length === 0 ? (
           <EmptyState
             icon={GraduationCap}
@@ -127,25 +127,25 @@ export default function LSUResearchers() {
       <div>
         <div className="flex items-center gap-3 mb-6">
           <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10">
-            <BookOpen className="h-5 w-5 text-primary" />
+            <BookOpen className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-2xl font-display font-bold">Recent LSU Publications</h2>
+            <h2 className="text-2xl font-heading font-bold">Recent LSU Publications</h2>
             <p className="text-sm text-muted-foreground">Research backing our AI recommendations</p>
           </div>
         </div>
         <div className="space-y-4">
-          {publications.map((pub) => (
-            <Card key={pub.id} className="border-primary/20">
+          {publications.map((pub, idx) => (
+            <AnimatedCard key={pub.id} delay={idx * 50} className="border-primary/20">
               <CardHeader>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{pub.title}</CardTitle>
+                    <CardTitle className="text-lg font-heading">{pub.title}</CardTitle>
                     <CardDescription className="mt-2">
                       By {pub.authors.join(', ')} • {pub.year}
                     </CardDescription>
                   </div>
-                  <Badge variant="outline">{pub.crops[0]}</Badge>
+                  <AgriculturalBadge type="growing">{pub.crops[0]}</AgriculturalBadge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -177,7 +177,7 @@ export default function LSUResearchers() {
                   </a>
                 </div>
               </CardContent>
-            </Card>
+            </AnimatedCard>
           ))}
         </div>
       </div>
