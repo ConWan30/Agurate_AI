@@ -69,6 +69,16 @@ section {
     --success: 142 65% 42%;
     --success-foreground: 0 0% 100%;
 
+    /* Health Status Colors - Agricultural Context */
+    --health-good: 142 71% 45%;
+    --health-moderate: 38 92% 50%;
+    --health-severe: 0 72% 51%;
+
+    /* Agricultural Aesthetic Colors */
+    --soil-brown: 30 40% 35%;
+    --sky-blue: 200 80% 60%;
+    --harvest-gold: 45 85% 55%;
+
     --border: 142 20% 88%;
     --input: 142 20% 88%;
     --ring: 142 65% 42%;
@@ -133,6 +143,16 @@ section {
     --success: 142 70% 48%;
     --success-foreground: 142 50% 12%;
 
+    /* Health Status Colors - Dark Mode */
+    --health-good: 142 71% 45%;
+    --health-moderate: 38 92% 50%;
+    --health-severe: 0 68% 48%;
+
+    /* Agricultural Aesthetic Colors - Dark Mode */
+    --soil-brown: 30 35% 30%;
+    --sky-blue: 200 75% 55%;
+    --harvest-gold: 45 80% 50%;
+
     --border: 142 30% 20%;
     --input: 142 30% 20%;
     --ring: 142 70% 48%;
@@ -169,7 +189,12 @@ section {
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
+    @apply font-sans;
+  }
+
+  /* Data display uses monospace for numbers */
+  .font-data {
+    @apply font-mono;
   }
   
   /* Mobile viewport height fix */

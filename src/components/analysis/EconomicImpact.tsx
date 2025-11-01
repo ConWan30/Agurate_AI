@@ -49,7 +49,7 @@ export function EconomicImpact({
           <div className="text-right">
             <p className={cn(
               "text-3xl font-bold flex items-center gap-2",
-              yieldImpact > 0 ? "text-destructive" : "text-primary"
+              yieldImpact > 0 ? "text-health-severe" : "text-health-good"
             )}>
               {yieldImpact > 0 ? <TrendingDown className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
               {yieldImpact > 0 ? '-' : '+'}{Math.abs(yieldImpact)}%
@@ -60,35 +60,35 @@ export function EconomicImpact({
         {/* Financial Impact */}
         {acreage > 0 && (
           <>
-            <div className="flex justify-between items-center p-4 bg-destructive/10 rounded-lg border border-destructive/20">
+            <div className="flex justify-between items-center p-4 bg-health-severe/10 rounded-lg border border-health-severe/20">
               <div>
                 <p className="text-sm font-medium">Potential Revenue Loss</p>
                 <p className="text-xs text-muted-foreground">
                   {acreage} acres × ${valuePerAcre}/acre × {Math.abs(yieldImpact)}%
                 </p>
               </div>
-              <p className="text-2xl font-bold text-destructive">
+              <p className="text-2xl font-bold text-health-severe">
                 ${Math.round(calculatedLoss).toLocaleString()}
               </p>
             </div>
 
             {treatmentCost && (
-              <div className="flex justify-between items-center p-4 bg-warning/10 rounded-lg border border-warning/20">
+              <div className="flex justify-between items-center p-4 bg-health-moderate/10 rounded-lg border border-health-moderate/20">
                 <p className="text-sm font-medium">Treatment Investment</p>
-                <p className="text-2xl font-bold text-warning">
+                <p className="text-2xl font-bold text-health-moderate">
                   ${treatmentCost.toLocaleString()}
                 </p>
               </div>
             )}
 
-            <div className="flex justify-between items-center p-4 bg-primary/10 rounded-lg border-2 border-primary">
+            <div className="flex justify-between items-center p-4 bg-health-good/10 rounded-lg border-2 border-health-good">
               <div>
                 <p className="text-sm font-medium">Potential Savings</p>
                 <p className="text-xs text-muted-foreground">
                   With recommended treatment
                 </p>
               </div>
-              <p className="text-3xl font-bold text-primary">
+              <p className="text-3xl font-bold font-mono text-health-good">
                 ${Math.round(calculatedSavings).toLocaleString()}
               </p>
             </div>
@@ -97,11 +97,11 @@ export function EconomicImpact({
               <div className="pt-4 border-t">
                 <div className="flex justify-between items-center">
                   <p className="font-semibold">Net Benefit (Savings - Treatment):</p>
-                  <p className="text-3xl font-bold text-primary">
+                  <p className="text-3xl font-bold font-mono text-health-good">
                     ${Math.round(calculatedSavings - treatmentCost).toLocaleString()}
                   </p>
                 </div>
-                <p className="text-sm text-muted-foreground text-right mt-1">
+                <p className="text-sm text-muted-foreground text-right mt-1 font-mono">
                   {((calculatedSavings / treatmentCost - 1) * 100).toFixed(0)}% ROI
                 </p>
               </div>

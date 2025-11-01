@@ -15,7 +15,9 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Playfair Display', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -68,6 +70,18 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+        },
+        // Health Status Colors
+        health: {
+          good: "hsl(var(--health-good))",
+          moderate: "hsl(var(--health-moderate))",
+          severe: "hsl(var(--health-severe))",
+        },
+        // Agricultural Aesthetic Colors
+        agricultural: {
+          soil: "hsl(var(--soil-brown))",
+          sky: "hsl(var(--sky-blue))",
+          harvest: "hsl(var(--harvest-gold))",
         },
       },
       borderRadius: {

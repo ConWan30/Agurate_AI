@@ -13,17 +13,17 @@ interface QuickInsightCardProps {
 
 export function QuickInsightCard({ icon: Icon, label, value, severity, urgent }: QuickInsightCardProps) {
   const severityColors = {
-    none: "border-primary/20 bg-primary/5",
-    mild: "border-blue-500/20 bg-blue-500/5",
-    moderate: "border-warning/20 bg-warning/5",
-    severe: "border-destructive/20 bg-destructive/5"
+    none: "border-health-good/20 bg-health-good/5",
+    mild: "border-agricultural-sky/20 bg-agricultural-sky/5",
+    moderate: "border-health-moderate/20 bg-health-moderate/5",
+    severe: "border-health-severe/20 bg-health-severe/5"
   };
 
   const severityTextColors = {
-    none: "text-primary",
-    mild: "text-blue-600",
-    moderate: "text-warning",
-    severe: "text-destructive"
+    none: "text-health-good",
+    mild: "text-agricultural-sky",
+    moderate: "text-health-moderate",
+    severe: "text-health-severe"
   };
 
   return (

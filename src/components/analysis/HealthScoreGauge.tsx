@@ -13,15 +13,15 @@ export function HealthScoreGauge({ score, size = "md" }: HealthScoreGaugeProps) 
   };
 
   const getColor = (score: number) => {
-    if (score >= 80) return "text-primary";
-    if (score >= 60) return "text-warning";
-    return "text-destructive";
+    if (score >= 80) return "text-health-good";
+    if (score >= 60) return "text-health-moderate";
+    return "text-health-severe";
   };
 
   const getStroke = (score: number) => {
-    if (score >= 80) return "stroke-primary";
-    if (score >= 60) return "stroke-warning";
-    return "stroke-destructive";
+    if (score >= 80) return "stroke-health-good";
+    if (score >= 60) return "stroke-health-moderate";
+    return "stroke-health-severe";
   };
 
   const circumference = 2 * Math.PI * 45;
