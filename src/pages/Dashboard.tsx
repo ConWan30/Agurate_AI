@@ -15,6 +15,9 @@ import { SuccessStoryPrompt } from "@/components/SuccessStoryPrompt";
 import { BetaConversionBanner } from "@/components/BetaConversionBanner";
 import { DailyBriefingCard } from "@/components/DailyBriefingCard";
 import { ROICalculatorCard } from "@/components/ROICalculatorCard";
+import { BetaEngagementCard } from "@/components/BetaEngagementCard";
+import { BetaValueTracker } from "@/components/BetaValueTracker";
+import { LiveCommunityActivity } from "@/components/LiveCommunityActivity";
 import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon, BarChart3, Droplets, GraduationCap, Network, Microscope } from "lucide-react";
 import { WeatherAlerts } from "@/components/WeatherAlerts";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -219,6 +222,13 @@ export default function Dashboard() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float" aria-hidden="true"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl animate-float" style={{ animationDelay: '1s' }} aria-hidden="true"></div>
           <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }} aria-hidden="true"></div>
+        </div>
+
+        {/* Beta Farmer Engagement & Value Tracking */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <BetaEngagementCard />
+          <BetaValueTracker />
+          <LiveCommunityActivity />
         </div>
 
         {/* Daily Briefing - Priority Enhancement #6 */}

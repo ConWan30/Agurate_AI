@@ -40,6 +40,7 @@ const ConversationalFormsAnalytics = lazy(() => import("./pages/ConversationalFo
 const IntegrationTest = lazy(() => import("./pages/IntegrationTest"));
 const BetaSignup = lazy(() => import("./pages/BetaSignup"));
 const Tutorials = lazy(() => import("./pages/Tutorials"));
+const Upgrade = lazy(() => import("./pages/Upgrade"));
 
 const queryClient = new QueryClient();
 
@@ -153,6 +154,7 @@ const App = () => (
           <Route path="/conversational-forms-analytics" element={<ProtectedRoute><Layout><ConversationalFormsAnalytics /></Layout></ProtectedRoute>} />
           <Route path="/integration-test" element={<ProtectedRoute><Layout><IntegrationTest /></Layout></ProtectedRoute>} />
           <Route path="/tutorials" element={<ProtectedRoute><Layout><Tutorials /></Layout></ProtectedRoute>} />
+          <Route path="/upgrade" element={<ProtectedRoute><Layout><Upgrade /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
           {/* Demo routes for screenshots - bypasses authentication */}
           <Route path="/demo/auth" element={<Auth />} />

@@ -854,6 +854,39 @@ export type Database = {
           },
         ]
       }
+      farmer_testimonials: {
+        Row: {
+          approved: boolean | null
+          created_at: string | null
+          farm_location: string | null
+          farmer_name: string
+          feature_mentioned: string[] | null
+          id: string
+          roi_achieved: number | null
+          testimonial_text: string
+        }
+        Insert: {
+          approved?: boolean | null
+          created_at?: string | null
+          farm_location?: string | null
+          farmer_name: string
+          feature_mentioned?: string[] | null
+          id?: string
+          roi_achieved?: number | null
+          testimonial_text: string
+        }
+        Update: {
+          approved?: boolean | null
+          created_at?: string | null
+          farm_location?: string | null
+          farmer_name?: string
+          feature_mentioned?: string[] | null
+          id?: string
+          roi_achieved?: number | null
+          testimonial_text?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           assessment_id: string | null
@@ -1469,6 +1502,63 @@ export type Database = {
             referencedColumns: ["assessment_id"]
           },
         ]
+      }
+      tutorial_completions: {
+        Row: {
+          action: string | null
+          completed_at: string | null
+          id: string
+          step_id: string | null
+          time_spent_seconds: number | null
+          tutorial_id: string
+          user_id: string
+        }
+        Insert: {
+          action?: string | null
+          completed_at?: string | null
+          id?: string
+          step_id?: string | null
+          time_spent_seconds?: number | null
+          tutorial_id: string
+          user_id: string
+        }
+        Update: {
+          action?: string | null
+          completed_at?: string | null
+          id?: string
+          step_id?: string | null
+          time_spent_seconds?: number | null
+          tutorial_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tutorial_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          rating: number | null
+          tutorial_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number | null
+          tutorial_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number | null
+          tutorial_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       variety_performance_metrics: {
         Row: {
