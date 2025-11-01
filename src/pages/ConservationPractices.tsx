@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LoadingState } from '@/components/ui/loading-state';
+import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
 import { Button } from '@/components/ui/button';
 import { DeltaConversationalForm } from '@/components/forms/DeltaConversationalForm';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -104,16 +107,17 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/50" />
         <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col justify-center text-white">
-          <h1 className="text-5xl font-bold mb-4">Conservation Practices</h1>
+          <h1 className="text-5xl font-heading font-bold mb-4">Conservation Practices</h1>
           <p className="text-xl text-white/90 max-w-2xl mb-6">
             Document your sustainable farming practices for USDA compliance and discover cost savings through LSU AgCenter-validated conservation methods.
           </p>
           <Button
             size="lg"
             onClick={() => setConversationalOpen(true)}
-            className="w-fit bg-white text-primary hover:bg-white/90"
+            className="w-fit bg-white text-primary hover:bg-white/90 focus-ring"
+            aria-label="Document conservation practices with AI assistant"
           >
-            <Sprout className="mr-2 h-5 w-5" />
+            <Sprout className="mr-2 h-5 w-5" aria-hidden="true" />
             Document Practices with Delta AI
           </Button>
         </div>
@@ -123,35 +127,35 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Benefits Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <Card>
+          <AnimatedCard>
             <CardHeader>
-              <DollarSign className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Cost Savings</CardTitle>
+              <DollarSign className="h-8 w-8 text-primary mb-2" aria-hidden="true" />
+              <CardTitle className="font-heading">Cost Savings</CardTitle>
               <CardDescription>
                 Save $20-50 per acre annually through reduced tillage and cover crops
               </CardDescription>
             </CardHeader>
-          </Card>
+          </AnimatedCard>
 
-          <Card>
+          <AnimatedCard delay={100}>
             <CardHeader>
-              <TrendingUp className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Soil Health</CardTitle>
+              <TrendingUp className="h-8 w-8 text-primary mb-2" aria-hidden="true" />
+              <CardTitle className="font-heading">Soil Health</CardTitle>
               <CardDescription>
                 Improve soil organic matter and water retention over time
               </CardDescription>
             </CardHeader>
-          </Card>
+          </AnimatedCard>
 
-          <Card>
+          <AnimatedCard delay={200}>
             <CardHeader>
-              <Sprout className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>USDA Compliance</CardTitle>
+              <Sprout className="h-8 w-8 text-primary mb-2" aria-hidden="true" />
+              <CardTitle className="font-heading">USDA Compliance</CardTitle>
               <CardDescription>
                 Qualify for Climate-Smart Agriculture and conservation programs
               </CardDescription>
             </CardHeader>
-          </Card>
+          </AnimatedCard>
         </div>
 
         {/* Conservation Predictions */}

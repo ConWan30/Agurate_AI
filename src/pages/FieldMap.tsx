@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LoadingState } from '@/components/ui/loading-state';
+import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Activity } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -107,7 +110,7 @@ export default function FieldMap() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 text-center space-y-4 relative z-10">
-          <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
+          <h1 className="text-5xl font-heading font-bold text-white drop-shadow-lg">
             Delta Field Command Center
           </h1>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
@@ -119,10 +122,10 @@ export default function FieldMap() {
       <div className="max-w-7xl mx-auto px-4 space-y-6">
 
         {/* Legend */}
-        <Card className="field-card">
+        <AnimatedCard>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
+            <CardTitle className="font-heading flex items-center gap-2">
+              <MapPin className="h-5 w-5" aria-hidden="true" />
               Field Health Overview
             </CardTitle>
           </CardHeader>
@@ -140,51 +143,54 @@ export default function FieldMap() {
               <span className="text-sm">Severe (0-49%)</span>
             </div>
           </CardContent>
-        </Card>
+        </AnimatedCard>
 
         {/* Interactive Map */}
         {isLoading ? (
-          <Card className="field-card">
+          <AnimatedCard delay={100}>
             <CardContent className="p-6 space-y-3">
-              <Skeleton className="h-[500px] w-full rounded-lg" />
+              <LoadingState message="Loading field map..." />
             </CardContent>
-          </Card>
+          </AnimatedCard>
         ) : fields.length > 0 ? (
           <FieldMapLeaflet fields={fields} />
         ) : null}
 
         {/* Fields Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {fields.map(field => {
+          {fields.map((field, idx) => {
             const assessment = assessments.find(a => a.field_id === field.id);
             const healthScore = assessment?.health_score || 0.5;
 
             return (
-              <Card key={field.id} className="field-card hover-lift">
+              <AnimatedCard key={field.id} delay={idx * 50} hover>
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <h3 className="font-bold text-lg">{field.name}</h3>
+                      <h3 className="font-heading font-bold text-lg">{field.name}</h3>
                       <p className="text-sm text-muted-foreground">
                         {field.crop_type} • {field.acreage || 'N/A'} acres
                       </p>
                     </div>
-                    <div className={`w-6 h-6 rounded-full ${getHealthColor(healthScore)} border-2 border-white shadow-md`} />
+                    <div className={`w-6 h-6 rounded-full ${getHealthColor(healthScore)} border-2 border-white shadow-md`} aria-label={`Health indicator: ${(healthScore * 100).toFixed(0)}%`} />
                   </div>
 
                   {assessment && (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <Activity className="h-4 w-4" />
-                        <span className="font-semibold">
+                        <Activity className="h-4 w-4" aria-hidden="true" />
+                        <span className="font-mono font-semibold">
                           Health: {(healthScore * 100).toFixed(0)}%
                         </span>
                       </div>
-                      <Badge variant={getStressBadgeVariant(assessment.stress_level)}>
+                      <AgriculturalBadge type={
+                        assessment.stress_level?.toLowerCase() === 'healthy' ? 'healthy' :
+                        assessment.stress_level?.toLowerCase() === 'moderate' ? 'moderate' : 'severe'
+                      }>
                         {assessment.stress_level}
-                      </Badge>
+                      </AgriculturalBadge>
                       <p className="text-xs text-muted-foreground">
-                        Last analyzed: {new Date(assessment.analyzed_at).toLocaleDateString()}
+                        Last analyzed: <time dateTime={assessment.analyzed_at}>{new Date(assessment.analyzed_at).toLocaleDateString()}</time>
                       </p>
                     </div>
                   )}
@@ -195,7 +201,7 @@ export default function FieldMap() {
                     </p>
                   </div>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             );
           })}
         </div>

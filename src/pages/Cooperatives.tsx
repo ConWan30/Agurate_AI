@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LoadingState } from '@/components/ui/loading-state';
+import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -199,7 +202,7 @@ export default function Cooperatives() {
       >
         <div className="relative z-10 flex flex-col md:flex-row items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+            <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
               Cooperatives & Community Intelligence
             </h1>
             <p className="text-white/90 text-base md:text-lg max-w-2xl">
@@ -208,8 +211,8 @@ export default function Cooperatives() {
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button variant="secondary" className="gap-2 flex-shrink-0">
-                <Plus className="h-4 w-4" />
+              <Button variant="secondary" className="gap-2 flex-shrink-0 focus-ring" aria-label="Create new cooperative">
+                <Plus className="h-4 w-4" aria-hidden="true" />
                 Create Cooperative
               </Button>
             </DialogTrigger>
@@ -244,12 +247,12 @@ export default function Cooperatives() {
 
       <Tabs defaultValue="cooperatives" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="cooperatives" className="gap-2">
-            <Building2 className="h-4 w-4" />
+          <TabsTrigger value="cooperatives" className="gap-2 focus-ring">
+            <Building2 className="h-4 w-4" aria-hidden="true" />
             My Cooperatives
           </TabsTrigger>
-          <TabsTrigger value="insights" className="gap-2">
-            <Award className="h-4 w-4" />
+          <TabsTrigger value="insights" className="gap-2 focus-ring">
+            <Award className="h-4 w-4" aria-hidden="true" />
             Community Insights
           </TabsTrigger>
         </TabsList>
@@ -334,19 +337,19 @@ export default function Cooperatives() {
 
           {myMemberships && myMemberships.length > 0 && (
             <section className="space-y-4">
-              <h2 className="text-2xl font-display font-bold">My Cooperatives</h2>
+              <h2 className="text-2xl font-heading font-bold">My Cooperatives</h2>
               <div className="grid gap-4 md:grid-cols-2">
-                {myMemberships.map(membership => (
-                  <Card key={membership.id} className="field-card">
+                {myMemberships.map((membership, idx) => (
+                  <AnimatedCard key={membership.id} delay={idx * 100}>
                     <CardHeader>
                       <div className="flex justify-between items-start">
-                        <CardTitle className="flex items-center gap-2">
-                          <Users className="h-5 w-5" />
+                        <CardTitle className="font-heading flex items-center gap-2">
+                          <Users className="h-5 w-5" aria-hidden="true" />
                           {membership.cooperative?.name}
                         </CardTitle>
-                        <Badge variant={membership.role === 'admin' ? 'default' : 'secondary'}>
+                        <AgriculturalBadge type={membership.role === 'admin' ? 'healthy' : 'growing'}>
                           {membership.role}
-                        </Badge>
+                        </AgriculturalBadge>
                       </div>
                       <CardDescription>{membership.cooperative?.description}</CardDescription>
                     </CardHeader>
@@ -355,18 +358,19 @@ export default function Cooperatives() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full gap-2"
+                          className="w-full gap-2 focus-ring"
                           onClick={() => {
                             setInviteCoopId(membership.cooperative?.id || '');
                             setInviteCoopName(membership.cooperative?.name || '');
                           }}
+                          aria-label="Invite members to cooperative"
                         >
-                          <UserPlus className="h-4 w-4" />
+                          <UserPlus className="h-4 w-4" aria-hidden="true" />
                           Invite Members
                         </Button>
                       </CardContent>
                     )}
-                  </Card>
+                  </AnimatedCard>
                 ))}
               </div>
             </section>

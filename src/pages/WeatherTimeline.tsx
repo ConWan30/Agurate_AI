@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LoadingState } from '@/components/ui/loading-state';
+import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { Cloud, CloudRain, Sun, Wind, Droplets, AlertTriangle, Activity } from 'lucide-react';
@@ -116,7 +119,7 @@ export default function WeatherTimeline() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 text-center space-y-4 relative z-10">
-          <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
+          <h1 className="text-5xl font-heading font-bold text-white drop-shadow-lg">
             Weather-Correlated Health Timeline
           </h1>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
@@ -128,9 +131,9 @@ export default function WeatherTimeline() {
       <div className="max-w-7xl mx-auto px-4 space-y-6">
 
         {/* Chart */}
-        <Card className="field-card">
+        <AnimatedCard>
           <CardHeader>
-            <CardTitle>30-Day Crop Health & Weather Trends</CardTitle>
+            <CardTitle className="font-heading">30-Day Crop Health & Weather Trends</CardTitle>
           </CardHeader>
           <CardContent>
             {timelineData.length > 0 ? (
@@ -195,18 +198,18 @@ export default function WeatherTimeline() {
                   <p className="font-semibold text-foreground">No assessment data available</p>
                   <p className="text-sm text-muted-foreground">Upload crop images to see health trends over time</p>
                 </div>
-                <Button onClick={() => window.location.href = '/scanner'} size="lg">
+                <Button onClick={() => window.location.href = '/scanner'} size="lg" className="focus-ring">
                   Start Scanning
                 </Button>
               </div>
             )}
           </CardContent>
-        </Card>
+        </AnimatedCard>
 
         {/* Weather Events Timeline */}
-        <Card className="field-card">
+        <AnimatedCard delay={100}>
           <CardHeader>
-            <CardTitle>Significant Weather Events</CardTitle>
+            <CardTitle className="font-heading">Significant Weather Events</CardTitle>
           </CardHeader>
           <CardContent>
             {weatherEvents.length > 0 ? (
@@ -216,17 +219,17 @@ export default function WeatherTimeline() {
                     key={event.id}
                     className="flex items-start gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                   >
-                    <div className="mt-1">
+                    <div className="mt-1" aria-hidden="true">
                       {getWeatherIcon(event.event_type)}
                     </div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <Badge variant={getEventBadgeVariant(event.event_type)}>
+                        <AgriculturalBadge type={event.event_type === 'heat_wave' ? 'severe' : event.event_type === 'heavy_rain' ? 'moderate' : 'healthy'}>
                           {event.event_type.replace('_', ' ')}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
+                        </AgriculturalBadge>
+                        <time className="text-sm text-muted-foreground" dateTime={event.event_date}>
                           {new Date(event.event_date).toLocaleDateString()}
-                        </span>
+                        </time>
                       </div>
                       {event.description && (
                         <p className="text-sm">{event.description}</p>
@@ -249,12 +252,12 @@ export default function WeatherTimeline() {
               </p>
             )}
           </CardContent>
-        </Card>
+        </AnimatedCard>
 
         {/* Recent Assessments */}
-        <Card className="field-card">
+        <AnimatedCard delay={200}>
           <CardHeader>
-            <CardTitle>Recent Assessments</CardTitle>
+            <CardTitle className="font-heading">Recent Assessments</CardTitle>
           </CardHeader>
           <CardContent>
             {assessments.length > 0 ? (
@@ -272,7 +275,7 @@ export default function WeatherTimeline() {
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <p className="font-semibold">
+                        <p className="font-mono font-semibold">
                           {((assessment.health_score || 0) * 100).toFixed(0)}%
                         </p>
                         {assessment.weather_temp_f && (
@@ -281,12 +284,12 @@ export default function WeatherTimeline() {
                           </p>
                         )}
                       </div>
-                      <Badge variant={
-                        assessment.stress_level === 'healthy' ? 'default' :
-                        assessment.stress_level === 'moderate' ? 'secondary' : 'destructive'
+                      <AgriculturalBadge type={
+                        assessment.stress_level === 'healthy' ? 'healthy' :
+                        assessment.stress_level === 'moderate' ? 'moderate' : 'severe'
                       }>
                         {assessment.stress_level}
-                      </Badge>
+                      </AgriculturalBadge>
                     </div>
                   </div>
                 ))}
@@ -297,7 +300,7 @@ export default function WeatherTimeline() {
               </p>
             )}
           </CardContent>
-        </Card>
+        </AnimatedCard>
       </div>
     </div>
   );
