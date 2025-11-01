@@ -248,35 +248,35 @@ export default function Dashboard() {
             </Link>
 
             {/* 2. Predictive Analytics */}
-            <Link to="/predictions" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/predictions" className="group focus-ring rounded-xl">
+              <AnimatedCard hover className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-sky shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <TrendingUp className="h-6 w-6 text-white" />
+                    <TrendingUp className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Predictive Analytics</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Predictive Analytics</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     7-14 day comprehensive forecasts
                   </p>
-                  <Badge variant="default" className="text-xs">Core</Badge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 3. Delta Intelligence Chat */}
-            <Link to="/delta" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/delta" className="group focus-ring rounded-xl">
+              <AnimatedCard hover className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-harvest shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Brain className="h-6 w-6 text-white" />
+                    <Brain className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Delta Intelligence</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Delta Intelligence</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     24/7 LSU-trained AI advisor
                   </p>
-                  <Badge variant="default" className="text-xs">Core</Badge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 4. Water Stress Intelligence */}

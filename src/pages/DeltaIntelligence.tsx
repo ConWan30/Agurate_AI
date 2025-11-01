@@ -281,7 +281,7 @@ export default function DeltaIntelligence() {
           <CardHeader className="border-b p-4 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-primary" aria-hidden="true" />
-              <h3 className="font-heading font-medium">
+              <h3 className="font-heading font-semibold">
                 {currentConversationId 
                   ? conversations.find(c => c.id === currentConversationId)?.title || 'Conversation'
                   : 'New Conversation'}
@@ -312,13 +312,13 @@ export default function DeltaIntelligence() {
                 </SheetTrigger>
                 <SheetContent className="w-[350px] sm:w-[400px]">
                   <SheetHeader>
-                    <SheetTitle>Conversation History</SheetTitle>
+                    <SheetTitle className="font-heading">Conversation History</SheetTitle>
                   </SheetHeader>
                   <ScrollArea className="h-[calc(100vh-8rem)] mt-6">
                     <div className="space-y-2">
                       {conversations.length === 0 ? (
                         <div className="text-center py-8 text-muted-foreground">
-                          <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
                           <p className="text-sm">No conversations yet</p>
                           <p className="text-xs mt-1">Start chatting to create your first conversation</p>
                         </div>
@@ -343,13 +343,14 @@ export default function DeltaIntelligence() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity focus-ring"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   deleteConversation(conv.id);
                                 }}
+                                aria-label={`Delete conversation: ${conv.title}`}
                               >
-                                <Trash2 className="h-4 w-4 text-destructive" />
+                                <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
                               </Button>
                             </div>
                           </div>
@@ -372,7 +373,7 @@ export default function DeltaIntelligence() {
                   >
                     {msg.role === 'assistant' && (
                       <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex items-center justify-center">
-                        <Brain className="h-5 w-5 text-purple-600 delta-wave" />
+                        <Brain className="h-5 w-5 text-purple-600 delta-wave" aria-hidden="true" />
                       </div>
                     )}
                     <div
@@ -395,11 +396,11 @@ export default function DeltaIntelligence() {
                 {isLoading && (
                   <div className="flex gap-3 justify-start">
                     <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex items-center justify-center">
-                      <Brain className="h-5 w-5 text-purple-600 animate-pulse" />
+                      <Brain className="h-5 w-5 text-purple-600 animate-pulse" aria-hidden="true" />
                     </div>
                     <div className="bg-muted/50 border border-border p-4 rounded-2xl">
                       <div className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" />
                         <span className="text-sm text-muted-foreground">Thinking...</span>
                       </div>
                     </div>

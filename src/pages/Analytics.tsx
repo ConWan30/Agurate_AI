@@ -246,9 +246,9 @@ export default function Analytics() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
+                  <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Projected Yield</p>
-                      <p className="text-2xl font-bold text-primary">
+                      <p className="text-2xl font-mono font-bold text-primary">
                         {Math.round(field.avgHealth * 1.2)} bu/ac
                       </p>
                     </div>
