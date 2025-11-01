@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Sparkles, Clock, DollarSign } from "lucide-react";
+import { toast } from "sonner";
 
 export function BetaConversionBanner() {
+  const navigate = useNavigate();
   const [isDismissed, setIsDismissed] = useState(false);
   const [betaEndDate, setBetaEndDate] = useState<Date | null>(null);
   const [daysRemaining, setDaysRemaining] = useState<number>(0);
@@ -47,6 +50,19 @@ export function BetaConversionBanner() {
     setIsDismissed(true);
     // Store dismissal in localStorage (could also save to profile)
     localStorage.setItem('beta-conversion-dismissed', 'true');
+  };
+
+  const handleClaimDiscount = () => {
+    toast.success("Redirecting to checkout...");
+    // Navigate to profile/subscription page
+    setTimeout(() => {
+      navigate('/profile?action=subscribe');
+    }, 500);
+  };
+
+  const handleLearnMore = () => {
+    // Navigate to pricing/how it works page
+    navigate('/how-it-works');
   };
 
   // Don't show if dismissed or if more than 30 days remaining
@@ -115,12 +131,13 @@ export function BetaConversionBanner() {
 
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <Button 
+                onClick={handleClaimDiscount}
                 className={`gap-2 ${isUrgent ? 'bg-destructive hover:bg-destructive/90' : ''}`}
               >
                 <Sparkles className="h-4 w-4" />
                 Claim Lifetime Discount
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleLearnMore}>
                 Learn More
               </Button>
             </div>
