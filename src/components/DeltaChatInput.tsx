@@ -150,7 +150,7 @@ export const DeltaChatInput = ({ onTextMessage, onImageMessage, disabled }: Delt
             type="button"
             variant="outline"
             size="icon"
-            className={`h-11 w-11 shrink-0 ${listening ? 'bg-red-500 text-white animate-pulse' : ''}`}
+            className={`h-11 w-11 shrink-0 ${listening ? 'bg-destructive text-white animate-pulse' : ''}`}
             onClick={handleVoiceInput}
             disabled={disabled || isUploading}
           >

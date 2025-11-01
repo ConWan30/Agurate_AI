@@ -50,9 +50,9 @@ export function LSUResearcherContactCard({ researcher, onContact }: LSUResearche
   };
 
   const availabilityColors = {
-    available: 'bg-green-500',
-    busy: 'bg-yellow-500',
-    unavailable: 'bg-red-500',
+    available: 'bg-health-good',
+    busy: 'bg-health-moderate',
+    unavailable: 'bg-health-severe',
   };
 
   return (

@@ -100,14 +100,14 @@ export default function HowItWorks() {
       title: 'Automated ROI Calculator',
       description: 'AI calculates real-time return on investment for every recommendation, factoring in treatment costs, yield protection, and market prices',
       benefit: '$8K-20K annual savings documented',
-      color: 'bg-green-500/10 text-green-700 border-green-500/20'
+      color: 'bg-health-good/10 text-health-good border-health-good/20'
     },
     {
       icon: Brain,
       title: 'Daily AI Briefing',
       description: 'Wake up to personalized field intelligence: overnight weather impacts, urgent actions needed, and 7-day stress forecasts delivered to your dashboard',
       benefit: '10 minutes saved daily',
-      color: 'bg-blue-500/10 text-blue-700 border-blue-500/20'
+      color: 'bg-secondary/10 text-secondary border-secondary/20'
     },
     {
       icon: FileText,
@@ -496,9 +496,9 @@ export default function HowItWorks() {
                         <p className="text-sm font-medium mb-1">Impact:</p>
                         <p className="text-sm text-muted-foreground">{useCase.impact}</p>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                        <span className="text-sm font-medium text-green-700">Estimated Savings:</span>
-                        <span className="text-lg font-bold text-green-700">{useCase.savings}</span>
+                      <div className="flex items-center justify-between p-3 bg-health-good/10 border border-health-good/20 rounded-lg">
+                        <span className="text-sm font-medium text-health-good">Estimated Savings:</span>
+                        <span className="text-lg font-bold text-health-good">{useCase.savings}</span>
                       </div>
                     </CardContent>
                   </Card>

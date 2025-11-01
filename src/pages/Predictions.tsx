@@ -249,9 +249,9 @@ export default function Predictions() {
               <CardContent className="space-y-4">
                 <p className="text-sm leading-relaxed">{predictions.summary}</p>
                 {predictions.high_risk_days > 0 && (
-                  <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                    <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                    <p className="text-sm text-red-900">
+                  <div className="flex items-center gap-2 p-3 bg-health-severe/10 border border-health-severe/20 rounded-lg">
+                    <AlertTriangle className="h-5 w-5 text-health-severe flex-shrink-0" />
+                    <p className="text-sm text-destructive">
                       <strong>{predictions.high_risk_days}</strong> high-risk day{predictions.high_risk_days > 1 ? 's' : ''} detected
                     </p>
                   </div>

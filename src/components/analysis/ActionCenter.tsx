@@ -62,7 +62,7 @@ export function ActionCenter({ recommendations, onSetReminder, onShare }: Action
       case "normal":
         return "border-l-warning bg-warning/5";
       default:
-        return "border-l-blue-500 bg-blue-500/5";
+        return "border-l-secondary bg-secondary/5";
     }
   };
 

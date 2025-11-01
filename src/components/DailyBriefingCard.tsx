@@ -187,8 +187,8 @@ export function DailyBriefingCard() {
               <div className="text-2xl font-bold text-primary">{briefing.fieldsSummary.healthy}</div>
               <div className="text-xs text-muted-foreground">Healthy</div>
             </div>
-            <div className="text-center p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-              <div className="text-2xl font-bold text-yellow-600">{briefing.fieldsSummary.needingAttention}</div>
+            <div className="text-center p-3 rounded-lg bg-health-moderate/10 border border-health-moderate/20">
+              <div className="text-2xl font-bold text-health-moderate">{briefing.fieldsSummary.needingAttention}</div>
               <div className="text-xs text-muted-foreground">Attention</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-destructive/10 border border-destructive/20">
@@ -211,7 +211,7 @@ export function DailyBriefingCard() {
                 >
                   <div className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent transition-colors">
                     <div className={`mt-1 ${
-                      priority.urgency === 'high' ? 'text-destructive' : 'text-yellow-600'
+                      priority.urgency === 'high' ? 'text-destructive' : 'text-health-moderate'
                     }`}>
                       {priority.urgency === 'high' ? (
                         <AlertTriangle className="h-5 w-5" />
@@ -241,18 +241,18 @@ export function DailyBriefingCard() {
         )}
 
         {/* Weather Insights */}
-        <div className="p-4 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20">
+        <div className="p-4 rounded-lg bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20">
           <h3 className="font-semibold text-sm text-muted-foreground mb-3 flex items-center gap-2">
-            <Droplets className="h-4 w-4 text-blue-600" />
+            <Droplets className="h-4 w-4 text-secondary" />
             Today's Weather Impact
           </h3>
           <div className="flex items-center gap-4 mb-2">
             <div className="flex items-center gap-2">
-              <Thermometer className="h-4 w-4 text-orange-500" />
+              <Thermometer className="h-4 w-4 text-health-moderate" />
               <span className="text-sm font-medium">{briefing.weatherInsights.temperature}°F</span>
             </div>
             <div className="flex items-center gap-2">
-              <Droplets className="h-4 w-4 text-blue-500" />
+              <Droplets className="h-4 w-4 text-secondary" />
               <span className="text-sm font-medium">{briefing.weatherInsights.precipitation}" rain</span>
             </div>
           </div>

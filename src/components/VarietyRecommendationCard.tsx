@@ -11,9 +11,9 @@ interface VarietyRecommendationCardProps {
 
 export function VarietyRecommendationCard({ recommendation, onAdopt }: VarietyRecommendationCardProps) {
   const riskColors = {
-    low: 'bg-green-100 text-green-800 border-green-200',
-    medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    high: 'bg-red-100 text-red-800 border-red-200',
+    low: 'bg-health-good/10 text-health-good border-health-good/30',
+    medium: 'bg-health-moderate/10 text-health-moderate border-health-moderate/30',
+    high: 'bg-health-severe/10 text-health-severe border-health-severe/30',
   };
 
   return (

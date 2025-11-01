@@ -319,14 +319,14 @@ export default function Cooperatives() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                  <p className="text-sm font-medium text-blue-700 mb-1">📊 Better Decisions</p>
+                <div className="p-4 bg-secondary/10 border border-secondary/20 rounded-lg">
+                  <p className="text-sm font-medium text-secondary mb-1">📊 Better Decisions</p>
                   <p className="text-sm text-muted-foreground">
                     Compare your crop performance against cooperative averages to identify what is working
                   </p>
                 </div>
-                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-                  <p className="text-sm font-medium text-green-700 mb-1">💰 Cost Savings</p>
+                <div className="p-4 bg-health-good/10 border border-health-good/20 rounded-lg">
+                  <p className="text-sm font-medium text-health-good mb-1">💰 Cost Savings</p>
                   <p className="text-sm text-muted-foreground">
                     Pool purchasing power for bulk discounts on fertilizer, seeds, and treatments
                   </p>

@@ -14,9 +14,9 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
   const { toast } = useToast();
 
   const severityConfig = {
-    mild: { color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-200', icon: Droplets },
-    moderate: { color: 'text-orange-600', bg: 'bg-orange-50 border-orange-200', icon: Droplets },
-    severe: { color: 'text-red-600', bg: 'bg-red-50 border-red-200', icon: AlertTriangle },
+    mild: { color: 'text-health-moderate', bg: 'bg-health-moderate/10 border-health-moderate/30', icon: Droplets },
+    moderate: { color: 'text-health-moderate', bg: 'bg-health-moderate/20 border-health-moderate/40', icon: Droplets },
+    severe: { color: 'text-health-severe', bg: 'bg-health-severe/10 border-health-severe/30', icon: AlertTriangle },
   };
 
   const config = severityConfig[waterStress.severity];

@@ -88,12 +88,12 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
             )}
 
             {predictionData.economic_forecast && (
-              <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+              <div className="p-4 rounded-lg bg-health-good/10 border border-health-good/30">
                 <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="h-5 w-5 text-green-600" />
+                  <DollarSign className="h-5 w-5 text-health-good" />
                   <span className="text-sm font-medium">Economic Outlook</span>
                 </div>
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-health-good">
                   {predictionData.economic_forecast}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">

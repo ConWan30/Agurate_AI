@@ -122,16 +122,16 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
         };
       case 'recommended':
         return {
-          color: 'text-blue-600',
-          bgColor: 'bg-blue-500/10 border-blue-500/20',
+          color: 'text-secondary',
+          bgColor: 'bg-secondary/10 border-secondary/20',
           icon: TrendingUp,
           text: 'Recommended',
           description: 'Positive ROI justifies treatment',
         };
       case 'marginal':
         return {
-          color: 'text-yellow-600',
-          bgColor: 'bg-yellow-500/10 border-yellow-500/20',
+          color: 'text-health-moderate',
+          bgColor: 'bg-health-moderate/10 border-health-moderate/20',
           icon: AlertTriangle,
           text: 'Marginal',
           description: 'Consider treatment if conditions worsen',
@@ -257,9 +257,9 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                     </div>
                   </div>
 
-                  <div className="text-center p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <div className="text-center p-4 rounded-lg bg-health-moderate/10 border border-health-moderate/20">
                     <div className="text-xs text-muted-foreground mb-1">Potential Loss</div>
-                    <div className="text-xl font-bold text-yellow-600">
+                    <div className="text-xl font-bold text-health-moderate">
                       $<AnimatedCounter value={roi.potentialLoss} duration={800} decimals={0} />
                     </div>
                   </div>

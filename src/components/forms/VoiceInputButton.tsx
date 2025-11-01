@@ -85,7 +85,7 @@ export const VoiceInputButton = ({ onTranscript, disabled, className }: VoiceInp
       disabled={disabled}
       className={cn(
         "transition-all",
-        isListening && "bg-red-500 hover:bg-red-600 animate-pulse",
+        isListening && "bg-destructive hover:bg-destructive/90 animate-pulse",
         className
       )}
       title={isListening ? "Stop listening" : "Start voice input"}

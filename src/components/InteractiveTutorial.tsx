@@ -211,32 +211,32 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </p>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-health-good/10 border border-health-good/30 rounded-lg">
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <CheckCircle2 className="h-5 w-5 text-health-good" />
                 <span className="text-sm font-medium">Today - Thursday</span>
               </div>
-              <Badge className="bg-green-600 text-white">Low Risk</Badge>
+              <Badge className="bg-health-good text-white">Low Risk</Badge>
             </div>
             
-            <div className="flex items-center justify-between p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-health-moderate/10 border border-health-moderate/30 rounded-lg">
               <div className="flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                <AlertTriangle className="h-5 w-5 text-health-moderate" />
                 <span className="text-sm font-medium">Friday - Saturday</span>
               </div>
-              <Badge className="bg-yellow-600 text-white">Medium Risk</Badge>
+              <Badge className="bg-health-moderate text-white">Medium Risk</Badge>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-health-severe/10 border border-health-severe/30 rounded-lg">
               <div className="flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+                <AlertTriangle className="h-5 w-5 text-health-severe" />
                 <span className="text-sm font-medium">Sunday - Monday</span>
               </div>
               <Badge variant="destructive">High Risk - Heat Wave</Badge>
             </div>
           </div>
 
-          <Card className="border-red-500/30 bg-red-500/5">
+          <Card className="border-health-severe/30 bg-health-severe/5">
             <CardContent className="p-4">
               <p className="font-semibold mb-2">⚠️ Proactive Alert</p>
               <p className="text-sm text-muted-foreground">
@@ -324,23 +324,23 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <p className="font-semibold mb-3">📋 Auto-Generated Claim Package:</p>
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                  <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
                   <span>Pre-storm baseline: 23 photos, Health Score 68% → 92%</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                  <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
                   <span>Post-storm damage: 18 photos, Health Score 41%, GPS-tagged</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                  <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
                   <span>AI damage assessment: Severe (87% confidence)</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                  <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
                   <span>Weather data: Hail event confirmed (NOAA)</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                  <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
                   <span>Timeline: Complete photo record (14 days)</span>
                 </div>
               </div>
@@ -348,18 +348,17 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </Card>
 
           <div className="grid grid-cols-2 gap-3">
-            <Card className="border-red-500/20 bg-red-500/5">
-              <CardContent className="p-3 text-center">
-                <p className="text-sm text-muted-foreground mb-1">Old Process</p>
-                <p className="text-2xl font-bold text-red-700">21 days</p>
-                <p className="text-xs text-muted-foreground">to file claim</p>
+            <Card className="border-health-severe/20 bg-health-severe/5">
+              <CardContent className="p-4 text-center">
+                <p className="text-sm text-muted-foreground mb-2">Average Response Time Before</p>
+                <p className="text-2xl font-bold text-health-severe">21 days</p>
               </CardContent>
             </Card>
-            <Card className="border-green-500/20 bg-green-500/5">
-              <CardContent className="p-3 text-center">
-                <p className="text-sm text-muted-foreground mb-1">With AgurateAI</p>
-                <p className="text-2xl font-bold text-green-700">8 minutes</p>
-                <p className="text-xs text-muted-foreground">auto-generated</p>
+            
+            <Card className="border-health-good/20 bg-health-good/5">
+              <CardContent className="p-4 text-center">
+                <p className="text-sm text-muted-foreground mb-2">Average Response Time Now</p>
+                <p className="text-2xl font-bold text-health-good">8 minutes</p>
               </CardContent>
             </Card>
           </div>

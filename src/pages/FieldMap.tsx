@@ -84,9 +84,9 @@ export default function FieldMap() {
   };
 
   const getHealthColor = (healthScore: number) => {
-    if (healthScore >= 0.75) return 'bg-green-500';
-    if (healthScore >= 0.50) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (healthScore >= 0.75) return 'bg-health-good';
+    if (healthScore >= 0.50) return 'bg-health-moderate';
+    return 'bg-health-severe';
   };
 
   const getStressBadgeVariant = (stressLevel: string) => {
@@ -131,15 +131,15 @@ export default function FieldMap() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow-md" />
+              <div className="w-4 h-4 rounded-full bg-health-good border-2 border-white shadow-md" />
               <span className="text-sm">Healthy (75-100%)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-yellow-500 border-2 border-white shadow-md" />
+              <div className="w-4 h-4 rounded-full bg-health-moderate border-2 border-white shadow-md" />
               <span className="text-sm">Moderate (50-74%)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-md" />
+              <div className="w-4 h-4 rounded-full bg-health-severe border-2 border-white shadow-md" />
               <span className="text-sm">Severe (0-49%)</span>
             </div>
           </CardContent>
@@ -230,7 +230,7 @@ export default function FieldMap() {
           </Card>
           <Card className="field-card">
             <CardContent className="p-6 text-center">
-              <p className="text-3xl font-bold text-green-600">
+              <p className="text-3xl font-bold text-health-good">
                 {assessments.filter(a => a.stress_level === 'healthy').length}
               </p>
               <p className="text-sm text-muted-foreground">Healthy Fields</p>
@@ -238,7 +238,7 @@ export default function FieldMap() {
           </Card>
           <Card className="field-card">
             <CardContent className="p-6 text-center">
-              <p className="text-3xl font-bold text-red-600">
+              <p className="text-3xl font-bold text-health-severe">
                 {assessments.filter(a => a.stress_level === 'severe').length}
               </p>
               <p className="text-sm text-muted-foreground">Fields Need Attention</p>

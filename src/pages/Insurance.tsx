@@ -243,8 +243,8 @@ export default function Insurance() {
               </div>
             </div>
 
-            <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-              <p className="text-sm font-medium text-green-700 mb-1">💰 Estimated Value</p>
+            <div className="p-4 bg-health-good/10 border border-health-good/20 rounded-lg">
+              <p className="text-sm font-medium text-health-good mb-1">💰 Estimated Value</p>
               <p className="text-sm text-muted-foreground">
                 Farmers with documented AI evidence settle claims <strong>40% faster</strong> and recover 
                 <strong> 15-25% more</strong> in payouts due to objective, timestamped crop health data.
