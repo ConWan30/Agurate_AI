@@ -38,6 +38,7 @@ const Onboarding = lazy(() => import("./pages/Onboarding"));
 const ConservationPractices = lazy(() => import("./pages/ConservationPractices"));
 const ConversationalFormsAnalytics = lazy(() => import("./pages/ConversationalFormsAnalytics"));
 const IntegrationTest = lazy(() => import("./pages/IntegrationTest"));
+const BetaSignup = lazy(() => import("./pages/BetaSignup"));
 
 const queryClient = new QueryClient();
 
@@ -124,6 +125,8 @@ const App = () => (
         }>
           <Routes>
             <Route path="/" element={<main id="main-content"><Home /></main>} />
+            <Route path="/beta-signup" element={<main id="main-content"><BetaSignup /></main>} />
+            <Route path="/join-beta" element={<main id="main-content"><BetaSignup /></main>} />
             <Route path="/install" element={<main id="main-content"><Install /></main>} />
             <Route path="/auth" element={<main id="main-content"><Auth /></main>} />
             <Route path="/reset-password" element={<main id="main-content"><ResetPassword /></main>} />

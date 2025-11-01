@@ -268,6 +268,36 @@ export const Layout = ({ children }: LayoutProps) => {
         </div>
       </div>
       
+      {/* Footer */}
+      <footer className="border-t bg-muted/30 py-8">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-center md:text-left">
+              <p className="text-sm text-muted-foreground">
+                © 2025 AgurateAI. Built for Louisiana Delta Farmers.
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link to="/beta-signup">
+                <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
+                  🌾 Join Beta Program
+                </Button>
+              </Link>
+              <Link to="/how-it-works">
+                <Button variant="ghost" size="sm">
+                  How It Works
+                </Button>
+              </Link>
+              <Link to="/lsu-researchers">
+                <Button variant="ghost" size="sm">
+                  LSU Partnership
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+      
       {/* Mobile Floating Action Buttons */}
       <MobileFloatingActions />
     </div>

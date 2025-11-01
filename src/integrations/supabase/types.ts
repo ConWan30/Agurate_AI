@@ -1285,6 +1285,7 @@ export type Database = {
       profiles: {
         Row: {
           beta_farmer: boolean | null
+          beta_feedback_provided: boolean | null
           beta_signup_date: string | null
           beta_welcome_dismissed: boolean | null
           created_at: string | null
@@ -1305,6 +1306,7 @@ export type Database = {
         }
         Insert: {
           beta_farmer?: boolean | null
+          beta_feedback_provided?: boolean | null
           beta_signup_date?: string | null
           beta_welcome_dismissed?: boolean | null
           created_at?: string | null
@@ -1325,6 +1327,7 @@ export type Database = {
         }
         Update: {
           beta_farmer?: boolean | null
+          beta_feedback_provided?: boolean | null
           beta_signup_date?: string | null
           beta_welcome_dismissed?: boolean | null
           created_at?: string | null
@@ -1755,6 +1758,7 @@ export type Database = {
         Args: { inv_id: string; user_id: string }
         Returns: boolean
       }
+      get_beta_farmer_count: { Args: never; Returns: number }
       is_cooperative_admin: {
         Args: { coop_id: string; user_id: string }
         Returns: boolean

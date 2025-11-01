@@ -204,7 +204,7 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/auth">
+              <Link to="/beta-signup">
                 <Button 
                   size="lg" 
                   className="w-full sm:w-auto bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 text-lg px-8 py-6 shadow-glow hover:shadow-field transition-all hover-lift focus-ring"
@@ -543,7 +543,7 @@ export default function Home() {
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90">
             Get FREE unlimited access as one of the first 100 Louisiana Delta farmers
           </p>
-          <Link to="/auth">
+          <Link to="/beta-signup">
             <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 text-lg px-8 py-6 shadow-glow hover:shadow-field hover-lift animate-glow-pulse">
               Join Free Beta Now
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
@@ -627,6 +627,11 @@ export default function Home() {
             <div>
               <h3 className="font-bold mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
+                <li>
+                  <Link to="/beta-signup" className="text-muted-foreground hover:text-primary transition-colors">
+                    Join Beta Program
+                  </Link>
+                </li>
                 <li>
                   <Link to="/auth" className="text-muted-foreground hover:text-primary transition-colors">
                     Sign In
