@@ -193,7 +193,7 @@ export default function Auth() {
               </div>
             </div>
             <div>
-              <h1 className="text-5xl font-display font-bold">
+              <h1 className="text-5xl font-heading font-bold">
                 Agurate<span className="text-primary-foreground">AI</span>
               </h1>
               <p className="text-sm opacity-75 mt-1">Morehouse Parish, Louisiana</p>
@@ -205,7 +205,7 @@ export default function Auth() {
             AI-Powered Precision Agriculture
           </Badge>
           
-          <h2 className="text-3xl font-display font-bold mb-4 leading-tight">
+          <h2 className="text-3xl font-heading font-bold mb-4 leading-tight">
             Transform Your Farming with Intelligent Crop Analysis
           </h2>
           
@@ -218,7 +218,7 @@ export default function Auth() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 group">
               <div className="h-10 w-10 rounded-xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                <CheckCircle2 className="h-5 w-5" />
+                <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
                 <p className="font-semibold">Real-time Crop Assessment</p>
@@ -228,7 +228,7 @@ export default function Auth() {
             
             <div className="flex items-center gap-3 group">
               <div className="h-10 w-10 rounded-xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Shield className="h-5 w-5" />
+                <Shield className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
                 <p className="font-semibold">LSU Research-Based</p>
@@ -238,7 +238,7 @@ export default function Auth() {
             
             <div className="flex items-center gap-3 group">
               <div className="h-10 w-10 rounded-xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users className="h-5 w-5" />
+                <Users className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
                 <p className="font-semibold">Cooperative Network</p>
@@ -306,10 +306,10 @@ export default function Auth() {
                 <CardHeader className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-xl gradient-delta shadow-glow flex items-center justify-center">
-                      <Sprout className="h-6 w-6 text-primary-foreground" />
+                      <Sprout className="h-6 w-6 text-primary-foreground" aria-hidden="true" />
                     </div>
                     <div>
-                      <CardTitle className="text-2xl">Welcome Back</CardTitle>
+                      <CardTitle className="text-2xl font-heading">Welcome Back</CardTitle>
                       <CardDescription>Sign in to access your dashboard</CardDescription>
                     </div>
                   </div>
@@ -328,7 +328,7 @@ export default function Auth() {
                         onChange={(e) =>
                           setSignInData({ ...signInData, email: e.target.value })
                         }
-                        className="h-11 border-2 focus:border-primary transition-colors"
+                        className="h-11 border-2 focus:border-primary transition-colors focus-ring"
                         autoComplete="email"
                         required
                       />
@@ -354,7 +354,7 @@ export default function Auth() {
                         onChange={(e) =>
                           setSignInData({ ...signInData, password: e.target.value })
                         }
-                        className="h-11 border-2 focus:border-primary transition-colors"
+                        className="h-11 border-2 focus:border-primary transition-colors focus-ring"
                         autoComplete="current-password"
                         required
                       />
@@ -400,10 +400,10 @@ export default function Auth() {
                 <CardHeader className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-xl gradient-harvest shadow-glow flex items-center justify-center">
-                      <Users className="h-6 w-6 text-primary-foreground" />
+                      <Users className="h-6 w-6 text-primary-foreground" aria-hidden="true" />
                     </div>
                     <div>
-                      <CardTitle className="text-2xl">Join Free Beta</CardTitle>
+                      <CardTitle className="text-2xl font-heading">Join Free Beta</CardTitle>
                       <CardDescription>Be one of the first 100 Louisiana Delta farmers</CardDescription>
                     </div>
                   </div>

@@ -280,115 +280,115 @@ export default function Dashboard() {
             </Link>
 
             {/* 4. Water Stress Intelligence */}
-            <Link to="/predictions" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/predictions" className="group focus-ring rounded-xl">
+              <AnimatedCard hover delay={100} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Droplets className="h-6 w-6 text-white" />
+                    <Droplets className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Water Stress</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Water Stress</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     Real-time monitoring + DIRT link
                   </p>
-                  <Badge variant="secondary" className="text-xs">Enhanced</Badge>
+                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 5. Conservation Tracking */}
-            <Link to="/predictions" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/predictions" className="group focus-ring rounded-xl">
+              <AnimatedCard hover delay={150} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-sky shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Leaf className="h-6 w-6 text-white" />
+                    <Leaf className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Conservation</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Conservation</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     Track practices & ROI analysis
                   </p>
-                  <Badge variant="secondary" className="text-xs">Enhanced</Badge>
+                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 6. Variety Recommendations */}
-            <Link to="/predictions" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/predictions" className="group focus-ring rounded-xl">
+              <AnimatedCard hover delay={200} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-harvest shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Microscope className="h-6 w-6 text-white" />
+                    <Microscope className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Variety Selection</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Variety Selection</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     AI rice & soybean recommendations
                   </p>
-                  <Badge variant="secondary" className="text-xs">Enhanced</Badge>
+                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 7. LSU Researcher Access */}
-            <Link to="/lsu-researchers" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/lsu-researchers" className="group focus-ring rounded-xl">
+              <AnimatedCard hover delay={250} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <GraduationCap className="h-6 w-6 text-white" />
+                    <GraduationCap className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">LSU Experts</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">LSU Experts</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     Direct AgCenter support access
                   </p>
-                  <Badge variant="secondary" className="text-xs">Enhanced</Badge>
+                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 8. Community Intelligence */}
-            <Link to="/cooperatives" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/cooperatives" className="group focus-ring rounded-xl">
+              <AnimatedCard hover delay={300} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-sky shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Network className="h-6 w-6 text-white" />
+                    <Network className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Cooperatives & Community</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Cooperatives & Community</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     Anonymous cooperative intelligence
                   </p>
-                  <Badge variant="secondary" className="text-xs">Enhanced</Badge>
+                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 9. Interactive Field Maps */}
-            <Link to="/field-map" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/field-map" className="group focus-ring rounded-xl">
+              <AnimatedCard hover delay={350} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-harvest shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <MapPin className="h-6 w-6 text-white" />
+                    <MapPin className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Field Maps</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Field Maps</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     GPS-tagged health visualization
                   </p>
-                  <Badge variant="default" className="text-xs">Core</Badge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
 
             {/* 10. Insurance Documentation */}
-            <Link to="/insurance" className="group">
-              <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:shadow-glow hover:border-primary/50 hover:-translate-y-1">
+            <Link to="/insurance" className="group focus-ring rounded-xl">
+              <AnimatedCard hover delay={400} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <FileText className="h-6 w-6 text-white" />
+                    <FileText className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-base mb-1 group-hover:text-primary transition-colors">Insurance Claims</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Insurance Claims</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     AI-verified documentation
                   </p>
-                  <Badge variant="default" className="text-xs">Core</Badge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             </Link>
           </div>
         </div>

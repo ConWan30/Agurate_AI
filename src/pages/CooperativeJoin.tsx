@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -90,9 +92,9 @@ export default function CooperativeJoin() {
         {/* Header */}
         <div className="text-center">
           <div className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-2xl mb-4">
-            <Users className="h-10 w-10 text-primary" />
+            <Users className="h-10 w-10 text-primary" aria-hidden="true" />
           </div>
-          <h1 className="text-3xl font-display font-bold mb-2">Join Cooperative</h1>
+          <h1 className="text-3xl font-heading font-bold mb-2">Join Cooperative</h1>
           <p className="text-muted-foreground">
             Enter your invitation code to join a farming cooperative
           </p>
@@ -100,57 +102,58 @@ export default function CooperativeJoin() {
 
         {/* Manual Code Entry */}
         {!code && (
-          <Card>
+          <AnimatedCard>
             <CardHeader>
-              <CardTitle className="text-lg">Enter Invitation Code</CardTitle>
+              <CardTitle className="text-lg font-heading">Enter Invitation Code</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <Label>Invitation Code</Label>
+                  <Label htmlFor="invite-code">Invitation Code</Label>
                   <Input
+                    id="invite-code"
                     value={manualCode}
                     onChange={(e) => setManualCode(e.target.value)}
                     placeholder="e.g., abc123de"
-                    className="font-mono"
+                    className="font-mono focus-ring"
+                    aria-label="Enter invitation code"
                   />
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         )}
 
         {/* Loading State */}
         {isLoading && manualCode && (
-          <Card>
+          <AnimatedCard>
             <CardContent className="pt-6 text-center py-12">
-              <Loader2 className="h-12 w-12 mx-auto mb-4 animate-spin text-primary" />
-              <p className="text-muted-foreground">Verifying invitation code...</p>
+              <LoadingState message="Verifying invitation code..." />
             </CardContent>
-          </Card>
+          </AnimatedCard>
         )}
 
         {/* Error State */}
         {error && manualCode && (
-          <Card className="border-destructive">
+          <AnimatedCard className="border-destructive">
             <CardContent className="pt-6 text-center py-12">
-              <XCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+              <XCircle className="h-12 w-12 mx-auto mb-4 text-destructive" aria-hidden="true" />
               <p className="font-semibold mb-2">Invalid or Expired Invitation</p>
               <p className="text-sm text-muted-foreground">
                 This invitation code is not valid or has expired. Please check with the person who invited you.
               </p>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         )}
 
         {/* Valid Invitation */}
         {invitation && !isLoading && (
-          <Card className="border-primary">
+          <AnimatedCard className="border-primary">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
+                  <CardTitle className="flex items-center gap-2 font-heading">
+                    <Users className="h-5 w-5" aria-hidden="true" />
                     {invitation.cooperative?.name}
                   </CardTitle>
                   <CardDescription>{invitation.cooperative?.description}</CardDescription>
@@ -168,15 +171,15 @@ export default function CooperativeJoin() {
                 <p className="font-semibold">What you'll get:</p>
                 <ul className="space-y-1 text-muted-foreground">
                   <li className="flex gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                    <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" aria-hidden="true" />
                     <span>Access to shared cooperative analytics</span>
                   </li>
                   <li className="flex gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                    <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" aria-hidden="true" />
                     <span>Option to share your field data with members</span>
                   </li>
                   <li className="flex gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                    <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" aria-hidden="true" />
                     <span>Collaborative insights and benchmarking</span>
                   </li>
                 </ul>
@@ -186,16 +189,17 @@ export default function CooperativeJoin() {
                 <Button
                   onClick={() => acceptInvitation.mutate()}
                   disabled={acceptInvitation.isPending}
-                  className="flex-1 gap-2"
+                  className="flex-1 gap-2 focus-ring"
+                  aria-label="Accept invitation and join cooperative"
                 >
                   {acceptInvitation.isPending ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                       Joining...
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="h-4 w-4" />
+                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                       Accept & Join
                     </>
                   )}
@@ -203,21 +207,22 @@ export default function CooperativeJoin() {
                 <Button
                   variant="outline"
                   onClick={() => navigate('/cooperatives')}
-                  className="flex-1"
+                  className="flex-1 focus-ring"
+                  aria-label="Decline invitation"
                 >
                   Decline
                 </Button>
               </div>
 
               <p className="text-xs text-muted-foreground text-center">
-                Invitation expires: {new Date(invitation.expires_at).toLocaleDateString()}
+                Invitation expires: <time dateTime={invitation.expires_at}>{new Date(invitation.expires_at).toLocaleDateString()}</time>
               </p>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         )}
 
         <div className="text-center">
-          <Button variant="link" onClick={() => navigate('/')}>
+          <Button variant="link" onClick={() => navigate('/')} className="focus-ring" aria-label="Return to home page">
             ← Back to Home
           </Button>
         </div>
