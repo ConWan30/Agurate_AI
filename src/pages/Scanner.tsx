@@ -288,7 +288,7 @@ export default function Scanner() {
         }}
       >
         <div className="max-w-2xl mx-auto px-4 text-center space-y-4 relative z-10">
-          <h1 className="text-5xl font-heading font-bold text-white drop-shadow-lg">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white drop-shadow-lg">
             Mobile Field Scanner
           </h1>
           <p className="text-lg text-white/90 max-w-xl mx-auto">
@@ -303,12 +303,12 @@ export default function Scanner() {
           <CardContent className="flex items-center gap-2 p-4">
             {isOnline ? (
               <>
-                <Wifi className="h-5 w-5 text-primary" />
+                <Wifi className="h-5 w-5 text-primary" aria-hidden="true" />
                 <span className="font-medium text-foreground">Online</span>
               </>
             ) : (
               <>
-                <WifiOff className="h-5 w-5 text-destructive" />
+                <WifiOff className="h-5 w-5 text-destructive" aria-hidden="true" />
                 <span className="font-medium text-foreground">Offline Mode</span>
               </>
             )}
@@ -318,9 +318,9 @@ export default function Scanner() {
         {/* Field Selection */}
         <Card className="field-card">
           <CardContent className="p-6 space-y-4">
-            <label className="text-sm font-semibold text-foreground">Select Field</label>
+            <label className="text-sm font-semibold text-foreground" htmlFor="field-select">Select Field</label>
             <Select value={selectedFieldId} onValueChange={setSelectedFieldId}>
-              <SelectTrigger>
+              <SelectTrigger id="field-select" aria-label="Select field for scanning">
                 <SelectValue placeholder="-- Choose Field --" />
               </SelectTrigger>
               <SelectContent>
@@ -335,13 +335,14 @@ export default function Scanner() {
             {/* AR Toggle */}
             <div className="flex items-center justify-between pt-2 border-t">
               <Label htmlFor="ar-mode" className="flex items-center gap-2 cursor-pointer">
-                <Layers className="h-4 w-4" />
+                <Layers className="h-4 w-4" aria-hidden="true" />
                 AR Overlay Mode
               </Label>
               <Switch
                 id="ar-mode"
                 checked={arEnabled}
                 onCheckedChange={setArEnabled}
+                aria-label="Toggle AR overlay mode"
               />
             </div>
           </CardContent>
@@ -406,11 +407,15 @@ export default function Scanner() {
                   )}
                 </>
               ) : (
-                <div 
-                  className="flex flex-col items-center justify-center h-full cursor-pointer hover:bg-muted/80 transition-colors"
+                 <div 
+                  className="flex flex-col items-center justify-center h-full cursor-pointer hover:bg-muted/80 transition-colors focus-ring"
                   onClick={handleCameraClick}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Capture crop image"
+                  onKeyDown={(e) => e.key === 'Enter' && handleCameraClick()}
                 >
-                  <Camera className="h-16 w-16 text-muted-foreground mb-4" />
+                  <Camera className="h-16 w-16 text-muted-foreground mb-4" aria-hidden="true" />
                   <p className="text-muted-foreground font-medium">Tap to capture crop image</p>
                   {arEnabled && (
                     <p className="text-xs text-blue-600 mt-2">AR mode enabled</p>
@@ -433,8 +438,8 @@ export default function Scanner() {
         {gpsCoords && (
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="flex items-center gap-2 p-4">
-              <MapPin className="h-5 w-5 text-primary" />
-              <span className="text-sm text-foreground">
+              <MapPin className="h-5 w-5 text-primary" aria-hidden="true" />
+              <span className="text-sm text-foreground font-mono">
                 Location: {gpsCoords.lat.toFixed(5)}, {gpsCoords.lng.toFixed(5)}
                 {gpsCoords.accuracy && ` (±${gpsCoords.accuracy.toFixed(0)}m)`}
               </span>

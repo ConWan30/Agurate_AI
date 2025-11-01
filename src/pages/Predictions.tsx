@@ -198,8 +198,8 @@ export default function Predictions() {
         {selectedFieldId && enhancedPredictions.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-display font-bold">30-Day Enhanced Forecast</h2>
+              <Brain className="h-5 w-5 text-primary" aria-hidden="true" />
+              <h2 className="text-2xl font-heading font-bold">30-Day Enhanced Forecast</h2>
             </div>
             {isLoadingEnhanced ? (
               <Card className="field-card">
@@ -217,11 +217,11 @@ export default function Predictions() {
         )}
 
         {/* 7-Day Stress Predictions */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Cloud className="h-5 w-5 text-primary" />
-            <h2 className="text-2xl font-display font-bold">7-Day Stress Forecast</h2>
-          </div>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Cloud className="h-5 w-5 text-primary" aria-hidden="true" />
+              <h2 className="text-2xl font-heading font-bold">7-Day Stress Forecast</h2>
+            </div>
 
         {isLoading ? (
           <Card className="field-card">
@@ -241,8 +241,8 @@ export default function Predictions() {
               }}
             >
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Cloud className="h-5 w-5 delta-wave" />
+                <CardTitle className="font-heading flex items-center gap-2">
+                  <Cloud className="h-5 w-5 delta-wave" aria-hidden="true" />
                   7-Day Forecast Summary
                 </CardTitle>
               </CardHeader>
@@ -266,8 +266,8 @@ export default function Predictions() {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
+                        <CardTitle className="text-lg font-heading flex items-center gap-2">
+                          <Calendar className="h-4 w-4" aria-hidden="true" />
                           Day {pred.day} - {pred.date}
                         </CardTitle>
                         <CardDescription>
@@ -292,7 +292,7 @@ export default function Predictions() {
 
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Confidence:</span>
-                      <span className="text-sm font-semibold">{(pred.confidence * 100).toFixed(0)}%</span>
+                      <span className="text-sm font-semibold font-mono">{(pred.confidence * 100).toFixed(0)}%</span>
                     </div>
 
                     <div className="pt-3 border-t">
@@ -308,8 +308,8 @@ export default function Predictions() {
 
             {/* Refresh Button */}
             <div className="flex justify-center pt-4">
-              <Button onClick={loadPredictions} disabled={isLoading} size="lg" className="gap-2">
-                <TrendingUp className="h-4 w-4" />
+              <Button onClick={loadPredictions} disabled={isLoading} size="lg" className="gap-2 focus-ring" aria-label="Refresh predictions">
+                <TrendingUp className="h-4 w-4" aria-hidden="true" />
                 Refresh Predictions
               </Button>
             </div>
@@ -340,8 +340,8 @@ export default function Predictions() {
                   </div>
                 </div>
               </div>
-              <Button onClick={() => window.location.href = '/upload'} size="lg" className="gap-2">
-                <TrendingUp className="h-4 w-4" />
+              <Button onClick={() => window.location.href = '/upload'} size="lg" className="gap-2 focus-ring" aria-label="Start analyzing crops">
+                <TrendingUp className="h-4 w-4" aria-hidden="true" />
                 Start Analyzing Crops
               </Button>
             </CardContent>
@@ -356,9 +356,9 @@ export default function Predictions() {
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10">
-                    <Brain className="h-5 w-5 text-primary" />
+                    <Brain className="h-5 w-5 text-primary" aria-hidden="true" />
                   </div>
-                  <CardTitle className="text-lg">Unified Context</CardTitle>
+                  <CardTitle className="text-lg font-heading">Unified Context</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
@@ -373,9 +373,9 @@ export default function Predictions() {
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-accent/10">
-                    <TrendingUp className="h-5 w-5 text-accent" />
+                    <TrendingUp className="h-5 w-5 text-accent" aria-hidden="true" />
                   </div>
-                  <CardTitle className="text-lg">Extended Forecasting</CardTitle>
+                  <CardTitle className="text-lg font-heading">Extended Forecasting</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
@@ -390,9 +390,9 @@ export default function Predictions() {
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-secondary/10">
-                    <Zap className="h-5 w-5 text-secondary" />
+                    <Zap className="h-5 w-5 text-secondary" aria-hidden="true" />
                   </div>
-                  <CardTitle className="text-lg">LSU-Validated</CardTitle>
+                  <CardTitle className="text-lg font-heading">LSU-Validated</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>

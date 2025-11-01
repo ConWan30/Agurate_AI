@@ -152,7 +152,7 @@ export default function History() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
         <LoadingState message="Loading assessment history..." size="lg" />
       </div>
     );
@@ -221,22 +221,24 @@ export default function History() {
                             </CardDescription>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-3xl font-bold font-mono">
+                       <div className="text-right">
+                          <div className="text-3xl font-bold font-mono text-foreground">
                             {Math.round((assessment.health_score || 0) * 100)}
                           </div>
                           <p className="text-xs text-muted-foreground">Health Score</p>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
+                     <CardContent>
+                      <div className="flex items-center justify-between gap-4">
                         <AgriculturalBadge 
                           type={assessment.stress_level === "Healthy" ? "healthy" : assessment.stress_level === "Moderate" ? "moderate" : "severe"}
                         >
                           {assessment.stress_level}
                         </AgriculturalBadge>
-                        <Button variant="outline" size="sm" className="focus-ring" aria-label={`View details for ${assessment.field.name}`}>View Details</Button>
+                        <Button variant="outline" size="sm" className="focus-ring flex-shrink-0" aria-label={`View details for ${assessment.field.name}`}>
+                          View Details
+                        </Button>
                       </div>
                     </CardContent>
                   </AnimatedCard>
@@ -253,10 +255,12 @@ export default function History() {
                   size="sm"
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
+                  className="focus-ring"
+                  aria-label="Go to previous page"
                 >
                   Previous
                 </Button>
-                <span className="text-sm text-muted-foreground px-4">
+                <span className="text-sm text-muted-foreground px-4" aria-live="polite">
                   Page {currentPage} of {Math.ceil(assessments.length / itemsPerPage)}
                 </span>
                 <Button
@@ -264,6 +268,8 @@ export default function History() {
                   size="sm"
                   onClick={() => setCurrentPage(p => Math.min(Math.ceil(assessments.length / itemsPerPage), p + 1))}
                   disabled={currentPage >= Math.ceil(assessments.length / itemsPerPage)}
+                  className="focus-ring"
+                  aria-label="Go to next page"
                 >
                   Next
                 </Button>
@@ -278,7 +284,7 @@ export default function History() {
             {selectedAssessment && (
               <>
                 <DialogHeader>
-                  <DialogTitle className="text-2xl flex items-center gap-3">
+                  <DialogTitle className="text-2xl font-heading flex items-center gap-3">
                     {getStressIcon(selectedAssessment.stress_level)}
                     {selectedAssessment.field.name} - Comprehensive Analysis
                   </DialogTitle>

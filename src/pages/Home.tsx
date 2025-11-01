@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AgriculturalBadge } from "@/components/ui/agricultural-badge";
 import { Link } from "react-router-dom";
 import { BetaCountdown } from "@/components/BetaCountdown";
 import { 
@@ -155,7 +156,7 @@ export default function Home() {
               <Sprout className="h-8 w-8 text-primary animate-float" aria-hidden="true" />
               <div className="absolute inset-0 blur-lg bg-primary/20 animate-glow-pulse" />
             </div>
-            <h1 className="text-2xl font-display font-bold">
+            <h1 className="text-2xl font-heading font-bold">
               Agurate<span className="font-bold text-primary">AI</span>
             </h1>
           </div>
@@ -193,7 +194,7 @@ export default function Home() {
               🌱 FREE BETA - Limited to First 100 Louisiana Delta Farmers
             </Badge>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-primary-foreground mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-primary-foreground mb-6 leading-tight">
               AI-Powered Crop Health Monitoring for Louisiana Delta
             </h1>
             
@@ -233,7 +234,7 @@ export default function Home() {
                   className="text-center animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">
+                  <div className="text-3xl md:text-4xl font-bold font-mono text-primary-foreground mb-2">
                     <AnimatedCounter 
                       value={stat.value} 
                       duration={2000}
@@ -274,7 +275,7 @@ export default function Home() {
               <Zap className="h-3 w-3 mr-1" />
               Built on LSU AgCenter Research
             </Badge>
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-4">
               Everything You Need to Monitor Your Crops
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -318,10 +319,10 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           <div className={`transition-all duration-1000 ${benefitsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
-                <Award className="h-3 w-3 mr-1" />
+                <Award className="h-3 w-3 mr-1" aria-hidden="true" />
                 130+ Years of LSU AgCenter Research
               </Badge>
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
                 Built for Louisiana Delta Farmers
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
@@ -354,27 +355,27 @@ export default function Home() {
             </div>
 
             <div className={`grid grid-cols-2 gap-6 transition-all duration-1000 ${benefitsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
-              <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group">
+              <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group focus-ring" tabIndex={0}>
                 <Shield className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">LSU Research-Based</h3>
+                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">LSU Research-Based</h3>
                 <p className="text-sm text-muted-foreground">Built on 130+ years of research</p>
               </Card>
               
-              <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group mt-8">
+              <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group mt-8 focus-ring" tabIndex={0}>
                 <Smartphone className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">Mobile First</h3>
+                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">Mobile First</h3>
                 <p className="text-sm text-muted-foreground">Works on any device</p>
               </Card>
               
-              <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group">
+              <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group focus-ring" tabIndex={0}>
                 <Users className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">Cooperative</h3>
+                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">Cooperative</h3>
                 <p className="text-sm text-muted-foreground">Share insights with neighbors</p>
               </Card>
               
-              <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group mt-8">
+              <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group mt-8 focus-ring" tabIndex={0}>
                 <Cloud className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">Always Available</h3>
+                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">Always Available</h3>
                 <p className="text-sm text-muted-foreground">24/7 crop monitoring</p>
               </Card>
             </div>
@@ -393,7 +394,7 @@ export default function Home() {
               <Sparkles className="h-3 w-3 mr-1" />
               Cutting-Edge Agricultural Technology
             </Badge>
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-4">
               Unified AI Intelligence System
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
