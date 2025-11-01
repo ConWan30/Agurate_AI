@@ -170,6 +170,12 @@ const App = () => (
           <Route path="/demo/insurance" element={<Layout><Insurance /></Layout>} />
           <Route path="/demo/cooperatives" element={<Layout><Cooperatives /></Layout>} />
           <Route path="/demo/delta" element={<Layout><DeltaIntelligence /></Layout>} />
+          <Route path="/demo/delta-intelligence" element={<Layout><DeltaIntelligence /></Layout>} />
+          <Route path="/demo/delta-ai" element={<Layout><DeltaIntelligence /></Layout>} />
+          <Route path="/demo/chat" element={<Layout><DeltaIntelligence /></Layout>} />
+          <Route path="/demo/ai-chat" element={<Layout><DeltaIntelligence /></Layout>} />
+          <Route path="/demo/predict" element={<Layout><Predictions /></Layout>} />
+          <Route path="/demo/stress-predictions" element={<Layout><Predictions /></Layout>} />
           <Route path="/demo/analytics" element={<Layout><Analytics /></Layout>} />
           <Route path="/demo/lsu-researchers" element={<Layout><LSUResearchers /></Layout>} />
           <Route path="/demo/profile" element={<Layout><Profile /></Layout>} />
