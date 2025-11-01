@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { TrendingUp, Cloud, AlertTriangle, Calendar, Loader2, Brain, Zap, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LoadingState } from '@/components/ui/loading-state';
+import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -147,9 +150,9 @@ export default function Predictions() {
 
   const getRiskIcon = (level: string) => {
     switch (level) {
-      case 'high': return <AlertTriangle className="h-5 w-5 text-destructive" />;
-      case 'medium': return <AlertTriangle className="h-5 w-5 text-secondary-foreground" />;
-      default: return <TrendingUp className="h-5 w-5 text-primary" />;
+      case 'high': return <AlertTriangle className="h-5 w-5 text-health-severe" aria-label="High risk" />;
+      case 'medium': return <AlertTriangle className="h-5 w-5 text-health-moderate" aria-label="Medium risk" />;
+      default: return <TrendingUp className="h-5 w-5 text-health-good" aria-label="Low risk" />;
     }
   };
 
@@ -222,11 +225,8 @@ export default function Predictions() {
 
         {isLoading ? (
           <Card className="field-card">
-            <CardContent className="flex items-center justify-center py-12">
-              <div className="text-center space-y-4">
-                <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-                <p className="text-muted-foreground">Analyzing historical data and weather patterns...</p>
-              </div>
+            <CardContent className="py-12">
+              <LoadingState message="Analyzing historical data and weather patterns..." size="lg" />
             </CardContent>
           </Card>
         ) : predictions ? (

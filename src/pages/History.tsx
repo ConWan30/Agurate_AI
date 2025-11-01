@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { LoadingState } from "@/components/ui/loading-state";
+import { AgriculturalBadge } from "@/components/ui/agricultural-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -124,11 +127,11 @@ export default function History() {
   const getStressIcon = (stressLevel: string) => {
     switch (stressLevel) {
       case "Healthy":
-        return <CheckCircle2 className="h-5 w-5 text-success" />;
+        return <CheckCircle2 className="h-5 w-5 text-health-good" aria-label="Healthy crop status" />;
       case "Moderate":
-        return <AlertTriangle className="h-5 w-5 text-warning" />;
+        return <AlertTriangle className="h-5 w-5 text-health-moderate" aria-label="Moderate stress detected" />;
       case "Severe":
-        return <AlertCircle className="h-5 w-5 text-destructive" />;
+        return <AlertCircle className="h-5 w-5 text-health-severe" aria-label="Severe stress detected" />;
       default:
         return null;
     }
@@ -149,8 +152,8 @@ export default function History() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Loading assessment history...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingState message="Loading assessment history..." size="lg" />
       </div>
     );
   }
@@ -168,7 +171,7 @@ export default function History() {
         }}
       >
         <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+          <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
             Assessment History
           </h1>
           <p className="text-white/90 text-base md:text-lg max-w-2xl">
@@ -201,38 +204,43 @@ export default function History() {
                     }
                   }}
                 >
-                  <Card
-                    className="field-card border-2 cursor-pointer hover:border-primary/50 transition-all"
-                    onClick={() => setSelectedAssessment(assessment)}
-                  >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        {getStressIcon(assessment.stress_level)}
-                        <div>
-                          <CardTitle className="text-xl">{assessment.field.name}</CardTitle>
-                          <CardDescription className="capitalize">
-                            {assessment.field.crop_type} • {format(new Date(assessment.created_at), "MMM d, yyyy 'at' h:mm a")}
-                          </CardDescription>
+                  <div onClick={() => setSelectedAssessment(assessment)} className="cursor-pointer">
+                    <AnimatedCard
+                      delay={index * 50}
+                      hover={true}
+                      className="border-2 focus-ring"
+                    >
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          {getStressIcon(assessment.stress_level)}
+                          <div>
+                            <CardTitle className="text-xl font-heading">{assessment.field.name}</CardTitle>
+                            <CardDescription className="capitalize">
+                              {assessment.field.crop_type} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy 'at' h:mm a")}</time>
+                            </CardDescription>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-3xl font-bold font-mono">
+                            {Math.round((assessment.health_score || 0) * 100)}
+                          </div>
+                          <p className="text-xs text-muted-foreground">Health Score</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-bold">
-                          {Math.round((assessment.health_score || 0) * 100)}
-                        </div>
-                        <p className="text-xs text-muted-foreground">Health Score</p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <AgriculturalBadge 
+                          type={assessment.stress_level === "Healthy" ? "healthy" : assessment.stress_level === "Moderate" ? "moderate" : "severe"}
+                        >
+                          {assessment.stress_level}
+                        </AgriculturalBadge>
+                        <Button variant="outline" size="sm" className="focus-ring" aria-label={`View details for ${assessment.field.name}`}>View Details</Button>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <Badge variant={assessment.stress_level === "Healthy" ? "default" : assessment.stress_level === "Moderate" ? "outline" : "destructive"}>
-                        {assessment.stress_level}
-                      </Badge>
-                      <Button variant="outline" size="sm">View Details</Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </AnimatedCard>
+                  </div>
                 </SwipeableCard>
               ))}
             </div>

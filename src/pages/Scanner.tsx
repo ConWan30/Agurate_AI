@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import bgMobileScanner from "@/assets/bg-mobile-scanner.jpg";
 import { Card, CardContent } from '@/components/ui/card';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -287,7 +288,7 @@ export default function Scanner() {
         }}
       >
         <div className="max-w-2xl mx-auto px-4 text-center space-y-4 relative z-10">
-          <h1 className="text-5xl font-display font-bold text-white drop-shadow-lg">
+          <h1 className="text-5xl font-heading font-bold text-white drop-shadow-lg">
             Mobile Field Scanner
           </h1>
           <p className="text-lg text-white/90 max-w-xl mx-auto">
@@ -445,17 +446,18 @@ export default function Scanner() {
         <Button
           onClick={handleAnalyze}
           disabled={!image || !selectedFieldId || isAnalyzing}
-          className="w-full h-14 text-lg gap-2 shadow-field"
+          className="w-full h-14 text-lg gap-2 shadow-field focus-ring"
           size="lg"
+          aria-label="Analyze captured crop image"
         >
           {isAnalyzing ? (
             <>
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
               Analyzing...
             </>
           ) : (
             <>
-              <Upload className="h-5 w-5" />
+              <Upload className="h-5 w-5" aria-hidden="true" />
               Analyze Crop Health
             </>
           )}

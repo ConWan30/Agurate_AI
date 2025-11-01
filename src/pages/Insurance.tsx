@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -145,7 +147,7 @@ export default function Insurance() {
         >
           <div className="relative z-10 flex items-start justify-between">
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
+              <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
                 Insurance Claims
               </h1>
               <p className="text-white/90 text-base md:text-lg">
@@ -263,24 +265,27 @@ export default function Insurance() {
               </CardContent>
             </Card>
           ) : (
-            claims?.map(claim => (
-              <Card key={claim.id} className="field-card hover-lift">
+            claims?.map((claim, index) => (
+              <AnimatedCard key={claim.id} delay={index * 50} hover={true}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <FileText className="h-5 w-5" />
+                      <CardTitle className="flex items-center gap-2 font-heading">
+                        <FileText className="h-5 w-5" aria-hidden="true" />
                         {claim.field?.name}
                       </CardTitle>
                       <CardDescription>
                         {claim.field?.crop_type} • {claim.field?.acreage} acres
                       </CardDescription>
                     </div>
-                    <Badge variant={
-                      claim.status === 'approved' ? 'default' :
-                      claim.status === 'submitted' ? 'secondary' :
-                      claim.status === 'denied' ? 'destructive' : 'outline'
-                    }>
+                    <Badge 
+                      variant={
+                        claim.status === 'approved' ? 'default' :
+                        claim.status === 'submitted' ? 'secondary' :
+                        claim.status === 'denied' ? 'destructive' : 'outline'
+                      }
+                      aria-label={`Claim status: ${claim.status}`}
+                    >
                       {claim.status}
                     </Badge>
                   </div>
@@ -328,23 +333,25 @@ export default function Insurance() {
                   <div className="grid grid-cols-2 gap-2">
                     <Button 
                       variant="outline" 
-                      className="gap-2"
+                      className="gap-2 focus-ring"
                       onClick={() => setDetailClaimId(claim.id)}
+                      aria-label={`View details for ${claim.field?.name} claim`}
                     >
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-4 w-4" aria-hidden="true" />
                       View Details
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="gap-2"
+                      className="gap-2 focus-ring"
                       onClick={() => exportClaim(claim.id)}
+                      aria-label={`Export ${claim.field?.name} claim as PDF`}
                     >
-                      <Download className="h-4 w-4" />
+                      <Download className="h-4 w-4" aria-hidden="true" />
                       Export
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
+              </AnimatedCard>
             ))
           )}
         </div>
