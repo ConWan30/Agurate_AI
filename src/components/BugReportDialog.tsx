@@ -85,11 +85,12 @@ export function BugReportDialog({ open, onClose }: BugReportDialogProps) {
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data, error: signedUrlError } = await supabase.storage
           .from('crop-images')
-          .getPublicUrl(fileName);
+          .createSignedUrl(fileName, 3600); // 1 hour expiry
 
-        screenshotUrl = publicUrl;
+        if (signedUrlError) throw signedUrlError;
+        screenshotUrl = data.signedUrl;
       }
 
       // Insert bug report

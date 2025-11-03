@@ -172,16 +172,22 @@ export default function Scanner() {
       if (!selectedField) throw new Error('Field not found');
 
       // Upload to Supabase Storage
-      const fileName = `${Date.now()}-${image.name}`;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Authentication required');
+
+      const fileName = `${user.id}/${Date.now()}-${image.name}`;
       const { error: uploadError } = await supabase.storage
         .from('crop-images')
         .upload(fileName, image);
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data, error: signedUrlError } = await supabase.storage
         .from('crop-images')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600); // 1 hour expiry
+
+      if (signedUrlError) throw signedUrlError;
+      const imageUrl = data.signedUrl;
 
       // ✅ UNIFIED AI: Gather context before analysis
       const unifiedContext = await gatherUnifiedContext(selectedFieldId);
@@ -189,7 +195,7 @@ export default function Scanner() {
       // Call analyze-crop edge function with unified context
       const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
         body: {
-          imageUrl: publicUrl,
+          imageUrl: imageUrl,
           cropType: selectedField.crop_type,
           fieldId: selectedFieldId,
           unifiedContext // Include intelligence pool data
@@ -203,7 +209,7 @@ export default function Scanner() {
         .from('assessments')
         .insert({
           field_id: selectedFieldId,
-          image_url: publicUrl,
+          image_url: imageUrl,
           health_score: aiResult.health_score || 0.75,
           stress_level: aiResult.stress_level || 'healthy',
           symptoms: aiResult.symptoms || [],

@@ -56,11 +56,12 @@ export const DeltaChatInput = ({ onTextMessage, onImageMessage, disabled }: Delt
 
     if (uploadError) throw uploadError;
 
-    const { data: { publicUrl } } = supabase.storage
+    const { data, error: signedUrlError } = await supabase.storage
       .from('crop-images')
-      .getPublicUrl(filePath);
+      .createSignedUrl(filePath, 3600); // 1 hour expiry
 
-    return publicUrl;
+    if (signedUrlError) throw signedUrlError;
+    return data.signedUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

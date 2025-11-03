@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.1";
+import { handleError, handleAuthError, handleRateLimitError } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -287,7 +288,10 @@ serve(async (req) => {
 
     // Get user
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) throw new Error('Unauthorized');
+    if (userError || !user) {
+      console.error('[conversational-form] Authentication failed');
+      return handleAuthError(corsHeaders);
+    }
 
     // Rate limiting: Check request frequency (20 requests per minute for forms)
     const { data: recentRequests } = await supabaseClient
@@ -298,10 +302,7 @@ serve(async (req) => {
       .gte('created_at', new Date(Date.now() - 60000).toISOString());
 
     if (recentRequests && recentRequests.length >= 20) {
-      return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded. Please wait before sending more messages.' }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return handleRateLimitError(corsHeaders);
     }
 
     // Log this request
@@ -569,11 +570,7 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
     );
 
   } catch (error) {
-    console.error('Error in conversational-form:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    console.error('[conversational-form] Error:', error);
+    return handleError(error, 'conversational-form', corsHeaders);
   }
 });

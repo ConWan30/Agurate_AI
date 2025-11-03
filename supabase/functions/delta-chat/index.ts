@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { handleError, handleAuthError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
@@ -122,10 +123,7 @@ serve(async (req) => {
     const { data: { user } } = await supabaseClient.auth.getUser();
     
     if (!user) {
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return handleAuthError(corsHeaders);
     }
 
     // Rate limiting: Check request frequency (10 requests per minute)
@@ -137,10 +135,7 @@ serve(async (req) => {
       .gte('created_at', new Date(Date.now() - 60000).toISOString());
 
     if (recentRequests && recentRequests.length >= 10) {
-      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please wait before sending more messages.' }), {
-        status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return handleRateLimitError(corsHeaders);
     }
 
     // Log this request
@@ -236,10 +231,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return handleRateLimitError(corsHeaders);
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: 'Payment required. Please add credits to your workspace.' }), {
@@ -247,8 +239,7 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
+      console.error('[delta-chat] AI gateway error:', response.status);
       return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -259,7 +250,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
     });
   } catch (error: any) {
-    console.error('Delta chat error:', error);
+    console.error('[delta-chat] Error:', error);
     
     // Handle validation errors
     if (error?.name === 'ZodError') {
@@ -275,10 +266,6 @@ serve(async (req) => {
       );
     }
     
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return handleError(error, 'delta-chat', corsHeaders);
   }
 });

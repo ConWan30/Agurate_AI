@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { handleError, handleAuthError, handleForbiddenError, handleRateLimitError } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,19 +33,8 @@ serve(async (req) => {
     // Get auth token from request header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error('No authorization header');
-      return new Response(
-        JSON.stringify({ 
-          error: 'Authentication required',
-          forecast: [],
-          summary: 'Please log in to generate predictions.',
-          high_risk_days: 0
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      );
+      console.error('[predict-stress] No authorization header');
+      return handleAuthError(corsHeaders);
     }
 
     // Create Supabase client with auth token
@@ -58,22 +48,11 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
     
     if (userError || !user) {
-      console.error('Failed to get user:', userError);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Authentication failed',
-          forecast: [],
-          summary: 'Unable to verify user. Please log in again.',
-          high_risk_days: 0
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      );
+      console.error('[predict-stress] Failed to get user');
+      return handleAuthError(corsHeaders);
     }
     
-    console.log('User authenticated successfully:', user.id);
+    console.log('[predict-stress] User authenticated:', user.id);
 
     // Rate limiting: Check request frequency (5 predictions per minute)
     const { data: recentRequests } = await supabaseClient
@@ -84,15 +63,7 @@ serve(async (req) => {
       .gte('created_at', new Date(Date.now() - 60000).toISOString());
 
     if (recentRequests && recentRequests.length >= 5) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'Rate limit exceeded. Please wait before requesting more predictions.',
-          forecast: [],
-          summary: 'Too many requests. Please try again in a minute.',
-          high_risk_days: 0
-        }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return handleRateLimitError(corsHeaders);
     }
 
     // Log this request
@@ -288,18 +259,7 @@ Return JSON only with structured predictions.`
     });
 
   } catch (error) {
-    console.error('Prediction error:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: 'Unable to generate predictions. Please try again.',
-        forecast: [],
-        summary: 'Unable to generate predictions at this time.',
-        high_risk_days: 0
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
-      }
-    );
+    console.error('[predict-stress] Error:', error);
+    return handleError(error, 'predict-stress', corsHeaders);
   }
 });

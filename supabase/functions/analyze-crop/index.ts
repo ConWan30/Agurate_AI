@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { handleError, handleAuthError, handleForbiddenError, handleNotFoundError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -72,10 +73,7 @@ serve(async (req) => {
     // Authenticate user
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return handleAuthError(corsHeaders);
     }
 
     const supabaseAuth = createClient(
@@ -87,11 +85,8 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token);
     
     if (userError || !user) {
-      console.error('Authentication failed:', userError);
-      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      console.error('[analyze-crop] Authentication failed');
+      return handleAuthError(corsHeaders);
     }
 
     // Verify field ownership if fieldId provided

@@ -126,10 +126,13 @@ export default function Upload() {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      // Get signed URL (secure, time-limited)
+      const { data, error: signedUrlError } = await supabase.storage
         .from("crop-images")
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600); // 1 hour expiry
+
+      if (signedUrlError) throw signedUrlError;
+      const imageUrl = data.signedUrl;
 
       setUploading(false);
       setAnalyzing(true);
@@ -143,7 +146,7 @@ export default function Upload() {
         : "Louisiana Delta region";
 
       // Call real AI analysis
-      await performAIAnalysis(publicUrl, field.crop_type, fieldLocation, selectedField, fileType);
+      await performAIAnalysis(imageUrl, field.crop_type, fieldLocation, selectedField, fileType);
 
       toast({
         title: "Analysis complete!",
