@@ -17,6 +17,18 @@ const analyzeCropSchema = z.object({
   mediaType: z.enum(['image', 'video']).default('image')
 });
 
+// Validate image URL has proper file extension
+function validateImageUrl(url: string, mediaType: string): boolean {
+  if (mediaType === 'image') {
+    const imagePattern = /\.(jpg|jpeg|png|webp|gif|bmp|tiff)(\?.*)?$/i;
+    return imagePattern.test(url);
+  } else if (mediaType === 'video') {
+    const videoPattern = /\.(mp4|mov|avi|webm)(\?.*)?$/i;
+    return videoPattern.test(url);
+  }
+  return false;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -41,6 +53,20 @@ serve(async (req) => {
     }
 
     const { imageUrl, cropType, fieldId, location, mediaType } = validation.data;
+    
+    // Validate image/video file format
+    if (!validateImageUrl(imageUrl, mediaType)) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid file format',
+          details: mediaType === 'image' 
+            ? 'Only JPG, JPEG, PNG, WebP, GIF, BMP, and TIFF images are supported'
+            : 'Only MP4, MOV, AVI, and WebM videos are supported'
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     console.log('🌾 Analyzing crop media with unified context:', { imageUrl, cropType, fieldId, location, mediaType });
 
     // Authenticate user
@@ -92,6 +118,31 @@ serve(async (req) => {
         });
       }
     }
+
+    // Rate limiting: Check request frequency (10 analyses per minute)
+    const { data: recentRequests } = await supabaseAuth
+      .from('request_logs')
+      .select('created_at')
+      .eq('user_id', user.id)
+      .eq('function_name', 'analyze-crop')
+      .gte('created_at', new Date(Date.now() - 60000).toISOString());
+
+    if (recentRequests && recentRequests.length >= 10) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please wait before analyzing more images.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Log this request
+    await supabaseAuth
+      .from('request_logs')
+      .insert({
+        user_id: user.id,
+        function_name: 'analyze-crop',
+        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
+        user_agent: req.headers.get('user-agent') || 'unknown'
+      });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {

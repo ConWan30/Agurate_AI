@@ -1377,6 +1377,33 @@ export type Database = {
           },
         ]
       }
+      request_logs: {
+        Row: {
+          created_at: string | null
+          function_name: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          function_name: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          function_name?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       success_stories: {
         Row: {
           acres_protected: number | null
@@ -1784,6 +1811,7 @@ export type Database = {
         Args: { inv_id: string; user_id: string }
         Returns: boolean
       }
+      cleanup_old_request_logs: { Args: never; Returns: undefined }
       get_beta_farmer_count: { Args: never; Returns: number }
       is_cooperative_admin: {
         Args: { coop_id: string; user_id: string }

@@ -75,6 +75,36 @@ serve(async (req) => {
     
     console.log('User authenticated successfully:', user.id);
 
+    // Rate limiting: Check request frequency (5 predictions per minute)
+    const { data: recentRequests } = await supabaseClient
+      .from('request_logs')
+      .select('created_at')
+      .eq('user_id', user.id)
+      .eq('function_name', 'predict-stress')
+      .gte('created_at', new Date(Date.now() - 60000).toISOString());
+
+    if (recentRequests && recentRequests.length >= 5) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded. Please wait before requesting more predictions.',
+          forecast: [],
+          summary: 'Too many requests. Please try again in a minute.',
+          high_risk_days: 0
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Log this request
+    await supabaseClient
+      .from('request_logs')
+      .insert({
+        user_id: user.id,
+        function_name: 'predict-stress',
+        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
+        user_agent: req.headers.get('user-agent') || 'unknown'
+      });
+
     // Gather comprehensive context data
     const [assessments, weatherEvents, waterStress, communityInsights] = await Promise.all([
       supabaseClient

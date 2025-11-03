@@ -6,6 +6,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Sanitize user input to prevent prompt injection and XSS
+function sanitizeInput(input: string): string {
+  return input
+    .trim()
+    .replace(/[<>]/g, '') // Remove HTML-like tags
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+    .slice(0, 2000); // Hard limit on input length
+}
+
 // Form schemas define expected output structure
 const FORM_SCHEMAS: Record<string, any> = {
   'field-registration': {
@@ -251,7 +260,18 @@ serve(async (req) => {
   }
 
   try {
-    const { sessionId, message, formType } = await req.json();
+    const rawBody = await req.json();
+    const { sessionId, message, formType } = rawBody;
+    
+    // Validate and sanitize inputs
+    if (!sessionId || !message || !formType) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const sanitizedMessage = sanitizeInput(message);
 
     if (!sessionId || !message || !formType) {
       throw new Error('Missing required parameters');
@@ -268,6 +288,31 @@ serve(async (req) => {
     // Get user
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) throw new Error('Unauthorized');
+
+    // Rate limiting: Check request frequency (20 requests per minute for forms)
+    const { data: recentRequests } = await supabaseClient
+      .from('request_logs')
+      .select('created_at')
+      .eq('user_id', user.id)
+      .eq('function_name', 'conversational-form')
+      .gte('created_at', new Date(Date.now() - 60000).toISOString());
+
+    if (recentRequests && recentRequests.length >= 20) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please wait before sending more messages.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Log this request
+    await supabaseClient
+      .from('request_logs')
+      .insert({
+        user_id: user.id,
+        function_name: 'conversational-form',
+        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
+        user_agent: req.headers.get('user-agent') || 'unknown'
+      });
 
     // Get session
     const { data: session, error: sessionError } = await supabaseClient
@@ -406,13 +451,13 @@ serve(async (req) => {
       } : null
     };
 
-    // Save user message
+    // Save user message with sanitized content
     await supabaseClient
       .from('conversational_form_messages')
       .insert({
         session_id: sessionId,
         role: 'user',
-        content: message
+        content: sanitizedMessage
       });
 
     // Build conversation history for AI

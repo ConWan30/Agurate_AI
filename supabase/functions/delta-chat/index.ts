@@ -19,6 +19,15 @@ const deltaChatSchema = z.object({
   conversationId: z.string().uuid().optional()
 });
 
+// Sanitize user input to prevent prompt injection
+function sanitizeMessage(content: string): string {
+  // Remove potentially harmful characters while preserving legitimate content
+  return content
+    .trim()
+    .replace(/[<>]/g, '') // Remove HTML-like tags
+    .slice(0, 5000); // Hard limit on message length
+}
+
 // Extract image URL from message if present
 function extractImageUrl(content: string): { imageUrl: string | null; textContent: string } {
   const imagePattern = /\[Image: (https?:\/\/[^\]]+)\]\n?/;
@@ -112,6 +121,38 @@ serve(async (req) => {
     // Get user context - their fields and recent assessments
     const { data: { user } } = await supabaseClient.auth.getUser();
     
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Rate limiting: Check request frequency (10 requests per minute)
+    const { data: recentRequests } = await supabaseClient
+      .from('request_logs')
+      .select('created_at')
+      .eq('user_id', user.id)
+      .eq('function_name', 'delta-chat')
+      .gte('created_at', new Date(Date.now() - 60000).toISOString());
+
+    if (recentRequests && recentRequests.length >= 10) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please wait before sending more messages.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Log this request
+    await supabaseClient
+      .from('request_logs')
+      .insert({
+        user_id: user.id,
+        function_name: 'delta-chat',
+        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
+        user_agent: req.headers.get('user-agent') || 'unknown'
+      });
+    
     let contextPrompt = '';
     if (user) {
       const { data: fields } = await supabaseClient
@@ -138,19 +179,25 @@ serve(async (req) => {
       }
     }
 
-    // Process messages for image analysis
+    // Process messages for image analysis and sanitize user inputs
     const processedMessages = messages.map((msg: any) => {
       if (msg.role === 'user') {
         const { imageUrl, textContent } = extractImageUrl(msg.content);
         
         if (imageUrl) {
+          // Validate image URL format
+          const imagePattern = /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i;
+          if (!imagePattern.test(imageUrl)) {
+            throw new Error('Invalid image format. Only JPG, PNG, WebP, and GIF are supported.');
+          }
+          
           // Gemini Vision format: array of content parts
           return {
             role: msg.role,
             content: [
               {
                 type: 'text',
-                text: textContent || 'What do you see in this image?'
+                text: sanitizeMessage(textContent || 'What do you see in this image?')
               },
               {
                 type: 'image_url',
@@ -161,6 +208,12 @@ serve(async (req) => {
             ]
           };
         }
+        
+        // Sanitize text-only messages
+        return {
+          role: msg.role,
+          content: sanitizeMessage(msg.content)
+        };
       }
       return msg;
     });
