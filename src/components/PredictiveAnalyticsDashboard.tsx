@@ -25,78 +25,78 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
   const confidencePercent = (latestPrediction.confidence_score * 100).toFixed(0);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Predictive Analytics Dashboard</CardTitle>
-              <CardDescription>
+        <CardHeader className="pb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="space-y-2">
+              <CardTitle className="text-2xl">Predictive Analytics Dashboard</CardTitle>
+              <CardDescription className="text-base">
                 30-day forecast based on current field conditions
               </CardDescription>
             </div>
-            <Badge variant={latestPrediction.confidence_score > 0.75 ? "default" : "secondary"}>
+            <Badge variant={latestPrediction.confidence_score > 0.75 ? "default" : "secondary"} className="text-sm px-3 py-1 w-fit">
               {confidencePercent}% confidence
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <CardContent className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {predictionData.yield_prediction && (
-              <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sprout className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium">Yield Forecast</span>
+              <div className="p-6 rounded-lg bg-primary/5 border border-primary/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <Sprout className="h-6 w-6 text-primary" />
+                  <span className="text-sm font-semibold">Yield Forecast</span>
                 </div>
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-3xl font-bold text-primary mb-2">
                   {predictionData.yield_prediction}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground">
                   Based on health trends
                 </p>
               </div>
             )}
 
             {predictionData.disease_risk !== undefined && (
-              <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-5 w-5 text-accent" />
-                  <span className="text-sm font-medium">Disease Risk</span>
+              <div className="p-6 rounded-lg bg-accent/10 border border-accent/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <AlertTriangle className="h-6 w-6 text-accent" />
+                  <span className="text-sm font-semibold">Disease Risk</span>
                 </div>
-                <div className="text-2xl font-bold text-accent">
+                <div className="text-3xl font-bold text-accent mb-2">
                   {(predictionData.disease_risk * 100).toFixed(0)}%
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground">
                   Outbreak probability
                 </p>
               </div>
             )}
 
             {predictionData.weather_impact && (
-              <div className="p-4 rounded-lg bg-secondary/10 border border-secondary/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="h-5 w-5 text-secondary" />
-                  <span className="text-sm font-medium">Weather Impact</span>
+              <div className="p-6 rounded-lg bg-secondary/10 border border-secondary/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <TrendingUp className="h-6 w-6 text-secondary" />
+                  <span className="text-sm font-semibold">Weather Impact</span>
                 </div>
-                <div className="text-2xl font-bold text-secondary">
+                <div className="text-3xl font-bold text-secondary mb-2">
                   {predictionData.weather_impact}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground">
                   Stress forecast
                 </p>
               </div>
             )}
 
             {predictionData.economic_forecast && (
-              <div className="p-4 rounded-lg bg-health-good/10 border border-health-good/30">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="h-5 w-5 text-health-good" />
-                  <span className="text-sm font-medium">Economic Outlook</span>
+              <div className="p-6 rounded-lg bg-health-good/10 border border-health-good/30">
+                <div className="flex items-center gap-3 mb-3">
+                  <DollarSign className="h-6 w-6 text-health-good" />
+                  <span className="text-sm font-semibold">Economic Outlook</span>
                 </div>
-                <div className="text-2xl font-bold text-health-good">
+                <div className="text-3xl font-bold text-health-good mb-2">
                   {predictionData.economic_forecast}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground">
                   Profitability trend
                 </p>
               </div>
@@ -104,13 +104,13 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
           </div>
 
           {predictionData.recommendations && predictionData.recommendations.length > 0 && (
-            <Alert>
-              <TrendingUp className="h-4 w-4" />
-              <AlertTitle>Recommended Actions</AlertTitle>
+            <Alert className="border-l-4 border-l-primary">
+              <TrendingUp className="h-5 w-5" />
+              <AlertTitle className="text-base font-semibold mb-3">Recommended Actions</AlertTitle>
               <AlertDescription>
-                <ul className="mt-2 space-y-1 list-disc pl-4">
+                <ul className="mt-3 space-y-2 list-disc pl-5">
                   {predictionData.recommendations.map((rec: string, idx: number) => (
-                    <li key={idx} className="text-sm">{rec}</li>
+                    <li key={idx} className="text-sm leading-relaxed">{rec}</li>
                   ))}
                 </ul>
               </AlertDescription>
@@ -118,15 +118,15 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
           )}
 
           {latestPrediction.lsu_validation && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Badge variant="default">LSU Validated</Badge>
-              <span>This prediction has been validated by LSU AgCenter researchers</span>
+            <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <Badge variant="default" className="text-sm">LSU Validated</Badge>
+              <span className="text-sm text-muted-foreground">This prediction has been validated by LSU AgCenter researchers</span>
             </div>
           )}
 
-          <div className="text-xs text-muted-foreground text-center pt-4 border-t">
-            Last updated: {new Date(latestPrediction.created_at).toLocaleString()} | 
-            Prediction horizon: {latestPrediction.prediction_horizon} days
+          <div className="text-sm text-muted-foreground text-center pt-6 border-t space-y-1">
+            <p>Last updated: {new Date(latestPrediction.created_at).toLocaleString()}</p>
+            <p>Prediction horizon: {latestPrediction.prediction_horizon} days</p>
           </div>
         </CardContent>
       </Card>

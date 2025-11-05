@@ -225,10 +225,10 @@ export default function Predictions() {
 
         {/* Enhanced 30-Day Predictive Analytics */}
         {selectedFieldId && enhancedPredictions.length > 0 && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-primary" aria-hidden="true" />
-              <h2 className="text-2xl font-heading font-bold">30-Day Enhanced Forecast</h2>
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Brain className="h-6 w-6 text-primary" aria-hidden="true" />
+              <h2 className="text-3xl font-heading font-bold">30-Day Enhanced Forecast</h2>
             </div>
             {isLoadingEnhanced ? (
               <Card className="field-card">
@@ -246,10 +246,10 @@ export default function Predictions() {
         )}
 
         {/* 7-Day Stress Predictions */}
-        <div id="prediction-cards" className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Cloud className="h-5 w-5 text-primary" aria-hidden="true" />
-            <h2 className="text-2xl font-heading font-bold">7-Day Stress Forecast</h2>
+        <div id="prediction-cards" className="space-y-6 pt-8">
+          <div className="flex items-center gap-3 pb-2 border-b">
+            <Cloud className="h-6 w-6 text-primary" aria-hidden="true" />
+            <h2 className="text-3xl font-heading font-bold">7-Day Stress Forecast</h2>
           </div>
 
         {isLoading ? (
@@ -265,22 +265,22 @@ export default function Predictions() {
               className="border-primary/20 relative overflow-hidden"
               style={{
                 backgroundImage: `linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%), url(${bgSoybeanResearch})`,
-                backgroundSize: 'cover',
+              backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
             >
-              <CardHeader>
-                <CardTitle className="font-heading flex items-center gap-2">
-                  <Cloud className="h-5 w-5 delta-wave" aria-hidden="true" />
+              <CardHeader className="pb-6">
+                <CardTitle className="font-heading flex items-center gap-3 text-xl">
+                  <Cloud className="h-6 w-6 delta-wave" aria-hidden="true" />
                   7-Day Forecast Summary
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm leading-relaxed">{predictions.summary}</p>
+              <CardContent className="space-y-6">
+                <p className="text-base leading-relaxed">{predictions.summary}</p>
                 {predictions.high_risk_days > 0 && (
-                  <div className="flex items-center gap-2 p-3 bg-health-severe/10 border border-health-severe/20 rounded-lg">
-                    <AlertTriangle className="h-5 w-5 text-health-severe flex-shrink-0" />
-                    <p className="text-sm text-destructive">
+                  <div className="flex items-center gap-3 p-4 bg-health-severe/10 border border-health-severe/20 rounded-lg">
+                    <AlertTriangle className="h-6 w-6 text-health-severe flex-shrink-0" />
+                    <p className="text-base text-destructive">
                       <strong>{predictions.high_risk_days}</strong> high-risk day{predictions.high_risk_days > 1 ? 's' : ''} detected
                     </p>
                   </div>
@@ -289,43 +289,43 @@ export default function Predictions() {
             </Card>
 
             {/* Daily Predictions */}
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               {predictions.forecast.map((pred) => (
                 <Card key={pred.day} className={`field-card border-2 ${getRiskColor(pred.risk_level)}`}>
-                  <CardHeader className="pb-3">
+                  <CardHeader className="pb-5">
                     <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <CardTitle className="text-lg font-heading flex items-center gap-2">
-                          <Calendar className="h-4 w-4" aria-hidden="true" />
+                      <div className="space-y-2">
+                        <CardTitle className="text-xl font-heading flex items-center gap-2">
+                          <Calendar className="h-5 w-5" aria-hidden="true" />
                           Day {pred.day} - {pred.date}
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="text-sm">
                           {pred.weather_factor}
                         </CardDescription>
                       </div>
                       {getRiskIcon(pred.risk_level)}
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Risk Level:</span>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm font-semibold">Risk Level:</span>
                       <Badge variant="outline" className={getRiskColor(pred.risk_level)}>
                         {pred.risk_level.toUpperCase()}
                       </Badge>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Predicted Stress:</span>
-                      <span className="text-sm">{pred.predicted_stress}</span>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm font-semibold">Predicted Stress:</span>
+                      <span className="text-sm font-medium">{pred.predicted_stress}</span>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Confidence:</span>
-                      <span className="text-sm font-semibold font-mono">{(pred.confidence * 100).toFixed(0)}%</span>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm font-semibold">Confidence:</span>
+                      <span className="text-base font-bold font-mono">{(pred.confidence * 100).toFixed(0)}%</span>
                     </div>
 
-                    <div className="pt-3 border-t">
-                      <p className="text-sm font-medium mb-1">Recommendation:</p>
+                    <div className="pt-4 border-t space-y-2">
+                      <p className="text-sm font-semibold">Recommendation:</p>
                       <p className="text-sm text-muted-foreground leading-relaxed">
                         {pred.recommendation}
                       </p>
