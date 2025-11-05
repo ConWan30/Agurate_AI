@@ -67,7 +67,18 @@ const FORM_SCHEMAS: Record<string, any> = {
       parish: { type: 'string' },
       primary_crops: { type: 'array', items: { type: 'string' } },
       total_acreage: { type: 'number', minimum: 0 },
-      phone: { type: 'string' }
+      phone: { type: 'string' },
+      // First field data (optional but recommended)
+      field_name: { type: 'string', description: 'Name of the first field (e.g., North Rice Field)' },
+      field_crop_type: { type: 'string', enum: ['rice', 'soybean', 'cotton', 'corn'] },
+      field_acreage: { type: 'number', minimum: 0 },
+      field_location_lat: { type: 'number' },
+      field_location_lng: { type: 'number' },
+      rice_variety: { type: 'string' },
+      soybean_variety: { type: 'string' },
+      cotton_variety: { type: 'string' },
+      corn_hybrid: { type: 'string' },
+      field_notes: { type: 'string' }
     },
     required: ['farm_name', 'parish', 'primary_crops']
   }
@@ -216,13 +227,36 @@ REQUIRED FORMAT:
 
 Be warm, enthusiastic, and explain beta program benefits. This is their first impression.
 
-Your goal: Collect profile information and create their first field:
+CRITICAL: Your goal is to collect BOTH farm profile AND first field information in one conversation:
+
+PROFILE INFORMATION (Required):
 - Farm name (what they call their operation)
 - Farmer's full name
 - Parish (Louisiana parish location)
-- Primary crops (rice, soybeans, cotton, corn)
-- Total farm acreage
+- Primary crops (rice, soybeans, cotton, corn - can be multiple)
+- Total farm acreage (total across all fields)
 - Phone number (optional, for text alerts)
+
+FIRST FIELD SETUP (Strongly Encouraged):
+After getting profile basics, TRANSITION to setting up their first field:
+- field_name: What they call this specific field (e.g., "North Rice Field", "Back 40")
+- field_crop_type: What's planted there (rice, soybean, cotton, or corn) - IMPORTANT: Use "soybean" not "soybeans"
+- field_acreage: Size of THIS specific field
+- Variety: Specific variety based on crop type (optional)
+- Location: GPS coordinates if available (optional)
+- field_notes: Any additional details (optional)
+
+CONVERSATION FLOW EXAMPLE:
+1. Warm welcome + explain beta benefits
+2. Get farm name and parish (30% complete)
+3. Get farmer's name and phone (50% complete)
+4. Get primary crops and total acreage (60% complete)
+5. TRANSITION: "Great! Now let's set up your first field so you can start analyzing crops right away. What do you call your main field?"
+6. Get field_name (70% complete)
+7. Get field_crop_type (80% complete)
+8. Get field_acreage (90% complete)
+9. Ask about variety (optional, 95% complete)
+10. Celebrate completion! (100%)
 
 Parish-Specific Personalization:
 - Mention parish-specific farming conditions ("Morehouse Parish is known for great rice farming!")
@@ -234,20 +268,22 @@ Beta Program Communication:
 - Mention 80% lifetime discount after beta ($158/year forever)
 - Explain they're helping build the future of Louisiana agriculture
 
-First Field Setup:
-- After profile complete, offer to set up their first field
-- Make it conversational and easy
-- Celebrate completion!
-
 CRITICAL JSON FORMAT REQUIREMENTS:
 1. Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
 2. The "message" field is REQUIRED and must contain your conversational response to the farmer
-3. The "next_question" field should contain a brief prompt for what to ask next (optional)
+3. Smoothly transition from profile to field setup - make it feel natural
+4. Celebrate when they complete the first field setup!
 
 REQUIRED FORMAT:
 {
   "message": "Your full conversational response that will be shown to the farmer",
-  "extracted_data": {"farm_name": "value", "parish": "Morehouse", ...},
+  "extracted_data": {
+    "farm_name": "value", 
+    "parish": "Morehouse",
+    "field_name": "North Rice Field",
+    "field_crop_type": "rice",
+    ...
+  },
   "completion_percentage": 70,
   "next_question": "Brief next question prompt",
   "suggestions": ["Rice", "Soybeans", "Cotton", "Corn"],

@@ -48,6 +48,8 @@ export default function Onboarding() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      console.log('🎯 Onboarding data extracted:', extractedData);
+
       // Update profile
       const { error: profileError } = await supabase
         .from('profiles')
@@ -66,6 +68,48 @@ export default function Onboarding() {
         .eq('id', user.id);
 
       if (profileError) throw profileError;
+
+      // ✅ CREATE FIRST FIELD AUTOMATICALLY if field data was collected
+      // Check if the conversational form extracted field information
+      if (extractedData.field_name && extractedData.field_crop_type) {
+        console.log('🌾 Creating first field from onboarding data...');
+        
+        const fieldData: any = {
+          user_id: user.id,
+          name: extractedData.field_name,
+          crop_type: extractedData.field_crop_type,
+          acreage: extractedData.field_acreage || extractedData.total_acreage,
+        };
+
+        // Add optional field data
+        if (extractedData.field_location_lat) fieldData.location_lat = extractedData.field_location_lat;
+        if (extractedData.field_location_lng) fieldData.location_lng = extractedData.field_location_lng;
+        if (extractedData.field_notes) fieldData.notes = extractedData.field_notes;
+        
+        // Add variety based on crop type
+        if (extractedData.field_crop_type === 'rice' && extractedData.rice_variety) {
+          fieldData.rice_variety = extractedData.rice_variety;
+        } else if (extractedData.field_crop_type === 'soybean' && extractedData.soybean_variety) {
+          fieldData.soybean_variety = extractedData.soybean_variety;
+        } else if (extractedData.field_crop_type === 'cotton' && extractedData.cotton_variety) {
+          fieldData.cotton_variety = extractedData.cotton_variety;
+        } else if (extractedData.field_crop_type === 'corn' && extractedData.corn_hybrid) {
+          fieldData.corn_hybrid = extractedData.corn_hybrid;
+        }
+
+        const { data: newField, error: fieldError } = await supabase
+          .from('fields')
+          .insert(fieldData)
+          .select()
+          .single();
+
+        if (fieldError) {
+          console.error('❌ Error creating field:', fieldError);
+        } else {
+          console.log('✅ First field created successfully:', newField);
+          toast.success(`🌾 ${fieldData.name} field created!`);
+        }
+      }
 
       toast.success('🎉 Welcome to AgurateAI! Your profile is all set.');
       
