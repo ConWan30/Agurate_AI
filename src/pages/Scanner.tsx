@@ -123,8 +123,26 @@ export default function Scanner() {
       return;
     }
 
-    setImage(file);
-    const preview = URL.createObjectURL(file);
+    // Compress image before setting
+    let processedFile = file;
+    if (file.type.startsWith('image/')) {
+      try {
+        const { compressImage, validateImageFile } = await import('@/lib/image-optimization');
+        const validation = validateImageFile(file);
+        if (!validation.valid) {
+          toast.error(validation.error || 'Invalid image file');
+          triggerHaptic('error');
+          return;
+        }
+        processedFile = await compressImage(file);
+      } catch (error) {
+        console.warn('Image compression failed, using original:', error);
+        // Continue with original file
+      }
+    }
+
+    setImage(processedFile);
+    const preview = URL.createObjectURL(processedFile);
     setImagePreview(preview);
     
     // Haptic feedback on successful capture
@@ -135,7 +153,7 @@ export default function Scanner() {
 
     // If AR is enabled, generate quick overlay
     if (arEnabled && selectedFieldId) {
-      await generateAROverlay(file);
+      await generateAROverlay(processedFile);
     }
   };
 

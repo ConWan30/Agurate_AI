@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { DemoDataProvider } from "./contexts/DemoDataContext";
@@ -10,6 +10,8 @@ import { SkeletonDashboard } from "@/components/ui/skeleton-card";
 import { Layout } from "./components/Layout";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import NetworkStatus from "./components/NetworkStatus";
+import { analytics } from "@/lib/analytics";
+import { errorTracker } from "@/lib/error-tracking";
 
 // Lazy load pages for better performance
 const Home = lazy(() => import("./pages/Home"));
@@ -42,7 +44,67 @@ const BetaSignup = lazy(() => import("./pages/BetaSignup"));
 const Tutorials = lazy(() => import("./pages/Tutorials"));
 const Upgrade = lazy(() => import("./pages/Upgrade"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
+
+// Analytics wrapper component
+const AnalyticsWrapper = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Track page views
+    const pageName = location.pathname.replace('/', '') || 'home';
+    analytics.pageView(pageName, {
+      path: location.pathname,
+      search: location.search,
+    });
+  }, [location]);
+
+  return <>{children}</>;
+};
+
+// Error boundary wrapper
+const ErrorBoundaryWrapper = ({ children }: { children: React.ReactNode }) => {
+  useEffect(() => {
+    // Global error handlers
+    const handleError = (event: ErrorEvent) => {
+      errorTracker.captureError(event.error, {
+        feature: 'global_error_handler',
+        additionalData: {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+        },
+      });
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      errorTracker.captureError(event.reason, {
+        feature: 'unhandled_promise_rejection',
+        additionalData: {
+          reason: String(event.reason),
+        },
+      });
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  return <>{children}</>;
+};
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -116,6 +178,8 @@ const App = () => (
           v7_relativeSplatPath: true
         }}
       >
+        <ErrorBoundaryWrapper>
+        <AnalyticsWrapper>
         <DemoDataProvider>
         <Suspense fallback={
           <div className="min-h-screen flex items-center justify-center">
@@ -184,6 +248,8 @@ const App = () => (
         </Routes>
         </Suspense>
         </DemoDataProvider>
+        </AnalyticsWrapper>
+        </ErrorBoundaryWrapper>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

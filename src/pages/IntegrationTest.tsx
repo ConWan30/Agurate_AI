@@ -48,8 +48,9 @@ export default function IntegrationTest() {
       } else {
         updateTest('Unified AI Intelligence', 'warning', '⚠️ Partial context gathered', Date.now() - test1Start);
       }
-    } catch (error: any) {
-      updateTest('Unified AI Intelligence', 'error', `❌ ${error.message}`, Date.now() - test1Start);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      updateTest('Unified AI Intelligence', 'error', `❌ ${errorMessage}`, Date.now() - test1Start);
     }
 
     // Test 2: Conservation Predictions
@@ -63,8 +64,9 @@ export default function IntegrationTest() {
       
       if (error) throw error;
       updateTest('Conservation Predictions', 'success', '✅ Table accessible', Date.now() - test2Start);
-    } catch (error: any) {
-      updateTest('Conservation Predictions', 'error', `❌ ${error.message}`, Date.now() - test2Start);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      updateTest('Conservation Predictions', 'error', `❌ ${errorMessage}`, Date.now() - test2Start);
     }
 
     // Test 3: Variety Recommendations
@@ -78,8 +80,9 @@ export default function IntegrationTest() {
       
       if (error) throw error;
       updateTest('Variety Recommendations', 'success', '✅ Table accessible', Date.now() - test3Start);
-    } catch (error: any) {
-      updateTest('Variety Recommendations', 'error', `❌ ${error.message}`, Date.now() - test3Start);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      updateTest('Variety Recommendations', 'error', `❌ ${errorMessage}`, Date.now() - test3Start);
     }
 
     // Test 4: Community Intelligence
@@ -93,8 +96,9 @@ export default function IntegrationTest() {
       
       if (error) throw error;
       updateTest('Community Intelligence', 'success', '✅ Network accessible', Date.now() - test4Start);
-    } catch (error: any) {
-      updateTest('Community Intelligence', 'error', `❌ ${error.message}`, Date.now() - test4Start);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      updateTest('Community Intelligence', 'error', `❌ ${errorMessage}`, Date.now() - test4Start);
     }
 
     // Test 5: Water Stress Intelligence
@@ -108,8 +112,9 @@ export default function IntegrationTest() {
       
       if (error) throw error;
       updateTest('Water Stress Intelligence', 'success', '✅ Table accessible', Date.now() - test5Start);
-    } catch (error: any) {
-      updateTest('Water Stress Intelligence', 'error', `❌ ${error.message}`, Date.now() - test5Start);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      updateTest('Water Stress Intelligence', 'error', `❌ ${errorMessage}`, Date.now() - test5Start);
     }
 
     // Test 6: Conversational Forms
@@ -123,8 +128,9 @@ export default function IntegrationTest() {
       
       if (error) throw error;
       updateTest('Conversational Forms', 'success', '✅ Forms system ready', Date.now() - test6Start);
-    } catch (error: any) {
-      updateTest('Conversational Forms', 'error', `❌ ${error.message}`, Date.now() - test6Start);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      updateTest('Conversational Forms', 'error', `❌ ${errorMessage}`, Date.now() - test6Start);
     }
 
     // Test 7: Predictive Analytics
@@ -138,8 +144,9 @@ export default function IntegrationTest() {
       
       if (error) throw error;
       updateTest('Predictive Analytics', 'success', '✅ Models accessible', Date.now() - test7Start);
-    } catch (error: any) {
-      updateTest('Predictive Analytics', 'error', `❌ ${error.message}`, Date.now() - test7Start);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      updateTest('Predictive Analytics', 'error', `❌ ${errorMessage}`, Date.now() - test7Start);
     }
 
     setRunning(false);

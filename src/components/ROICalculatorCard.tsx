@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { DollarSign, TrendingUp, AlertTriangle, ChevronDown, ChevronUp, Calculator, CheckCircle2 } from 'lucide-react';
+import { DollarSign, TrendingUp, AlertTriangle, ChevronDown, ChevronUp, Calculator, CheckCircle2, RefreshCw } from 'lucide-react';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ROICalculation {
   treatmentCost: number;
@@ -42,13 +43,69 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
   const [cropType, setCropType] = useState(fieldData?.cropType || 'rice');
   const [treatmentType, setTreatmentType] = useState('fungicide');
   const [roi, setRoi] = useState<ROICalculation | null>(null);
+  const [marketPrice, setMarketPrice] = useState<{ price: number; unit: string; source: string; last_updated: string } | null>(null);
+  const [loadingPrice, setLoadingPrice] = useState(false);
 
-  // Louisiana Delta average prices (2024)
-  const cropPrices: Record<string, { price: number; unit: string; avgYield: number }> = {
+  // Fallback prices (used if market price API fails)
+  const fallbackPrices: Record<string, { price: number; unit: string; avgYield: number }> = {
     rice: { price: 18.50, unit: 'cwt', avgYield: 75 }, // $18.50/cwt, 75 cwt/acre
     soybeans: { price: 13.50, unit: 'bu', avgYield: 52 }, // $13.50/bu, 52 bu/acre
     cotton: { price: 0.75, unit: 'lb', avgYield: 1100 }, // $0.75/lb, 1100 lb/acre
     corn: { price: 5.80, unit: 'bu', avgYield: 180 }, // $5.80/bu, 180 bu/acre
+  };
+
+  // Fetch market price when crop type changes
+  useEffect(() => {
+    fetchMarketPrice(cropType);
+  }, [cropType]);
+
+  const fetchMarketPrice = async (crop: string) => {
+    setLoadingPrice(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-market-prices?crop_type=${crop}`, {
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+      });
+
+      if (response.ok) {
+        const priceData = await response.json();
+        // Convert to format expected by calculator
+        const unit = priceData.unit === 'bushel' ? (crop === 'rice' ? 'cwt' : 'bu') : priceData.unit;
+        const price = priceData.price_per_bushel || priceData.price_per_pound || priceData.price;
+        
+        setMarketPrice({
+          price,
+          unit,
+          source: priceData.source || 'USDA',
+          last_updated: priceData.last_updated || new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching market price:', error);
+      // Use fallback price
+      setMarketPrice(null);
+    } finally {
+      setLoadingPrice(false);
+    }
+  };
+
+  // Get current price (market price or fallback)
+  const getCurrentPrice = () => {
+    if (marketPrice) {
+      return {
+        price: marketPrice.price,
+        unit: marketPrice.unit,
+        avgYield: fallbackPrices[cropType]?.avgYield || 75,
+      };
+    }
+    return fallbackPrices[cropType] || fallbackPrices.rice;
+  };
+
+  const cropPrices: Record<string, { price: number; unit: string; avgYield: number }> = {
+    ...fallbackPrices,
+    [cropType]: getCurrentPrice(),
   };
 
   // Treatment costs per acre (Louisiana Delta averages)
@@ -290,8 +347,16 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Price per unit:</span>
-                      <span className="font-medium">${roi.breakdownDetails.pricePerUnit}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Price per unit:</span>
+                        <span className="font-medium">${roi.breakdownDetails.pricePerUnit}</span>
+                        {marketPrice && (
+                          <Badge variant="outline" className="text-xs gap-1">
+                            <RefreshCw className="h-3 w-3" />
+                            {marketPrice.source}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Treatment cost per acre:</span>
@@ -305,7 +370,24 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                 </div>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  * Estimates based on Louisiana Delta averages and current market prices
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p>* Estimates based on Louisiana Delta averages{marketPrice ? ` and ${marketPrice.source} market prices` : ' and historical market prices'}</p>
+                    {marketPrice && (
+                      <p className="flex items-center gap-1">
+                        <RefreshCw className="h-3 w-3" />
+                        Prices updated: {new Date(marketPrice.last_updated).toLocaleDateString()}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-4 px-2 text-xs"
+                          onClick={() => fetchMarketPrice(cropType)}
+                          disabled={loadingPrice}
+                        >
+                          {loadingPrice ? 'Updating...' : 'Refresh'}
+                        </Button>
+                      </p>
+                    )}
+                  </div>
                 </p>
               </div>
             )}

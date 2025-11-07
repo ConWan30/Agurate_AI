@@ -17,7 +17,8 @@ const deltaChatSchema = z.object({
     role: z.enum(['user', 'assistant', 'system']),
     content: z.string().min(1).max(20000) // Increased for image URLs
   })).min(1).max(50),
-  conversationId: z.string().uuid().optional()
+  conversationId: z.string().uuid().optional(),
+  simplifiedLanguage: z.boolean().optional() // Simplified language mode
 });
 
 // Sanitize user input to prevent prompt injection
@@ -47,7 +48,34 @@ function extractImageUrl(content: string): { imageUrl: string | null; textConten
   };
 }
 
-const SYSTEM_PROMPT = `You are Delta Intelligence, an AI expert assistant specialized in Louisiana Delta agriculture. You have deep knowledge of:
+const SYSTEM_PROMPT = (simplified: boolean = false) => simplified ? `You are Delta Intelligence, a friendly AI farming helper for Louisiana Delta farmers. You explain things in simple, easy-to-understand language.
+
+**IMPORTANT: Use Simple Language**
+- Use short sentences (10-15 words max)
+- Avoid technical jargon - explain terms when needed
+- Use everyday words farmers use
+- Give clear, step-by-step instructions
+- Use examples from everyday life
+- Be friendly and encouraging
+
+**What You Know:**
+- Louisiana crops: rice, soybeans, cotton, corn
+- LSU AgCenter research (explain in simple terms)
+- Delta farming conditions
+- Common problems and solutions
+
+**How to Answer:**
+- Keep it simple and clear
+- Break complex ideas into small steps
+- Use "you" and "your" to make it personal
+- Give one main idea per sentence
+- End with what they should do next
+
+Example of simple language:
+❌ "Apply a systemic fungicide with azoxystrobin as the active ingredient at a rate of 6.2 fl oz per acre during the R3 growth stage."
+✅ "Use a fungicide spray. Put 6 ounces on each acre. Do this when your soybeans start making pods. This stops the disease from spreading."
+
+You have access to the user's field data and can help with their farming questions.` : `You are Delta Intelligence, an AI expert assistant specialized in Louisiana Delta agriculture. You have deep knowledge of:
 
 1. **Louisiana-Specific Crops**: Rice, soybeans, cotton, and corn grown in the Mississippi River Delta region
 2. **LSU AgCenter Research**: Access to Louisiana State University Agricultural Center's decades of research on Delta farming practices
@@ -110,7 +138,7 @@ serve(async (req) => {
       );
     }
 
-    const { messages, conversationId } = validation.data;
+    const { messages, conversationId, simplifiedLanguage = false } = validation.data;
     
     const authHeader = req.headers.get('authorization');
     const supabaseClient = createClient(
@@ -172,6 +200,50 @@ serve(async (req) => {
           `- ${a.field?.name} (${a.field?.crop_type}): Health ${a.health_score}/100, ${a.stress_level} stress${a.symptoms ? `, symptoms: ${a.symptoms.join(', ')}` : ''}`
         ).join('\n')}`;
       }
+
+      // ✅ CONVERSATION MEMORY: Load recent conversation history
+      try {
+        const { data: conversationMemory, error: memoryError } = await supabaseClient.rpc('get_conversation_memory', {
+          p_user_id: user.id,
+          p_limit: 50,
+          p_exclude_conversation_id: conversationId || null,
+        });
+
+        if (!memoryError && conversationMemory && conversationMemory.length > 0) {
+          // Format conversation memory for AI context
+          const groupedByConversation = conversationMemory.reduce((acc: any, msg: any) => {
+            const convId = msg.conversation_id;
+            if (!acc[convId]) {
+              acc[convId] = {
+                title: msg.conversation_title || 'Previous conversation',
+                messages: [],
+              };
+            }
+            acc[convId].messages.push(msg);
+            return acc;
+          }, {});
+
+          contextPrompt += '\n\n## CONVERSATION MEMORY (Previous Interactions)\n';
+          contextPrompt += 'The following are recent conversations that may provide context:\n\n';
+
+          Object.entries(groupedByConversation).forEach(([convId, group]: [string, any]) => {
+            contextPrompt += `### ${group.title}\n`;
+            // Reverse messages to chronological order
+            group.messages.reverse().forEach((msg: any) => {
+              const contextInfo = msg.context_snapshot && Object.keys(msg.context_snapshot).length > 0
+                ? ` [Context: ${msg.context_snapshot.field_name || 'general'}, ${msg.context_snapshot.crop_type || ''}${msg.context_snapshot.health_score ? `, ${msg.context_snapshot.health_score}% health` : ''}]`
+                : '';
+              contextPrompt += `${msg.role === 'user' ? '👤' : '🤖'}: ${msg.content}${contextInfo}\n`;
+            });
+            contextPrompt += '\n';
+          });
+
+          contextPrompt += '\n**Instructions:** Reference previous conversations when relevant. If the user asks about something discussed before, acknowledge the previous conversation and build upon it.\n';
+        }
+      } catch (memoryError) {
+        console.warn('[delta-chat] Error loading conversation memory:', memoryError);
+        // Don't fail the request if memory loading fails
+      }
     }
 
     // Process messages for image analysis and sanitize user inputs
@@ -222,7 +294,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash', // Supports vision
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT + contextPrompt },
+          { role: 'system', content: SYSTEM_PROMPT(simplifiedLanguage) + contextPrompt },
           ...processedMessages
         ],
         stream: true,

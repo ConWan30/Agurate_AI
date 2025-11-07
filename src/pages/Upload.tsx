@@ -54,10 +54,11 @@ export default function Upload() {
 
       if (error) throw error;
       if (data) setFields(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load fields';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -94,9 +95,33 @@ export default function Upload() {
       return;
     }
 
+    // Compress image before setting (for images only)
+    if (!isVideo && file.type.startsWith('image/')) {
+      try {
+        const { compressImage, validateImageFile } = await import('@/lib/image-optimization');
+        const validation = validateImageFile(file);
+        if (!validation.valid) {
+          toast({
+            title: "Invalid image",
+            description: validation.error,
+            variant: "destructive",
+          });
+          return;
+        }
+        const compressed = await compressImage(file);
+        setSelectedFile(compressed);
+        setPreviewUrl(URL.createObjectURL(compressed));
+      } catch (error) {
+        // Fallback to original if compression fails
+        console.warn('Image compression failed, using original:', error);
+        setSelectedFile(file);
+        setPreviewUrl(URL.createObjectURL(file));
+      }
+    } else {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
     setFileType(isVideo ? 'video' : 'image');
-    setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
   };
 
   const handleAnalyze = async () => {
@@ -145,8 +170,21 @@ export default function Upload() {
         ? `${field.location_lat}, ${field.location_lng}`
         : "Louisiana Delta region";
 
+      // Track analytics
+      const { analytics } = await import('@/lib/analytics');
+      analytics.track('image_uploaded', {
+        crop_type: field.crop_type,
+        file_size: selectedFile.size,
+        file_type: fileType,
+      });
+
       // Call real AI analysis
       await performAIAnalysis(imageUrl, field.crop_type, fieldLocation, selectedField, fileType);
+      
+      analytics.track('analysis_completed', {
+        crop_type: field.crop_type,
+        field_id: selectedField,
+      });
 
       toast({
         title: "Analysis complete!",
@@ -154,10 +192,11 @@ export default function Upload() {
       });
 
       navigate("/history");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load fields';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -216,7 +255,13 @@ export default function Upload() {
     if (assessmentError) throw assessmentError;
 
     // Insert AI-generated recommendations
-    const recommendations = aiResult.recommendations.map((rec: any) => ({
+    interface Recommendation {
+      text: string;
+      priority: 'urgent' | 'normal' | 'low';
+      category: 'irrigation' | 'fertilization' | 'pest_management' | 'weather_alert' | 'general';
+    }
+    
+    const recommendations = (aiResult.recommendations as Recommendation[]).map((rec) => ({
       assessment_id: assessment.id,
       recommendation_text: rec.text,
       priority: rec.priority,
@@ -229,6 +274,32 @@ export default function Upload() {
 
     // ✅ UNIFIED AI: Enrich intelligence pool after analysis
     await enrichUnifiedContext(fieldId, aiResult);
+
+    // ✅ CRITICAL ALERTS: Check if assessment triggers critical alert
+    try {
+      const { data: fieldData } = await supabase
+        .from('fields')
+        .select('acreage, crop_type')
+        .eq('id', fieldId)
+        .single();
+
+      await supabase.functions.invoke('detect-critical-alerts', {
+        body: {
+          assessment_id: assessment.id,
+          field_id: fieldId,
+          health_score: aiResult.health_score,
+          stress_level: aiResult.stress_level,
+          diseases: aiResult.disease_identified,
+          pests: aiResult.pest_identified,
+          estimated_yield_impact_percent: aiResult.estimated_yield_impact_percent,
+          field_acreage: fieldData?.acreage,
+          crop_type: fieldData?.crop_type || cropType,
+        },
+      });
+    } catch (alertError) {
+      // Don't fail the upload if alert detection fails
+      console.warn('Critical alert detection failed:', alertError);
+    }
   };
 
   return (

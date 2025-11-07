@@ -110,7 +110,20 @@ export default function Insurance() {
     }
   };
 
-  const handleConversationalComplete = async (extractedData: any) => {
+  interface InsuranceClaimData {
+    fieldId?: string;
+    field_id?: string;
+    eventType?: string;
+    event_type?: string;
+    eventDate?: string;
+    event_date?: string;
+    estimatedLossPercentage?: number | string;
+    estimated_loss_percentage?: number | string;
+    description?: string;
+    [key: string]: unknown;
+  }
+
+  const handleConversationalComplete = async (extractedData: InsuranceClaimData) => {
     try {
       const { error } = await supabase.from('insurance_claims').insert([{
         field_id: extractedData.fieldId || extractedData.field_id,
@@ -127,9 +140,10 @@ export default function Insurance() {
         description: 'Delta Intelligence made it easy for you.'
       });
       setConversationalOpen(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create claim';
       toast.error('Failed to create claim', {
-        description: error.message
+        description: errorMessage
       });
     }
   };

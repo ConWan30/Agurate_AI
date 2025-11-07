@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CheckCircle2, AlertTriangle, AlertCircle, Calendar, ThumbsUp, ThumbsDown } from "lucide-react";
+import { CheckCircle2, AlertTriangle, AlertCircle, Calendar, ThumbsUp, ThumbsDown, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import bgCropTimeline from "@/assets/bg-crop-timeline.jpg";
@@ -23,6 +23,10 @@ import { DiseasePestDetection } from "@/components/analysis/DiseasePestDetection
 import { EconomicImpact } from "@/components/analysis/EconomicImpact";
 import { HistoricalTrend } from "@/components/analysis/HistoricalTrend";
 import { DetailedAnalysisTabs } from "@/components/analysis/DetailedAnalysisTabs";
+import { ImageHistoryComparison } from "@/components/ImageHistoryComparison";
+import { ExpertEscalationCard } from "@/components/ExpertEscalationCard";
+import { PeerComparisonCard } from "@/components/PeerComparisonCard";
+import { AnnotatedImage, type ImageAnnotation } from "@/components/AnnotatedImage";
 
 interface Assessment {
   id: string;
@@ -62,6 +66,10 @@ export default function History() {
   const { isDemoMode, assessments: demoAssessments } = useDemoData();
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
+  const [showImageComparison, setShowImageComparison] = useState(false);
+  const [comparisonFieldId, setComparisonFieldId] = useState<string | null>(null);
+  const [imageAnnotations, setImageAnnotations] = useState<ImageAnnotation[]>([]);
+  const [loadingAnnotations, setLoadingAnnotations] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -92,11 +100,12 @@ export default function History() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      if (data) setAssessments(data as any);
-    } catch (error: any) {
+      if (data) setAssessments(data);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load assessments';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -115,10 +124,11 @@ export default function History() {
 
       if (error) throw error;
       toast({ title: "Thank you for your feedback!" });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit feedback';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -291,14 +301,89 @@ export default function History() {
                 </DialogHeader>
 
                 <div className="space-y-6">
-                  {/* Image with Progressive Loading */}
+                  {/* Image with Annotations */}
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <ProgressiveImage
-                      src={selectedAssessment.image_url}
-                      alt="Crop assessment"
-                      className="w-full h-80 object-cover"
-                    />
+                    {imageAnnotations.length > 0 ? (
+                      <AnnotatedImage
+                        imageUrl={selectedAssessment.image_url}
+                        annotations={imageAnnotations}
+                        alt="Annotated crop assessment"
+                        className="w-full"
+                      />
+                    ) : (
+                      <>
+                        <ProgressiveImage
+                          src={selectedAssessment.image_url}
+                          alt="Crop assessment"
+                          className="w-full h-80 object-cover"
+                        />
+                        <div className="flex justify-end p-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              setLoadingAnnotations(true);
+                              try {
+                                const { data: { session } } = await supabase.auth.getSession();
+                                const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-image-annotations`, {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${session?.access_token}`,
+                                  },
+                                  body: JSON.stringify({
+                                    image_url: selectedAssessment.image_url,
+                                    analysis_context: {
+                                      health_score: (selectedAssessment.health_score || 0) * 100,
+                                      stress_level: selectedAssessment.stress_level,
+                                      symptoms: selectedAssessment.symptoms,
+                                      diseases: selectedAssessment.disease_identified,
+                                      pests: selectedAssessment.pest_identified,
+                                    },
+                                  }),
+                                });
+
+                                if (response.ok) {
+                                  const data = await response.json();
+                                  setImageAnnotations(data.annotations || []);
+                                }
+                              } catch (error) {
+                                console.error('Error generating annotations:', error);
+                                toast.error('Failed to generate annotations');
+                              } finally {
+                                setLoadingAnnotations(false);
+                              }
+                            }}
+                            disabled={loadingAnnotations}
+                          >
+                            {loadingAnnotations ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Generating...
+                              </>
+                            ) : (
+                              'Show Annotations'
+                            )}
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
+
+                  {/* Image History Comparison Button */}
+                  {selectedAssessment.field.id && (
+                    <div className="flex justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setComparisonFieldId(selectedAssessment.field.id);
+                          setShowImageComparison(true);
+                        }}
+                      >
+                        Compare with Previous Images
+                      </Button>
+                    </div>
+                  )}
 
                   {/* Executive Summary */}
                   <AnalysisExecutiveSummary
@@ -344,23 +429,73 @@ export default function History() {
 
                   {/* Action Center with Recommendations */}
                   {selectedAssessment.recommendations.length > 0 && (
-                    <ActionCenter
-                      recommendations={selectedAssessment.recommendations.map(rec => ({
-                        ...rec,
-                        reasoning: rec.category ? `${rec.category.replace(/_/g, " ")} recommendation based on field analysis` : undefined
-                      }))}
-                      onSetReminder={(rec) => {
-                        toast({ title: "Reminder feature coming soon!" });
-                      }}
-                      onShare={(rec) => {
-                        if (navigator.share) {
-                          navigator.share({
-                            title: "Crop Recommendation",
-                            text: rec.recommendation_text
-                          });
-                        } else {
-                          toast({ title: "Share feature not supported on this device" });
-                        }
+                    <>
+                      <ActionCenter
+                        recommendations={selectedAssessment.recommendations.map(rec => ({
+                          ...rec,
+                          reasoning: rec.category ? `${rec.category.replace(/_/g, " ")} recommendation based on field analysis` : undefined
+                        }))}
+                        onSetReminder={(rec) => {
+                          toast({ title: "Reminder feature coming soon!" });
+                        }}
+                        onShare={(rec) => {
+                          if (navigator.share) {
+                            navigator.share({
+                              title: "Crop Recommendation",
+                              text: rec.recommendation_text
+                            });
+                          } else {
+                            toast({ title: "Share feature not supported on this device" });
+                          }
+                        }}
+                      />
+                      
+                      {/* Peer Comparison for Treatment Recommendations */}
+                      {selectedAssessment.recommendations.some(rec => 
+                        rec.category === 'pest_management' || 
+                        rec.category === 'fertilization' ||
+                        rec.category === 'irrigation'
+                      ) && (
+                        <PeerComparisonCard
+                          treatmentType={
+                            selectedAssessment.recommendations.find(rec => 
+                              rec.category === 'pest_management'
+                            ) ? 'fungicide' :
+                            selectedAssessment.recommendations.find(rec => 
+                              rec.category === 'fertilization'
+                            ) ? 'fertilizer' : 'general'
+                          }
+                          cropType={selectedAssessment.field.crop_type}
+                          stressLevel={selectedAssessment.stress_level}
+                          currentHealthScore={(selectedAssessment.health_score || 0) * 100}
+                        />
+                      )}
+                    </>
+                  )}
+
+                  {/* Expert Escalation */}
+                  {selectedAssessment && (
+                    <ExpertEscalationCard
+                      issueType={
+                        selectedAssessment.disease_identified && selectedAssessment.disease_identified.length > 0
+                          ? 'disease'
+                          : selectedAssessment.pest_identified && selectedAssessment.pest_identified.length > 0
+                          ? 'pest'
+                          : 'general'
+                      }
+                      issueDescription={
+                        selectedAssessment.detailed_visual_analysis ||
+                        `Health score: ${(selectedAssessment.health_score || 0) * 100}%, Stress: ${selectedAssessment.stress_level}`
+                      }
+                      confidenceScore={(selectedAssessment.confidence_score || 0) * 100}
+                      fieldId={selectedAssessment.field.id}
+                      assessmentId={selectedAssessment.id}
+                      aiAnalysis={{
+                        health_score: selectedAssessment.health_score,
+                        stress_level: selectedAssessment.stress_level,
+                        symptoms: selectedAssessment.symptoms,
+                        diseases: selectedAssessment.disease_identified,
+                        pests: selectedAssessment.pest_identified,
                       }}
                     />
                   )}
@@ -463,6 +598,22 @@ export default function History() {
                   </Card>
                 </div>
               </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Image History Comparison Dialog */}
+        <Dialog open={showImageComparison} onOpenChange={setShowImageComparison}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Image History Comparison</DialogTitle>
+            </DialogHeader>
+            {comparisonFieldId && (
+              <ImageHistoryComparison
+                fieldId={comparisonFieldId}
+                currentAssessmentId={selectedAssessment?.id}
+                onClose={() => setShowImageComparison(false)}
+              />
             )}
           </DialogContent>
         </Dialog>

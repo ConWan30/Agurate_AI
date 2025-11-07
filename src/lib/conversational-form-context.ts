@@ -5,13 +5,54 @@ import { FormType } from '@/hooks/use-conversational-form';
  * Gathers unified AI intelligence context for conversational forms
  * Integrates with unified-ai-intelligence system for context awareness
  */
+interface FormContextParams {
+  fieldId?: string;
+  [key: string]: unknown;
+}
+
+interface FormContextData {
+  formType: FormType;
+  userId: string;
+  timestamp: string;
+  profile?: {
+    farmName: string | null;
+    parish: string | null;
+    primaryCrops: string[] | null;
+    totalAcreage: number | null;
+  };
+  existingFields?: Array<{
+    id: string;
+    name: string;
+    cropType: string;
+    acreage: number | null;
+    variety: string | null;
+  }>;
+  recentAssessments?: Array<{
+    fieldId: string;
+    healthScore: number;
+    stressLevel: string;
+    date: string;
+  }>;
+  cooperatives?: Array<{
+    id: string;
+    name: string | null;
+  }>;
+  targetField?: {
+    id: string;
+    name: string;
+    cropType: string;
+    acreage: number | null;
+  };
+  targetFieldAssessments?: unknown[];
+}
+
 export async function gatherFormContext(
   userId: string,
   formType: FormType,
-  contextParams: any,
+  contextParams: FormContextParams,
   supabase: SupabaseClient
-) {
-  const context: any = {
+): Promise<FormContextData> {
+  const context: FormContextData = {
     formType,
     userId,
     timestamp: new Date().toISOString(),
@@ -78,9 +119,9 @@ export async function gatherFormContext(
       .eq('user_id', userId);
 
     if (coopMemberships && coopMemberships.length > 0) {
-      context.cooperatives = coopMemberships.map((m: any) => ({
+      context.cooperatives = coopMemberships.map((m: { cooperative_id: string; cooperatives?: { name: string | null } | null }) => ({
         id: m.cooperative_id,
-        name: m.cooperatives?.name,
+        name: m.cooperatives?.name || null,
       }));
     }
 
@@ -126,9 +167,9 @@ export async function gatherFormContext(
  */
 export async function enrichFormContext(
   formType: FormType,
-  extractedData: any,
+  extractedData: Record<string, unknown>,
   supabase: SupabaseClient
-) {
+): Promise<boolean> {
   try {
     // Log form completion analytics
     console.log(`Form completed: ${formType}`, extractedData);

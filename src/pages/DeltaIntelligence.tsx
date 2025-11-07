@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Brain, Loader2, BookOpen, HelpCircle, History, Plus, Trash2, MessageSquare } from 'lucide-react';
+import { Brain, Loader2, BookOpen, HelpCircle, History, Plus, Trash2, MessageSquare, Volume2, VolumeX, Pause, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
@@ -16,7 +16,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { DeltaChatInput } from '@/components/DeltaChatInput';
 import { PredictiveQuestions } from '@/components/PredictiveQuestions';
 import { gatherUnifiedContext, formatContextForAI, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
+import { createContextSnapshot } from '@/lib/conversation-memory';
 import TutorialTooltip from '@/components/TutorialTooltip';
+import { useTextToSpeech } from '@/hooks/use-text-to-speech';
+import type { DeltaContext } from '@/types';
 
 export default function DeltaIntelligence() {
   const {
@@ -33,9 +36,15 @@ export default function DeltaIntelligence() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [fieldContext, setFieldContext] = useState<any>(null);
+  const [fieldContext, setFieldContext] = useState<DeltaContext | null>(null);
+  const [voiceResponseEnabled, setVoiceResponseEnabled] = useState(false);
+  const [simplifiedLanguage, setSimplifiedLanguage] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
+  const { isSupported: isTTSSupported, isSpeaking, isPaused, speak, stop, pause, resume } = useTextToSpeech({
+    enabled: voiceResponseEnabled,
+  });
 
   // Show welcome message only for new conversations
   const displayMessages = messages.length === 0 ? [{
@@ -106,11 +115,12 @@ export default function DeltaIntelligence() {
       conversationId = await createConversation(userMessage);
     }
 
-    // Save user message with optional image
+    // Save user message with optional image and context snapshot
     const messageContent = imageUrl 
       ? `[Image: ${imageUrl}]\n${userMessage}`
       : userMessage;
-    await saveMessage(conversationId, 'user', messageContent);
+    const contextSnapshot = createContextSnapshot(fieldContext);
+    await saveMessage(conversationId, 'user', messageContent, contextSnapshot);
 
     const newMessages = [...messages, { role: 'user' as const, content: messageContent }];
     setMessages(newMessages);
@@ -144,7 +154,8 @@ export default function DeltaIntelligence() {
         },
         body: JSON.stringify({ 
           messages: newMessages,
-          unifiedContext: unifiedContext ? formatContextForAI(unifiedContext) : null
+          unifiedContext: unifiedContext ? formatContextForAI(unifiedContext) : null,
+          simplifiedLanguage: simplifiedLanguage
         }),
       });
 
@@ -208,9 +219,25 @@ export default function DeltaIntelligence() {
           }
         }
 
-        // Save assistant message after streaming is complete
+        // Save assistant message after streaming is complete with context snapshot
         if (conversationId && assistantMessage) {
-          await saveMessage(conversationId, 'assistant', assistantMessage);
+          const assistantContextSnapshot = createContextSnapshot(fieldContext);
+          await saveMessage(conversationId, 'assistant', assistantMessage, assistantContextSnapshot);
+          
+          // Speak the response if voice response is enabled
+          if (voiceResponseEnabled && isTTSSupported) {
+            // Remove markdown formatting for cleaner speech
+            const textToSpeak = assistantMessage
+              .replace(/#{1,6}\s+/g, '') // Remove headers
+              .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+              .replace(/\*(.*?)\*/g, '$1') // Remove italic
+              .replace(/`(.*?)`/g, '$1') // Remove code
+              .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links
+              .replace(/\n{2,}/g, '. ') // Replace multiple newlines with period
+              .trim();
+            
+            speak(textToSpeak);
+          }
         }
       }
     } catch (error) {
@@ -224,11 +251,27 @@ export default function DeltaIntelligence() {
 
   const handleTextMessage = async (message: string) => {
     if (isLoading) return;
+    
+    // Track analytics
+    const { analytics } = await import('@/lib/analytics');
+    analytics.track('delta_chat_message', {
+      message_length: message.length,
+      has_image: false,
+    });
+    
     await streamChat(message);
   };
 
   const handleImageMessage = async (imageUrl: string, question: string) => {
     if (isLoading) return;
+    
+    // Track analytics
+    const { analytics } = await import('@/lib/analytics');
+    analytics.track('delta_chat_message', {
+      message_length: question.length,
+      has_image: true,
+    });
+    
     await streamChat(question, imageUrl);
   };
 
@@ -323,6 +366,53 @@ export default function DeltaIntelligence() {
               </h3>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                variant={simplifiedLanguage ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setSimplifiedLanguage(!simplifiedLanguage)}
+                title={simplifiedLanguage ? "Use detailed language" : "Use simple language"}
+                className="h-9"
+              >
+                <Languages className="h-4 w-4" />
+              </Button>
+              {isTTSSupported && (
+                <>
+                  {isSpeaking && (
+                    <>
+                      {isPaused ? (
+                        <Button variant="ghost" size="sm" onClick={resume} title="Resume voice" className="h-9">
+                          <Play className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button variant="ghost" size="sm" onClick={pause} title="Pause voice" className="h-9">
+                          <Pause className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="sm" onClick={stop} title="Stop voice" className="h-9">
+                        <VolumeX className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                  <Button
+                    variant={voiceResponseEnabled ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => {
+                      setVoiceResponseEnabled(!voiceResponseEnabled);
+                      if (voiceResponseEnabled) {
+                        stop();
+                      }
+                    }}
+                    title={voiceResponseEnabled ? "Disable voice response" : "Enable voice response"}
+                    className="h-9"
+                  >
+                    {voiceResponseEnabled ? (
+                      <Volume2 className="h-4 w-4" />
+                    ) : (
+                      <VolumeX className="h-4 w-4" />
+                    )}
+                  </Button>
+                </>
+              )}
               <Button
                 variant="outline"
                 size="sm"

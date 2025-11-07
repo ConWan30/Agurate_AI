@@ -28,7 +28,7 @@ export const DeltaChatInput = ({ onTextMessage, onImageMessage, disabled }: Delt
     }
   });
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
@@ -36,12 +36,31 @@ export const DeltaChatInput = ({ onTextMessage, onImageMessage, disabled }: Delt
         return;
       }
       
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      // Compress image before setting
+      try {
+        const { compressImage, validateImageFile } = await import('@/lib/image-optimization');
+        const validation = validateImageFile(file);
+        if (!validation.valid) {
+          toast.error(validation.error || 'Invalid image file');
+          return;
+        }
+        const compressed = await compressImage(file);
+        setSelectedImage(compressed);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(compressed);
+      } catch (error) {
+        // Fallback to original if compression fails
+        console.warn('Image compression failed, using original:', error);
+        setSelectedImage(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

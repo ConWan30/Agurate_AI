@@ -65,7 +65,18 @@ export default function ConservationPractices() {
     }
   });
 
-  const handleConversationalComplete = async (extractedData: any) => {
+  interface ConservationPracticesData {
+    field_id: string;
+    tillage_type?: string;
+    cover_crops?: boolean;
+    crop_rotation?: boolean;
+    buffer_strips?: boolean;
+    precision_fertilization?: boolean;
+    notes?: string;
+    [key: string]: unknown;
+  }
+
+  const handleConversationalComplete = async (extractedData: ConservationPracticesData) => {
     try {
       // Conservation practices would typically be stored in a conservation_practices table
       // or as JSONB on the fields table. For now, we'll update the field's notes.

@@ -4,18 +4,8 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-
-export interface UnifiedContext {
-  fieldData: any;
-  assessmentHistory: any[];
-  conservationData: any[];
-  varietyData: any[];
-  weatherData: any;
-  communityData: any[];
-  waterStressData: any[];
-  predictiveData: any[];
-  intelligencePool: any;
-}
+import type { UnifiedContext, Field, Assessment, WeatherData, IntelligencePool, AnalysisData } from '@/types';
+import type { ConservationPrediction, VarietyPerformanceMetric, WaterStressEvent, CommunityInsight, PredictiveModel } from '@/types/enhanced-features';
 
 /**
  * Gathers unified context from all AI systems for a field
@@ -44,28 +34,30 @@ export async function gatherUnifiedContext(fieldId: string): Promise<UnifiedCont
     ]);
 
     // Get weather data (simulated for now)
-    const weatherData = {
+    const weatherData: WeatherData = {
       current_temp: 85,
       humidity: 75,
       precipitation_forecast: [0.1, 0.2, 0, 0.3, 0.5, 0.1, 0],
       days_since_rain: 3
     };
 
-    return {
-      fieldData: fieldData || {},
-      assessmentHistory: assessmentHistory || [],
-      conservationData: conservationData || [],
-      varietyData: varietyData || [],
+    const context: UnifiedContext = {
+      fieldData: (fieldData as Field) || null,
+      assessmentHistory: (assessmentHistory as Assessment[]) || [],
+      conservationData: (conservationData as ConservationPrediction[]) || [],
+      varietyData: (varietyData as VarietyPerformanceMetric[]) || [],
       weatherData,
-      communityData: communityDataRaw || [],
-      waterStressData: waterStressData || [],
-      predictiveData: predictiveData || [],
-      intelligencePool: intelligencePoolRaw?.[0] || {}
+      communityData: (communityDataRaw as CommunityInsight[]) || [],
+      waterStressData: (waterStressData as WaterStressEvent[]) || [],
+      predictiveData: (predictiveData as PredictiveModel[]) || [],
+      intelligencePool: (intelligencePoolRaw?.[0] as IntelligencePool) || {} as IntelligencePool
     };
+
+    return context;
   } catch (error) {
     console.error('Error gathering unified context:', error);
-    return {
-      fieldData: {},
+    const emptyContext: UnifiedContext = {
+      fieldData: null,
       assessmentHistory: [],
       conservationData: [],
       varietyData: [],
@@ -73,15 +65,16 @@ export async function gatherUnifiedContext(fieldId: string): Promise<UnifiedCont
       communityData: [],
       waterStressData: [],
       predictiveData: [],
-      intelligencePool: {}
+      intelligencePool: {} as IntelligencePool
     };
+    return emptyContext;
   }
 }
 
 /**
  * Enriches unified context after new analysis
  */
-export async function enrichUnifiedContext(fieldId: string, analysisData: any) {
+export async function enrichUnifiedContext(fieldId: string, analysisData: AnalysisData): Promise<boolean> {
   try {
     const patterns = {
       image_analysis_patterns: {
@@ -152,10 +145,10 @@ export function formatContextForAI(context: UnifiedContext): string {
 UNIFIED FIELD INTELLIGENCE CONTEXT:
 
 FIELD INFORMATION:
-- Crop Type: ${fieldData.crop_type || 'Unknown'}
-- Variety: ${fieldData.rice_variety || fieldData.soybean_variety || fieldData.cotton_variety || fieldData.corn_hybrid || 'Not specified'}
-- Acreage: ${fieldData.acreage || 'Unknown'} acres
-- Location: ${fieldData.location_lat || 'N/A'}, ${fieldData.location_lng || 'N/A'}
+- Crop Type: ${fieldData?.crop_type || 'Unknown'}
+- Variety: ${fieldData?.rice_variety || fieldData?.soybean_variety || fieldData?.cotton_variety || fieldData?.corn_hybrid || 'Not specified'}
+- Acreage: ${fieldData?.acreage || 'Unknown'} acres
+- Location: ${fieldData?.location_lat || 'N/A'}, ${fieldData?.location_lng || 'N/A'}
 
 HISTORICAL ASSESSMENT TRENDS (Last 10):
 ${assessmentHistory.map(a => `- ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${a.health_score}%, Stress Level: ${a.stress_level}, Symptoms: ${a.symptoms?.join(', ') || 'None'}`).join('\n') || '- No historical data'}

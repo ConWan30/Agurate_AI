@@ -170,7 +170,7 @@ export const messageInputSchema = z.object({
 /**
  * Validates extracted data against form schema
  */
-export function validateExtractedData(formType: string, data: any) {
+export function validateExtractedData(formType: string, data: unknown) {
   try {
     switch (formType) {
       case 'field-registration':

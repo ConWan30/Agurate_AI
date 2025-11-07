@@ -44,11 +44,12 @@ export function FeedbackWidget({ featureContext, onClose, compact = false }: Fee
       });
       setSubmitted(true);
       setTimeout(() => onClose?.(), 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit feedback';
       toast({
         variant: "destructive",
         title: "Error submitting feedback",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
@@ -86,11 +87,12 @@ export function FeedbackWidget({ featureContext, onClose, compact = false }: Fee
       });
       setSubmitted(true);
       setTimeout(() => onClose?.(), 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit feedback';
       toast({
         variant: "destructive",
         title: "Error submitting feedback",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);

@@ -16,11 +16,11 @@ interface DeltaConversationalFormProps {
   context?: {
     fieldId?: string;
     assessmentId?: string;
-    relatedData?: any;
+    relatedData?: Record<string, unknown>;
   };
-  onComplete: (extractedData: any) => void;
+  onComplete: (extractedData: Record<string, unknown>) => void;
   onAbandon?: () => void;
-  initialData?: Partial<any>;
+  initialData?: Partial<Record<string, unknown>>;
   className?: string;
 }
 

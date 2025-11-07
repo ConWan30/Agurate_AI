@@ -32,10 +32,11 @@ export default function ResetPassword() {
         title: "Email sent!",
         description: "Check your inbox for password reset instructions.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send reset email';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

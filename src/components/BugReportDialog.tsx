@@ -113,11 +113,12 @@ export function BugReportDialog({ open, onClose }: BugReportDialogProps) {
       setDescription("");
       setScreenshot(null);
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit bug report';
       toast({
         variant: "destructive",
         title: "Error submitting bug report",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);

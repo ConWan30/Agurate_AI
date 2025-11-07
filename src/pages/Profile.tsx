@@ -47,7 +47,7 @@ export default function Profile() {
           farm_name: data.farm_name || "",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching profile:", error);
     } finally {
       setLoading(false);
@@ -78,10 +78,11 @@ export default function Profile() {
         title: "Profile updated",
         description: "Your changes have been saved",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

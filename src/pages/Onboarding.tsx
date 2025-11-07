@@ -43,7 +43,23 @@ export default function Onboarding() {
     }
   };
 
-  const handleComplete = async (extractedData: any) => {
+  interface OnboardingExtractedData {
+    farm_name?: string;
+    full_name?: string;
+    parish?: string;
+    primary_crops?: string[];
+    total_acreage?: number;
+    phone?: string;
+    field_name?: string;
+    field_crop_type?: string;
+    field_acreage?: number;
+    field_location_lat?: number;
+    field_location_lng?: number;
+    field_notes?: string;
+    [key: string]: unknown;
+  }
+
+  const handleComplete = async (extractedData: OnboardingExtractedData) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -74,10 +90,24 @@ export default function Onboarding() {
       if (extractedData.field_name && extractedData.field_crop_type) {
         console.log('🌾 Creating first field from onboarding data...');
         
-        const fieldData: any = {
+        interface FieldData {
+          user_id: string;
+          name: string;
+          crop_type: string;
+          acreage?: number;
+          location_lat?: number;
+          location_lng?: number;
+          notes?: string;
+          rice_variety?: string;
+          soybean_variety?: string;
+          cotton_variety?: string;
+          corn_hybrid?: string;
+        }
+
+        const fieldData: FieldData = {
           user_id: user.id,
-          name: extractedData.field_name,
-          crop_type: extractedData.field_crop_type,
+          name: extractedData.field_name!,
+          crop_type: extractedData.field_crop_type!,
           acreage: extractedData.field_acreage || extractedData.total_acreage,
         };
 

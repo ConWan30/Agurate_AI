@@ -64,11 +64,12 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
         description: "Thank you for sharing your experience. This helps other farmers and strengthens our LSU partnership.",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save success story';
       toast({
         variant: "destructive",
         title: "Error saving success story",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);

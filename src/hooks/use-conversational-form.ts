@@ -2,35 +2,9 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { FormType, ConversationalFormSession, FormMessage, FormContext } from '@/types/conversational';
 
-export type FormType = 
-  | 'field-registration' 
-  | 'insurance-claim' 
-  | 'conservation-practices' 
-  | 'onboarding' 
-  | 'feedback' 
-  | 'cooperative-application';
-
-interface Message {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  field_mapping?: string;
-  validation_status?: 'pending' | 'valid' | 'invalid';
-  created_at: string;
-}
-
-interface ConversationalFormSession {
-  id: string;
-  form_type: FormType;
-  status: 'active' | 'completed' | 'abandoned';
-  context_data: any;
-  extracted_data: any;
-  completion_percentage: number;
-  started_at: string;
-  completed_at?: string;
-}
-
-export const useConversationalForm = (formType: FormType, contextData?: any) => {
+export const useConversationalForm = (formType: FormType, contextData?: Record<string, unknown>) => {
   const queryClient = useQueryClient();
   const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -41,7 +15,7 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('conversational_form_sessions')
         .insert({
           user_id: user.id,
@@ -61,14 +35,14 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
       setSessionId(data.id);
       
       // Insert initial system message
-      (supabase as any)
+      supabase
         .from('conversational_form_messages')
         .insert({
           session_id: data.id,
           role: 'assistant',
           content: getInitialMessage(formType)
         })
-        .then();
+        .then(() => {});
     },
     onError: (error) => {
       console.error('Failed to create session:', error);
@@ -82,7 +56,7 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
     queryFn: async () => {
       if (!sessionId) return null;
       
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('conversational_form_sessions')
         .select('*')
         .eq('id', sessionId)
@@ -100,14 +74,14 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
     queryFn: async () => {
       if (!sessionId) return [];
       
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('conversational_form_messages')
         .select('*')
         .eq('session_id', sessionId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      return data as Message[];
+      return (data || []) as FormMessage[];
     },
     enabled: !!sessionId
   });
@@ -144,7 +118,7 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
     mutationFn: async () => {
       if (!sessionId) throw new Error('No active session');
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('conversational_form_sessions')
         .update({
           status: 'completed',
@@ -168,7 +142,7 @@ export const useConversationalForm = (formType: FormType, contextData?: any) => 
     mutationFn: async () => {
       if (!sessionId) throw new Error('No active session');
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('conversational_form_sessions')
         .update({
           status: 'abandoned',

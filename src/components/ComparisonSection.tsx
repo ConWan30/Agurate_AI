@@ -1,8 +1,9 @@
+import { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, X, Zap } from "lucide-react";
 
-export function ComparisonSection() {
+export const ComparisonSection = memo(function ComparisonSection() {
   const comparisons = [
     {
       feature: "AI Crop Analysis",
@@ -135,4 +136,4 @@ export function ComparisonSection() {
       </div>
     </section>
   );
-}
+});

@@ -115,10 +115,11 @@ export default function Fields() {
 
       if (error) throw error;
       if (data) setFields(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -162,10 +163,11 @@ export default function Fields() {
       setDialogOpen(false);
       resetForm();
       fetchFields();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -182,10 +184,11 @@ export default function Fields() {
       if (error) throw error;
       toast({ title: "Field deleted successfully" });
       fetchFields();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -216,7 +219,19 @@ export default function Fields() {
     setEditingField(null);
   };
 
-  const handleConversationalComplete = async (extractedData: any) => {
+  interface FieldRegistrationData {
+    name?: string;
+    fieldName?: string;
+    crop_type?: string;
+    cropType?: string;
+    acreage?: number | string;
+    location_lat?: number | string;
+    location_lng?: number | string;
+    notes?: string;
+    [key: string]: unknown;
+  }
+
+  const handleConversationalComplete = async (extractedData: FieldRegistrationData) => {
     console.log('🎯 Conversational form completed with data:', extractedData);
     setLoading(true);
     
@@ -268,11 +283,12 @@ export default function Fields() {
 
       setConversationalDialogOpen(false);
       fetchFields();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       console.error('❌ Error in handleConversationalComplete:', error);
       toast({
         title: "Error creating field",
-        description: error.message || "Failed to create field. Please try again.",
+        description: errorMessage || "Failed to create field. Please try again.",
         variant: "destructive",
       });
     } finally {

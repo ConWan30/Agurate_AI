@@ -15,6 +15,8 @@ import { SuccessStoryPrompt } from "@/components/SuccessStoryPrompt";
 import { BetaConversionBanner } from "@/components/BetaConversionBanner";
 import { DailyBriefingCard } from "@/components/DailyBriefingCard";
 import { ROICalculatorCard } from "@/components/ROICalculatorCard";
+import { CriticalAlertsManager } from "@/components/CriticalAlertsManager";
+import { CooperativeAlertsManager } from "@/components/CooperativeAlertsManager";
 import { BetaEngagementCard } from "@/components/BetaEngagementCard";
 import { BetaValueTracker } from "@/components/BetaValueTracker";
 import { LiveCommunityActivity } from "@/components/LiveCommunityActivity";
@@ -233,6 +235,12 @@ export default function Dashboard() {
 
         {/* Daily Briefing - Priority Enhancement #6 */}
         {!isDemoMode && fields.length > 0 && <DailyBriefingCard />}
+
+        {/* Critical Alerts - Priority Enhancement #7 */}
+        {!isDemoMode && <CriticalAlertsManager />}
+
+        {/* Cooperative Alerts - Phase 3 Enhancement #17 */}
+        {!isDemoMode && <CooperativeAlertsManager />}
 
         {/* ROI Calculator - Treatment Value Analysis */}
         {!isDemoMode && fields.length > 0 && <ROICalculatorCard />}

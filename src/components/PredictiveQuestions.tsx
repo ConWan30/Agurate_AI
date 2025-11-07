@@ -1,16 +1,15 @@
+import { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
 
+import type { DeltaContext } from '@/types/delta';
+
 interface PredictiveQuestionsProps {
-  fieldContext?: {
-    recentAssessment?: any;
-    cropType?: string;
-    healthScore?: number;
-  };
+  fieldContext?: DeltaContext;
   onSelectQuestion: (question: string) => void;
 }
 
-export const PredictiveQuestions = ({ fieldContext, onSelectQuestion }: PredictiveQuestionsProps) => {
+export const PredictiveQuestions = memo(function PredictiveQuestions({ fieldContext, onSelectQuestion }: PredictiveQuestionsProps) {
   // Generate contextual questions based on field data
   const generateQuestions = () => {
     const questions = [];
@@ -112,4 +111,4 @@ export const PredictiveQuestions = ({ fieldContext, onSelectQuestion }: Predicti
       </div>
     </div>
   );
-};
+});

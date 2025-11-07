@@ -89,11 +89,21 @@ export function useDeltaConversations() {
     }
   };
 
-  const saveMessage = async (conversationId: string, role: 'user' | 'assistant', content: string) => {
+  const saveMessage = async (
+    conversationId: string, 
+    role: 'user' | 'assistant', 
+    content: string,
+    contextSnapshot?: Record<string, unknown>
+  ) => {
     try {
       const { error } = await supabase
         .from('delta_messages')
-        .insert({ conversation_id: conversationId, role, content });
+        .insert({ 
+          conversation_id: conversationId, 
+          role, 
+          content,
+          context_snapshot: contextSnapshot || {}
+        });
 
       if (error) throw error;
 
