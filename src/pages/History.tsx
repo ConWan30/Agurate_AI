@@ -435,6 +435,12 @@ export default function History() {
                           ...rec,
                           reasoning: rec.category ? `${rec.category.replace(/_/g, " ")} recommendation based on field analysis` : undefined
                         }))}
+                        fieldId={selectedAssessment.field.id}
+                        fieldName={selectedAssessment.field.name}
+                        cropType={selectedAssessment.field.crop_type}
+                        healthScoreBefore={(selectedAssessment.health_score || 0) * 100}
+                        stressLevel={selectedAssessment.stress_level}
+                        symptoms={selectedAssessment.symptoms || []}
                         onSetReminder={(rec) => {
                           toast({ title: "Reminder feature coming soon!" });
                         }}

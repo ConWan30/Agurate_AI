@@ -43,20 +43,50 @@ export function DailyBriefingCard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Fetch fields and recent assessments
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      // Fetch fields to check if user has any
       const { data: fields } = await supabase
         .from('fields')
-        .select('id, name, crop_type')
-        .eq('user_id', user.id);
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
 
       if (!fields || fields.length === 0) {
         setLoading(false);
         return;
       }
 
-      // Get latest assessment for each field
+      // Call Edge Function for AI-generated briefing with weather
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-daily-briefing`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to generate briefing');
+      }
+
+      const data = await response.json();
+
+      // Fetch fields for summary
+      const { data: allFields } = await supabase
+        .from('fields')
+        .select('id, name, crop_type')
+        .eq('user_id', user.id);
+
+      if (!allFields) return;
+
+      // Get latest assessment for each field for summary
       const fieldAssessments = await Promise.all(
-        fields.map(async (field) => {
+        allFields.map(async (field) => {
           const { data: assessment } = await supabase
             .from('assessments')
             .select('health_score, stress_level, analyzed_at')
@@ -74,65 +104,53 @@ export function DailyBriefingCard() {
 
       // Calculate field summary
       const healthyCount = fieldAssessments.filter(f => 
-        f.latestAssessment?.health_score >= 75
+        f.latestAssessment && (f.latestAssessment.health_score || 0) >= 0.75
       ).length;
       const needingAttentionCount = fieldAssessments.filter(f => 
-        f.latestAssessment && f.latestAssessment.health_score >= 50 && f.latestAssessment.health_score < 75
+        f.latestAssessment && (f.latestAssessment.health_score || 0) >= 0.5 && (f.latestAssessment.health_score || 0) < 0.75
       ).length;
       const criticalCount = fieldAssessments.filter(f => 
-        f.latestAssessment && f.latestAssessment.health_score < 50
+        f.latestAssessment && (f.latestAssessment.health_score || 0) < 0.5
       ).length;
 
-      // Generate priorities
-      const priorities = fieldAssessments
-        .filter(f => f.latestAssessment && f.latestAssessment.health_score < 75)
-        .map(field => ({
-          fieldName: field.name,
-          fieldId: field.id,
-          issue: field.latestAssessment!.stress_level === 'severe' 
-            ? `Severe stress detected (${field.latestAssessment!.health_score}% health)`
-            : `Moderate stress (${field.latestAssessment!.health_score}% health)`,
-          urgency: field.latestAssessment!.health_score < 50 ? 'high' as const : 'medium' as const,
-          action: field.latestAssessment!.health_score < 50 
-            ? 'Immediate inspection recommended'
-            : 'Monitor closely, consider treatment'
-        }))
-        .sort((a, b) => {
-          const urgencyOrder = { high: 0, medium: 1, low: 2 };
-          return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
-        })
-        .slice(0, 3);
+      // Map AI priorities to our format
+      const priorities = (data.priorities || []).map((p: any) => {
+        const field = allFields.find(f => f.name === p.fieldName);
+        return {
+          fieldName: p.fieldName,
+          fieldId: field?.id || '',
+          issue: p.issue || 'Field needs attention',
+          urgency: (p.urgency || 'medium') as 'high' | 'medium' | 'low',
+          action: p.action || 'Monitor closely'
+        };
+      });
 
-      // Mock weather insights (in production, fetch from weather API)
+      // Weather insights from API
       const weatherInsights = {
-        temperature: 87,
-        precipitation: 0.3,
-        recommendation: 'Warm and dry conditions. Consider irrigation for stressed fields.'
+        temperature: data.weather?.highTemp || 0,
+        precipitation: data.weather?.precipitation || 0,
+        recommendation: data.weatherRecommendation || data.weather 
+          ? `High: ${data.weather.highTemp}°F, Low: ${data.weather.lowTemp}°F`
+          : 'Check local weather forecast'
       };
 
-      // Generate achievements
-      const achievements = [];
-      if (healthyCount > 0) {
-        achievements.push(`${healthyCount} field${healthyCount > 1 ? 's' : ''} in excellent health`);
-      }
-      if (criticalCount === 0) {
-        achievements.push('No critical issues detected');
-      }
-
+      setSprayWindow(data.sprayWindow || null);
       setBriefing({
-        date: format(new Date(), 'MMMM d, yyyy'),
+        date: format(new Date(data.date || new Date()), 'MMMM d, yyyy'),
         fieldsSummary: {
-          total: fields.length,
+          total: allFields.length,
           healthy: healthyCount,
           needingAttention: needingAttentionCount,
           critical: criticalCount
         },
         topPriorities: priorities,
         weatherInsights,
-        achievements
+        achievements: data.achievements || []
       });
     } catch (error) {
       console.error('Error generating daily briefing:', error);
+      // Fallback to basic briefing on error
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -246,17 +264,26 @@ export function DailyBriefingCard() {
             <Droplets className="h-4 w-4 text-secondary" />
             Today's Weather Impact
           </h3>
-          <div className="flex items-center gap-4 mb-2">
-            <div className="flex items-center gap-2">
-              <Thermometer className="h-4 w-4 text-health-moderate" />
-              <span className="text-sm font-medium">{briefing.weatherInsights.temperature}°F</span>
+          {briefing.weatherInsights.temperature > 0 && (
+            <div className="flex items-center gap-4 mb-2">
+              <div className="flex items-center gap-2">
+                <Thermometer className="h-4 w-4 text-health-moderate" />
+                <span className="text-sm font-medium">{briefing.weatherInsights.temperature}°F</span>
+              </div>
+              {briefing.weatherInsights.precipitation > 0 && (
+                <div className="flex items-center gap-2">
+                  <Droplets className="h-4 w-4 text-secondary" />
+                  <span className="text-sm font-medium">{briefing.weatherInsights.precipitation.toFixed(1)}mm rain</span>
+                </div>
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <Droplets className="h-4 w-4 text-secondary" />
-              <span className="text-sm font-medium">{briefing.weatherInsights.precipitation}" rain</span>
-            </div>
-          </div>
+          )}
           <p className="text-sm text-muted-foreground">{briefing.weatherInsights.recommendation}</p>
+          {sprayWindow && (
+            <p className="text-xs text-muted-foreground mt-2">
+              <strong>Spray Window:</strong> {sprayWindow}
+            </p>
+          )}
         </div>
 
         {/* Achievements */}

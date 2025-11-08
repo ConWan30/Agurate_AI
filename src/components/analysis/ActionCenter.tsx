@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, BookOpen, Bell, Share2, DollarSign } from "lucide-react";
+import { Clock, BookOpen, Bell, Share2, DollarSign, ClipboardCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TreatmentOutcomeDialog } from "@/components/TreatmentOutcomeDialog";
+import { useState } from "react";
 
 interface Recommendation {
   id: string;
@@ -24,9 +26,41 @@ interface ActionCenterProps {
   recommendations: Recommendation[];
   onSetReminder?: (rec: Recommendation) => void;
   onShare?: (rec: Recommendation) => void;
+  fieldId?: string;
+  fieldName?: string;
+  cropType?: string;
+  healthScoreBefore?: number;
+  stressLevel?: string;
+  symptoms?: string[];
 }
 
-export function ActionCenter({ recommendations, onSetReminder, onShare }: ActionCenterProps) {
+export function ActionCenter({ 
+  recommendations, 
+  onSetReminder, 
+  onShare,
+  fieldId,
+  fieldName,
+  cropType,
+  healthScoreBefore = 0,
+  stressLevel,
+  symptoms = []
+}: ActionCenterProps) {
+  const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<Recommendation | null>(null);
+
+  const isTreatmentRecommendation = (category: string): boolean => {
+    const categoryLower = category.toLowerCase();
+    return categoryLower.includes('pest') || 
+           categoryLower.includes('disease') || 
+           categoryLower.includes('fertil') || 
+           categoryLower.includes('irrigat') || 
+           categoryLower.includes('herbic');
+  };
+
+  const handleLogOutcome = (rec: Recommendation) => {
+    setSelectedRecommendation(rec);
+    setOutcomeDialogOpen(true);
+  };
   const getPriorityVariant = (priority: string) => {
     switch (priority.toLowerCase()) {
       case "urgent":
@@ -168,6 +202,16 @@ export function ActionCenter({ recommendations, onSetReminder, onShare }: Action
                   </a>
                 </Button>
               )}
+              {fieldId && isTreatmentRecommendation(rec.category) && (
+                <Button 
+                  size="sm" 
+                  onClick={() => handleLogOutcome(rec)} 
+                  variant="default"
+                >
+                  <ClipboardCheck className="h-4 w-4 mr-2" />
+                  Log Outcome
+                </Button>
+              )}
               {onSetReminder && (
                 <Button size="sm" onClick={() => onSetReminder(rec)} variant="secondary">
                   <Bell className="h-4 w-4 mr-2" />
@@ -184,6 +228,24 @@ export function ActionCenter({ recommendations, onSetReminder, onShare }: Action
           </CardContent>
         </Card>
       ))}
+
+      {/* Treatment Outcome Dialog */}
+      {selectedRecommendation && fieldId && (
+        <TreatmentOutcomeDialog
+          open={outcomeDialogOpen}
+          onClose={() => {
+            setOutcomeDialogOpen(false);
+            setSelectedRecommendation(null);
+          }}
+          recommendation={selectedRecommendation}
+          fieldId={fieldId}
+          fieldName={fieldName || 'Unknown Field'}
+          cropType={cropType || 'unknown'}
+          healthScoreBefore={healthScoreBefore}
+          stressLevel={stressLevel}
+          symptoms={symptoms}
+        />
+      )}
     </div>
   );
 }

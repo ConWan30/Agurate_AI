@@ -540,6 +540,7 @@ export default function DeltaIntelligence() {
               <PredictiveQuestions 
                 fieldContext={fieldContext}
                 onSelectQuestion={handleQuestionSelect}
+                conversationHistory={messages}
               />
             ) : null}
 
