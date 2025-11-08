@@ -58,11 +58,6 @@ export function createContextSnapshot(fieldContext: DeltaContext | null): Record
     timestamp: new Date().toISOString(),
   };
 
-  if (fieldContext?.field) {
-    snapshot.field_name = fieldContext.field.name;
-    snapshot.crop_type = fieldContext.field.crop_type;
-  }
-
   if (fieldContext?.recentAssessment) {
     snapshot.health_score = fieldContext.recentAssessment.health_score;
     snapshot.stress_level = fieldContext.recentAssessment.stress_level;

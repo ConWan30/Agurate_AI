@@ -5,7 +5,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Send, X, CheckCircle2, Sparkles, Clock, ChevronUp, Info, Mic } from 'lucide-react';
-import { useConversationalForm, FormType } from '@/hooks/use-conversational-form';
+import { useConversationalForm } from '@/hooks/use-conversational-form';
+import type { FormType } from '@/types/conversational';
 import { ConversationalFormMessage } from './ConversationalFormMessage';
 import { VoiceInputButton } from './VoiceInputButton';
 import { cn } from '@/lib/utils';
@@ -236,8 +237,6 @@ export const DeltaConversationalForm = ({
               key={`${message.created_at}-${index}`}
               role={message.role}
               content={message.content}
-              fieldMapping={message.field_mapping ? JSON.parse(message.field_mapping) : undefined}
-              validationStatus={message.validation_status}
             />
           ))}
           

@@ -373,7 +373,7 @@ export default function DeltaIntelligence() {
                 title={simplifiedLanguage ? "Use detailed language" : "Use simple language"}
                 className="h-9"
               >
-                <Languages className="h-4 w-4" />
+                <span className="font-semibold">Aa</span>
               </Button>
               {isTTSSupported && (
                 <>

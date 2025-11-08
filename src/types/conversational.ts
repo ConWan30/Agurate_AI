@@ -3,7 +3,14 @@
  * Types for AI-powered conversational form interactions
  */
 
-export type FormType = 'onboarding' | 'field_setup' | 'insurance_claim' | 'cooperative_invite';
+export type FormType = 
+  | 'onboarding' 
+  | 'field_setup' 
+  | 'insurance_claim' 
+  | 'cooperative_invite'
+  | 'field-registration'
+  | 'conservation-practices'
+  | 'insurance-claim';
 
 export interface FormSession {
   id: string;

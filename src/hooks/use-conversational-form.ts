@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { FormType, ConversationalFormSession, FormMessage, FormContext } from '@/types/conversational';
 
+export type { FormType };
+
 export const useConversationalForm = (formType: FormType, contextData?: Record<string, unknown>) => {
   const queryClient = useQueryClient();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -17,14 +19,14 @@ export const useConversationalForm = (formType: FormType, contextData?: Record<s
 
       const { data, error } = await supabase
         .from('conversational_form_sessions')
-        .insert({
+        .insert([{
           user_id: user.id,
           form_type: formType,
           status: 'active',
-          context_data: contextData || {},
-          extracted_data: {},
+          context_data: (contextData || {}) as any,
+          extracted_data: {} as any,
           completion_percentage: 0
-        })
+        }])
         .select()
         .single();
 
@@ -185,13 +187,14 @@ export const useConversationalForm = (formType: FormType, contextData?: Record<s
 
 // Helper function for initial messages
 function getInitialMessage(formType: FormType): string {
-  const messages: Record<FormType, string> = {
-    'field-registration': "👋 Hey there! I'm Delta Intelligence, and I'm here to help you register a new field. Let's make this quick and easy. What would you like to name this field?",
-    'insurance-claim': "I'm here to help you document your insurance claim. First, I'm sorry to hear about the damage to your crop. Let's work together to get this documented properly. Which field was affected?",
-    'conservation-practices': "Great to see you're interested in conservation practices! These can really help your soil health and reduce costs over time. Which field would you like to track practices for?",
+  const messages: Record<string, string> = {
     'onboarding': "Welcome to AgurateAI! I'm Delta Intelligence, your AI farming advisor. Let's get you set up. First, what's your farm name?",
-    'feedback': "Thanks for taking the time to share your feedback! Your input helps us improve AgurateAI for all Louisiana Delta farmers. What feature would you like to give feedback on?",
-    'cooperative-application': "Excellent! Cooperatives help farmers share knowledge and reduce costs through bulk purchasing. Let's get your application started. What's the name of your farm?"
+    'field_setup': "👋 Hey there! I'm Delta Intelligence, and I'm here to help you set up a new field. Let's make this quick and easy. What would you like to name this field?",
+    'insurance_claim': "I'm here to help you document your insurance claim. First, I'm sorry to hear about the damage to your crop. Let's work together to get this documented properly. Which field was affected?",
+    'cooperative_invite': "Excellent! Cooperatives help farmers share knowledge and reduce costs through bulk purchasing. Let's get your application started. What's the name of your farm?",
+    'field-registration': "👋 Hey there! I'm Delta Intelligence, and I'm here to help you register a new field. Let's make this quick and easy. What would you like to name this field?",
+    'conservation-practices': "Great to see you're interested in conservation practices! These can really help your soil health and reduce costs over time. Which field would you like to track practices for?",
+    'insurance-claim': "I'm here to help you document your insurance claim. First, I'm sorry to hear about the damage to your crop. Let's work together to get this documented properly. Which field was affected?"
   };
 
   return messages[formType] || "Hello! I'm here to help you with this form. Let's get started!";

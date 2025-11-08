@@ -347,12 +347,12 @@ export default function History() {
                                   const data = await response.json();
                                   setImageAnnotations(data.annotations || []);
                                 }
-                              } catch (error) {
-                                console.error('Error generating annotations:', error);
-                                toast.error('Failed to generate annotations');
-                              } finally {
-                                setLoadingAnnotations(false);
-                              }
+              } catch (error) {
+                console.error('Error generating annotations:', error);
+                toast('Failed to generate annotations');
+              } finally {
+                setLoadingAnnotations(false);
+              }
                             }}
                             disabled={loadingAnnotations}
                           >

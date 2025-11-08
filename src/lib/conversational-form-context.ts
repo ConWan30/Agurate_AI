@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { FormType } from '@/hooks/use-conversational-form';
+import type { FormType } from '@/types/conversational';
 
 /**
  * Gathers unified AI intelligence context for conversational forms
@@ -119,14 +119,16 @@ export async function gatherFormContext(
       .eq('user_id', userId);
 
     if (coopMemberships && coopMemberships.length > 0) {
-      context.cooperatives = coopMemberships.map((m: { cooperative_id: string; cooperatives?: { name: string | null } | null }) => ({
-        id: m.cooperative_id,
-        name: m.cooperatives?.name || null,
-      }));
+      context.cooperatives = coopMemberships
+        .filter((m: any) => m.cooperatives)
+        .map((m: any) => ({
+          id: m.cooperative_id,
+          name: m.cooperatives?.name || null,
+        }));
     }
 
     // Form-specific context enrichment
-    if (formType === 'insurance-claim' && contextParams?.fieldId) {
+    if (formType === 'insurance_claim' || formType === 'insurance-claim' && contextParams?.fieldId) {
       const { data: field } = await supabase
         .from('fields')
         .select('*')

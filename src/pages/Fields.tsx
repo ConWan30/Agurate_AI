@@ -244,10 +244,10 @@ export default function Fields() {
         user_id: user.id,
         name: extractedData.name || extractedData.fieldName,
         crop_type: extractedData.crop_type || extractedData.cropType,
-        acreage: parseFloat(extractedData.acreage),
-        location_lat: extractedData.location_lat ? parseFloat(extractedData.location_lat) : null,
-        location_lng: extractedData.location_lng ? parseFloat(extractedData.location_lng) : null,
-        notes: extractedData.notes || null,
+        acreage: parseFloat(String(extractedData.acreage)),
+        location_lat: extractedData.location_lat ? parseFloat(String(extractedData.location_lat)) : null,
+        location_lng: extractedData.location_lng ? parseFloat(String(extractedData.location_lng)) : null,
+        notes: extractedData.notes ? String(extractedData.notes) : null,
       };
 
       console.log('💾 Inserting field with data:', fieldData);

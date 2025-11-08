@@ -87,7 +87,7 @@ describe('formatContextForAI', () => {
       communityData: [],
       waterStressData: [],
       predictiveData: [],
-      intelligencePool: {},
+      intelligencePool: { field_id: 'field-1' },
     };
 
     const formatted = formatContextForAI(context);

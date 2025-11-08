@@ -33,6 +33,7 @@ interface BriefingData {
 export function DailyBriefingCard() {
   const [briefing, setBriefing] = useState<BriefingData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sprayWindow, setSprayWindow] = useState<string | null>(null);
 
   useEffect(() => {
     generateDailyBriefing();

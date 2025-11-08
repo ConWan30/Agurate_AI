@@ -112,19 +112,19 @@ export default function Onboarding() {
         };
 
         // Add optional field data
-        if (extractedData.field_location_lat) fieldData.location_lat = extractedData.field_location_lat;
-        if (extractedData.field_location_lng) fieldData.location_lng = extractedData.field_location_lng;
-        if (extractedData.field_notes) fieldData.notes = extractedData.field_notes;
+          if (extractedData.field_location_lat) fieldData.location_lat = parseFloat(String(extractedData.field_location_lat));
+        if (extractedData.field_location_lng) fieldData.location_lng = parseFloat(String(extractedData.field_location_lng));
+        if (extractedData.field_notes) fieldData.notes = String(extractedData.field_notes);
         
         // Add variety based on crop type
         if (extractedData.field_crop_type === 'rice' && extractedData.rice_variety) {
-          fieldData.rice_variety = extractedData.rice_variety;
+          fieldData.rice_variety = String(extractedData.rice_variety);
         } else if (extractedData.field_crop_type === 'soybean' && extractedData.soybean_variety) {
-          fieldData.soybean_variety = extractedData.soybean_variety;
+          fieldData.soybean_variety = String(extractedData.soybean_variety);
         } else if (extractedData.field_crop_type === 'cotton' && extractedData.cotton_variety) {
-          fieldData.cotton_variety = extractedData.cotton_variety;
+          fieldData.cotton_variety = String(extractedData.cotton_variety);
         } else if (extractedData.field_crop_type === 'corn' && extractedData.corn_hybrid) {
-          fieldData.corn_hybrid = extractedData.corn_hybrid;
+          fieldData.corn_hybrid = String(extractedData.corn_hybrid);
         }
 
         const { data: newField, error: fieldError } = await supabase
