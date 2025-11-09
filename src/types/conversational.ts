@@ -10,7 +10,9 @@ export type FormType =
   | 'cooperative_invite'
   | 'field-registration'
   | 'conservation-practices'
-  | 'insurance-claim';
+  | 'insurance-claim'
+  | 'feedback'
+  | 'cooperative-application';
 
 export interface FormSession {
   id: string;

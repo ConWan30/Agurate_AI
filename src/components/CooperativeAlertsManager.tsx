@@ -16,23 +16,23 @@ interface CooperativeAlert {
   created_by: string;
   created_by_name: string;
   alert_type: string;
-  severity: 'critical' | 'high' | 'medium' | 'low' | 'info';
+  severity: 'critical' | 'high' | 'medium' | 'low';
   title: string;
   message: string;
   crop_type: string | null;
-  affected_area: string | null;
+  affected_area_acres: number | null;
   recommended_action: string | null;
   field_id: string | null;
-  assessment_id: string | null;
-  acknowledged_by: string[];
+  field_name: string | null;
+  status: string;
   created_at: string;
-  expires_at: string | null;
   resolved_at: string | null;
 }
 
 function AcknowledgeButton({ alert, onAcknowledge }: { alert: CooperativeAlert; onAcknowledge: (id: string) => void }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [acknowledged, setAcknowledged] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -40,9 +40,7 @@ function AcknowledgeButton({ alert, onAcknowledge }: { alert: CooperativeAlert; 
     });
   }, []);
 
-  const isAcknowledged = userId ? alert.acknowledged_by.includes(userId) : false;
-
-  if (isAcknowledged) {
+  if (acknowledged) {
     return (
       <Button variant="outline" size="sm" disabled>
         ✓ Acknowledged
@@ -56,7 +54,8 @@ function AcknowledgeButton({ alert, onAcknowledge }: { alert: CooperativeAlert; 
       size="sm"
       onClick={async () => {
         setLoading(true);
-        onAcknowledge(alert.id);
+        await onAcknowledge(alert.id);
+        setAcknowledged(true);
         setLoading(false);
       }}
       disabled={loading}
@@ -237,10 +236,10 @@ export function CooperativeAlertsManager() {
           <CardContent className="space-y-3">
             <p className="text-sm leading-relaxed">{alert.message}</p>
             
-            {alert.affected_area && (
+            {alert.affected_area_acres && (
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Affected: {alert.affected_area}</span>
+                <span className="text-muted-foreground">Affected: {alert.affected_area_acres} acres</span>
               </div>
             )}
 
@@ -253,8 +252,7 @@ export function CooperativeAlertsManager() {
 
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="text-xs text-muted-foreground">
-                Acknowledged by {alert.acknowledged_by.length} member{alert.acknowledged_by.length !== 1 ? 's' : ''}
-                {alert.created_by_name && ` • Shared by ${alert.created_by_name}`}
+                {alert.created_by_name && `Shared by ${alert.created_by_name}`}
               </div>
               <div className="flex gap-2">
                 {alert.field_id && (

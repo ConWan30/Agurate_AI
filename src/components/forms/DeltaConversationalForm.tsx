@@ -154,7 +154,10 @@ export const DeltaConversationalForm = ({
       'conservation-practices': 'Conservation Practices',
       'onboarding': 'Getting Started',
       'feedback': 'Share Feedback',
-      'cooperative-application': 'Cooperative Application'
+      'cooperative-application': 'Cooperative Application',
+      'field_setup': 'Field Setup',
+      'insurance_claim': 'Insurance Claim',
+      'cooperative_invite': 'Cooperative Invitation'
     };
     return titles[formType] || 'Conversation';
   };

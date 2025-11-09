@@ -97,26 +97,29 @@ export default function Upload() {
 
     // Compress image before setting (for images only)
     if (!isVideo && file.type.startsWith('image/')) {
-      try {
-        const { compressImage, validateImageFile } = await import('@/lib/image-optimization');
-        const validation = validateImageFile(file);
-        if (!validation.valid) {
-          toast({
-            title: "Invalid image",
-            description: validation.error,
-            variant: "destructive",
-          });
-          return;
+      // Use async function to handle await
+      (async () => {
+        try {
+          const { compressImage, validateImageFile } = await import('@/lib/image-optimization');
+          const validation = validateImageFile(file);
+          if (!validation.valid) {
+            toast({
+              title: "Invalid image",
+              description: validation.error,
+              variant: "destructive",
+            });
+            return;
+          }
+          const compressed = await compressImage(file);
+          setSelectedFile(compressed);
+          setPreviewUrl(URL.createObjectURL(compressed));
+        } catch (error) {
+          // Fallback to original if compression fails
+          console.warn('Image compression failed, using original:', error);
+          setSelectedFile(file);
+          setPreviewUrl(URL.createObjectURL(file));
         }
-        const compressed = await compressImage(file);
-        setSelectedFile(compressed);
-        setPreviewUrl(URL.createObjectURL(compressed));
-      } catch (error) {
-        // Fallback to original if compression fails
-        console.warn('Image compression failed, using original:', error);
-        setSelectedFile(file);
-        setPreviewUrl(URL.createObjectURL(file));
-      }
+      })();
     } else {
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));

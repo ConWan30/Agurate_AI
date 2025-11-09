@@ -47,10 +47,13 @@ export const mockSupabaseClient = {
 
 // Helper to reset all mocks
 export function resetSupabaseMocks() {
-  Object.values(mockSupabaseClient).forEach((value) => {
-    if (typeof value === 'function') {
-      vi.mocked(value).mockClear();
+  const resetValue = (value: any) => {
+    if (typeof value === 'function' && 'mockClear' in value) {
+      value.mockClear();
+    } else if (typeof value === 'object' && value !== null) {
+      Object.values(value).forEach(resetValue);
     }
-  });
+  };
+  Object.values(mockSupabaseClient).forEach(resetValue);
 }
 

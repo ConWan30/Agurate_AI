@@ -44,14 +44,13 @@ export function PeerComparisonCard({
     setLoading(true);
     try {
       const { data, error } = await supabase.rpc('get_peer_comparison', {
-        p_treatment_type: treatmentType,
+        p_field_id: '',  // TODO: Pass actual field ID
         p_crop_type: cropType,
-        p_stress_level: stressLevel || null,
-        p_limit: 5,
+        p_problem: treatmentType,
       });
 
       if (error) throw error;
-      setComparisonData((data || []) as PeerComparisonData[]);
+      setComparisonData((data || []) as any[] as PeerComparisonData[]);
     } catch (error) {
       console.error('Error loading peer comparison:', error);
       toast.error('Failed to load peer comparison data');

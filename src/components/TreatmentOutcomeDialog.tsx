@@ -134,22 +134,18 @@ export function TreatmentOutcomeDialog({
       const { error } = await supabase
         .from('peer_treatment_outcomes')
         .insert({
-          user_id: user.id,
+          farmer_id: user.id,
           field_id: fieldId,
+          recommendation_id: recommendation.id,
           treatment_type: getTreatmentType(recommendation.category),
-          treatment_name: extractTreatmentName(recommendation.recommendation_text),
-          application_date: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          health_score_before: healthScoreBefore,
-          health_score_after: healthAfter,
-          health_score_after_days: days,
-          success,
-          improvement_percentage: improvementPercentage,
-          cost_per_acre: cost,
           crop_type: cropType,
-          stress_level_before: stressLevel || null,
-          symptoms_before: symptoms,
-          symptoms_after: [], // Could be enhanced later
-          anonymized: true
+          problem_addressed: symptoms.join(', ') || stressLevel || 'Unknown',
+          outcome: outcome === 'success' ? 'successful' : outcome === 'partial' ? 'partially_successful' : 'unsuccessful',
+          effectiveness_score: healthAfter,
+          cost_usd: costPerAcre ? parseFloat(costPerAcre) : null,
+          notes: notes,
+          applied_at: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          evaluated_at: new Date().toISOString().split('T')[0],
         });
 
       if (error) throw error;

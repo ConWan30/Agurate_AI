@@ -349,7 +349,10 @@ export default function History() {
                                 }
               } catch (error) {
                 console.error('Error generating annotations:', error);
-                toast('Failed to generate annotations');
+                toast({
+                  title: "Failed to generate annotations",
+                  variant: "destructive",
+                });
               } finally {
                 setLoadingAnnotations(false);
               }

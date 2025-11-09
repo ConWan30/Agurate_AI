@@ -64,13 +64,13 @@ export function ExpertEscalationCard({
       if (issueType.includes('soybean')) specialties.push('soybean_pathology');
 
       const { data, error } = await supabase.rpc('find_matching_researcher', {
+        p_crop_type: specialties.length > 0 ? specialties[0] : issueType,
         p_issue_type: issueType,
-        p_specialties: specialties.length > 0 ? specialties : [issueType],
       });
 
       if (error) throw error;
-      if (data && data.length > 0) {
-        setResearcher(data[0] as LSUResearcher);
+      if (data) {
+        setResearcher(data as any as LSUResearcher);
       }
     } catch (error) {
       console.error('Error loading researcher:', error);
@@ -93,11 +93,11 @@ export function ExpertEscalationCard({
       const { data, error } = await supabase
         .from('expert_consultations')
         .insert({
-          user_id: user.id,
+          farmer_id: user.id,
           field_id: fieldId || null,
           assessment_id: assessmentId || null,
           researcher_id: researcher.id,
-          issue_type: issueType,
+          question: issueDescription,
           issue_description: issueDescription,
           ai_analysis: aiAnalysis || {},
           confidence_score: confidenceScore,

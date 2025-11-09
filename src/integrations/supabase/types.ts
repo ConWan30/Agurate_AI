@@ -67,6 +67,30 @@ export type Database = {
           },
         ]
       }
+      alert_acknowledgments: {
+        Row: {
+          acknowledged_at: string | null
+          alert_id: string
+          alert_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          alert_id: string
+          alert_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          alert_id?: string
+          alert_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       analytics_insights: {
         Row: {
           actionable_recommendations: string[]
@@ -484,6 +508,47 @@ export type Database = {
           },
         ]
       }
+      conversation_memory: {
+        Row: {
+          context_data: Json
+          context_type: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          last_referenced_at: string | null
+          relevance_score: number | null
+          user_id: string
+        }
+        Insert: {
+          context_data?: Json
+          context_type: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          last_referenced_at?: string | null
+          relevance_score?: number | null
+          user_id: string
+        }
+        Update: {
+          context_data?: Json
+          context_type?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          last_referenced_at?: string | null
+          relevance_score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_memory_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "delta_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversational_form_messages: {
         Row: {
           content: string
@@ -563,6 +628,72 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      cooperative_alerts: {
+        Row: {
+          affected_area_acres: number | null
+          alert_type: string
+          cooperative_id: string
+          created_at: string | null
+          created_by: string
+          crop_type: string | null
+          field_id: string | null
+          id: string
+          message: string
+          recommended_action: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+          title: string
+        }
+        Insert: {
+          affected_area_acres?: number | null
+          alert_type: string
+          cooperative_id: string
+          created_at?: string | null
+          created_by: string
+          crop_type?: string | null
+          field_id?: string | null
+          id?: string
+          message: string
+          recommended_action?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          affected_area_acres?: number | null
+          alert_type?: string
+          cooperative_id?: string
+          created_at?: string | null
+          created_by?: string
+          crop_type?: string | null
+          field_id?: string | null
+          id?: string
+          message?: string
+          recommended_action?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cooperative_alerts_cooperative_id_fkey"
+            columns: ["cooperative_id"]
+            isOneToOne: false
+            referencedRelation: "cooperatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooperative_alerts_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cooperative_invitations: {
         Row: {
@@ -667,6 +798,86 @@ export type Database = {
         }
         Relationships: []
       }
+      critical_alerts: {
+        Row: {
+          acknowledged: boolean | null
+          acknowledged_at: string | null
+          alert_type: string
+          assessment_id: string | null
+          created_at: string | null
+          estimated_loss_usd: number | null
+          field_id: string | null
+          id: string
+          message: string
+          severity: string
+          sms_sent: boolean | null
+          title: string
+          urgency_score: number
+          voice_call_attempted: boolean | null
+        }
+        Insert: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          alert_type: string
+          assessment_id?: string | null
+          created_at?: string | null
+          estimated_loss_usd?: number | null
+          field_id?: string | null
+          id?: string
+          message: string
+          severity?: string
+          sms_sent?: boolean | null
+          title: string
+          urgency_score: number
+          voice_call_attempted?: boolean | null
+        }
+        Update: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          alert_type?: string
+          assessment_id?: string | null
+          created_at?: string | null
+          estimated_loss_usd?: number | null
+          field_id?: string | null
+          id?: string
+          message?: string
+          severity?: string
+          sms_sent?: boolean | null
+          title?: string
+          urgency_score?: number
+          voice_call_attempted?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "critical_alerts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "critical_alerts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "critical_alerts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "critical_alerts_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delta_conversations: {
         Row: {
           created_at: string | null
@@ -765,6 +976,84 @@ export type Database = {
           {
             foreignKeyName: "dirt_referral_metrics_lsu_researcher_id_fkey"
             columns: ["lsu_researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expert_consultations: {
+        Row: {
+          assessment_id: string | null
+          created_at: string | null
+          farmer_id: string
+          field_id: string | null
+          id: string
+          priority: string
+          question: string
+          researcher_id: string
+          responded_at: string | null
+          response: string | null
+          status: string
+        }
+        Insert: {
+          assessment_id?: string | null
+          created_at?: string | null
+          farmer_id: string
+          field_id?: string | null
+          id?: string
+          priority?: string
+          question: string
+          researcher_id: string
+          responded_at?: string | null
+          response?: string | null
+          status?: string
+        }
+        Update: {
+          assessment_id?: string | null
+          created_at?: string | null
+          farmer_id?: string
+          field_id?: string | null
+          id?: string
+          priority?: string
+          question?: string
+          researcher_id?: string
+          responded_at?: string | null
+          response?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_consultations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "expert_consultations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expert_consultations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "expert_consultations_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expert_consultations_researcher_id_fkey"
+            columns: ["researcher_id"]
             isOneToOne: false
             referencedRelation: "lsu_researchers"
             referencedColumns: ["id"]
@@ -1176,6 +1465,79 @@ export type Database = {
           research_areas?: string[]
         }
         Relationships: []
+      }
+      peer_treatment_outcomes: {
+        Row: {
+          applied_at: string
+          cost_usd: number | null
+          created_at: string | null
+          crop_type: string
+          effectiveness_score: number | null
+          evaluated_at: string
+          farmer_id: string
+          field_id: string
+          id: string
+          notes: string | null
+          outcome: string
+          problem_addressed: string
+          recommendation_id: string | null
+          treatment_type: string
+        }
+        Insert: {
+          applied_at: string
+          cost_usd?: number | null
+          created_at?: string | null
+          crop_type: string
+          effectiveness_score?: number | null
+          evaluated_at: string
+          farmer_id: string
+          field_id: string
+          id?: string
+          notes?: string | null
+          outcome: string
+          problem_addressed: string
+          recommendation_id?: string | null
+          treatment_type: string
+        }
+        Update: {
+          applied_at?: string
+          cost_usd?: number | null
+          created_at?: string | null
+          crop_type?: string
+          effectiveness_score?: number | null
+          evaluated_at?: string
+          farmer_id?: string
+          field_id?: string
+          id?: string
+          notes?: string | null
+          outcome?: string
+          problem_addressed?: string
+          recommendation_id?: string | null
+          treatment_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "peer_treatment_outcomes_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "peer_treatment_outcomes_recommendation_id_fkey"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["recommendation_id"]
+          },
+          {
+            foreignKeyName: "peer_treatment_outcomes_recommendation_id_fkey"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "recommendations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       prediction_outcomes: {
         Row: {
@@ -1744,6 +2106,43 @@ export type Database = {
       }
     }
     Views: {
+      active_cooperative_alerts: {
+        Row: {
+          affected_area_acres: number | null
+          alert_type: string | null
+          cooperative_id: string | null
+          cooperative_name: string | null
+          created_at: string | null
+          created_by: string | null
+          created_by_name: string | null
+          crop_type: string | null
+          field_id: string | null
+          field_name: string | null
+          id: string | null
+          message: string | null
+          recommended_action: string | null
+          resolved_at: string | null
+          severity: string | null
+          status: string | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cooperative_alerts_cooperative_id_fkey"
+            columns: ["cooperative_id"]
+            isOneToOne: false
+            referencedRelation: "cooperatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooperative_alerts_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessment_details: {
         Row: {
           acreage: number | null
@@ -1805,14 +2204,102 @@ export type Database = {
         }
         Relationships: []
       }
+      unacknowledged_critical_alerts: {
+        Row: {
+          acknowledged: boolean | null
+          acknowledged_at: string | null
+          alert_type: string | null
+          assessment_id: string | null
+          created_at: string | null
+          crop_type: string | null
+          estimated_loss_usd: number | null
+          field_id: string | null
+          field_name: string | null
+          id: string | null
+          message: string | null
+          severity: string | null
+          sms_sent: boolean | null
+          title: string | null
+          urgency_score: number | null
+          voice_call_attempted: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "critical_alerts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "critical_alerts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "critical_alerts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_details"
+            referencedColumns: ["assessment_id"]
+          },
+          {
+            foreignKeyName: "critical_alerts_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      acknowledge_cooperative_alert: {
+        Args: { alert_id: string }
+        Returns: undefined
+      }
+      acknowledge_critical_alert: {
+        Args: { alert_id: string }
+        Returns: undefined
+      }
       can_view_invitation: {
         Args: { inv_id: string; user_id: string }
         Returns: boolean
       }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
+      find_matching_researcher: {
+        Args: { p_crop_type: string; p_issue_type: string }
+        Returns: {
+          availability: string
+          department: string
+          email: string
+          expertise: string[]
+          id: string
+          name: string
+        }[]
+      }
       get_beta_farmer_count: { Args: never; Returns: number }
+      get_conversation_memory: {
+        Args: { p_conversation_id: string; p_user_id: string }
+        Returns: {
+          context_data: Json
+          context_type: string
+          id: string
+          last_referenced_at: string
+          relevance_score: number
+        }[]
+      }
+      get_peer_comparison: {
+        Args: { p_crop_type: string; p_field_id: string; p_problem: string }
+        Returns: {
+          avg_effectiveness: number
+          sample_size: number
+          success_rate: number
+          treatment_type: string
+        }[]
+      }
       is_cooperative_admin: {
         Args: { coop_id: string; user_id: string }
         Returns: boolean
