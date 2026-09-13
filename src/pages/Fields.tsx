@@ -63,11 +63,20 @@ export default function Fields() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return [];
 
+        // variety_recommendations links to fields, not users directly
+        const { data: userFields } = await supabase
+          .from('fields')
+          .select('id')
+          .eq('user_id', user.id);
+
+        const fieldIds = (userFields || []).map((f) => f.id);
+        if (fieldIds.length === 0) return [];
+
         const response = await (supabase as any)
           .from('variety_recommendations')
           .select('*')
-          .eq('user_id', user.id)
-          .order('recommendation_date', { ascending: false })
+          .in('field_id', fieldIds)
+          .order('created_at', { ascending: false })
           .limit(3);
 
         if (response.error) {
