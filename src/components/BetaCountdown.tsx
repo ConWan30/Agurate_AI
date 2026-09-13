@@ -42,13 +42,10 @@ export function BetaCountdown() {
 
   const fetchBetaCount = async () => {
     try {
-      const { count, error } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('beta_farmer', true);
+      const { data, error } = await supabase.rpc('get_beta_farmer_count');
 
       if (error) throw error;
-      setSignupCount(count || 0);
+      setSignupCount(typeof data === 'number' ? data : 0);
     } catch (error) {
       console.error('Error fetching beta count:', error);
     } finally {
