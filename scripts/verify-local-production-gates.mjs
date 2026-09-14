@@ -21,6 +21,7 @@ const GATES = [
       process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example',
   } },
+  { name: 'health stamp', cmd: 'npm', args: ['run', 'verify:health-stamp'] },
 ];
 
 function latestMigrationId() {

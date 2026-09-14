@@ -136,7 +136,7 @@ export default function Home() {
   const stats = [
     { value: 7, label: "Day Stress Forecasts", suffix: "+", prefix: "" },
     { value: 4, label: "Delta Crops Supported", suffix: "", prefix: "" },
-    { value: 100, label: "Beta Partner Spots", suffix: "", prefix: "" },
+    { value: 100, label: "Closed Beta Seats", suffix: "", prefix: "" },
     { value: 1, label: "On-Demand AI Advisor", suffix: "", prefix: "" }
   ];
 

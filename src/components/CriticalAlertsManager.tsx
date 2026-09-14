@@ -165,13 +165,14 @@ export function CriticalAlertsManager() {
                   <Badge variant={getSeverityVariant(alert.severity)}>
                     {alert.severity.toUpperCase()}
                   </Badge>
-                  {alert.sms_sent && (
+                  {/* SMS/voice delivery is not enabled — do not render delivery badges */}
+                  {false && alert.sms_sent && (
                     <Badge variant="outline" className="gap-1">
                       <MessageSquare className="h-3 w-3" />
                       SMS Sent
                     </Badge>
                   )}
-                  {alert.voice_call_attempted && (
+                  {false && alert.voice_call_attempted && (
                     <Badge variant="outline" className="gap-1">
                       <Phone className="h-3 w-3" />
                       Voice Call

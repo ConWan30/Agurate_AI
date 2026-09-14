@@ -72,7 +72,9 @@ export const generateInsurancePDF = (claim: ClaimData): jsPDF => {
       day: 'numeric' 
     })],
     ['Claim Status', claim.status.toUpperCase()],
-    ['Estimated Loss', `${claim.estimated_loss_percentage}%`],
+    ['Estimated Loss', Number.isFinite(Number(claim.estimated_loss_percentage))
+      ? `${claim.estimated_loss_percentage}%`
+      : 'Not recorded'],
     ['Created Date', new Date(claim.created_at).toLocaleDateString('en-US', { 
       year: 'numeric', 
       month: 'long', 

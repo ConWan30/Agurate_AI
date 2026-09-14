@@ -18,8 +18,8 @@ interface DetailedAnalysisTabsProps {
   canopyCoverage?: number;
   plantDensity?: string;
   fieldUniformity?: number;
-  diseases?: any[];
-  pests?: any[];
+  diseases?: any[] | null;
+  pests?: any[] | null;
   nutrientDeficiencies?: {
     nitrogen?: NutrientDeficiency;
     phosphorus?: NutrientDeficiency;
@@ -39,8 +39,8 @@ export function DetailedAnalysisTabs({
   canopyCoverage,
   plantDensity,
   fieldUniformity,
-  diseases = [],
-  pests = [],
+  diseases,
+  pests,
   nutrientDeficiencies,
   environmentalStress,
   rootHealthIndicators,
@@ -121,14 +121,18 @@ export function DetailedAnalysisTabs({
             <CardTitle>Diseases & Pests</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {diseases.length > 0 ? (
+            {diseases == null ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Disease findings were not recorded for this assessment
+              </p>
+            ) : diseases.length > 0 ? (
               <div>
                 <p className="text-sm font-semibold mb-3">Diseases Detected:</p>
                 <div className="space-y-2">
                   {diseases.map((disease, idx) => (
                     <div key={idx} className="p-3 border rounded-lg">
                       <div className="flex justify-between items-start">
-                        <p className="font-medium">{disease}</p>
+                        <p className="font-medium">{typeof disease === 'string' ? disease : disease?.name ?? 'Unknown'}</p>
                         <Badge variant="destructive">Active</Badge>
                       </div>
                     </div>
@@ -137,24 +141,28 @@ export function DetailedAnalysisTabs({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">
-                ✓ No diseases detected
+                This analysis reported no diseases
               </p>
             )}
 
-            {pests.length > 0 && (
+            {pests == null ? null : pests.length > 0 ? (
               <div className="pt-4 border-t">
                 <p className="text-sm font-semibold mb-3">Pests Detected:</p>
                 <div className="space-y-2">
                   {pests.map((pest, idx) => (
                     <div key={idx} className="p-3 border rounded-lg">
                       <div className="flex justify-between items-start">
-                        <p className="font-medium">{pest}</p>
+                        <p className="font-medium">{typeof pest === 'string' ? pest : pest?.name ?? 'Unknown'}</p>
                         <Badge variant="destructive">Active</Badge>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4 border-t pt-4">
+                This analysis reported no pests
+              </p>
             )}
           </CardContent>
         </Card>

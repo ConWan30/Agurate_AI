@@ -60,11 +60,12 @@ export default function Insurance() {
 
   const createClaim = useMutation({
     mutationFn: async (formData: FormData) => {
+      const rawLoss = Number(formData.get('estimated_loss_percentage'));
       const { error } = await supabase.from('insurance_claims').insert([{
         field_id: formData.get('field_id') as string,
         event_type: formData.get('event_type') as string,
         event_date: formData.get('event_date') as string,
-        estimated_loss_percentage: Number(formData.get('estimated_loss_percentage')),
+        estimated_loss_percentage: Number.isFinite(rawLoss) ? rawLoss : null,
         description: formData.get('description') as string,
         status: 'draft'
       }]);
@@ -129,11 +130,14 @@ export default function Insurance() {
 
   const handleConversationalComplete = async (extractedData: InsuranceClaimData) => {
     try {
+      const rawExtractedLoss = Number(
+        extractedData.estimatedLossPercentage || extractedData.estimated_loss_percentage,
+      );
       const { error } = await supabase.from('insurance_claims').insert([{
         field_id: extractedData.fieldId || extractedData.field_id,
         event_type: extractedData.eventType || extractedData.event_type,
         event_date: extractedData.eventDate || extractedData.event_date,
-        estimated_loss_percentage: Number(extractedData.estimatedLossPercentage || extractedData.estimated_loss_percentage),
+        estimated_loss_percentage: Number.isFinite(rawExtractedLoss) ? rawExtractedLoss : null,
         description: extractedData.description,
         status: 'draft'
       }]);

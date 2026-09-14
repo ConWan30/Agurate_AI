@@ -48,3 +48,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: https://example.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
+      - name: Assert health.json tip stamp
+        run: npm run verify:health-stamp
+        env:
+          EXPECTED_COMMIT: ${{ github.sha }}

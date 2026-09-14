@@ -137,7 +137,7 @@ Last updated: 2026-09-14
 
 See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
-- [ ] Apply pending Supabase migrations (through `20260914180000` (includes entitlement clamps; researcher PII is `20260914100000`), plus prior RLS/RPC/storage)
+- [ ] Apply pending Supabase migrations (through `20260914190000` claim-status/invitation locks; prior tip `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
@@ -147,8 +147,8 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 ## Evidence expected before production-complete
 
 1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
-2. Migration applied confirmation in Supabase through `20260914180000_beta_metrics_require_approved_stories` — **pending credentials**
+2. Migration applied confirmation in Supabase through `20260914190000_protect_claim_status_and_invitation_columns` — **pending credentials**
 3. Live production URL showing honest closed-beta copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
 
-In-repo honesty residuals closed on this tip batch (delta-chat LSU trial-% invent, compare-images null health arithmetic, DetailedAnalysisTabs null→0% uniformity/canopy, water-stress severity NaN%, analyze-crop null metric prompt leaks, conversational-form invented evidence example, tutorial fabricated specialist name, Morehouse-as-default geography soft claim). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).
+In-repo honesty/security residuals closed on this tip batch (insurance claim status self-write lock, invitation column freeze, disease/pest empty≠unknown, nutrient null≠none, NaN loss guards, SMS badge removed, health.json tip-stamp CI/local assert). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).

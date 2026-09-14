@@ -23,6 +23,7 @@
     "verify:honesty:static": "node scripts/verify-honesty-static.mjs",
     "verify:public-routes": "node scripts/verify-public-routes.mjs",
     "verify:local-gates": "node scripts/verify-local-production-gates.mjs",
+    "verify:health-stamp": "node scripts/verify-health-stamp.mjs",
     "verify:production-smoke": "node scripts/verify-production-smoke.mjs",
     "check:edge": "bash scripts/check-edge-functions.sh"
   },

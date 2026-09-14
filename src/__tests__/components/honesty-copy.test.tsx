@@ -53,7 +53,8 @@ describe('launch honesty copy', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/LSU research-linked/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cites public LSU research/i)).toBeInTheDocument();
     expect(screen.queryByText(/LSU Validated/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/LSU research-linked/i)).not.toBeInTheDocument();
   });
 });

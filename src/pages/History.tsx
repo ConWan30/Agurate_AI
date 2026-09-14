@@ -445,6 +445,8 @@ export default function History() {
                           selectedAssessment.nutrient_deficiencies?.phosphorus?.severity === "moderate" ||
                           selectedAssessment.nutrient_deficiencies?.potassium?.severity === "moderate"
                         ? "moderate"
+                        : selectedAssessment.nutrient_deficiencies == null
+                        ? "unknown"
                         : selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ||
                           selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ||
                           selectedAssessment.nutrient_deficiencies?.potassium?.detected
@@ -464,7 +466,7 @@ export default function History() {
                   />
 
                   {/* Action Center with Recommendations */}
-                  {selectedAssessment.recommendations.length > 0 && (
+                  {selectedAssessment.recommendations && selectedAssessment.recommendations.length > 0 && (
                     <>
                       <ActionCenter
                         recommendations={selectedAssessment.recommendations.map(rec => ({
