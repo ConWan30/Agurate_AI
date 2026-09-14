@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Calendar, Camera, FileText, Send, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { resolveCropImageUrls } from '@/lib/crop-image';
 
 type ClaimDetailProps = {
   claimId: string;
@@ -45,7 +46,28 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
         .single();
       
       if (error) throw error;
-      return data;
+
+      const linked = data.linked_assessments ?? [];
+      const assessments = linked
+        .map((la: { assessment: { id: string; image_url: string } | null }) => la.assessment)
+        .filter((a): a is { id: string; image_url: string } => Boolean(a));
+      const resolved = await resolveCropImageUrls(supabase, assessments);
+      const byId = new Map(resolved.map((a) => [a.id, a.image_url]));
+
+      return {
+        ...data,
+        linked_assessments: linked.map(
+          (la: { assessment: { id: string; image_url: string } | null }) => ({
+            ...la,
+            assessment: la.assessment
+              ? {
+                  ...la.assessment,
+                  image_url: byId.get(la.assessment.id) ?? la.assessment.image_url,
+                }
+              : null,
+          })
+        ),
+      };
     },
     enabled: open
   });
@@ -62,7 +84,7 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
         .limit(10);
       
       if (error) throw error;
-      return data;
+      return resolveCropImageUrls(supabase, data ?? []);
     },
     enabled: !!claim?.field_id && open
   });

@@ -210,7 +210,7 @@ export default function Scanner() {
         .createSignedUrl(fileName, 3600); // 1 hour expiry
 
       if (signedUrlError) throw signedUrlError;
-      const imageUrl = data.signedUrl;
+      const signedImageUrl = data.signedUrl;
 
       // ✅ UNIFIED AI: Gather context before analysis
       const unifiedContext = await gatherUnifiedContext(selectedFieldId);
@@ -218,7 +218,7 @@ export default function Scanner() {
       // Call analyze-crop edge function with unified context
       const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
         body: {
-          imageUrl: imageUrl,
+          imageUrl: signedImageUrl,
           cropType: selectedField.crop_type,
           fieldId: selectedFieldId,
           unifiedContext // Include intelligence pool data
@@ -233,12 +233,12 @@ export default function Scanner() {
         throw new Error('AI analysis did not return a stress_level');
       }
 
-      // Save assessment to database
+      // Durable storage path — never persist the ephemeral signed URL
       const { data: assessment, error: dbError } = await supabase
         .from('assessments')
         .insert({
           field_id: selectedFieldId,
-          image_url: imageUrl,
+          image_url: fileName,
           health_score: toHealthPercent(aiResult.health_score),
           stress_level: aiResult.stress_level,
           symptoms: aiResult.symptoms || [],

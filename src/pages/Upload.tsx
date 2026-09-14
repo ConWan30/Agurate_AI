@@ -155,13 +155,13 @@ export default function Upload() {
 
       if (uploadError) throw uploadError;
 
-      // Get signed URL (secure, time-limited)
+      // Short-lived signed URL for AI only — persist storage path, not this URL
       const { data, error: signedUrlError } = await supabase.storage
         .from("crop-images")
         .createSignedUrl(fileName, 3600); // 1 hour expiry
 
       if (signedUrlError) throw signedUrlError;
-      const imageUrl = data.signedUrl;
+      const signedImageUrl = data.signedUrl;
 
       setUploading(false);
       setAnalyzing(true);
@@ -182,8 +182,15 @@ export default function Upload() {
         file_type: fileType,
       });
 
-      // Call real AI analysis
-      await performAIAnalysis(imageUrl, field.crop_type, fieldLocation, selectedField, fileType);
+      // Call real AI analysis; store durable path as assessments.image_url
+      await performAIAnalysis(
+        signedImageUrl,
+        fileName,
+        field.crop_type,
+        fieldLocation,
+        selectedField,
+        fileType
+      );
       
       analytics.track('analysis_completed', {
         crop_type: field.crop_type,
@@ -209,14 +216,21 @@ export default function Upload() {
     }
   };
 
-  const performAIAnalysis = async (imageUrl: string, cropType: string, location: string, fieldId: string, mediaType: 'image' | 'video') => {
+  const performAIAnalysis = async (
+    signedImageUrl: string,
+    storagePath: string,
+    cropType: string,
+    location: string,
+    fieldId: string,
+    mediaType: 'image' | 'video'
+  ) => {
     // ✅ UNIFIED AI: Gather context before analysis
     const unifiedContext = await gatherUnifiedContext(fieldId);
     
     // Call the AI edge function with unified context
     const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
       body: { 
-        imageUrl, 
+        imageUrl: signedImageUrl, 
         cropType, 
         location, 
         mediaType,
@@ -228,12 +242,12 @@ export default function Upload() {
     if (!aiResult) throw new Error('No analysis results received');
     requireHealthScore(aiResult.health_score);
 
-    // Insert assessment with AI results
+    // Insert assessment with AI results — durable storage path, not signed URL
     const { data: assessment, error: assessmentError } = await supabase
       .from("assessments")
       .insert({
         field_id: fieldId,
-        image_url: imageUrl,
+        image_url: storagePath,
         health_score: toHealthPercent(aiResult.health_score),
         stress_level: aiResult.stress_level,
         symptoms: aiResult.symptoms,

@@ -182,38 +182,33 @@ serve(async (req) => {
       console.error('Error parsing AI response:', error);
     }
 
-    // Fallback if AI parsing failed
+    // Fail closed — never invent spray windows or soft priorities when AI output is missing
     if (!briefingData.priorities || briefingData.priorities.length === 0) {
-      briefingData = {
-        priorities: fieldAssessments
-          .filter((f) => {
-            const pct = toHealthPercent(f.latestAssessment?.health_score);
-            return f.latestAssessment && pct > 0 && pct < 75;
-          })
-          .slice(0, 3)
-          .map((field) => {
-            const pct = toHealthPercent(field.latestAssessment?.health_score);
-            return {
-              fieldName: field.name,
-              issue: `Health score: ${pct.toFixed(0)}%`,
-              urgency: pct < 50 ? 'high' : 'medium',
-              action: 'Monitor closely and consider treatment if symptoms worsen.',
-            };
-          }),
-        weatherRecommendation: weather
-          ? `High: ${weather.highTemp}°F, Low: ${weather.lowTemp}°F. ${weather.precipitation > 0 ? `${weather.precipitation}mm rain expected.` : 'Dry conditions.'}`
-          : 'Check local weather forecast for today.',
-        sprayWindow: '7 AM - 11 AM (optimal conditions)',
-        achievements: [],
-      };
+      return new Response(
+        JSON.stringify({
+          error: 'Daily briefing unavailable — AI response missing or unparseable',
+          weather: weather || null,
+          date: new Date().toISOString(),
+        }),
+        {
+          status: 503,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
+    // Only surface spray guidance when the model provided it
+    const responseBody = {
+      ...briefingData,
+      sprayWindow: typeof briefingData.sprayWindow === 'string' && briefingData.sprayWindow.trim()
+        ? briefingData.sprayWindow.trim()
+        : null,
+      weather: weather || null,
+      date: new Date().toISOString(),
+    };
+
     return new Response(
-      JSON.stringify({
-        ...briefingData,
-        weather: weather || null,
-        date: new Date().toISOString(),
-      }),
+      JSON.stringify(responseBody),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }

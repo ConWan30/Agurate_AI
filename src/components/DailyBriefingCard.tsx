@@ -26,7 +26,7 @@ interface BriefingData {
   weatherInsights: {
     temperature: number;
     precipitation: number;
-    recommendation: string;
+    recommendation: string | null;
   };
   achievements: string[];
 }
@@ -77,6 +77,9 @@ export function DailyBriefingCard() {
       }
 
       const data = await response.json();
+      if (data.error || !Array.isArray(data.priorities) || data.priorities.length === 0) {
+        throw new Error(data.error || 'Daily briefing unavailable');
+      }
 
       // Fetch fields for summary
       const { data: allFields } = await supabase
@@ -115,28 +118,46 @@ export function DailyBriefingCard() {
         f.latestAssessment && toHealthPercent(f.latestAssessment.health_score) < 50
       ).length;
 
-      // Map AI priorities to our format
-      const priorities = (data.priorities || []).map((p: any) => {
-        const field = allFields.find(f => f.name === p.fieldName);
-        return {
-          fieldName: p.fieldName,
-          fieldId: field?.id || '',
-          issue: p.issue || 'Field needs attention',
-          urgency: (p.urgency || 'medium') as 'high' | 'medium' | 'low',
-          action: p.action || 'Monitor closely'
-        };
-      });
+      // Map AI priorities — require model-provided fields (no invented issue/action copy)
+      const priorities = data.priorities
+        .filter(
+          (p: { fieldName?: string; issue?: string; action?: string; urgency?: string }) =>
+            Boolean(p?.fieldName && p?.issue && p?.action)
+        )
+        .map((p: { fieldName: string; issue: string; action: string; urgency?: string }) => {
+          const field = allFields.find(f => f.name === p.fieldName);
+          return {
+            fieldName: p.fieldName,
+            fieldId: field?.id || '',
+            issue: p.issue,
+            urgency: (p.urgency === 'high' || p.urgency === 'low' || p.urgency === 'medium'
+              ? p.urgency
+              : 'medium') as 'high' | 'medium' | 'low',
+            action: p.action,
+          };
+        });
 
-      // Weather insights from API
+      if (priorities.length === 0) {
+        throw new Error('Daily briefing priorities incomplete');
+      }
+
+      // Weather insights from API — omit invented spray/recommendation text
       const weatherInsights = {
         temperature: data.weather?.highTemp || 0,
         precipitation: data.weather?.precipitation || 0,
-        recommendation: data.weatherRecommendation || data.weather 
-          ? `High: ${data.weather.highTemp}°F, Low: ${data.weather.lowTemp}°F`
-          : 'Check local weather forecast'
+        recommendation:
+          typeof data.weatherRecommendation === 'string' && data.weatherRecommendation.trim()
+            ? data.weatherRecommendation.trim()
+            : data.weather
+              ? `High: ${data.weather.highTemp}°F, Low: ${data.weather.lowTemp}°F`
+              : null,
       };
 
-      setSprayWindow(data.sprayWindow || null);
+      setSprayWindow(
+        typeof data.sprayWindow === 'string' && data.sprayWindow.trim()
+          ? data.sprayWindow.trim()
+          : null
+      );
       setBriefing({
         date: format(new Date(data.date || new Date()), 'MMMM d, yyyy'),
         fieldsSummary: {
@@ -280,7 +301,9 @@ export function DailyBriefingCard() {
               )}
             </div>
           )}
-          <p className="text-sm text-muted-foreground">{briefing.weatherInsights.recommendation}</p>
+          {briefing.weatherInsights.recommendation && (
+            <p className="text-sm text-muted-foreground">{briefing.weatherInsights.recommendation}</p>
+          )}
           {sprayWindow && (
             <p className="text-xs text-muted-foreground mt-2">
               <strong>Spray Window:</strong> {sprayWindow}

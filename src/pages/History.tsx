@@ -28,6 +28,7 @@ import { ExpertEscalationCard } from "@/components/ExpertEscalationCard";
 import { PeerComparisonCard } from "@/components/PeerComparisonCard";
 import { AnnotatedImage, type ImageAnnotation } from "@/components/AnnotatedImage";
 import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { resolveCropImageUrls } from '@/lib/crop-image';
 
 interface Assessment {
   id: string;
@@ -101,7 +102,10 @@ export default function History() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      if (data) setAssessments(data);
+      if (data) {
+        // Mint fresh signed URLs for display (image_url may be a storage path)
+        setAssessments(await resolveCropImageUrls(supabase, data as Assessment[]));
+      }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load assessments';
       toast({

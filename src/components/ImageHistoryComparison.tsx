@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { ProgressiveImage } from '@/components/ui/progressive-image';
 import { toHealthPercent } from '@/lib/health-score';
+import { resolveCropImageUrl, resolveCropImageUrls } from '@/lib/crop-image';
 
 interface Assessment {
   id: string;
@@ -58,14 +59,18 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
 
       if (error) throw error;
 
-      setAssessments((data || []) as Assessment[]);
+      const withUrls = await resolveCropImageUrls(
+        supabase,
+        (data || []) as Assessment[]
+      );
+      setAssessments(withUrls);
       
       // Auto-select most recent and second most recent if available
-      if (data && data.length >= 2) {
-        setSelectedAssessment1(currentAssessmentId || data[0].id);
-        setSelectedAssessment2(data[1].id);
-      } else if (data && data.length === 1) {
-        setSelectedAssessment1(currentAssessmentId || data[0].id);
+      if (withUrls.length >= 2) {
+        setSelectedAssessment1(currentAssessmentId || withUrls[0].id);
+        setSelectedAssessment2(withUrls[1].id);
+      } else if (withUrls.length === 1) {
+        setSelectedAssessment1(currentAssessmentId || withUrls[0].id);
       }
     } catch (error) {
       console.error('Error loading assessments:', error);
@@ -95,6 +100,15 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
         throw new Error('Assessments not found');
       }
 
+      // Fresh signed URLs for the vision model (paths or legacy signed URLs)
+      const [image1Url, image2Url] = await Promise.all([
+        resolveCropImageUrl(supabase, assessment1.image_url),
+        resolveCropImageUrl(supabase, assessment2.image_url),
+      ]);
+      if (!image1Url || !image2Url) {
+        throw new Error('Could not resolve assessment image URLs');
+      }
+
       // Call Edge Function for image comparison
       const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/compare-images`, {
@@ -104,8 +118,8 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
           'Authorization': `Bearer ${session?.access_token}`,
         },
         body: JSON.stringify({
-          image1_url: assessment1.image_url,
-          image2_url: assessment2.image_url,
+          image1_url: image1Url,
+          image2_url: image2Url,
           assessment1_data: {
             health_score: assessment1.health_score,
             stress_level: assessment1.stress_level,
@@ -126,30 +140,15 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
       }
 
       const result = await response.json();
+      if (!result?.health_trend || !Array.isArray(result.visual_changes)) {
+        throw new Error('Comparison response missing required fields');
+      }
       setComparisonResult(result);
     } catch (error) {
       console.error('Error comparing images:', error);
       toast.error('Failed to compare images');
-      
-      // Fallback: Calculate basic comparison from assessment data
-      const assessment1 = assessments.find(a => a.id === selectedAssessment1);
-      const assessment2 = assessments.find(a => a.id === selectedAssessment2);
-      
-      if (assessment1 && assessment2) {
-        const healthChange = assessment2.health_score - assessment1.health_score;
-        setComparisonResult({
-          health_trend: healthChange > 5 ? 'improving' : healthChange < -5 ? 'declining' : 'stable',
-          health_change: healthChange,
-          symptom_progression: [
-            ...(assessment1.symptoms || []),
-            ...(assessment2.symptoms || []),
-          ],
-          visual_changes: [
-            `Health score changed from ${toHealthPercent(assessment1.health_score)}% to ${toHealthPercent(assessment2.health_score)}%`,
-            `Stress level: ${assessment1.stress_level} → ${assessment2.stress_level}`,
-          ],
-        });
-      }
+      // Fail closed — never invent visual comparison from score math alone
+      setComparisonResult(null);
     } finally {
       setComparing(false);
     }

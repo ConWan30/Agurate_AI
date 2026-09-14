@@ -104,6 +104,9 @@ Last updated: 2026-09-14
 - [x] `npm run verify:local-gates` orchestrates typecheck + unit + honesty static + edge check + build; operator handoff doc for platform steps
 - [x] `/health.json` stamped with git commit/branch/builtAt (vite plugin) for post-publish identity verification
 - [x] Public route alignment gate (`verify:public-routes`) keeps App ↔ robots ↔ sitemap in sync
+- [x] Persist durable `crop-images` storage paths (not ephemeral signed URLs) on assessments
+- [x] Image history comparison fail-closed (no invented visual comparison on edge failure)
+- [x] Daily briefing fail-closed (no invented spray windows / soft priorities)
 
 ## Platform gates (external)
 
