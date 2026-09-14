@@ -26,6 +26,7 @@ import { DetailedAnalysisTabs } from "@/components/analysis/DetailedAnalysisTabs
 import { ImageHistoryComparison } from "@/components/ImageHistoryComparison";
 import { ExpertEscalationCard } from "@/components/ExpertEscalationCard";
 import { PeerComparisonCard } from "@/components/PeerComparisonCard";
+import { getTreatmentType } from "@/lib/phase4-helpers";
 import { AnnotatedImage, type ImageAnnotation } from "@/components/AnnotatedImage";
 import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 import { normalizeStressLevel } from '@/lib/stress-level';
@@ -509,14 +510,14 @@ export default function History() {
                       ) && (
                         <PeerComparisonCard
                           fieldId={selectedAssessment.field?.id ?? selectedAssessment.field_id}
-                          treatmentType={
-                            selectedAssessment.recommendations.find(rec => 
-                              rec.category === 'pest_management'
-                            ) ? 'fungicide' :
-                            selectedAssessment.recommendations.find(rec => 
-                              rec.category === 'fertilization'
-                            ) ? 'fertilizer' : 'general'
-                          }
+                          treatmentType={getTreatmentType(
+                            selectedAssessment.recommendations.find(
+                              (rec) =>
+                                rec.category === 'pest_management' ||
+                                rec.category === 'fertilization' ||
+                                rec.category === 'irrigation'
+                            )?.category ?? 'general'
+                          )}
                           cropType={selectedAssessment.field?.crop_type ?? 'unknown'}
                           stressLevel={selectedAssessment.stress_level}
                           currentHealthScore={

@@ -5,13 +5,16 @@
 
 import { toHealthPercent } from '@/lib/health-score';
 
+/** Map recommendation category → peer problem token. Never invent a product class (e.g. fungicide) from "pest". */
 export function getTreatmentType(category: string): string {
   const categoryLower = category.toLowerCase();
-  if (categoryLower.includes('pest') || categoryLower.includes('disease')) return 'fungicide';
-  if (categoryLower.includes('fertil')) return 'fertilizer';
+  if (categoryLower.includes('disease')) return 'disease_management';
+  if (categoryLower.includes('pest')) return 'pest_management';
+  if (categoryLower.includes('fertil')) return 'fertilization';
   if (categoryLower.includes('irrigat')) return 'irrigation';
   if (categoryLower.includes('herbic')) return 'herbicide';
-  return 'general';
+  const trimmed = category.trim();
+  return trimmed.length > 0 ? trimmed : 'general';
 }
 
 export function extractTreatmentName(text: string): string {

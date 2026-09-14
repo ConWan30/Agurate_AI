@@ -111,9 +111,12 @@ export async function enrichUnifiedContext(fieldId: string, analysisData: Analys
         community_alignment: analysisData.community?.confidence ?? null
       }
     };
-    // Pool writes are service-role only (unified-ai-analysis edge). Client invent removed.
-
-    return true;
+    // Pool writes are service-role only (unified-ai-analysis edge).
+    // Do not pretend client enrichment succeeded — that edge needs imageUrl and
+    // runs a full analysis; calling it here would double-invoke AI. Call sites
+    // may still await this for forward-compat; false = pool not updated.
+    void patterns;
+    return false;
   } catch (error) {
     console.error('Error enriching unified context:', error);
     return false;

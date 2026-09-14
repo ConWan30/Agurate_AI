@@ -292,6 +292,14 @@ const required = [
         'protect_peer_treatment_outcome_metrics',
       ],
     },
+    {
+      id: '20260914450000_scrub_peer_effectiveness_history',
+      needles: [
+        'effectiveness_score = NULL',
+        'cost_usd = NULL',
+        'AVG(pto.effectiveness_score) FILTER (WHERE pto.effectiveness_score IS NOT NULL)',
+      ],
+    },
   ];
 
   for (const req of required) {
@@ -312,11 +320,12 @@ const required = [
   const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
   pass(`tip migration ${tip}`);
   if (
+    !tip.startsWith('2026091445') &&
     !tip.startsWith('2026091444') &&
-    tip < '20260914440000_lock_peer_effectiveness_strip'
+    tip < '20260914450000_scrub_peer_effectiveness_history'
   ) {
     fail(
-      `tip migration ${tip} should include peer effectiveness strip (20260914440000+)`
+      `tip migration ${tip} should include peer effectiveness history scrub (20260914450000+)`
     );
   }
 

@@ -7,13 +7,14 @@ import {
 } from '@/lib/phase4-helpers';
 
 describe('Phase 4 treatment outcome helpers', () => {
-  it('maps recommendation categories to treatment types', () => {
-    expect(getTreatmentType('pest_management')).toBe('fungicide');
-    expect(getTreatmentType('disease control')).toBe('fungicide');
-    expect(getTreatmentType('fertilization')).toBe('fertilizer');
+  it('maps recommendation categories without inventing product classes', () => {
+    expect(getTreatmentType('pest_management')).toBe('pest_management');
+    expect(getTreatmentType('disease control')).toBe('disease_management');
+    expect(getTreatmentType('fertilization')).toBe('fertilization');
     expect(getTreatmentType('irrigation schedule')).toBe('irrigation');
     expect(getTreatmentType('herbicide pass')).toBe('herbicide');
-    expect(getTreatmentType('other')).toBe('general');
+    expect(getTreatmentType('other')).toBe('other');
+    expect(getTreatmentType('')).toBe('general');
   });
 
   it('extracts known treatment names from recommendation text', () => {
