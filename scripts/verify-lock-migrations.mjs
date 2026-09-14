@@ -234,6 +234,19 @@ const required = [
       'protect_peer_treatment_outcome_metrics',
     ],
   },
+  {
+    id: '20260914390000_lock_peer_sample_success_insert_weather_money',
+    needles: [
+      'COUNT(DISTINCT pto.farmer_id) >= 3',
+      'pto.farmer_id IS DISTINCT FROM auth.uid()',
+      'NEW.estimated_savings := NULL',
+      'NEW.acres_protected := NULL',
+      'NEW.roi_achieved := NULL',
+      'cooperative_alerts_affected_area_acres_upper_check',
+      'ALTER COLUMN location_lat DROP DEFAULT',
+      'reject_client_insert_weather_events_trg',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -254,11 +267,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091438') &&
-  tip < '20260914380000_lock_catalog_community_variety_money_caps'
+  !tip.startsWith('2026091439') &&
+  tip < '20260914390000_lock_peer_sample_success_insert_weather_money'
 ) {
   fail(
-    `tip migration ${tip} should include catalog/community/variety/money-cap invent lock (20260914380000+)`
+    `tip migration ${tip} should include peer-sample/success-insert/weather invent lock (20260914390000+)`
   );
 }
 

@@ -454,7 +454,14 @@ export default function Cooperatives() {
                   <div>
                     <p className="text-sm text-muted-foreground">Total Adopters</p>
                     <p className="text-2xl font-bold">
-                      {adoptionMetrics.reduce((sum, m) => sum + m.total_adopters, 0)}
+                      {(() => {
+                        const values = adoptionMetrics
+                          .map((m) => Number(m.total_adopters))
+                          .filter((n) => Number.isFinite(n));
+                        return values.length
+                          ? values.reduce((sum, n) => sum + n, 0)
+                          : '—';
+                      })()}
                     </p>
                   </div>
                 </div>
@@ -469,7 +476,14 @@ export default function Cooperatives() {
                   <div>
                     <p className="text-sm text-muted-foreground">Total Acres</p>
                     <p className="text-2xl font-bold">
-                      {adoptionMetrics.reduce((sum, m) => sum + Number(m.total_acres), 0).toLocaleString()}
+                      {(() => {
+                        const values = adoptionMetrics
+                          .map((m) => Number(m.total_acres))
+                          .filter((n) => Number.isFinite(n));
+                        return values.length
+                          ? values.reduce((sum, n) => sum + n, 0).toLocaleString()
+                          : '—';
+                      })()}
                     </p>
                   </div>
                 </div>

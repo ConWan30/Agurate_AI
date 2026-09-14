@@ -104,6 +104,15 @@ serve(async (req) => {
     if (result.health_score == null || Number.isNaN(Number(result.health_score))) {
       throw new Error('AR analysis omitted health_score');
     }
+    const confidence = Number(result.confidence_score);
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+      throw new Error('AR analysis omitted or invented confidence_score (require finite 0–1)');
+    }
+    const allowedStress = new Set(['healthy', 'moderate_stress', 'severe_stress']);
+    if (!allowedStress.has(String(result.stress_level))) {
+      throw new Error('AR analysis omitted or invented stress_level');
+    }
+    result.confidence_score = confidence;
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

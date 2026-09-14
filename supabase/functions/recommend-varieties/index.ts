@@ -144,7 +144,12 @@ ${communityInsights.map(c => {
 }).join('\n')}
 
 Conservation Context:
-${conservationData.length > 0 ? `Soil health trending ${conservationData[0].soil_health_improvement > 0.5 ? 'upward' : 'stable'}` : 'No conservation data'}
+${(() => {
+  if (!conservationData.length) return 'No conservation data';
+  const n = Number(conservationData[0].soil_health_improvement);
+  if (!Number.isFinite(n)) return 'Soil health trend not recorded';
+  return `Soil health trending ${n > 0.5 ? 'upward' : 'stable'}`;
+})()}
 
 LSU AgCenter published variety references: ${lsuVarieties.join(', ')}
 

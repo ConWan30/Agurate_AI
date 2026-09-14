@@ -43,13 +43,11 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const parsedSavings = estimatedSavings.trim()
-        ? Number(estimatedSavings)
-        : null;
-      const parsedAcres = acresProtected.trim()
-        ? Number(acresProtected)
-        : null;
-      if (parsedSavings != null && (!Number.isFinite(parsedSavings) || parsedSavings < 0)) {
+      // Money/acre metrics are not client-writable — moderators set verified
+      // figures after review. Optional self-report notes stay in the testimonial.
+      const savingsNote = estimatedSavings.trim();
+      const acresNote = acresProtected.trim();
+      if (savingsNote && (!Number.isFinite(Number(savingsNote)) || Number(savingsNote) < 0)) {
         toast({
           variant: "destructive",
           title: "Invalid savings amount",
@@ -57,7 +55,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
         });
         return;
       }
-      if (parsedAcres != null && (!Number.isFinite(parsedAcres) || parsedAcres < 0)) {
+      if (acresNote && (!Number.isFinite(Number(acresNote)) || Number(acresNote) < 0)) {
         toast({
           variant: "destructive",
           title: "Invalid acres protected",
@@ -66,15 +64,19 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
         return;
       }
 
+      const moneyNotes = [
+        savingsNote ? `Self-reported estimated savings (unverified): $${savingsNote}` : null,
+        acresNote ? `Self-reported acres protected (unverified): ${acresNote}` : null,
+      ].filter(Boolean);
+      const testimonialBody = [testimonial.trim(), ...moneyNotes].join('\n\n');
+
       const { error } = await supabase.from('success_stories').insert({
         user_id: user.id,
         assessment_id: assessmentId,
         problem_encountered: problemEncountered.trim(),
         action_taken: actionTaken.trim(),
         outcome: outcome.trim(),
-        estimated_savings: parsedSavings,
-        acres_protected: parsedAcres,
-        testimonial: testimonial.trim(),
+        testimonial: testimonialBody,
         allow_public_use: allowPublicUse,
         allow_name: allowName,
         allow_farm_name: allowFarmName,
@@ -84,7 +86,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
 
       toast({
         title: "🏆 Success story saved!",
-        description: "Thanks for sharing. Public display requires moderation approval before it appears publicly.",
+        description: "Thanks for sharing. Dollar/acre figures stay unverified until moderation; public display requires approval.",
       });
       onClose();
     } catch (error: unknown) {
@@ -149,33 +151,38 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
             />
           </div>
 
-          {/* Financial Impact */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="savings" className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
-                Estimated Savings
-              </Label>
-              <Input
-                id="savings"
-                type="number"
-                placeholder="e.g., 15000"
-                value={estimatedSavings}
-                onChange={(e) => setEstimatedSavings(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="acres" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Acres Protected
-              </Label>
-              <Input
-                id="acres"
-                type="number"
-                placeholder="e.g., 180"
-                value={acresProtected}
-                onChange={(e) => setAcresProtected(e.target.value)}
-              />
+          {/* Optional self-report notes — not stored as verified money metrics */}
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Optional self-reported figures (kept as notes only — not published as verified savings).
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="savings" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Estimated Savings (optional)
+                </Label>
+                <Input
+                  id="savings"
+                  type="number"
+                  placeholder="e.g., 15000"
+                  value={estimatedSavings}
+                  onChange={(e) => setEstimatedSavings(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="acres" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Acres Protected (optional)
+                </Label>
+                <Input
+                  id="acres"
+                  type="number"
+                  placeholder="e.g., 180"
+                  value={acresProtected}
+                  onChange={(e) => setAcresProtected(e.target.value)}
+                />
+              </div>
             </div>
           </div>
 

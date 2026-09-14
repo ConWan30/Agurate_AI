@@ -65,8 +65,7 @@ export function ExpertEscalationCard({
       const issue = (issueType || '').toLowerCase();
       const cropType =
         cropHints.find((c) => issue.includes(c)) ||
-        cropHints.find((c) => (issueType || '').toLowerCase().includes(c)) ||
-        'rice';
+        cropHints.find((c) => (issueType || '').toLowerCase().includes(c));
       const issueKey = issue.includes('pest')
         ? 'pest'
         : issue.includes('nutrient') || issue.includes('soil')
@@ -74,6 +73,12 @@ export function ExpertEscalationCard({
           : issue.includes('disease') || issue.includes('patholog')
             ? 'disease'
             : issue;
+
+      // Fail closed — do not invent a crop specialty when none is recorded.
+      if (!cropType) {
+        setResearcher(null);
+        return;
+      }
 
       const { data, error } = await supabase.rpc('find_matching_researcher', {
         p_crop_type: cropType,

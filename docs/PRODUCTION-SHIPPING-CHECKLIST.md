@@ -137,7 +137,7 @@ Last updated: 2026-09-14
 
 See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
-- [ ] Apply pending Supabase migrations (through `20260914380000` catalog/community/variety/money-caps; prior `20260914370000` coop-alert-coop-match/ai-update/dirt; prior `20260914300000` success/peer-cost/recommendation-update; prior `20260914290000` yield/feedback/event/bug/acreage; `20260914280000` claim loss / expert priority / form-complete / field_uniformity; `20260914270000` alert-ack; `20260914260000` delta/peer/expert; `20260914240000` critical-alert UPDATE freeze + claim↔assessment; `20260914230000` peer effectiveness CHECK; `20260914220000` AI metric invent lock; `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
+- [ ] Apply pending Supabase migrations (through `20260914390000` peer-sample/success-insert/weather; prior `20260914380000` catalog/community/variety/money-caps; prior `20260914370000` coop-alert-coop-match/ai-update/dirt; prior `20260914300000` success/peer-cost/recommendation-update; prior `20260914290000` yield/feedback/event/bug/acreage; `20260914280000` claim loss / expert priority / form-complete / field_uniformity; `20260914270000` alert-ack; `20260914260000` delta/peer/expert; `20260914240000` critical-alert UPDATE freeze + claim↔assessment; `20260914230000` peer effectiveness CHECK; `20260914220000` AI metric invent lock; `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
@@ -147,7 +147,7 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 ## Evidence expected before production-complete
 
 1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build + honesty e2e) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
-2. Migration applied confirmation in Supabase through `20260914380000_lock_catalog_community_variety_money_caps` — **pending credentials**
+2. Migration applied confirmation in Supabase through `20260914390000_lock_peer_sample_success_insert_weather_money` — **pending credentials**
 3. Live production URL showing honest closed-beta copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
 

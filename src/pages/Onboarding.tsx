@@ -108,7 +108,12 @@ export default function Onboarding() {
           user_id: user.id,
           name: extractedData.field_name!,
           crop_type: normalizedCropType!,
-          acreage: extractedData.field_acreage || extractedData.total_acreage,
+          // Only use explicit field acreage — never invent from farm-total acreage.
+          ...(extractedData.field_acreage != null &&
+          Number.isFinite(Number(extractedData.field_acreage)) &&
+          Number(extractedData.field_acreage) > 0
+            ? { acreage: Number(extractedData.field_acreage) }
+            : {}),
         };
 
         // Add optional field data

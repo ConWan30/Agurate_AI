@@ -35,7 +35,11 @@ export function CommunityInsightsCard({ practice }: CommunityInsightsCardProps) 
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center p-3 rounded-lg bg-primary/5">
             <Users className="h-5 w-5 mx-auto mb-1 text-primary" />
-            <div className="text-lg font-bold">{practice.adoption_count}</div>
+            <div className="text-lg font-bold">
+              {practice.adoption_count != null && Number.isFinite(Number(practice.adoption_count))
+                ? practice.adoption_count
+                : '—'}
+            </div>
             <div className="text-xs text-muted-foreground">Farmers</div>
           </div>
 
@@ -79,7 +83,9 @@ export function CommunityInsightsCard({ practice }: CommunityInsightsCardProps) 
         )}
 
         <div className="text-xs text-muted-foreground text-center pt-2 border-t">
-          Data aggregated from {practice.adoption_count} anonymous farmer reports
+          {practice.adoption_count != null && Number.isFinite(Number(practice.adoption_count))
+            ? `Data aggregated from ${practice.adoption_count} anonymous farmer reports`
+            : 'Adoption count not recorded for this practice'}
         </div>
       </CardContent>
     </Card>
