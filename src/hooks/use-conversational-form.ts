@@ -105,7 +105,9 @@ export const useConversationalForm = (formType: FormType, contextData?: Record<s
       return data;
     },
     onSuccess: () => {
-      console.log('✅ Message sent successfully, invalidating queries');
+      if (import.meta.env.DEV) {
+        console.log('Message sent successfully, invalidating queries');
+      }
       queryClient.invalidateQueries({ queryKey: ['conversational-form-session', sessionId] });
       queryClient.invalidateQueries({ queryKey: ['conversational-form-messages', sessionId] });
     },
@@ -168,7 +170,9 @@ export const useConversationalForm = (formType: FormType, contextData?: Record<s
     messages,
     isLoadingMessages,
     sendMessage: (message: string) => {
-      console.log('📤 Sending message to edge function:', { sessionId, message });
+      if (import.meta.env.DEV) {
+        console.log('Sending message to edge function:', { sessionId, message });
+      }
       sendMessageMutation.mutate(message);
     },
     isSendingMessage: sendMessageMutation.isPending,

@@ -1,4 +1,5 @@
 - [x] Finish launch-readiness fixes and verify critical pages
 - [x] Apply honest closed-beta copy and metadata corrections
 - [x] Remove fabricated testimonials, ratings, accuracy, validation, partnership, and user-count claims
-- [ ] Verify preview, security, and publish updated app
+- [x] Verify preview and security hardening (view SECURITY INVOKER migration; build + public-page honesty checks)
+- [ ] Publish updated app (Lovable / production deploy)

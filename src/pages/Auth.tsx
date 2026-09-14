@@ -213,7 +213,7 @@ export default function Auth() {
           
               <p className="text-lg opacity-90 mb-8 leading-relaxed">
             Real-time crop health monitoring for rice, soybean, cotton, and corn. 
-            Built on LSU AgCenter research.
+            Guidance framed around publicly available LSU AgCenter research.
           </p>
 
           {/* Feature list with icons */}

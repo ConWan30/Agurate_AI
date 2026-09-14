@@ -206,7 +206,7 @@ const App = () => (
           <Route path="/fields" element={<ProtectedRoute><Layout><Fields /></Layout></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute><Layout><History /></Layout></ProtectedRoute>} />
           <Route path="/predictions" element={<ProtectedRoute><Layout><Predictions /></Layout></ProtectedRoute>} />
-          <Route path="/how-it-works" element={<ProtectedRoute><Layout><HowItWorks /></Layout></ProtectedRoute>} />
+          <Route path="/how-it-works" element={<main id="main-content"><HowItWorks /></main>} />
           <Route path="/insurance" element={<ProtectedRoute><Layout><Insurance /></Layout></ProtectedRoute>} />
           <Route path="/cooperatives" element={<ProtectedRoute><Layout><Cooperatives /></Layout></ProtectedRoute>} />
           <Route path="/cooperatives/join/:code" element={<ProtectedRoute><CooperativeJoin /></ProtectedRoute>} />

@@ -126,7 +126,9 @@ export default function LSUResearchers() {
               <LSUResearcherContactCard
                 key={researcher.id}
                 researcher={researcher}
-                onContact={() => console.log('Contact researcher:', researcher.id)}
+                onContact={() => {
+                  // Contact is handled via public LSU channels in the card UI
+                }}
               />
             ))}
           </div>

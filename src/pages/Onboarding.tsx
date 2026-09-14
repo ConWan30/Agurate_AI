@@ -64,7 +64,7 @@ export default function Onboarding() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      console.log('🎯 Onboarding data extracted:', extractedData);
+      if (import.meta.env.DEV) console.log('🎯 Onboarding data extracted:', extractedData);
 
       // Update profile
       const { error: profileError } = await supabase
@@ -88,7 +88,7 @@ export default function Onboarding() {
       // ✅ CREATE FIRST FIELD AUTOMATICALLY if field data was collected
       // Check if the conversational form extracted field information
       if (extractedData.field_name && extractedData.field_crop_type) {
-        console.log('🌾 Creating first field from onboarding data...');
+        if (import.meta.env.DEV) console.log('🌾 Creating first field from onboarding data...');
         
         interface FieldData {
           user_id: string;
@@ -136,7 +136,7 @@ export default function Onboarding() {
         if (fieldError) {
           console.error('❌ Error creating field:', fieldError);
         } else {
-          console.log('✅ First field created successfully:', newField);
+          if (import.meta.env.DEV) console.log('✅ First field created successfully:', newField);
           toast.success(`🌾 ${fieldData.name} field created!`);
         }
       }

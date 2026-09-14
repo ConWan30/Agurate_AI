@@ -241,7 +241,7 @@ export default function Fields() {
   }
 
   const handleConversationalComplete = async (extractedData: FieldRegistrationData) => {
-    console.log('🎯 Conversational form completed with data:', extractedData);
+    if (import.meta.env.DEV) console.log('🎯 Conversational form completed with data:', extractedData);
     setLoading(true);
     
     try {
@@ -259,7 +259,7 @@ export default function Fields() {
         notes: extractedData.notes ? String(extractedData.notes) : null,
       };
 
-      console.log('💾 Inserting field with data:', fieldData);
+      if (import.meta.env.DEV) console.log('💾 Inserting field with data:', fieldData);
 
       // Validate required fields
       if (!fieldData.name) {
@@ -283,7 +283,7 @@ export default function Fields() {
         throw error;
       }
 
-      console.log('✅ Field created successfully:', insertedField);
+      if (import.meta.env.DEV) console.log('✅ Field created successfully:', insertedField);
 
       toast({ 
         title: "🎉 Field registered successfully!",
