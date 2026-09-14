@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
-import { toHealthPercent } from '@/lib/health-score';
+import { requireHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -226,9 +226,7 @@ export default function Upload() {
 
     if (aiError) throw aiError;
     if (!aiResult) throw new Error('No analysis results received');
-    if (aiResult.health_score == null || Number.isNaN(Number(aiResult.health_score))) {
-      throw new Error('AI analysis did not return a health score');
-    }
+    requireHealthScore(aiResult.health_score);
 
     // Insert assessment with AI results
     const { data: assessment, error: assessmentError } = await supabase

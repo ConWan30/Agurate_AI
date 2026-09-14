@@ -89,9 +89,9 @@ export function BetaValueTracker() {
 
         {/* Beta discount CTA */}
         <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-sm space-y-1">
-          <p className="font-semibold text-primary">💡 Beta Lifetime Discount</p>
+          <p className="font-semibold text-primary">💡 Closed-beta pricing note</p>
           <p className="text-xs text-muted-foreground">
-            Lock in 50% off the published plan rate when you convert after beta ends
+            Beta farmers may be offered 50% off the published plan rate when paid plans launch — checkout is not open yet
           </p>
         </div>
       </CardContent>

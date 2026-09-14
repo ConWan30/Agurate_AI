@@ -31,8 +31,16 @@ function validateImageUrl(url: string, mediaType: string): boolean {
 function toHealthPercent(score: number | null | undefined): number {
   if (score == null || Number.isNaN(Number(score))) return 0;
   const n = Number(score);
+  if (n < 0) return 0;
   if (n <= 1) return Math.round(n * 1000) / 10;
-  return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
+  return Math.min(100, Math.round(n * 10) / 10);
+}
+
+function requireHealthScore(score: unknown, label = 'health_score'): number {
+  if (score == null || Number.isNaN(Number(score))) {
+    throw new Error(`AI analysis omitted ${label}`);
+  }
+  return toHealthPercent(Number(score));
 }
 
 serve(async (req) => {
@@ -468,15 +476,18 @@ Respond with JSON:
       return 'moderate'; // default fallback
     };
 
-    // Combine both AI outputs
+    // Combine both AI outputs — fail closed if health_score is missing (do not invent 0%)
     const finalResult = {
       // From image analysis
-      health_score: toHealthPercent(imageAnalysis.health_score),
+      health_score: requireHealthScore(imageAnalysis.health_score),
       stress_level: normalizeStressLevel(imageAnalysis.condition),
       stress_score: imageAnalysis.stress_score,
       symptoms: imageAnalysis.symptoms,
       visual_cues: imageAnalysis.visual_cues,
-      confidence_score: toHealthPercent(imageAnalysis.confidence_score),
+      confidence_score:
+        imageAnalysis.confidence_score == null || Number.isNaN(Number(imageAnalysis.confidence_score))
+          ? null
+          : toHealthPercent(imageAnalysis.confidence_score),
       
       // Enhanced analytical fields
       growth_stage: imageAnalysis.growth_stage,

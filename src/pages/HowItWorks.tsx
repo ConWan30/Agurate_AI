@@ -59,7 +59,7 @@ export default function HowItWorks() {
     { from: 'Field Photo/Video', to: 'Secure Cloud Storage', detail: 'Supabase Storage (encrypted)' },
     { from: 'Media URL', to: 'AI Analysis', detail: 'Lovable AI Gateway (Video/Image)' },
     { from: 'Visual Symptoms', to: 'Database', detail: 'PostgreSQL with RLS' },
-    { from: 'Weather API', to: 'Correlation Engine', detail: 'Real-time enrichment' },
+    { from: 'Weather API', to: 'Correlation Engine', detail: 'Weather context enrichment' },
     { from: 'Historical Data', to: 'Predictions', detail: 'Pattern recognition' },
   ];
 
@@ -74,23 +74,23 @@ export default function HowItWorks() {
     {
       icon: Cloud,
       title: 'Weather Stress Prevention',
-      scenario: 'Predict heat stress 5-7 days ahead during Louisiana summers',
+      scenario: 'Explore multi-day heat-stress outlooks during Louisiana summers (illustrative decision aid)',
       impact: 'Adjust irrigation before damage occurs',
       savings: 'Proactive irrigation cues'
     },
     {
       icon: MapPin,
-      title: 'Drone-Powered Field Mapping',
-      scenario: 'Upload drone video to identify stressed zones across entire 50-acre field in one analysis',
-      impact: 'Comprehensive aerial view shows patterns invisible from ground level',
+      title: 'Aerial / Field Video Mapping',
+      scenario: 'Upload field or aerial video to review stressed zones across a larger area in one pass',
+      impact: 'Broader coverage can highlight patterns that are harder to see from ground level',
       savings: 'Broader field coverage'
     },
     {
       icon: TrendingUp,
       title: 'Seasonal Planning',
-      scenario: 'Historical analysis shows optimal planting window for your specific field',
-      impact: 'Plant at peak time for soil/weather conditions',
-      savings: 'Better timing decisions'
+      scenario: 'Historical notes can inform planting-window discussion for your field (illustrative planning aid)',
+      impact: 'Use past season context when choosing planting timing',
+      savings: 'Better-informed timing discussions'
     }
   ];
 
@@ -105,7 +105,7 @@ export default function HowItWorks() {
     {
       icon: Brain,
       title: 'Daily AI Briefing',
-      description: 'Wake up to personalized field intelligence: overnight weather impacts, urgent actions needed, and 7-day stress forecasts delivered to your dashboard',
+      description: 'Optional daily briefing summarizes overnight weather context, suggested actions, and multi-day stress outlooks on your dashboard',
       benefit: 'Daily action focus',
       color: 'bg-secondary/10 text-secondary border-secondary/20'
     },
@@ -361,11 +361,11 @@ export default function HowItWorks() {
               <CardContent className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Response Time:</span>
-                  <span className="font-semibold">&lt;2 seconds</span>
+                  <span className="font-semibold">Typically a few seconds</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Overlay Type:</span>
-                  <span className="font-semibold">Live Vision</span>
+                  <span className="font-semibold">On-device overlay</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Edge Processing:</span>

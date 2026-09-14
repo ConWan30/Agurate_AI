@@ -208,7 +208,7 @@ CRITICAL: Analyze this image considering all historical context above.`;
   try {
     return JSON.parse(content);
   } catch {
-    return { health_score: 85, stress_level: 'healthy', symptoms: [], confidence_score: 0.85 };
+    throw new Error('AI analysis returned unparseable JSON — refusing to invent health scores');
   }
 }
 

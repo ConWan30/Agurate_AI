@@ -83,6 +83,9 @@ const FORBIDDEN = [
   { name: 'faster claims processing claim', re: /faster claims processing/i },
   { name: 'enhance all future analyses claim', re: /enhance all future analyses/i },
   { name: 'Multi-Model Parallel Processing claim', re: /Multi-Model Parallel Processing/i },
+  { name: 'Beta Lifetime Discount marketing', re: /Beta Lifetime Discount/i },
+  { name: 'Lock in 50% off published rate CTA', re: /Lock in 50% off the published plan rate/i },
+  { name: 'Predict heat stress 5-7 days claim', re: /Predict heat stress 5-7 days ahead/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

@@ -12,6 +12,19 @@ export function toHealthPercent(score: number | null | undefined): number {
   return Math.min(100, Math.round(n * 10) / 10);
 }
 
+/** True when a score is usable for persistence (not null/NaN). 0 is a valid score. */
+export function hasHealthScore(score: unknown): score is number {
+  return score != null && !Number.isNaN(Number(score));
+}
+
+/** Fail-closed helper for persist paths — throws if AI omitted the score. */
+export function requireHealthScore(score: unknown, label = 'health_score'): number {
+  if (!hasHealthScore(score)) {
+    throw new Error(`AI analysis did not return a ${label}`);
+  }
+  return toHealthPercent(score);
+}
+
 /** 0–1 fraction for math that expects a ratio. */
 export function toHealthFraction(score: number | null | undefined): number {
   return toHealthPercent(score) / 100;

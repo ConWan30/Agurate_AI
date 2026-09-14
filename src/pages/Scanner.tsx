@@ -14,7 +14,7 @@ import TutorialTooltip from '@/components/TutorialTooltip';
 import { useHaptics } from '@/hooks/use-haptics';
 import { useGlobalKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
-import { toHealthPercent } from '@/lib/health-score';
+import { requireHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -223,9 +223,8 @@ export default function Scanner() {
 
       if (aiError) throw aiError;
 
-      if (aiResult.health_score == null || Number.isNaN(Number(aiResult.health_score))) {
-        throw new Error('AI analysis did not return a health score');
-      }
+      // Edge should also refuse missing scores; keep client fail-closed as defense in depth.
+      requireHealthScore(aiResult.health_score);
 
       // Save assessment to database
       const { data: assessment, error: dbError } = await supabase

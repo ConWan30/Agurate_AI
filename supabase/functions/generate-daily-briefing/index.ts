@@ -186,14 +186,20 @@ serve(async (req) => {
     if (!briefingData.priorities || briefingData.priorities.length === 0) {
       briefingData = {
         priorities: fieldAssessments
-          .filter((f) => f.latestAssessment && (f.latestAssessment.health_score || 0) < 0.75)
+          .filter((f) => {
+            const pct = toHealthPercent(f.latestAssessment?.health_score);
+            return f.latestAssessment && pct > 0 && pct < 75;
+          })
           .slice(0, 3)
-          .map((field) => ({
-            fieldName: field.name,
-            issue: `Health score: ${toHealthPercent(field.latestAssessment?.health_score).toFixed(0)}%`,
-            urgency: (field.latestAssessment?.health_score || 0) < 0.5 ? 'high' : 'medium',
-            action: 'Monitor closely and consider treatment if symptoms worsen.',
-          })),
+          .map((field) => {
+            const pct = toHealthPercent(field.latestAssessment?.health_score);
+            return {
+              fieldName: field.name,
+              issue: `Health score: ${pct.toFixed(0)}%`,
+              urgency: pct < 50 ? 'high' : 'medium',
+              action: 'Monitor closely and consider treatment if symptoms worsen.',
+            };
+          }),
         weatherRecommendation: weather
           ? `High: ${weather.highTemp}°F, Low: ${weather.lowTemp}°F. ${weather.precipitation > 0 ? `${weather.precipitation}mm rain expected.` : 'Dry conditions.'}`
           : 'Check local weather forecast for today.',
