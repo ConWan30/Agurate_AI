@@ -5,7 +5,7 @@
 
 // Health status types
 export type HealthStatus = 'healthy' | 'moderate' | 'severe' | 'unknown';
-export type CropType = 'rice' | 'soybeans' | 'cotton' | 'corn';
+export type CropType = 'rice' | 'soybean' | 'cotton' | 'corn';
 
 /**
  * Get health status badge classes using semantic health colors
@@ -116,10 +116,11 @@ export function getSoilTypeLabel(soilType: string): string {
 }
 
 /**
- * Format acreage for display
+ * Format acreage for display — never invent 0/null acres as a real value.
  */
-export function formatAcreage(acres: number): string {
-  return `${acres.toLocaleString()} acres`;
+export function formatAcreage(acres: number | null | undefined): string {
+  if (acres == null || !Number.isFinite(Number(acres))) return 'not recorded';
+  return `${Number(acres).toLocaleString()} acres`;
 }
 
 /**
@@ -130,15 +131,9 @@ export function formatCurrency(amount: number): string {
 }
 
 /**
- * Get crop value per acre (Louisiana averages)
+ * Crop $/acre is farm-specific — never invent Louisiana commodity defaults.
+ * Callers must require a farmer-entered value when USD math is needed.
  */
-export function getCropValuePerAcre(cropType: string): number {
-  const values: Record<string, number> = {
-    rice: 850,
-    soybeans: 400,
-    soybean: 400,
-    cotton: 750,
-    corn: 600
-  };
-  return values[cropType?.toLowerCase()] || 500;
+export function getCropValuePerAcre(_cropType: string): number | null {
+  return null;
 }

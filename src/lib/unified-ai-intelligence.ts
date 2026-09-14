@@ -33,13 +33,8 @@ export async function gatherUnifiedContext(fieldId: string): Promise<UnifiedCont
       supabase.from('ai_intelligence_pool').select('*').eq('field_id', fieldId).order('snapshot_date', { ascending: false }).limit(1)
     ]);
 
-    // Get weather data (simulated for now)
-    const weatherData: WeatherData = {
-      current_temp: 85,
-      humidity: 75,
-      precipitation_forecast: [0.1, 0.2, 0, 0.3, 0.5, 0.1, 0],
-      days_since_rain: 3
-    };
+    // Weather integrations are not wired yet — omit fabricated readings from AI context.
+    const weatherData: WeatherData = {};
 
     const context: UnifiedContext = {
       fieldData: (fieldData as Field) || null,
@@ -79,7 +74,9 @@ export async function enrichUnifiedContext(fieldId: string, analysisData: Analys
     const patterns = {
       image_analysis_patterns: {
         symptom_progression: analysisData.visionAnalysis?.symptoms || [],
-        health_score_trend: [analysisData.visionAnalysis?.health_score || 0],
+        health_score_trend: analysisData.visionAnalysis?.health_score != null
+          ? [analysisData.visionAnalysis.health_score]
+          : [],
         visual_patterns: analysisData.visionAnalysis?.visual_patterns || []
       },
       variety_intelligence: {
@@ -88,7 +85,7 @@ export async function enrichUnifiedContext(fieldId: string, analysisData: Analys
         performance_patterns: analysisData.variety?.performance || {}
       },
       conservation_effectiveness: {
-        soil_health_trend: analysisData.conservation?.soil_health_indicator || 0,
+        soil_health_trend: analysisData.conservation?.soil_health_indicator ?? null,
         practice_impacts: analysisData.conservation?.practice_impacts || {},
         visual_improvements: analysisData.conservation?.improvements || []
       },
@@ -108,19 +105,18 @@ export async function enrichUnifiedContext(fieldId: string, analysisData: Analys
         intervention_windows: analysisData.predictions?.windows || []
       },
       confidence_scores: {
-        vision_analysis: analysisData.visionAnalysis?.confidence_score || 0,
-        water_stress: analysisData.waterStress?.confidence || 0,
-        variety_match: analysisData.variety?.confidence || 0,
-        community_alignment: analysisData.community?.confidence || 0
+        vision_analysis: analysisData.visionAnalysis?.confidence_score ?? null,
+        water_stress: analysisData.waterStress?.confidence ?? null,
+        variety_match: analysisData.variety?.confidence ?? null,
+        community_alignment: analysisData.community?.confidence ?? null
       }
     };
-
-    await supabase.from('ai_intelligence_pool').insert({
-      field_id: fieldId,
-      ...patterns
-    });
-
-    return true;
+    // Pool writes are service-role only (unified-ai-analysis edge).
+    // Do not pretend client enrichment succeeded — that edge needs imageUrl and
+    // runs a full analysis; calling it here would double-invoke AI. Call sites
+    // may still await this for forward-compat; false = pool not updated.
+    void patterns;
+    return false;
   } catch (error) {
     console.error('Error enriching unified context:', error);
     return false;
@@ -147,11 +143,11 @@ UNIFIED FIELD INTELLIGENCE CONTEXT:
 FIELD INFORMATION:
 - Crop Type: ${fieldData?.crop_type || 'Unknown'}
 - Variety: ${fieldData?.rice_variety || fieldData?.soybean_variety || fieldData?.cotton_variety || fieldData?.corn_hybrid || 'Not specified'}
-- Acreage: ${fieldData?.acreage || 'Unknown'} acres
-- Location: ${fieldData?.location_lat || 'N/A'}, ${fieldData?.location_lng || 'N/A'}
+- Acreage: ${fieldData?.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? `${fieldData.acreage} acres` : 'not recorded'}
+- Location: ${fieldData?.location_lat != null ? fieldData.location_lat : 'not recorded'}, ${fieldData?.location_lng != null ? fieldData.location_lng : 'not recorded'}
 
 HISTORICAL ASSESSMENT TRENDS (Last 10):
-${assessmentHistory.map(a => `- ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${a.health_score}%, Stress Level: ${a.stress_level}, Symptoms: ${a.symptoms?.join(', ') || 'None'}`).join('\n') || '- No historical data'}
+${assessmentHistory.map(a => `- ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${a.health_score != null && Number.isFinite(Number(a.health_score)) ? `${a.health_score}%` : 'not recorded'}, Stress Level: ${a.stress_level ?? 'not recorded'}, Symptoms: ${a.symptoms?.length ? a.symptoms.join(', ') : 'not recorded'}`).join('\n') || '- No historical data'}
 
 CONSERVATION PRACTICES:
 ${conservationData.length > 0 ? conservationData.map(c => `- ${c.practice_type}: Current Impact ${c.current_impact}, Confidence ${c.confidence_score}`).join('\n') : '- No conservation data available'}
@@ -160,17 +156,30 @@ VARIETY PERFORMANCE HISTORY:
 ${varietyData.length > 0 ? varietyData.map(v => `- ${v.variety_name}: Performance ${v.performance_score}, Disease Resistance ${v.disease_resistance}`).join('\n') : '- No variety data available'}
 
 CURRENT WEATHER CONDITIONS:
-- Temperature: ${weatherData.current_temp}°F
-- Humidity: ${weatherData.humidity}%
-- Days Since Rain: ${weatherData.days_since_rain}
-- Precipitation Forecast (7-day): ${weatherData.precipitation_forecast?.join(', ') || 'N/A'} inches
+${
+  weatherData.current_temp != null ||
+  weatherData.humidity != null ||
+  weatherData.days_since_rain != null ||
+  (weatherData.precipitation_forecast && weatherData.precipitation_forecast.length > 0)
+    ? [
+        weatherData.current_temp != null ? `- Temperature: ${weatherData.current_temp}°F` : null,
+        weatherData.humidity != null ? `- Humidity: ${weatherData.humidity}%` : null,
+        weatherData.days_since_rain != null ? `- Days Since Rain: ${weatherData.days_since_rain}` : null,
+        weatherData.precipitation_forecast?.length
+          ? `- Precipitation Forecast (7-day): ${weatherData.precipitation_forecast.join(', ')} inches`
+          : null,
+      ]
+        .filter(Boolean)
+        .join('\n')
+    : '- Weather: not available — do not infer temperature, humidity, rain, or forecasts'
+}
 
 WATER STRESS HISTORY:
 ${waterStressData.length > 0 ? waterStressData.map(w => `- ${new Date(w.created_at).toLocaleDateString()}: Stress Score ${w.stress_score}, Severity: ${w.severity}`).join('\n') : '- No water stress events recorded'}
 
 AI INTELLIGENCE POOL INSIGHTS:
-- Historical Pattern Confidence: ${intelligencePool.confidence_scores?.vision_analysis || 'N/A'}
-- Community Pattern Alignment: ${intelligencePool.confidence_scores?.community_alignment || 'N/A'}
+- Historical Pattern Confidence: ${intelligencePool.confidence_scores?.vision_analysis ?? 'N/A'}
+- Community Pattern Alignment: ${intelligencePool.confidence_scores?.community_alignment ?? 'N/A'}
 ${intelligencePool.image_analysis_patterns?.symptom_progression ? `- Symptom Progression Detected: ${JSON.stringify(intelligencePool.image_analysis_patterns.symptom_progression)}` : ''}
 
 CRITICAL: Use all above context to enhance analysis accuracy. Cross-reference current observations with historical patterns, variety-specific traits, conservation impacts, and weather correlations.

@@ -1,73 +1,221 @@
-# Welcome to your Lovable project
+<p align="center">
+  <img src="public/icon-512.png" alt="AgurateAI logo" width="128" height="128" />
+</p>
 
-## Project info
+<h1 align="center">AgurateAI</h1>
 
-**URL**: https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f
+<p align="center">
+  <strong>AI-assisted crop health intelligence for the Louisiana Delta</strong>
+</p>
 
-## How can I edit this code?
+<p align="center">
+  Closed beta · Research-framed decision aid · Built for rice, soybean, cotton &amp; corn growers
+</p>
 
-There are several ways of editing your application.
+<p align="center">
+  <a href="https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f">Lovable Project</a>
+  ·
+  <a href="docs/PRODUCTION-SHIPPING-CHECKLIST.md">Shipping Checklist</a>
+  ·
+  <a href="docs/PRE-LAUNCH-CRITICAL-TASKS.md">Pre-Launch Tasks</a>
+  ·
+  <a href="docs/OPERATOR-PLATFORM-HANDOFF.md">Operator Handoff</a>
+  ·
+  <a href="mailto:support@agurateai.com">support@agurateai.com</a>
+</p>
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f) and start prompting.
+<p align="center">
+  <img src="src/assets/hero-fields.jpg" alt="AgurateAI — Louisiana Delta fields at dusk" width="100%" />
+</p>
 
-Changes made via Lovable will be committed automatically to this repo.
+<p align="center">
+  <em>Home hero imagery used across the AgurateAI experience</em>
+</p>
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## What is AgurateAI?
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+**AgurateAI** is a web application that helps Louisiana Delta farmers assess crop health, organize field history, and explore research-oriented insights for rice, soybean, cotton, and corn.
 
-Follow these steps:
+Growers can photograph plants in the field, get AI-assisted analysis framed as a research decision aid (not a validated diagnosis), track observations over time, explore conservation and water-stress context, and connect with LSU AgCenter researcher directory information.
+
+The product is currently in **closed beta**. Access is invite- or signup-gated while we harden security, authenticity of claims, and production operations.
+
+### Purpose
+
+| Goal | How AgurateAI helps |
+|------|---------------------|
+| Faster field assessment | Capture crop photos and review AI-assisted health scores and observations |
+| Continuity across seasons | Keep scan history, field notes, and documentation in one place |
+| Local relevance | Surface Delta-focused guidance, variety context, and researcher directory links |
+| Honest decision support | Present insights as research framing — not official diagnosis or guaranteed outcomes |
+
+> **Honesty note:** AgurateAI is **not** an official LSU AgCenter product or partner endorsement, and outputs are **not** a substitute for certified agronomic diagnosis. Marketing and UI copy are intentionally conservative about accuracy, offline capability, and ROI claims.
+
+---
+
+## Product snapshot
+
+<p align="center">
+  <img src="public/screenshot-mobile.png" alt="AgurateAI brand visual" width="360" />
+</p>
+
+---
+
+## Features
+
+Core capabilities available in the closed-beta experience:
+
+| Feature | Description |
+|---------|-------------|
+| **AI Crop Scanner** | Photograph plants in the field and receive AI-assisted health scoring with observations |
+| **Predictive Analytics** | Explore scenario-style questions about conditions and management choices |
+| **Delta Intelligence Chat** | Ask Louisiana Delta–focused crop and conservation questions |
+| **Water Stress & DIRT** | Deep-dive views for water-stress context and DIRT-related exploration |
+| **Conservation Tracking** | Log and review conservation-oriented field activity |
+| **Variety Recommendations** | Browse variety context aligned to Delta crop systems |
+| **LSU Researcher Directory** | Find AgCenter researcher directory entries (privacy-conscious listings) |
+| **Community Intelligence** | Share and learn from regional grower signal (beta-scoped) |
+| **Interactive Field Maps** | Map fields and relate scans to locations |
+| **Insurance Documentation** | Generate documentation-oriented exports for records |
+
+Supporting product surfaces include dashboard history, upload flows, PWA install support, and beta signup / invitation join paths.
+
+---
+
+## Who it's for
+
+- **Louisiana Delta growers** evaluating rice, soybean, cotton, or corn stands
+- **Closed-beta invitees** validating field workflows before wider release
+- **Operators / co-ops** exploring multi-user access paths (cooperative plan inquiries via support)
+
+---
+
+## Tech stack
+
+| Layer | Choice |
+|-------|--------|
+| UI | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui |
+| Backend | Supabase (Auth, Postgres + RLS, Edge Functions, Storage) |
+| Maps / media | Interactive field maps, crop image storage, PDF generation |
+| Quality | Vitest, Playwright honesty smoke, static honesty scanner, Deno edge typecheck |
+| Hosting / edit | [Lovable](https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f) + this GitHub repository |
+
+---
+
+## Quick start
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- A Supabase project (URL + publishable/anon key)
+
+### Setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/ConWan30/Agurate_AI.git
+cd Agurate_AI
+npm install
+cp .env.example .env
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Fill `.env` from `.env.example`:
 
-# Step 3: Install the necessary dependencies.
-npm i
+```env
+VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY
+VITE_SUPABASE_PROJECT_ID=YOUR_PROJECT_ID
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Run locally
+
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+App defaults to **http://localhost:8080**.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Useful scripts
 
-**Use GitHub Codespaces**
+| Command | Purpose |
+|---------|---------|
+| `npm run typecheck` | TypeScript (`tsc --noEmit`) |
+| `npm run test:ci` | Unit tests (Vitest) |
+| `npm run verify:honesty:static` | Static banned-claim scan (`src` + edge functions) |
+| `npm run verify:public-routes` | App ↔ robots.txt ↔ sitemap public route alignment |
+| `npm run check:edge` | Deno check for Supabase Edge Functions |
+| `npm run test:e2e:honesty` | Playwright public-copy honesty smoke |
+| `npm run verify:local-gates` | All in-repo production gates in one command |
+| `npm run build` | Production build (stamps `/health.json` with git SHA) |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+CI runs these gates on pull requests (see `.github/workflows/ci.yml`). For migrate/deploy/publish steps that need credentials, see [docs/OPERATOR-PLATFORM-HANDOFF.md](docs/OPERATOR-PLATFORM-HANDOFF.md).
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Documentation & links
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+| Resource | Link |
+|----------|------|
+| Repository | https://github.com/ConWan30/Agurate_AI |
+| Lovable editor / project | https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f |
+| Production shipping checklist | [docs/PRODUCTION-SHIPPING-CHECKLIST.md](docs/PRODUCTION-SHIPPING-CHECKLIST.md) |
+| Pre-launch critical tasks | [docs/PRE-LAUNCH-CRITICAL-TASKS.md](docs/PRE-LAUNCH-CRITICAL-TASKS.md) |
+| Operator platform handoff | [docs/OPERATOR-PLATFORM-HANDOFF.md](docs/OPERATOR-PLATFORM-HANDOFF.md) |
+| Environment template | [.env.example](.env.example) |
+| Support | [support@agurateai.com](mailto:support@agurateai.com) |
+| Product site (referenced in-app) | https://agurateai.com |
 
-## How can I deploy this project?
+### Edit with Lovable
 
-Simply open [Lovable](https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f) and click on Share -> Publish.
+Open the [Lovable project](https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f), prompt changes, and sync back to this repo via GitHub.
 
-## Can I connect a custom domain to my Lovable project?
+### Edit locally
 
-Yes, you can!
+Clone, install, configure `.env`, then `npm run dev` as above. Commit and push; Lovable can pull from GitHub when connected.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Project layout (high level)
+
+```text
+src/                 React app (pages, components, hooks, lib)
+public/              PWA icons, favicon, brand screenshot asset
+supabase/
+  functions/         Edge Functions (AI analysis, beta signup, etc.)
+  migrations/        Postgres + RLS schema history
+docs/                Shipping and launch checklists
+e2e/                 Playwright honesty / smoke specs
+scripts/             Honesty verifiers and edge check helpers
+```
+
+---
+
+## Security & privacy (summary)
+
+- Do **not** commit real `.env` secrets; use `.env.example` only.
+- Supabase **RLS** protects user data; catalog and researcher listings are intentionally scoped.
+- Crop images use ownership-aware storage paths.
+- Edge functions apply shared auth helpers and rate limiting (including durable IP limits for sensitive public endpoints).
+- Demo / integration routes are gated to development builds where applicable.
+
+See the shipping checklist for production steps that still require dashboard credentials (migrations, Auth leaked-password protection, edge deploy, live smoke).
+
+---
+
+## Status
+
+**Closed beta — launch-readiness work in progress.**
+
+In-repo quality gates (typecheck, unit tests, honesty static scan, edge check, Playwright honesty, production build) are maintained on this branch. Remote production cutover (apply migrations, deploy functions, publish, live URL smoke) still depends on operator credentials outside this repository.
+
+---
+
+<p align="center">
+  <img src="public/icon-192.png" alt="AgurateAI" width="48" height="48" />
+  <br />
+  <sub>AgurateAI · Louisiana Delta crop intelligence</sub>
+</p>

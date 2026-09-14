@@ -1,63 +1,39 @@
 import { serve } from 'https://deno.land/std@0.178.0/http/server.ts';
-import { handleAuthError, handleError } from '../_shared/errorHandler.ts';
+import { handleError } from '../_shared/errorHandler.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-// Market price data structure
-interface MarketPrice {
-  commodity: string;
-  price_per_bushel: number;
-  price_per_pound?: number;
-  unit: string;
-  source: string;
-  last_updated: string;
-}
-
-// Mock market prices (in production, integrate with USDA/CBOT API)
-const MOCK_MARKET_PRICES: Record<string, MarketPrice> = {
-  rice: {
-    commodity: 'Rice',
-    price_per_bushel: 14.50,
-    unit: 'bushel',
-    source: 'USDA',
-    last_updated: new Date().toISOString(),
-  },
-  soybeans: {
-    commodity: 'Soybeans',
-    price_per_bushel: 12.80,
-    unit: 'bushel',
-    source: 'USDA',
-    last_updated: new Date().toISOString(),
-  },
-  cotton: {
-    commodity: 'Cotton',
-    price_per_pound: 0.75,
-    price_per_bushel: 0, // Not applicable
-    unit: 'pound',
-    source: 'USDA',
-    last_updated: new Date().toISOString(),
-  },
-  corn: {
-    commodity: 'Corn',
-    price_per_bushel: 5.20,
-    unit: 'bushel',
-    source: 'USDA',
-    last_updated: new Date().toISOString(),
-  },
-};
-
+/**
+ * Live USDA/CBOT market quotes are not wired in closed beta.
+ * Fail closed — never return invented placeholder commodity prices.
+ * ROI and planning UIs must require farmer-entered prices.
+ */
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      return handleAuthError(corsHeaders);
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) {
+      return auth;
+    }
+    const { user, authHeader } = auth;
+    const rateLimitClient = getAnonClient(authHeader);
+
+    const rateLimit = await enforceRateLimit(rateLimitClient, user.id, {
+      functionName: 'get-market-prices',
+      maxRequests: RATE_LIMITS['get-market-prices'].maxRequests,
+      windowMs: RATE_LIMITS['get-market-prices'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const url = new URL(req.url);
@@ -70,32 +46,15 @@ serve(async (req) => {
       );
     }
 
-    // Map crop types to commodities
-    const cropToCommodity: Record<string, string> = {
-      rice: 'rice',
-      soybean: 'soybeans',
-      soybeans: 'soybeans',
-      cotton: 'cotton',
-      corn: 'corn',
-    };
-
-    const commodity = cropToCommodity[cropType] || cropType;
-    const price = MOCK_MARKET_PRICES[commodity];
-
-    if (!price) {
-      return new Response(
-        JSON.stringify({ 
-          error: `No market price data available for ${cropType}`,
-          available_crops: Object.keys(MOCK_MARKET_PRICES),
-        }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     return new Response(
-      JSON.stringify(price),
+      JSON.stringify({
+        error: 'Live market price feed is not configured',
+        crop_type: cropType,
+        disclaimer:
+          'No placeholder commodity prices are returned. Enter your own price for planning ROI.',
+      }),
       {
-        status: 200,
+        status: 503,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
@@ -103,4 +62,3 @@ serve(async (req) => {
     return handleError(error, 'get-market-prices', corsHeaders);
   }
 });
-

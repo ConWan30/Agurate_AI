@@ -4,14 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
-import { GraduationCap, Clock, Mail, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
+import { GraduationCap, Clock, FileText, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface LSUResearcher {
   id: string;
   name: string;
   title: string;
-  email: string;
   specialties: string[];
   typical_response_time: string;
 }
@@ -30,7 +29,7 @@ interface ExpertEscalationCardProps {
 export function ExpertEscalationCard({
   issueType,
   issueDescription,
-  confidenceScore = 0,
+  confidenceScore,
   fieldId,
   assessmentId,
   aiAnalysis,
@@ -43,7 +42,12 @@ export function ExpertEscalationCard({
   const [consultationCreated, setConsultationCreated] = useState(false);
 
   // Determine if escalation is recommended
-  const shouldEscalate = confidenceScore < 70 || issueType === 'unusual' || issueType === 'complex';
+  const hasConfidence =
+    confidenceScore != null && !Number.isNaN(Number(confidenceScore));
+  const shouldEscalate =
+    (hasConfidence && Number(confidenceScore) < 70) ||
+    issueType === 'unusual' ||
+    issueType === 'complex';
 
   // Load matching researcher when component mounts
   useEffect(() => {
@@ -56,21 +60,41 @@ export function ExpertEscalationCard({
     setLoading(true);
     try {
       // Map issue type to specialties
-      const specialties: string[] = [];
-      if (issueType.includes('disease')) specialties.push('disease_diagnostics');
-      if (issueType.includes('pest')) specialties.push('pest_management');
-      if (issueType.includes('nutrient')) specialties.push('soil_health');
-      if (issueType.includes('rice')) specialties.push('rice_specialist');
-      if (issueType.includes('soybean')) specialties.push('soybean_pathology');
+      // Match directory expertise tokens (crops / issue themes), not fabricated specialty slugs.
+      const cropHints = ['rice', 'soybean', 'cotton', 'corn'] as const;
+      const issue = (issueType || '').toLowerCase();
+      const cropType =
+        cropHints.find((c) => issue.includes(c)) ||
+        cropHints.find((c) => (issueType || '').toLowerCase().includes(c));
+      const issueKey = issue.includes('pest')
+        ? 'pest'
+        : issue.includes('nutrient') || issue.includes('soil')
+          ? 'soil'
+          : issue.includes('disease') || issue.includes('patholog')
+            ? 'disease'
+            : issue;
+
+      // Fail closed — do not invent a crop specialty when none is recorded.
+      if (!cropType) {
+        setResearcher(null);
+        return;
+      }
 
       const { data, error } = await supabase.rpc('find_matching_researcher', {
-        p_crop_type: specialties.length > 0 ? specialties[0] : issueType,
-        p_issue_type: issueType,
+        p_crop_type: cropType,
+        p_issue_type: issueKey,
       });
 
       if (error) throw error;
-      if (data) {
-        setResearcher(data as any as LSUResearcher);
+      const match = Array.isArray(data) ? data[0] : data;
+      if (match) {
+        setResearcher({
+          id: match.id,
+          name: match.name,
+          title: match.department || 'LSU AgCenter',
+          specialties: match.expertise || [],
+          typical_response_time: match.availability || 'varies',
+        });
       }
     } catch (error) {
       console.error('Error loading researcher:', error);
@@ -98,11 +122,9 @@ export function ExpertEscalationCard({
           assessment_id: assessmentId || null,
           researcher_id: researcher.id,
           question: issueDescription,
-          issue_description: issueDescription,
-          ai_analysis: aiAnalysis || {},
-          confidence_score: confidenceScore,
           status: 'pending',
-          priority: confidenceScore < 50 ? 'urgent' : confidenceScore < 70 ? 'high' : 'normal',
+          // Priority is not forged from confidence — DB trigger also forces medium
+          priority: 'medium',
         })
         .select()
         .single();
@@ -110,7 +132,7 @@ export function ExpertEscalationCard({
       if (error) throw error;
 
       setConsultationCreated(true);
-      toast.success('Expert consultation requested! You will be notified when the researcher responds.');
+      toast.success('Consultation note saved. This does not email LSU staff — use public AgCenter channels for follow-up.');
       
       if (onEscalationCreated) {
         onEscalationCreated(data.id);
@@ -135,7 +157,7 @@ export function ExpertEscalationCard({
           Expert Consultation Available
         </CardTitle>
         <CardDescription>
-          Connect with LSU AgCenter researchers for complex cases
+          Save a consultation note and use public LSU AgCenter channels for complex cases
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -144,8 +166,8 @@ export function ExpertEscalationCard({
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Expert Review Recommended</AlertTitle>
             <AlertDescription>
-              {confidenceScore < 70
-                ? `AI confidence is ${confidenceScore}%. An expert review is recommended for the most accurate diagnosis.`
+              {hasConfidence && Number(confidenceScore) < 70
+                ? `AI confidence is ${confidenceScore}%. An expert review is recommended as a decision aid — not a validated diagnosis.`
                 : 'This case may benefit from expert consultation for specialized guidance.'}
             </AlertDescription>
           </Alert>
@@ -163,7 +185,7 @@ export function ExpertEscalationCard({
                 <CheckCircle2 className="h-4 w-4 text-success" />
                 <AlertTitle>Consultation Requested</AlertTitle>
                 <AlertDescription>
-                  Your request has been sent to {researcher.name}. You will receive a notification when they respond.
+                  Your consultation note was saved locally in AgurateAI. Contact {researcher.name} through official LSU AgCenter channels — we do not broker introductions.
                 </AlertDescription>
               </Alert>
             ) : (
@@ -203,18 +225,18 @@ export function ExpertEscalationCard({
                   {escalating ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Requesting Consultation...
+                      Saving consultation note...
                     </>
                   ) : (
                     <>
-                      <Mail className="h-4 w-4 mr-2" />
-                      Request Expert Consultation
+                      <FileText className="h-4 w-4 mr-2" />
+                      Save Consultation Note
                     </>
                   )}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  The researcher will receive your case details, field history, and AI analysis.
+                  Saves a note in AgurateAI only. It does not email or notify LSU staff — use public AgCenter channels for follow-up.
                 </p>
               </>
             )}

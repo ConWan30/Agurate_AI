@@ -19,6 +19,7 @@ interface ROICalculation {
   breakdownDetails: {
     yieldAtRisk: number;
     pricePerUnit: number;
+    priceUnit: string;
     costPerAcre: number;
     acres: number;
   };
@@ -37,115 +38,163 @@ interface ROICalculatorCardProps {
   className?: string;
 }
 
+/** Labels only — never invent $/acre treatment defaults. */
+const TREATMENT_TYPES: Record<string, string> = {
+  fungicide: 'Fungicide Application',
+  fertilizer: 'Corrective Fertilizer',
+  herbicide: 'Herbicide Application',
+  irrigation: 'Supplemental Irrigation',
+  insecticide: 'Insecticide Treatment',
+};
+
+/** Unit hints for placeholders only — never used as silent price/yield defaults. */
+const UNIT_HINTS: Record<string, string> = {
+  rice: 'cwt',
+  soybean: 'bu',
+  soybeans: 'bu',
+  cotton: 'lb',
+  corn: 'bu',
+};
+
 export function ROICalculatorCard({ assessmentData, fieldData, className }: ROICalculatorCardProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [acres, setAcres] = useState(fieldData?.acreage?.toString() || '100');
-  const [cropType, setCropType] = useState(fieldData?.cropType || 'rice');
+  const [acres, setAcres] = useState(fieldData?.acreage != null ? String(fieldData.acreage) : '');
+  const [cropType, setCropType] = useState(fieldData?.cropType || '');
   const [treatmentType, setTreatmentType] = useState('fungicide');
+  const [treatmentCostPerAcre, setTreatmentCostPerAcre] = useState('');
   const [roi, setRoi] = useState<ROICalculation | null>(null);
-  const [marketPrice, setMarketPrice] = useState<{ price: number; unit: string; source: string; last_updated: string } | null>(null);
+  const [marketPrice, setMarketPrice] = useState<{
+    price: number;
+    unit: string;
+    source: string;
+    last_updated: string;
+  } | null>(null);
   const [loadingPrice, setLoadingPrice] = useState(false);
+  const [yieldAtRiskPercent, setYieldAtRiskPercent] = useState(
+    assessmentData?.estimatedYieldImpact != null ? String(assessmentData.estimatedYieldImpact) : ''
+  );
+  const [avgYieldInput, setAvgYieldInput] = useState('');
+  const [yieldProtectionPercent, setYieldProtectionPercent] = useState('');
+  const [manualPriceInput, setManualPriceInput] = useState('');
 
-  // Fallback prices (used if market price API fails)
-  const fallbackPrices: Record<string, { price: number; unit: string; avgYield: number }> = {
-    rice: { price: 18.50, unit: 'cwt', avgYield: 75 }, // $18.50/cwt, 75 cwt/acre
-    soybeans: { price: 13.50, unit: 'bu', avgYield: 52 }, // $13.50/bu, 52 bu/acre
-    cotton: { price: 0.75, unit: 'lb', avgYield: 1100 }, // $0.75/lb, 1100 lb/acre
-    corn: { price: 5.80, unit: 'bu', avgYield: 180 }, // $5.80/bu, 180 bu/acre
-  };
-
-  // Fetch market price when crop type changes
   useEffect(() => {
-    fetchMarketPrice(cropType);
+    if (cropType) {
+      void fetchMarketPrice(cropType);
+    } else {
+      setMarketPrice(null);
+    }
   }, [cropType]);
+
+  useEffect(() => {
+    if (assessmentData?.estimatedYieldImpact != null) {
+      setYieldAtRiskPercent(String(assessmentData.estimatedYieldImpact));
+    }
+  }, [assessmentData?.estimatedYieldImpact]);
 
   const fetchMarketPrice = async (crop: string) => {
     setLoadingPrice(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-market-prices?crop_type=${crop}`, {
-        headers: {
-          'Authorization': `Bearer ${session?.access_token}`,
-        },
-      });
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-market-prices?crop_type=${crop}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const priceData = await response.json();
-        // Convert to format expected by calculator
         const unit = priceData.unit === 'bushel' ? (crop === 'rice' ? 'cwt' : 'bu') : priceData.unit;
         const price = priceData.price_per_bushel || priceData.price_per_pound || priceData.price;
-        
-        setMarketPrice({
-          price,
-          unit,
-          source: priceData.source || 'USDA',
-          last_updated: priceData.last_updated || new Date().toISOString(),
-        });
+        if (Number.isFinite(Number(price)) && Number(price) > 0) {
+          setMarketPrice({
+            price: Number(price),
+            unit: unit || UNIT_HINTS[crop] || 'unit',
+            source: priceData.source || 'Market API',
+            last_updated: priceData.last_updated || new Date().toISOString(),
+          });
+          return;
+        }
       }
+      setMarketPrice(null);
     } catch (error) {
       console.error('Error fetching market price:', error);
-      // Use fallback price
       setMarketPrice(null);
     } finally {
       setLoadingPrice(false);
     }
   };
 
-  // Get current price (market price or fallback)
-  const getCurrentPrice = () => {
-    if (marketPrice) {
-      return {
-        price: marketPrice.price,
-        unit: marketPrice.unit,
-        avgYield: fallbackPrices[cropType]?.avgYield || 75,
-      };
+  const getCurrentPrice = (): { price: number; unit: string } | null => {
+    if (marketPrice && Number.isFinite(marketPrice.price) && marketPrice.price > 0) {
+      return { price: marketPrice.price, unit: marketPrice.unit };
     }
-    return fallbackPrices[cropType] || fallbackPrices.rice;
+    const manual = Number(manualPriceInput);
+    if (Number.isFinite(manual) && manual > 0) {
+      return { price: manual, unit: UNIT_HINTS[cropType] || 'unit' };
+    }
+    return null;
   };
 
-  const cropPrices: Record<string, { price: number; unit: string; avgYield: number }> = {
-    ...fallbackPrices,
-    [cropType]: getCurrentPrice(),
-  };
-
-  // Treatment costs per acre (Louisiana Delta averages)
-  const treatmentCosts: Record<string, { cost: number; yieldProtection: number; name: string }> = {
-    fungicide: { cost: 28, yieldProtection: 0.15, name: 'Fungicide Application' },
-    fertilizer: { cost: 45, yieldProtection: 0.20, name: 'Corrective Fertilizer' },
-    herbicide: { cost: 22, yieldProtection: 0.12, name: 'Herbicide Application' },
-    irrigation: { cost: 35, yieldProtection: 0.25, name: 'Supplemental Irrigation' },
-    insecticide: { cost: 30, yieldProtection: 0.18, name: 'Insecticide Treatment' },
-  };
+  const hasAssessmentHealth =
+    assessmentData?.healthScore != null && !Number.isNaN(Number(assessmentData.healthScore));
+  const hasYieldAtRisk =
+    yieldAtRiskPercent !== '' &&
+    Number.isFinite(Number(yieldAtRiskPercent)) &&
+    Number(yieldAtRiskPercent) >= 0;
+  const hasAvgYield =
+    avgYieldInput !== '' && Number.isFinite(Number(avgYieldInput)) && Number(avgYieldInput) > 0;
+  const hasProtection =
+    yieldProtectionPercent !== '' &&
+    Number.isFinite(Number(yieldProtectionPercent)) &&
+    Number(yieldProtectionPercent) >= 0;
+  const hasAcres = acres !== '' && Number.isFinite(Number(acres)) && Number(acres) >= 0;
+  const hasTreatmentCost =
+    treatmentCostPerAcre !== '' &&
+    Number.isFinite(Number(treatmentCostPerAcre)) &&
+    Number(treatmentCostPerAcre) >= 0;
+  const hasCrop = cropType !== '';
+  const currentPrice = getCurrentPrice();
+  const hasPrice = currentPrice != null;
 
   const calculateROI = () => {
-    const acreage = parseFloat(acres) || 100;
-    const crop = cropPrices[cropType] || cropPrices.rice;
-    const treatment = treatmentCosts[treatmentType] || treatmentCosts.fungicide;
+    if (
+      !hasAssessmentHealth ||
+      !hasYieldAtRisk ||
+      !hasAvgYield ||
+      !hasProtection ||
+      !hasAcres ||
+      !hasPrice ||
+      !hasTreatmentCost ||
+      !hasCrop
+    ) {
+      setRoi(null);
+      return;
+    }
 
-    // Estimate yield at risk based on health score
-    const healthScore = assessmentData?.healthScore || 65;
-    const yieldImpactPercent = assessmentData?.estimatedYieldImpact || (100 - healthScore) * 0.8;
-    const yieldAtRisk = crop.avgYield * (yieldImpactPercent / 100);
+    const acreage = Number(acres);
+    const crop = currentPrice;
+    const costPerAcre = Number(treatmentCostPerAcre);
+    const avgYield = Number(avgYieldInput);
+    const yieldImpactPercent = Number(yieldAtRiskPercent);
+    const protectionFraction = Number(yieldProtectionPercent) / 100;
 
-    // Calculate potential loss without treatment
-    const potentialLossPerAcre = yieldAtRisk * crop.price;
-    const totalPotentialLoss = potentialLossPerAcre * acreage;
+    if (!Number.isFinite(yieldImpactPercent) || yieldImpactPercent < 0 || !Number.isFinite(protectionFraction)) {
+      setRoi(null);
+      return;
+    }
 
-    // Calculate treatment cost
-    const treatmentCostPerAcre = treatment.cost;
-    const totalTreatmentCost = treatmentCostPerAcre * acreage;
-
-    // Calculate yield protection from treatment
-    const yieldProtected = yieldAtRisk * treatment.yieldProtection;
-    const revenueProtected = yieldProtected * crop.price * acreage;
-
-    // Net benefit = Revenue protected - Treatment cost
+    const yieldAtRisk = avgYield * (yieldImpactPercent / 100);
+    const totalPotentialLoss = yieldAtRisk * crop.price * acreage;
+    const totalTreatmentCost = costPerAcre * acreage;
+    const revenueProtected = yieldAtRisk * protectionFraction * crop.price * acreage;
     const netBenefit = revenueProtected - totalTreatmentCost;
+    const roiPercentage = totalTreatmentCost > 0 ? (netBenefit / totalTreatmentCost) * 100 : 0;
 
-    // ROI percentage
-    const roiPercentage = (netBenefit / totalTreatmentCost) * 100;
-
-    // Recommendation logic
     let recommendation: ROICalculation['recommendation'];
     if (roiPercentage >= 300) recommendation = 'highly_recommended';
     else if (roiPercentage >= 150) recommendation = 'recommended';
@@ -161,7 +210,8 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
       breakdownDetails: {
         yieldAtRisk,
         pricePerUnit: crop.price,
-        costPerAcre: treatmentCostPerAcre,
+        priceUnit: crop.unit,
+        costPerAcre,
         acres: acreage,
       },
     });
@@ -174,16 +224,16 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
           color: 'text-primary',
           bgColor: 'bg-primary/10 border-primary/20',
           icon: CheckCircle2,
-          text: 'Highly Recommended',
-          description: 'Strong economic case for immediate treatment',
+          text: 'Favorable (illustrative)',
+          description: 'Illustrative planning estimate — strong case under your inputs',
         };
       case 'recommended':
         return {
           color: 'text-secondary',
           bgColor: 'bg-secondary/10 border-secondary/20',
           icon: TrendingUp,
-          text: 'Recommended',
-          description: 'Positive ROI justifies treatment',
+          text: 'Favorable (illustrative)',
+          description: 'Positive ROI under the assumptions you entered',
         };
       case 'marginal':
         return {
@@ -198,11 +248,21 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
           color: 'text-muted-foreground',
           bgColor: 'bg-muted border-border',
           icon: AlertTriangle,
-          text: 'Not Recommended',
-          description: 'Low ROI - monitor before treating',
+          text: 'Not recommended (under these inputs)',
+          description: 'Low ROI under the assumptions you entered — monitor before treating',
         };
     }
   };
+
+  const canCalculate =
+    hasAssessmentHealth &&
+    hasYieldAtRisk &&
+    hasAvgYield &&
+    hasProtection &&
+    hasAcres &&
+    hasPrice &&
+    hasTreatmentCost &&
+    hasCrop;
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className={className}>
@@ -236,7 +296,6 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
 
         <CollapsibleContent>
           <CardContent className="space-y-6">
-            {/* Input Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="acres">Acres to Treat</Label>
@@ -245,51 +304,149 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                   type="number"
                   value={acres}
                   onChange={(e) => setAcres(e.target.value)}
-                  placeholder="100"
+                  placeholder="Enter field acres"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="crop">Crop Type</Label>
-                <Select value={cropType} onValueChange={setCropType}>
+                <Select value={cropType || undefined} onValueChange={setCropType}>
                   <SelectTrigger id="crop">
-                    <SelectValue />
+                    <SelectValue placeholder="Select crop" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="rice">Rice</SelectItem>
-                    <SelectItem value="soybeans">Soybeans</SelectItem>
+                    <SelectItem value="soybean">Soybeans</SelectItem>
                     <SelectItem value="cotton">Cotton</SelectItem>
                     <SelectItem value="corn">Corn</SelectItem>
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">Required — no default crop assumed.</p>
               </div>
 
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2">
+                <Label htmlFor="yield-at-risk">Yield at risk (%)</Label>
+                <Input
+                  id="yield-at-risk"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={yieldAtRiskPercent}
+                  onChange={(e) => setYieldAtRiskPercent(e.target.value)}
+                  placeholder="From assessment or enter estimate"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Required. Prefills from assessment when available — never invented from health score alone.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="avg-yield">Typical yield (units/acre)</Label>
+                <Input
+                  id="avg-yield"
+                  type="number"
+                  min={0}
+                  value={avgYieldInput}
+                  onChange={(e) => setAvgYieldInput(e.target.value)}
+                  placeholder="Enter your typical yield"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Required. Use your field average — defaults are not assumed.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="yield-protection">Assumed treatment yield protection (%)</Label>
+                <Input
+                  id="yield-protection"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={yieldProtectionPercent}
+                  onChange={(e) => setYieldProtectionPercent(e.target.value)}
+                  placeholder="e.g. 15"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Planning assumption you control — not a measured efficacy claim.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="crop-price">Price per unit ($)</Label>
+                <Input
+                  id="crop-price"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={
+                    marketPrice && Number.isFinite(marketPrice.price)
+                      ? String(marketPrice.price)
+                      : manualPriceInput
+                  }
+                  onChange={(e) => {
+                    setManualPriceInput(e.target.value);
+                    if (marketPrice) setMarketPrice(null);
+                  }}
+                  placeholder={
+                    loadingPrice
+                      ? 'Checking market feed…'
+                      : `Enter $/${UNIT_HINTS[cropType] || 'unit'}`
+                  }
+                  disabled={loadingPrice}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {marketPrice
+                    ? `Using ${marketPrice.source} quote — edit to override.`
+                    : 'Required. Enter your price — live market quotes are not invented.'}
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="treatment">Treatment Type</Label>
                 <Select value={treatmentType} onValueChange={setTreatmentType}>
                   <SelectTrigger id="treatment">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(treatmentCosts).map(([key, value]) => (
+                    {Object.entries(TREATMENT_TYPES).map(([key, name]) => (
                       <SelectItem key={key} value={key}>
-                        {value.name} (${value.cost}/acre)
+                        {name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="treatment-cost">Treatment cost ($/acre)</Label>
+                <Input
+                  id="treatment-cost"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={treatmentCostPerAcre}
+                  onChange={(e) => setTreatmentCostPerAcre(e.target.value)}
+                  placeholder="Enter your $/acre cost"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Required. Your recorded cost — no Louisiana average defaults.
+                </p>
+              </div>
             </div>
 
-            <Button onClick={calculateROI} className="w-full">
+            {!canCalculate && (
+              <p className="text-sm text-muted-foreground text-center">
+                ROI needs assessment health, crop, acres, yield-at-risk %, typical yield, protection %,
+                crop price, and your treatment $/acre.
+              </p>
+            )}
+            <Button onClick={calculateROI} className="w-full" disabled={!canCalculate}>
               <Calculator className="h-4 w-4 mr-2" />
               Calculate ROI
             </Button>
 
-            {/* Results */}
             {roi && (
               <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                {/* Recommendation Banner */}
                 <div className={`p-4 rounded-lg border ${getRecommendationConfig(roi.recommendation).bgColor}`}>
                   <div className="flex items-center gap-3 mb-2">
                     {(() => {
@@ -305,7 +462,6 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                   </p>
                 </div>
 
-                {/* ROI Metrics */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-4 rounded-lg bg-muted">
                     <div className="text-xs text-muted-foreground mb-1">Treatment Cost</div>
@@ -313,21 +469,18 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                       $<AnimatedCounter value={roi.treatmentCost} duration={800} decimals={0} />
                     </div>
                   </div>
-
                   <div className="text-center p-4 rounded-lg bg-health-moderate/10 border border-health-moderate/20">
                     <div className="text-xs text-muted-foreground mb-1">Potential Loss</div>
                     <div className="text-xl font-bold text-health-moderate">
                       $<AnimatedCounter value={roi.potentialLoss} duration={800} decimals={0} />
                     </div>
                   </div>
-
                   <div className="text-center p-4 rounded-lg bg-primary/10 border border-primary/20">
                     <div className="text-xs text-muted-foreground mb-1">Net Benefit</div>
                     <div className="text-xl font-bold text-primary">
                       $<AnimatedCounter value={roi.netBenefit} duration={800} decimals={0} />
                     </div>
                   </div>
-
                   <div className="text-center p-4 rounded-lg bg-gradient-to-br from-primary to-primary/80 text-white">
                     <div className="text-xs text-white/80 mb-1">ROI</div>
                     <div className="text-xl font-bold">
@@ -336,27 +489,26 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                   </div>
                 </div>
 
-                {/* Breakdown */}
                 <div className="p-4 rounded-lg bg-muted/50 border">
                   <h4 className="font-semibold text-sm mb-3">Calculation Breakdown</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Yield at risk:</span>
                       <span className="font-medium">
-                        {roi.breakdownDetails.yieldAtRisk.toFixed(1)} {cropPrices[cropType].unit}/acre
+                        {roi.breakdownDetails.yieldAtRisk.toFixed(1)} {roi.breakdownDetails.priceUnit}/acre
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">Price per unit:</span>
-                        <span className="font-medium">${roi.breakdownDetails.pricePerUnit}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Price per unit:</span>
+                      <span className="font-medium flex items-center gap-2">
+                        ${roi.breakdownDetails.pricePerUnit}
                         {marketPrice && (
                           <Badge variant="outline" className="text-xs gap-1">
                             <RefreshCw className="h-3 w-3" />
                             {marketPrice.source}
                           </Badge>
                         )}
-                      </div>
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Treatment cost per acre:</span>
@@ -369,26 +521,28 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                   </div>
                 </div>
 
-                <p className="text-xs text-muted-foreground text-center">
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <p>* Estimates based on Louisiana Delta averages{marketPrice ? ` and ${marketPrice.source} market prices` : ' and historical market prices'}</p>
-                    {marketPrice && (
-                      <p className="flex items-center gap-1">
-                        <RefreshCw className="h-3 w-3" />
-                        Prices updated: {new Date(marketPrice.last_updated).toLocaleDateString()}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-4 px-2 text-xs"
-                          onClick={() => fetchMarketPrice(cropType)}
-                          disabled={loadingPrice}
-                        >
-                          {loadingPrice ? 'Updating...' : 'Refresh'}
-                        </Button>
-                      </p>
-                    )}
-                  </div>
-                </p>
+                <div className="text-xs text-muted-foreground text-center space-y-1">
+                  <p>
+                    * Illustrative planning estimate using only the inputs you entered
+                    {marketPrice ? ` and ${marketPrice.source} market prices` : ''}. Treatment $/acre is
+                    your recorded cost — not a regional average.
+                  </p>
+                  {marketPrice && (
+                    <p className="flex items-center justify-center gap-1">
+                      <RefreshCw className="h-3 w-3" />
+                      Prices updated: {new Date(marketPrice.last_updated).toLocaleDateString()}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 px-2 text-xs"
+                        onClick={() => void fetchMarketPrice(cropType)}
+                        disabled={loadingPrice || !cropType}
+                      >
+                        {loadingPrice ? 'Updating...' : 'Refresh'}
+                      </Button>
+                    </p>
+                  )}
+                </div>
               </div>
             )}
           </CardContent>

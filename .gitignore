@@ -12,6 +12,30 @@ dist
 dist-ssr
 *.local
 
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Supabase CLI local state
+supabase/.temp/
+
+# Test artifacts
+test-results/
+playwright-report/
+coverage/
+blob-report/
+
+# Host / deploy artifacts
+.vercel/
+.netlify/
+dev-dist/
+supabase/.branches/
+
+# Secrets / keys
+*.pem
+*.key
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -7,7 +7,7 @@ interface QuickInsightCardProps {
   icon: LucideIcon;
   label: string;
   value: string | number;
-  severity: "none" | "mild" | "moderate" | "severe";
+  severity?: "none" | "mild" | "moderate" | "severe" | "unknown";
   urgent?: boolean;
 }
 
@@ -16,21 +16,25 @@ export function QuickInsightCard({ icon: Icon, label, value, severity, urgent }:
     none: "border-health-good/20 bg-health-good/5",
     mild: "border-agricultural-sky/20 bg-agricultural-sky/5",
     moderate: "border-health-moderate/20 bg-health-moderate/5",
-    severe: "border-health-severe/20 bg-health-severe/5"
+    severe: "border-health-severe/20 bg-health-severe/5",
+    unknown: "border-muted-foreground/20 bg-muted/40"
   };
 
   const severityTextColors = {
     none: "text-health-good",
     mild: "text-agricultural-sky",
     moderate: "text-health-moderate",
-    severe: "text-health-severe"
+    severe: "text-health-severe",
+    unknown: "text-muted-foreground"
   };
 
+  const tone = severity ?? "unknown";
+
   return (
-    <Card className={cn("border-2", severityColors[severity], urgent && "animate-pulse")}>
+    <Card className={cn("border-2", severityColors[tone], urgent && "animate-pulse")}>
       <CardContent className="p-4">
         <div className="flex flex-col items-center text-center gap-2">
-          <Icon className={cn("h-6 w-6", severityTextColors[severity])} />
+          <Icon className={cn("h-6 w-6", severityTextColors[tone])} />
           <div>
             <p className="text-2xl font-bold">{value}</p>
             <p className="text-xs text-muted-foreground">{label}</p>

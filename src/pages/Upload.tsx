@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
+import { requireHealthScore } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -154,13 +155,13 @@ export default function Upload() {
 
       if (uploadError) throw uploadError;
 
-      // Get signed URL (secure, time-limited)
+      // Short-lived signed URL for AI only — persist storage path, not this URL
       const { data, error: signedUrlError } = await supabase.storage
         .from("crop-images")
         .createSignedUrl(fileName, 3600); // 1 hour expiry
 
       if (signedUrlError) throw signedUrlError;
-      const imageUrl = data.signedUrl;
+      const signedImageUrl = data.signedUrl;
 
       setUploading(false);
       setAnalyzing(true);
@@ -169,9 +170,13 @@ export default function Upload() {
       const field = fields.find((f) => f.id === selectedField);
       if (!field) throw new Error("Field not found");
       
-      const fieldLocation = field.location_lat && field.location_lng 
-        ? `${field.location_lat}, ${field.location_lng}`
-        : "Louisiana Delta region";
+      const fieldLocation =
+        field.location_lat != null &&
+        field.location_lng != null &&
+        Number.isFinite(Number(field.location_lat)) &&
+        Number.isFinite(Number(field.location_lng))
+          ? `${field.location_lat}, ${field.location_lng}`
+          : undefined;
 
       // Track analytics
       const { analytics } = await import('@/lib/analytics');
@@ -181,8 +186,15 @@ export default function Upload() {
         file_type: fileType,
       });
 
-      // Call real AI analysis
-      await performAIAnalysis(imageUrl, field.crop_type, fieldLocation, selectedField, fileType);
+      // Call real AI analysis; store durable path as assessments.image_url
+      await performAIAnalysis(
+        signedImageUrl,
+        fileName,
+        field.crop_type,
+        fieldLocation,
+        selectedField,
+        fileType
+      );
       
       analytics.track('analysis_completed', {
         crop_type: field.crop_type,
@@ -208,77 +220,67 @@ export default function Upload() {
     }
   };
 
-  const performAIAnalysis = async (imageUrl: string, cropType: string, location: string, fieldId: string, mediaType: 'image' | 'video') => {
+  const performAIAnalysis = async (
+    signedImageUrl: string,
+    storagePath: string,
+    cropType: string,
+    location: string | undefined,
+    fieldId: string,
+    mediaType: 'image' | 'video'
+  ) => {
     // ✅ UNIFIED AI: Gather context before analysis
     const unifiedContext = await gatherUnifiedContext(fieldId);
     
-    // Call the AI edge function with unified context
+    // Call the AI edge function with unified context; edge persists scored assessment
     const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
       body: { 
-        imageUrl, 
+        imageUrl: signedImageUrl, 
         cropType, 
         location, 
         mediaType,
+        fieldId,
+        latitude: fields.find((f) => f.id === fieldId)?.location_lat ?? undefined,
+        longitude: fields.find((f) => f.id === fieldId)?.location_lng ?? undefined,
+        storagePath,
         unifiedContext // Include intelligence pool data
       }
     });
 
     if (aiError) throw aiError;
     if (!aiResult) throw new Error('No analysis results received');
-
-    // Insert assessment with AI results
-    const { data: assessment, error: assessmentError } = await supabase
-      .from("assessments")
-      .insert({
-        field_id: fieldId,
-        image_url: imageUrl,
-        health_score: aiResult.health_score,
-        stress_level: aiResult.stress_level,
-        symptoms: aiResult.symptoms,
-        confidence_score: aiResult.confidence_score,
-        weather_temp_f: aiResult.weather_data?.temp_f,
-        weather_precipitation_mm: aiResult.weather_data?.precipitation_inch ? 
-          aiResult.weather_data.precipitation_inch * 25.4 : null, // Convert inches to mm
-        // Enhanced analytical fields
-        growth_stage: aiResult.growth_stage,
-        disease_identified: aiResult.disease_identified,
-        pest_identified: aiResult.pest_identified,
-        nutrient_deficiencies: aiResult.nutrient_deficiencies,
-        severity_ratings: aiResult.severity_ratings,
-        field_uniformity_score: aiResult.field_uniformity_score,
-        estimated_yield_impact_percent: aiResult.estimated_yield_impact_percent,
-        canopy_coverage_percent: aiResult.canopy_coverage_percent,
-        plant_density_assessment: aiResult.plant_density_assessment,
-        root_health_indicators: aiResult.root_health_indicators,
-        detailed_visual_analysis: aiResult.detailed_visual_analysis,
-      })
-      .select()
-      .single();
-
-    if (assessmentError) throw assessmentError;
-
-    // Insert AI-generated recommendations
-    interface Recommendation {
-      text: string;
-      priority: 'urgent' | 'normal' | 'low';
-      category: 'irrigation' | 'fertilization' | 'pest_management' | 'weather_alert' | 'general';
+    requireHealthScore(aiResult.health_score);
+    if (!aiResult.assessment_id) {
+      throw new Error('Analysis did not persist an assessment');
     }
-    
-    const recommendations = (aiResult.recommendations as Recommendation[]).map((rec) => ({
-      assessment_id: assessment.id,
-      recommendation_text: rec.text,
-      priority: rec.priority,
-      category: rec.category,
-    }));
 
-    const { error: recError } = await supabase.from("recommendations").insert(recommendations);
-
-    if (recError) throw recError;
+    const assessmentId = aiResult.assessment_id as string;
 
     // ✅ UNIFIED AI: Enrich intelligence pool after analysis
     await enrichUnifiedContext(fieldId, aiResult);
 
-    // ✅ CRITICAL ALERTS: Check if assessment triggers critical alert
+    
+  const toThreatObjects = (raw: unknown) => {
+    if (!Array.isArray(raw)) return [];
+    return raw.map((item) => {
+      if (typeof item === 'string') {
+        // Name-only threat — do not invent severity or confidence
+        return { name: item, severity: 'unknown', confidence: null };
+      }
+      if (item && typeof item === 'object' && 'name' in item) {
+        const o = item as { name: string; severity?: string; confidence?: number };
+        return {
+          name: o.name,
+          severity: o.severity ?? 'unknown',
+          confidence: typeof o.confidence === 'number' && Number.isFinite(o.confidence)
+            ? o.confidence
+            : null,
+        };
+      }
+      return null;
+    }).filter(Boolean);
+  };
+
+    // ✅ CRITICAL ALERTS: scores are loaded from the persisted assessment server-side
     try {
       const { data: fieldData } = await supabase
         .from('fields')
@@ -288,13 +290,10 @@ export default function Upload() {
 
       await supabase.functions.invoke('detect-critical-alerts', {
         body: {
-          assessment_id: assessment.id,
+          assessment_id: assessmentId,
           field_id: fieldId,
-          health_score: aiResult.health_score,
-          stress_level: aiResult.stress_level,
-          diseases: aiResult.disease_identified,
-          pests: aiResult.pest_identified,
-          estimated_yield_impact_percent: aiResult.estimated_yield_impact_percent,
+          diseases: toThreatObjects(aiResult.disease_identified),
+          pests: toThreatObjects(aiResult.pest_identified),
           field_acreage: fieldData?.acreage,
           crop_type: fieldData?.crop_type || cropType,
         },

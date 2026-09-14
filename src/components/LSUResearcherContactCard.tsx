@@ -26,16 +26,20 @@ export function LSUResearcherContactCard({ researcher, onContact }: LSUResearche
         return;
       }
 
-      await supabase.from('farmer_researcher_interactions').insert({
+      const { data: interaction, error } = await supabase.from('farmer_researcher_interactions').insert({
         farmer_id: user.id,
         researcher_id: researcher.id,
         interaction_type: 'question',
         status: 'pending',
-      });
+      }).select('id').maybeSingle();
+      if (error) throw error;
+      if (!interaction) {
+        throw new Error('Contact request was not recorded (insert returned no row or not permitted)');
+      }
 
       toast({
-        title: "Contact request sent",
-        description: `Your request to contact ${researcher.name} has been recorded`,
+        title: "Request recorded (no email sent)",
+        description: `Request recorded for ${researcher.name}. This does not send email to LSU staff`,
       });
       
       onContact?.();
@@ -43,7 +47,7 @@ export function LSUResearcherContactCard({ researcher, onContact }: LSUResearche
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "Failed to send contact request",
+        description: "Failed to record contact request",
         variant: "destructive",
       });
     }

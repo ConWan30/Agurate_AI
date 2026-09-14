@@ -10,6 +10,8 @@ import { Cloud, CloudRain, Sun, Wind, Droplets, AlertTriangle, Activity } from '
 import { Button } from '@/components/ui/button';
 import TutorialTooltip from '@/components/TutorialTooltip';
 import bgWeatherStation from "@/assets/bg-weather-station.jpg";
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
 
 interface Assessment {
   id: string;
@@ -35,7 +37,7 @@ interface WeatherEvent {
 
 interface TimelineDataPoint {
   date: string;
-  healthScore: number;
+  healthScore: number | null;
   temperature: number | null;
   precipitation: number | null;
   events: WeatherEvent[];
@@ -96,9 +98,16 @@ export default function WeatherTimeline() {
     if (assessmentsData && assessmentsData.length > 0) {
       const timeline: TimelineDataPoint[] = assessmentsData.map(assessment => ({
         date: new Date(assessment.analyzed_at).toLocaleDateString(),
-        healthScore: (assessment.health_score || 0) * 100,
+        healthScore: hasHealthScore(assessment.health_score)
+          ? toHealthPercent(assessment.health_score)
+          : null,
         temperature: assessment.weather_temp_f,
-        precipitation: assessment.weather_precipitation_mm ? assessment.weather_precipitation_mm / 25.4 : null, // mm to inches
+        // Preserve recorded 0" precip — do not treat falsy 0 as "missing".
+        precipitation:
+          assessment.weather_precipitation_mm != null &&
+          Number.isFinite(Number(assessment.weather_precipitation_mm))
+            ? Number(assessment.weather_precipitation_mm) / 25.4
+            : null,
         events: (eventsData || []).filter(e => 
           new Date(e.event_date).toDateString() === new Date(assessment.analyzed_at).toDateString()
         )
@@ -114,8 +123,8 @@ export default function WeatherTimeline() {
         steps={[
           { id: "welcome", title: "Weather Timeline", content: "Visualize how weather impacts crop health over 30 days", position: "bottom" },
           { id: "chart", title: "Health & Weather Chart", content: "Green line = crop health, Blue/Red = temperature and rainfall trends", position: "bottom" },
-          { id: "events", title: "Weather Events", content: "See correlations between weather events and health drops", position: "bottom" },
-          { id: "assessments", title: "Recent Assessments", content: "Quick access to your scan history with GPS tags", position: "bottom" }
+          { id: "events", title: "Weather Events", content: "Review recorded weather events alongside health scores when both exist", position: "bottom" },
+          { id: "assessments", title: "Recent Assessments", content: "Quick access to your recent scan history", position: "bottom" }
         ]}
         storageKey="tutorial-weather-timeline-shown"
       />
@@ -130,10 +139,10 @@ export default function WeatherTimeline() {
       >
         <div className="max-w-7xl mx-auto px-4 text-center space-y-4 relative z-10">
           <h1 className="text-5xl font-heading font-bold text-white drop-shadow-lg">
-            Weather-Correlated Health Timeline
+            Weather & Health Timeline
           </h1>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Visualize how weather events impact crop health over time with data-driven insights
+            Compare recorded weather events with your scan health scores over the last 30 days
           </p>
         </div>
       </div>
@@ -189,13 +198,15 @@ export default function WeatherTimeline() {
                   />
                   {/* Precipitation reference lines */}
                   {timelineData.map((point, idx) => 
-                    point.precipitation && point.precipitation > 0.5 ? (
+                    point.precipitation != null
+                      && Number.isFinite(Number(point.precipitation))
+                      && Number(point.precipitation) > 0.5 ? (
                       <ReferenceLine 
                         key={`precip-${idx}`}
                         x={point.date}
                         stroke="#3B82F6"
                         strokeDasharray="3 3"
-                        label={{ value: `${point.precipitation.toFixed(1)}"`, position: 'top' }}
+                        label={{ value: `${Number(point.precipitation).toFixed(1)}"`, position: 'top' }}
                       />
                     ) : null
                   )}
@@ -234,7 +245,7 @@ export default function WeatherTimeline() {
                     </div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <AgriculturalBadge type={event.event_type === 'heat_wave' ? 'severe' : event.event_type === 'heavy_rain' ? 'moderate' : 'healthy'}>
+                        <AgriculturalBadge type={event.event_type === 'heat_wave' ? 'severe' : event.event_type === 'heavy_rain' ? 'moderate' : 'unknown'}>
                           {event.event_type.replace('_', ' ')}
                         </AgriculturalBadge>
                         <time className="text-sm text-muted-foreground" dateTime={event.event_date}>
@@ -245,11 +256,13 @@ export default function WeatherTimeline() {
                         <p className="text-sm">{event.description}</p>
                       )}
                       <div className="flex gap-4 text-xs text-muted-foreground">
-                        {event.temperature_f && (
-                          <span>🌡️ {event.temperature_f}°F</span>
+                        {event.temperature_f != null &&
+                          Number.isFinite(Number(event.temperature_f)) && (
+                          <span>{event.temperature_f}°F</span>
                         )}
-                        {event.precipitation_inches && (
-                          <span>🌧️ {event.precipitation_inches}" rain</span>
+                        {event.precipitation_inches != null &&
+                          Number.isFinite(Number(event.precipitation_inches)) && (
+                          <span>{event.precipitation_inches}" rain</span>
                         )}
                       </div>
                     </div>
@@ -286,20 +299,24 @@ export default function WeatherTimeline() {
                     <div className="flex items-center gap-3">
                       <div className="text-right">
                         <p className="font-mono font-semibold">
-                          {((assessment.health_score || 0) * 100).toFixed(0)}%
+                          {hasHealthScore(assessment.health_score)
+                            ? `${toHealthPercent(assessment.health_score).toFixed(0)}%`
+                            : 'No score'}
                         </p>
-                        {assessment.weather_temp_f && (
+                        {assessment.weather_temp_f != null &&
+                          Number.isFinite(Number(assessment.weather_temp_f)) && (
                           <p className="text-xs text-muted-foreground">
                             {assessment.weather_temp_f}°F
                           </p>
                         )}
                       </div>
-                      <AgriculturalBadge type={
-                        assessment.stress_level === 'healthy' ? 'healthy' :
-                        assessment.stress_level === 'moderate' ? 'moderate' : 'severe'
-                      }>
-                        {assessment.stress_level}
-                      </AgriculturalBadge>
+                      {normalizeStressLevel(assessment.stress_level) ? (
+                        <AgriculturalBadge type={stressBadgeType(assessment.stress_level)}>
+                          {formatStressLabel(assessment.stress_level)}
+                        </AgriculturalBadge>
+                      ) : (
+                        <Badge variant="outline">Stress not recorded</Badge>
+                      )}
                     </div>
                   </div>
                 ))}

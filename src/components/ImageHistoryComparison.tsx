@@ -8,24 +8,27 @@ import { Calendar, TrendingUp, TrendingDown, Minus, Loader2, Image as ImageIcon 
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { ProgressiveImage } from '@/components/ui/progressive-image';
+import { formatHealthPercent } from '@/lib/health-score';
+import { resolveCropImageUrl, resolveCropImageUrls } from '@/lib/crop-image';
 
 interface Assessment {
   id: string;
   image_url: string;
-  health_score: number;
-  stress_level: string;
+  health_score: number | null;
+  stress_level: string | null;
   analyzed_at: string;
   symptoms?: string[] | null;
   field_id: string;
 }
 
 interface ComparisonResult {
-  health_trend: 'improving' | 'declining' | 'stable';
-  health_change: number;
+  health_trend: 'improving' | 'declining' | 'stable' | 'unknown';
+  health_change: number | null;
+  health_scores_recorded?: boolean;
   symptom_progression: string[];
   visual_changes: string[];
-  treatment_effectiveness?: string;
-  projected_recovery?: string;
+  treatment_effectiveness?: string | null;
+  projected_recovery?: string | null;
 }
 
 interface ImageHistoryComparisonProps {
@@ -57,14 +60,18 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
 
       if (error) throw error;
 
-      setAssessments((data || []) as Assessment[]);
+      const withUrls = await resolveCropImageUrls(
+        supabase,
+        (data || []) as Assessment[]
+      );
+      setAssessments(withUrls);
       
       // Auto-select most recent and second most recent if available
-      if (data && data.length >= 2) {
-        setSelectedAssessment1(currentAssessmentId || data[0].id);
-        setSelectedAssessment2(data[1].id);
-      } else if (data && data.length === 1) {
-        setSelectedAssessment1(currentAssessmentId || data[0].id);
+      if (withUrls.length >= 2) {
+        setSelectedAssessment1(currentAssessmentId || withUrls[0].id);
+        setSelectedAssessment2(withUrls[1].id);
+      } else if (withUrls.length === 1) {
+        setSelectedAssessment1(currentAssessmentId || withUrls[0].id);
       }
     } catch (error) {
       console.error('Error loading assessments:', error);
@@ -94,6 +101,15 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
         throw new Error('Assessments not found');
       }
 
+      // Fresh signed URLs for the vision model (paths or legacy signed URLs)
+      const [image1Url, image2Url] = await Promise.all([
+        resolveCropImageUrl(supabase, assessment1.image_url),
+        resolveCropImageUrl(supabase, assessment2.image_url),
+      ]);
+      if (!image1Url || !image2Url) {
+        throw new Error('Could not resolve assessment image URLs');
+      }
+
       // Call Edge Function for image comparison
       const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/compare-images`, {
@@ -103,20 +119,10 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
           'Authorization': `Bearer ${session?.access_token}`,
         },
         body: JSON.stringify({
-          image1_url: assessment1.image_url,
-          image2_url: assessment2.image_url,
-          assessment1_data: {
-            health_score: assessment1.health_score,
-            stress_level: assessment1.stress_level,
-            symptoms: assessment1.symptoms,
-            analyzed_at: assessment1.analyzed_at,
-          },
-          assessment2_data: {
-            health_score: assessment2.health_score,
-            stress_level: assessment2.stress_level,
-            symptoms: assessment2.symptoms,
-            analyzed_at: assessment2.analyzed_at,
-          },
+          image1_url: image1Url,
+          image2_url: image2Url,
+          assessment1_id: assessment1.id,
+          assessment2_id: assessment2.id,
         }),
       });
 
@@ -125,30 +131,15 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
       }
 
       const result = await response.json();
+      if (!result?.health_trend || !Array.isArray(result.visual_changes)) {
+        throw new Error('Comparison response missing required fields');
+      }
       setComparisonResult(result);
     } catch (error) {
       console.error('Error comparing images:', error);
       toast.error('Failed to compare images');
-      
-      // Fallback: Calculate basic comparison from assessment data
-      const assessment1 = assessments.find(a => a.id === selectedAssessment1);
-      const assessment2 = assessments.find(a => a.id === selectedAssessment2);
-      
-      if (assessment1 && assessment2) {
-        const healthChange = assessment2.health_score - assessment1.health_score;
-        setComparisonResult({
-          health_trend: healthChange > 5 ? 'improving' : healthChange < -5 ? 'declining' : 'stable',
-          health_change: healthChange,
-          symptom_progression: [
-            ...(assessment1.symptoms || []),
-            ...(assessment2.symptoms || []),
-          ],
-          visual_changes: [
-            `Health score changed from ${assessment1.health_score}% to ${assessment2.health_score}%`,
-            `Stress level: ${assessment1.stress_level} → ${assessment2.stress_level}`,
-          ],
-        });
-      }
+      // Fail closed — never invent visual comparison from score math alone
+      setComparisonResult(null);
     } finally {
       setComparing(false);
     }
@@ -235,7 +226,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
               <SelectContent>
                 {assessments.map((assessment) => (
                   <SelectItem key={assessment.id} value={assessment.id}>
-                    {format(new Date(assessment.analyzed_at), 'MMM d, yyyy')} - {assessment.health_score}% health
+                    {format(new Date(assessment.analyzed_at), 'MMM d, yyyy')} - {formatHealthPercent(assessment.health_score)} health
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -254,7 +245,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
               <SelectContent>
                 {assessments.map((assessment) => (
                   <SelectItem key={assessment.id} value={assessment.id}>
-                    {format(new Date(assessment.analyzed_at), 'MMM d, yyyy')} - {assessment.health_score}% health
+                    {format(new Date(assessment.analyzed_at), 'MMM d, yyyy')} - {formatHealthPercent(assessment.health_score)} health
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -288,7 +279,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
                     {format(new Date(assessment1.analyzed_at), 'MMM d, yyyy')}
                   </CardTitle>
                   <Badge variant={assessment1.stress_level === 'severe' ? 'destructive' : assessment1.stress_level === 'moderate' ? 'default' : 'outline'}>
-                    {assessment1.health_score}% health
+                    {formatHealthPercent(assessment1.health_score)} health
                   </Badge>
                 </div>
               </CardHeader>
@@ -313,7 +304,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
                     {format(new Date(assessment2.analyzed_at), 'MMM d, yyyy')}
                   </CardTitle>
                   <Badge variant={assessment2.stress_level === 'severe' ? 'destructive' : assessment2.stress_level === 'moderate' ? 'default' : 'outline'}>
-                    {assessment2.health_score}% health
+                    {formatHealthPercent(assessment2.health_score)} health
                   </Badge>
                 </div>
               </CardHeader>
@@ -353,7 +344,11 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Health score changed by {comparisonResult.health_change > 0 ? '+' : ''}{comparisonResult.health_change}%
+                  {comparisonResult.health_change != null &&
+                  Number.isFinite(comparisonResult.health_change) &&
+                  comparisonResult.health_scores_recorded !== false
+                    ? `Health score changed by ${comparisonResult.health_change > 0 ? '+' : ''}${comparisonResult.health_change}%`
+                    : 'Health score change not available — one or both assessments lack a recorded score.'}
                 </p>
               </div>
 

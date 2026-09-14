@@ -11,21 +11,22 @@ import { Badge } from "@/components/ui/badge";
 import { format, subDays } from "date-fns";
 import TutorialTooltip from "@/components/TutorialTooltip";
 import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
+import { hasHealthScore, toHealthPercent } from "@/lib/health-score";
 
 interface FieldData {
   id: string;
   name: string;
   crop_type: string;
-  avgHealth: number;
-  trend: number;
+  avgHealth: number | null;
+  trend: number | null;
   lastAssessment: string;
 }
 
 interface TimeSeriesPoint {
   date: string;
-  health_score: number;
-  temp_f: number;
-  precipitation: number;
+  health_score: number | null;
+  temp_f: number | null;
+  precipitation: number | null;
 }
 
 export default function Analytics() {
@@ -57,21 +58,24 @@ export default function Analytics() {
       if (fieldsData) {
         const processedFields = fieldsData.map((field: any) => {
           const assessments = field.assessments || [];
-          const avgHealth = assessments.length > 0
-            ? assessments.reduce((sum: number, a: any) => sum + (a.health_score || 0), 0) / assessments.length
-            : 0;
+          const scored = assessments
+            .filter((a: any) => hasHealthScore(a.health_score))
+            .map((a: any) => ({ ...a, health_score: toHealthPercent(a.health_score) }));
+          const avgHealth = scored.length > 0
+            ? scored.reduce((sum: number, a: any) => sum + a.health_score, 0) / scored.length
+            : null;
           
-          const recentAssessments = assessments.slice(-2);
-          const trend = recentAssessments.length === 2
-            ? recentAssessments[1].health_score - recentAssessments[0].health_score
-            : 0;
+          const scoredRecent = scored.slice(-2);
+          const trend = scoredRecent.length === 2
+            ? scoredRecent[1].health_score - scoredRecent[0].health_score
+            : null;
 
           return {
             id: field.id,
             name: field.name,
             crop_type: field.crop_type,
-            avgHealth: Math.round(avgHealth),
-            trend: Math.round(trend),
+            avgHealth: avgHealth == null ? null : Math.round(avgHealth),
+            trend: trend == null ? null : Math.round(trend),
             lastAssessment: assessments[assessments.length - 1]?.analyzed_at || "N/A"
           };
         });
@@ -104,16 +108,28 @@ export default function Analytics() {
           const date = format(new Date(assessment.analyzed_at), "MMM dd");
           const existing = acc.find(d => d.date === date);
           
+          const hasScore = hasHealthScore(assessment.health_score);
+          const normalizedScore = hasScore ? toHealthPercent(assessment.health_score) : null;
           if (existing) {
-            existing.health_score = (existing.health_score + assessment.health_score) / 2;
-            existing.temp_f = assessment.weather_temp_f || existing.temp_f;
-            existing.precipitation = assessment.weather_precipitation_mm || existing.precipitation;
+            if (normalizedScore != null) {
+              if (existing.health_score == null) {
+                existing.health_score = normalizedScore;
+              } else {
+                existing.health_score = (existing.health_score + normalizedScore) / 2;
+              }
+            }
+            existing.temp_f = assessment.weather_temp_f ?? existing.temp_f;
+            existing.precipitation = assessment.weather_precipitation_mm != null && Number.isFinite(Number(assessment.weather_precipitation_mm))
+              ? Number(assessment.weather_precipitation_mm) / 25.4
+              : existing.precipitation;
           } else {
             acc.push({
               date,
-              health_score: assessment.health_score,
-              temp_f: assessment.weather_temp_f || 75,
-              precipitation: assessment.weather_precipitation_mm || 0
+              health_score: normalizedScore,
+              temp_f: assessment.weather_temp_f ?? null,
+              precipitation: assessment.weather_precipitation_mm != null && Number.isFinite(Number(assessment.weather_precipitation_mm))
+              ? Number(assessment.weather_precipitation_mm) / 25.4
+              : null
             });
           }
           return acc;
@@ -135,7 +151,10 @@ export default function Analytics() {
           <p className="font-semibold text-foreground mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value.toFixed(1)}
+              {entry.name}:{' '}
+              {entry.value != null && Number.isFinite(Number(entry.value))
+                ? Number(entry.value).toFixed(1)
+                : '—'}
             </p>
           ))}
         </div>
@@ -151,7 +170,7 @@ export default function Analytics() {
           { id: "welcome", title: "Your Farming Dashboard", content: "Track performance across all fields with comprehensive analytics", position: "bottom" },
           { id: "comparison", title: "Field Comparison", content: "Identify which fields perform best and which need attention", position: "bottom" },
           { id: "treatment", title: "Treatment Effectiveness", content: "Measure ROI on your interventions and optimize spending", position: "bottom" },
-          { id: "export", title: "Export Reports", content: "Download data for insurance claims or USDA compliance", position: "bottom" }
+          { id: "export", title: "Export Reports", content: "Download data for insurance claims or your USDA records (not a compliance guarantee)", position: "bottom" }
         ]}
         storageKey="tutorial-analytics-shown"
       />
@@ -248,8 +267,8 @@ export default function Analytics() {
                 <CardHeader>
                   <CardTitle className="font-heading flex items-center justify-between">
                     {field.name}
-                    <AgriculturalBadge type={field.avgHealth > 80 ? "healthy" : field.avgHealth > 60 ? "moderate" : "severe"}>
-                      {field.avgHealth}% Health
+                    <AgriculturalBadge type={field.avgHealth == null ? "unknown" : field.avgHealth > 80 ? "healthy" : field.avgHealth > 60 ? "moderate" : "severe"}>
+                      {field.avgHealth == null ? "No score" : `${field.avgHealth}% Health`}
                     </AgriculturalBadge>
                   </CardTitle>
                   <CardDescription className="capitalize">{field.crop_type}</CardDescription>
@@ -259,21 +278,28 @@ export default function Analytics() {
                   <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Projected Yield</p>
                       <p className="text-2xl font-mono font-bold text-primary">
-                        {Math.round(field.avgHealth * 1.2)} bu/ac
+                        Not estimated
                       </p>
+                      <p className="text-xs text-muted-foreground">Yield is not derived from health score alone</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Trend</p>
                       <div className="flex items-center gap-2">
-                        <TrendingUp className={`h-5 w-5 ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`} aria-hidden="true" />
-                        <p className={`text-2xl font-mono font-bold ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`}>
-                          {field.trend >= 0 ? '+' : ''}{field.trend}%
-                        </p>
+                        {field.trend == null ? (
+                          <p className="text-2xl font-mono font-bold text-muted-foreground">N/A</p>
+                        ) : (
+                          <>
+                            <TrendingUp className={`h-5 w-5 ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`} aria-hidden="true" />
+                            <p className={`text-2xl font-mono font-bold ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`}>
+                              {field.trend >= 0 ? '+' : ''}{field.trend}%
+                            </p>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="pt-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground">Based on AI analysis of current health, weather patterns, and historical data</p>
+                    <p className="text-sm text-muted-foreground">Health averages use recorded assessment scores only — yield is not estimated from health</p>
                   </div>
                 </CardContent>
               </AnimatedCard>
@@ -290,7 +316,7 @@ export default function Analytics() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={fields}>
+                <BarChart data={fields.filter((f) => f.avgHealth != null)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
                   <YAxis stroke="hsl(var(--muted-foreground))" domain={[0, 100]} />
@@ -343,7 +369,7 @@ export default function Analytics() {
                     dataKey="precipitation" 
                     stroke="hsl(var(--secondary))" 
                     strokeWidth={2}
-                    name="Precipitation (mm)"
+                    name="Precipitation (in)"
                     dot={{ fill: "hsl(var(--secondary))", r: 3 }}
                   />
                 </LineChart>

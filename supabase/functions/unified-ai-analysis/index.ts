@@ -1,11 +1,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const unifiedAnalysisSchema = z.object({
   imageUrl: z.string().url().max(2048),
@@ -14,11 +11,30 @@ const unifiedAnalysisSchema = z.object({
 });
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const supabase = getAnonClient(authHeader);
+
+    const rateLimit = await enforceRateLimit(supabase, user.id, {
+      functionName: 'unified-ai-analysis',
+      maxRequests: RATE_LIMITS['unified-ai-analysis'].maxRequests,
+      windowMs: RATE_LIMITS['unified-ai-analysis'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const rawBody = await req.json();
     const validation = unifiedAnalysisSchema.safeParse(rawBody);
     
@@ -30,31 +46,6 @@ serve(async (req) => {
     }
 
     const { imageUrl, fieldId, assessmentId } = validation.data;
-
-    // Authenticate user and verify field ownership
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    
-    if (userError || !user) {
-      console.error('Authentication failed:', userError);
-      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
 
     // Verify field ownership
     const { data: field, error: fieldError } = await supabase
@@ -80,10 +71,7 @@ serve(async (req) => {
     }
 
     // Use service role for database operations after auth check
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseAdmin = getServiceClient();
 
     console.log('🌾 Starting unified AI analysis for field:', fieldId);
 
@@ -134,6 +122,21 @@ serve(async (req) => {
 
     console.log('✅ Unified AI analysis complete');
 
+    // Only claim sources that gatherUnifiedContext actually loaded — weather is not wired.
+    const context_sources = [
+      'vision',
+      Array.isArray(context?.assessmentHistory) && context.assessmentHistory.length > 0
+        ? 'historical'
+        : null,
+      Array.isArray(context?.conservationData) && context.conservationData.length > 0
+        ? 'conservation'
+        : null,
+      Array.isArray(context?.varietyData) && context.varietyData.length > 0 ? 'variety' : null,
+      Array.isArray(context?.waterStressData) && context.waterStressData.length > 0
+        ? 'water_stress'
+        : null,
+    ].filter(Boolean);
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -144,7 +147,7 @@ serve(async (req) => {
         community,
         predictions,
         recommendations,
-        context_sources: ['vision', 'historical', 'conservation', 'variety', 'weather', 'community']
+        context_sources,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -188,15 +191,24 @@ async function gatherUnifiedContext(supabase: any, fieldId: string) {
 }
 
 async function enhancedVisionAnalysis(apiKey: string, imageUrl: string, context: any) {
+  const scoredHistory = (context.assessmentHistory || []).filter(
+    (a: any) => a.health_score != null && Number.isFinite(Number(a.health_score)),
+  );
+  const healthTrendLabel =
+    scoredHistory.length > 0
+      ? scoredHistory.map((a: any) => a.health_score).join(' → ')
+      : 'no scored assessments yet';
+
   const contextPrompt = `
 UNIFIED FIELD CONTEXT:
-- Crop: ${context.fieldData.crop_type}
-- Historical Health Trend: ${context.assessmentHistory.map((a: any) => a.health_score).join(' → ')}
-- Recent Symptoms: ${context.assessmentHistory.map((a: any) => a.symptoms?.join(', ')).filter(Boolean).join('; ')}
+- Crop: ${context.fieldData.crop_type ?? 'not recorded'}
+- Historical Health Trend: ${healthTrendLabel}
+- Recent Symptoms: ${context.assessmentHistory.map((a: any) => a.symptoms?.join(', ')).filter(Boolean).join('; ') || 'none recorded'}
 - Conservation Practices Active: ${context.conservationData.map((c: any) => c.practice_type).join(', ') || 'None'}
 - Water Stress Events: ${context.waterStressData.length} in last 30 days
 
-CRITICAL: Analyze this image considering all historical context above.`;
+CRITICAL: Analyze this image considering all historical context above.
+Do not invent health_score, stress_level, or confidence_score — omit the field if uncertain.`;
 
   const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
@@ -207,8 +219,8 @@ CRITICAL: Analyze this image considering all historical context above.`;
     body: JSON.stringify({
       model: 'google/gemini-2.5-flash',
       messages: [
-        { role: 'system', content: 'You are an expert crop pathologist with access to comprehensive field history.' },
-        { role: 'user', content: contextPrompt + '\n\nAnalyze crop health from image and return JSON with: health_score, stress_level, symptoms, confidence_score, historical_comparison' }
+        { role: 'system', content: 'You are an expert crop pathologist with access to comprehensive field history. Fail closed: never invent numeric scores.' },
+        { role: 'user', content: contextPrompt + '\n\nAnalyze crop health from image and return JSON with: health_score (0-100), stress_level (healthy|moderate|severe), symptoms (array), confidence_score (0-1), historical_comparison (string or null)' }
       ],
       temperature: 0.3,
     }),
@@ -217,61 +229,125 @@ CRITICAL: Analyze this image considering all historical context above.`;
   const data = await response.json();
   const content = data.choices[0].message.content;
   
+  let parsed: unknown;
   try {
-    return JSON.parse(content);
+    parsed = JSON.parse(content);
   } catch {
-    return { health_score: 85, stress_level: 'healthy', symptoms: [], confidence_score: 0.85 };
+    throw new Error('AI analysis returned unparseable JSON — refusing to invent health scores');
   }
+  return sanitizeVisionAnalysis(parsed);
 }
 
-async function analyzeWaterStress(apiKey: string, { visionAnalysis, context }: any) {
-  return { stress_score: 0.3, severity: 'mild', confidence: 0.8, dirt_recommendation: false };
+/** Fail-closed vision payload before intelligence-pool write. */
+function sanitizeVisionAnalysis(raw: unknown) {
+  if (!raw || typeof raw !== 'object') {
+    throw new Error('Vision analysis omitted structured result');
+  }
+  const o = raw as Record<string, unknown>;
+
+  const healthRaw = Number(o.health_score);
+  if (!Number.isFinite(healthRaw)) {
+    throw new Error('Vision analysis omitted health_score');
+  }
+  // Accept 0–1 fractions or 0–100 percents; store as 0–100.
+  const health_score =
+    healthRaw <= 1 && healthRaw >= 0
+      ? Math.round(healthRaw * 1000) / 10
+      : Math.min(100, Math.max(0, Math.round(healthRaw * 10) / 10));
+  if (health_score < 0 || health_score > 100) {
+    throw new Error('Vision analysis health_score out of range');
+  }
+
+  const confidenceRaw = Number(o.confidence_score);
+  if (!Number.isFinite(confidenceRaw) || confidenceRaw < 0 || confidenceRaw > 1) {
+    throw new Error('Vision analysis omitted or invalid confidence_score (require 0–1)');
+  }
+
+  const stressRaw = String(o.stress_level ?? '').trim().toLowerCase();
+  let stress_level: 'healthy' | 'moderate' | 'severe';
+  if (stressRaw.includes('severe')) stress_level = 'severe';
+  else if (stressRaw.includes('mild') || stressRaw.includes('moderate')) stress_level = 'moderate';
+  else if (stressRaw.includes('healthy')) stress_level = 'healthy';
+  else {
+    throw new Error(`Vision analysis unrecognized stress_level: ${o.stress_level}`);
+  }
+
+  const symptoms = Array.isArray(o.symptoms)
+    ? o.symptoms.filter((s): s is string => typeof s === 'string').slice(0, 20)
+    : [];
+
+  return {
+    health_score,
+    stress_level,
+    confidence_score: confidenceRaw,
+    symptoms,
+    historical_comparison:
+      typeof o.historical_comparison === 'string' ? o.historical_comparison.slice(0, 500) : null,
+  };
 }
 
-async function analyzeConservation(apiKey: string, { visionAnalysis, context }: any) {
-  return { soil_health_indicator: 85, practice_impacts: {}, confidence: 0.85 };
+async function analyzeWaterStress(_apiKey: string, _args: any) {
+  // Enrichment models are not shipped yet — do not invent stress/confidence.
+  return { available: false, reason: 'water_stress_enrichment_not_configured' };
 }
 
-async function analyzeVariety(apiKey: string, { visionAnalysis, context }: any) {
-  return { recommendation: null, confidence: 0.8 };
+async function analyzeConservation(_apiKey: string, _args: any) {
+  return { available: false, reason: 'conservation_enrichment_not_configured' };
 }
 
-async function analyzeCommunity(apiKey: string, { visionAnalysis, context }: any) {
-  return { similar_fields: [], trending_issues: [], confidence: 0.75 };
+async function analyzeVariety(_apiKey: string, _args: any) {
+  return { available: false, reason: 'variety_enrichment_not_configured' };
 }
 
-async function generatePredictions(apiKey: string, { visionAnalysis, context }: any) {
-  return { yield_forecast: {}, disease_risk: [], confidence: 0.8 };
+async function analyzeCommunity(_apiKey: string, _args: any) {
+  return { available: false, reason: 'community_enrichment_not_configured' };
+}
+
+async function generatePredictions(_apiKey: string, _args: any) {
+  return { available: false, reason: 'prediction_enrichment_not_configured' };
 }
 
 async function updateIntelligencePool(supabase: any, fieldId: string, data: any) {
   await supabase.from('ai_intelligence_pool').insert({
     field_id: fieldId,
-    image_analysis_patterns: { symptoms: data.visionAnalysis.symptoms },
+    image_analysis_patterns: { symptoms: data.visionAnalysis?.symptoms ?? [] },
     variety_intelligence: {},
     conservation_effectiveness: {},
     weather_correlations: {},
     community_patterns: {},
     predictive_insights: {},
     confidence_scores: {
-      vision_analysis: data.visionAnalysis.confidence_score || 0,
-      water_stress: data.waterStress.confidence || 0,
-      variety_match: data.variety.confidence || 0,
-      community_alignment: data.community.confidence || 0
-    }
+      vision_analysis: data.visionAnalysis?.confidence_score ?? null,
+      water_stress: data.waterStress?.available === false ? null : data.waterStress?.confidence ?? null,
+      variety_match: data.variety?.available === false ? null : data.variety?.confidence ?? null,
+      community_alignment: data.community?.available === false ? null : data.community?.confidence ?? null,
+    },
   });
 }
 
-async function generateUnifiedRecommendations(apiKey: string, data: any) {
+async function generateUnifiedRecommendations(_apiKey: string, data: any) {
+  const visionScore = data.vision?.confidence_score ?? data.visionAnalysis?.confidence_score;
+  const health = data.vision?.health_score ?? data.visionAnalysis?.health_score;
   return {
     prioritized: [
       {
-        title: 'Monitor Health Trend',
-        recommendation: 'Continue monitoring based on current health score',
+        title: 'Review latest vision result',
+        recommendation:
+          health == null
+            ? 'Vision enrichment completed without a health score — re-run analysis if needed.'
+            : `Latest vision health score is available for this field. Treat it as a decision aid, not a validated diagnosis.`,
         urgency: 'routine',
-        contributing_systems: ['vision', 'historical'],
-        lsu_research_basis: 'LSU AgCenter monitoring guidelines'
-      }
-    ]
+        contributing_systems: ['vision'],
+        enrichment_status: {
+          water_stress: data.waterStress?.available === false ? 'not_configured' : 'present',
+          conservation: data.conservation?.available === false ? 'not_configured' : 'present',
+          variety: data.variety?.available === false ? 'not_configured' : 'present',
+          community: data.community?.available === false ? 'not_configured' : 'present',
+          predictions: data.predictions?.available === false ? 'not_configured' : 'present',
+        },
+        research_framing: 'Informed by publicly available agronomic guidance — not an official LSU partnership or validation',
+        vision_confidence: visionScore ?? null,
+      },
+    ],
   };
 }

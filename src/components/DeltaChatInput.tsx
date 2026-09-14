@@ -65,9 +65,13 @@ export const DeltaChatInput = ({ onTextMessage, onImageMessage, disabled }: Delt
   };
 
   const uploadImage = async (file: File): Promise<string> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `chat-images/${fileName}`;
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+    // Owner-prefixed path required by crop-images storage RLS
+    const filePath = `${user.id}/chat-images/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('crop-images')
@@ -75,12 +79,8 @@ export const DeltaChatInput = ({ onTextMessage, onImageMessage, disabled }: Delt
 
     if (uploadError) throw uploadError;
 
-    const { data, error: signedUrlError } = await supabase.storage
-      .from('crop-images')
-      .createSignedUrl(filePath, 3600); // 1 hour expiry
-
-    if (signedUrlError) throw signedUrlError;
-    return data.signedUrl;
+    // Return durable storage path — callers mint signed URLs when needed
+    return filePath;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

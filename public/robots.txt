@@ -1,14 +1,34 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Allow: /beta-signup
+Allow: /join-beta
+Allow: /auth
+Allow: /how-it-works
+Allow: /install
+
+Disallow: /dashboard
+Disallow: /fields
+Disallow: /history
+Disallow: /upload
+Disallow: /scanner
+Disallow: /profile
+Disallow: /predictions
+Disallow: /field-map
+Disallow: /weather-timeline
+Disallow: /insurance
+Disallow: /cooperatives
+Disallow: /delta
+Disallow: /delta-intelligence
+Disallow: /analytics
+Disallow: /lsu-researchers
+Disallow: /conservation-practices
+Disallow: /conversational-forms-analytics
+Disallow: /tutorials
+Disallow: /upgrade
+Disallow: /onboarding
+Disallow: /beta-metrics
+Disallow: /integration-test
+Disallow: /reset-password
+Disallow: /demo/
+
+Sitemap: https://agurateai.lovable.app/sitemap.xml

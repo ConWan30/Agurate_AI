@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -74,16 +75,10 @@ export default function Cooperatives() {
       
       if (memberError) throw memberError;
 
-      const { data: roles, error: roleError } = await supabase
-        .from('cooperative_roles' as any)
-        .select('cooperative_id, role')
-        .eq('user_id', user?.id || '');
-      
-      if (roleError) throw roleError;
-
+      // Role lives on cooperative_members (no separate cooperative_roles table)
       return memberships?.map(m => ({
         ...m,
-        role: (roles as any)?.find((r: any) => r.cooperative_id === m.cooperative_id)?.role || 'member'
+        role: m.role || 'member'
       }));
     },
     enabled: !!user
@@ -103,24 +98,20 @@ export default function Cooperatives() {
       
       if (coopError) throw coopError;
 
-      const { error: memberError } = await supabase
+      const { data: member, error: memberError } = await supabase
         .from('cooperative_members')
-        .insert([{
-          cooperative_id: coop.id,
-          user_id: user?.id || ''
-        }]);
-      
-      if (memberError) throw memberError;
-
-      const { error: roleError } = await supabase
-        .from('cooperative_roles' as any)
         .insert([{
           cooperative_id: coop.id,
           user_id: user?.id || '',
           role: 'admin'
-        }]);
+        }])
+        .select('id')
+        .maybeSingle();
       
-      if (roleError) throw roleError;
+      if (memberError) throw memberError;
+      if (!member) {
+        throw new Error('Admin membership was not created (insert returned no row or not permitted)');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cooperatives'] });
@@ -150,16 +141,25 @@ export default function Cooperatives() {
             .order('analyzed_at', { ascending: false })
             .limit(50);
 
-          const totalAcreage = fields?.reduce((sum, f) => sum + (Number(f.acreage) || 0), 0) || 0;
-          const avgHealth = assessments?.length 
-            ? assessments.reduce((sum, a) => sum + (Number(a.health_score) || 0), 0) / assessments.length
-            : 0;
+          // Sum only recorded acreages — null/invalid acreage is omitted, not invented as 0.
+          const recordedAcreages = (fields || [])
+            .map((f) => Number(f.acreage))
+            .filter((n) => Number.isFinite(n) && n >= 0);
+          const totalAcreage = recordedAcreages.length
+            ? recordedAcreages.reduce((sum, n) => sum + n, 0)
+            : null;
+          const scored = (assessments || []).flatMap((a) =>
+            hasHealthScore(a.health_score) ? [toHealthPercent(a.health_score)] : []
+          );
+          const avgHealth = scored.length
+            ? scored.reduce((sum, n) => sum + n, 0) / scored.length
+            : null;
 
           return {
             cooperative_id: coop.id,
             total_acreage: totalAcreage,
             field_count: fields?.length || 0,
-            avg_health: Math.round(avgHealth)
+            avg_health: avgHealth == null ? null : Math.round(avgHealth)
           };
         })
       );
@@ -198,7 +198,7 @@ export default function Cooperatives() {
           { id: "welcome", title: "Welcome to Cooperatives!", content: "Join or create farming networks to share insights with neighboring farms", position: "bottom" },
           { id: "create", title: "Create Cooperative", content: "Start your own multi-farm network for collaborative intelligence", position: "bottom" },
           { id: "stats", title: "View Stats", content: "See aggregate health data, total acreage, and member insights", position: "bottom" },
-          { id: "insights", title: "Community Insights", content: "Access shared best practices and early disease outbreak warnings", position: "bottom" },
+          { id: "insights", title: "Community Insights", content: "Access shared best practices and member-reported alerts — planning signals, not confirmed outbreak detection", position: "bottom" },
           { id: "invite", title: "Invite Members", content: "Grow your cooperative with email invitations for better analytics", position: "bottom" }
         ]}
         storageKey="tutorial-cooperatives-shown"
@@ -432,14 +432,18 @@ export default function Cooperatives() {
                             <div className="p-4 bg-muted/50 rounded-lg text-center">
                               <div className="flex items-center justify-center gap-2 mb-1">
                                 <Building2 className="h-4 w-4 text-primary" />
-                                <span className="text-2xl font-bold">{Math.round(stats.total_acreage)}</span>
+                                <span className="text-2xl font-bold">
+                                  {stats.total_acreage == null
+                                    ? "—"
+                                    : Math.round(stats.total_acreage)}
+                                </span>
                               </div>
                               <p className="text-xs text-muted-foreground">Total Acres</p>
                             </div>
                             <div className="p-4 bg-muted/50 rounded-lg text-center">
                               <div className="flex items-center justify-center gap-2 mb-1">
                                 <TrendingUp className="h-4 w-4 text-primary" />
-                                <span className="text-2xl font-bold">{stats.avg_health}</span>
+                                <span className="text-2xl font-bold">{stats.avg_health == null ? "—" : stats.avg_health}</span>
                               </div>
                               <p className="text-xs text-muted-foreground">Avg Health</p>
                             </div>
@@ -465,7 +469,14 @@ export default function Cooperatives() {
                   <div>
                     <p className="text-sm text-muted-foreground">Total Adopters</p>
                     <p className="text-2xl font-bold">
-                      {adoptionMetrics.reduce((sum, m) => sum + m.total_adopters, 0)}
+                      {(() => {
+                        const values = adoptionMetrics
+                          .map((m) => Number(m.total_adopters))
+                          .filter((n) => Number.isFinite(n));
+                        return values.length
+                          ? values.reduce((sum, n) => sum + n, 0)
+                          : '—';
+                      })()}
                     </p>
                   </div>
                 </div>
@@ -480,7 +491,14 @@ export default function Cooperatives() {
                   <div>
                     <p className="text-sm text-muted-foreground">Total Acres</p>
                     <p className="text-2xl font-bold">
-                      {adoptionMetrics.reduce((sum, m) => sum + Number(m.total_acres), 0).toLocaleString()}
+                      {(() => {
+                        const values = adoptionMetrics
+                          .map((m) => Number(m.total_acres))
+                          .filter((n) => Number.isFinite(n));
+                        return values.length
+                          ? values.reduce((sum, n) => sum + n, 0).toLocaleString()
+                          : '—';
+                      })()}
                     </p>
                   </div>
                 </div>
@@ -493,9 +511,16 @@ export default function Cooperatives() {
                     <DollarSign className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Avg. Savings</p>
+                    <p className="text-sm text-muted-foreground">Self-reported avg. savings</p>
                     <p className="text-2xl font-bold">
-                      ${(adoptionMetrics.reduce((sum, m) => sum + Number(m.average_savings), 0) / (adoptionMetrics.length || 1)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      {(() => {
+                        const reported = adoptionMetrics
+                          .map((m) => Number(m.average_savings))
+                          .filter((n) => Number.isFinite(n) && n > 0);
+                        if (reported.length === 0) return '—';
+                        const avg = reported.reduce((sum, n) => sum + n, 0) / reported.length;
+                        return `$${avg.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+                      })()}
                     </p>
                   </div>
                 </div>
@@ -529,8 +554,8 @@ export default function Cooperatives() {
                 <Award className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h2 className="text-2xl font-display font-bold">Proven Best Practices</h2>
-                <p className="text-sm text-muted-foreground">LSU-validated techniques with real farmer results</p>
+                <h2 className="text-2xl font-display font-bold">Community-Reported Practices</h2>
+                <p className="text-sm text-muted-foreground">Farmer-shared techniques with public LSU AgCenter research framing</p>
               </div>
             </div>
 

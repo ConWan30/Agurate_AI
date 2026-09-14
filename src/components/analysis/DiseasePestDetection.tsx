@@ -6,7 +6,8 @@ import { AlertCircle, Bug, BookOpen } from "lucide-react";
 interface DiseaseOrPest {
   name: string;
   description?: string;
-  severity: "mild" | "moderate" | "severe";
+  /** Omit or "unknown" when AI did not return severity — never invent moderate. */
+  severity?: "mild" | "moderate" | "severe" | "unknown";
   treatment?: string;
   lsu_publication?: {
     title: string;
@@ -15,19 +16,25 @@ interface DiseaseOrPest {
 }
 
 interface DiseasePestDetectionProps {
-  diseases?: DiseaseOrPest[];
-  pests?: DiseaseOrPest[];
+  /** Omit/undefined = analysis not recorded; [] = model reported none. */
+  diseases?: DiseaseOrPest[] | null;
+  pests?: DiseaseOrPest[] | null;
 }
 
-export function DiseasePestDetection({ diseases = [], pests = [] }: DiseasePestDetectionProps) {
-  const getSeverityBadge = (severity: string) => {
+export function DiseasePestDetection({ diseases, pests }: DiseasePestDetectionProps) {
+  const diseaseList = diseases ?? null;
+  const pestList = pests ?? null;
+  const getSeverityBadge = (severity?: string) => {
     switch (severity) {
       case "severe":
         return "destructive";
       case "moderate":
         return "outline";
-      default:
+      case "mild":
         return "secondary";
+      default:
+        // Fail closed — unknown is not mild
+        return "outline";
     }
   };
 
@@ -41,7 +48,7 @@ export function DiseasePestDetection({ diseases = [], pests = [] }: DiseasePestD
           )}
         </div>
         <Badge variant={getSeverityBadge(issue.severity)} className="shrink-0">
-          {issue.severity}
+          {issue.severity && issue.severity !== "unknown" ? issue.severity : "severity unknown"}
         </Badge>
       </div>
       
@@ -63,12 +70,24 @@ export function DiseasePestDetection({ diseases = [], pests = [] }: DiseasePestD
     </div>
   );
 
-  if (diseases.length === 0 && pests.length === 0) {
+  if (diseaseList == null && pestList == null) {
+    return (
+      <Card className="border-muted bg-muted/30">
+        <CardContent className="p-6 text-center">
+          <p className="text-muted-foreground">
+            Disease/pest findings were not recorded for this assessment
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if ((diseaseList?.length ?? 0) === 0 && (pestList?.length ?? 0) === 0) {
     return (
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="p-6 text-center">
           <p className="text-muted-foreground">
-            ✓ No significant diseases or pests detected
+            This analysis reported no significant diseases or pests
           </p>
         </CardContent>
       </Card>
@@ -78,31 +97,31 @@ export function DiseasePestDetection({ diseases = [], pests = [] }: DiseasePestD
   return (
     <div className="grid md:grid-cols-2 gap-4">
       {/* Disease Detection */}
-      {diseases.length > 0 && (
+      {(diseaseList?.length ?? 0) > 0 && (
         <Card className="border-destructive/30 bg-destructive/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
-              Diseases Detected ({diseases.length})
+              Diseases Detected ({diseaseList!.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {diseases.map((disease, index) => renderIssueCard(disease, index))}
+            {diseaseList!.map((disease, index) => renderIssueCard(disease, index))}
           </CardContent>
         </Card>
       )}
       
       {/* Pest Detection */}
-      {pests.length > 0 && (
+      {(pestList?.length ?? 0) > 0 && (
         <Card className="border-warning/30 bg-warning/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bug className="h-5 w-5 text-warning" />
-              Pests Detected ({pests.length})
+              Pests Detected ({pestList!.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {pests.map((pest, index) => renderIssueCard(pest, index))}
+            {pestList!.map((pest, index) => renderIssueCard(pest, index))}
           </CardContent>
         </Card>
       )}

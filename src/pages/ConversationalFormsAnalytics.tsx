@@ -53,7 +53,7 @@ export default function ConversationalFormsAnalytics() {
           <div>
             <h1 className="text-3xl font-bold mb-2">Conversational Forms Analytics</h1>
             <p className="text-muted-foreground">
-              Track performance, adoption, and farmer feedback for Delta Intelligence conversational forms
+              Your conversational form activity (session-scoped — not platform-wide cohort metrics)
             </p>
           </div>
           <div className="flex gap-2">
@@ -112,7 +112,7 @@ export default function ConversationalFormsAnalytics() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-yellow-500">
-                {feedbackMetrics ? feedbackMetrics.avg_rating.toFixed(1) : 0} ⭐
+                {feedbackMetrics && Number.isFinite(Number(feedbackMetrics.avg_rating)) ? Number(feedbackMetrics.avg_rating).toFixed(1) : 'n/a'} ⭐
               </div>
               <p className="text-xs text-muted-foreground">
                 From {feedbackMetrics?.feedback_count || 0} responses
@@ -132,7 +132,7 @@ export default function ConversationalFormsAnalytics() {
                   Object.keys(sessionStats).length
                 ) : 0}s
               </div>
-              <p className="text-xs text-muted-foreground">80% faster than traditional</p>
+              <p className="text-xs text-muted-foreground">Average time across tracked sessions</p>
             </CardContent>
           </Card>
         </div>
@@ -211,8 +211,10 @@ export default function ConversationalFormsAnalytics() {
                         labelLine={false}
                         label={(props: any) => {
                           const { name, value, percent } = props;
-                          const pct = typeof percent === 'number' ? (percent * 100).toFixed(0) : '0';
-                          return `${name}: ${value} (${pct}%)`;
+                          if (typeof percent !== 'number' || !Number.isFinite(percent)) {
+                            return `${name}: ${value ?? '—'}`;
+                          }
+                          return `${name}: ${value} (${(percent * 100).toFixed(0)}%)`;
                         }}
                         outerRadius={120}
                         fill="#8884d8"
@@ -228,7 +230,7 @@ export default function ConversationalFormsAnalytics() {
                 </div>
                 <div className="mt-4 text-center">
                   <p className="text-sm text-muted-foreground">
-                    Total responses: {feedbackMetrics?.feedback_count || 0}
+                    Total responses: {feedbackMetrics?.feedback_count != null ? feedbackMetrics.feedback_count : '—'}
                   </p>
                 </div>
               </CardContent>
@@ -320,7 +322,7 @@ export default function ConversationalFormsAnalytics() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">Average Rating (Target: 4.5+ stars)</span>
                 <Badge variant={feedbackMetrics && feedbackMetrics.avg_rating >= 4.5 ? 'default' : 'secondary'}>
-                  {feedbackMetrics?.avg_rating.toFixed(1) || 0} ⭐
+                  {feedbackMetrics && Number.isFinite(Number(feedbackMetrics.avg_rating)) ? Number(feedbackMetrics.avg_rating).toFixed(1) : 'n/a'} ⭐
                 </Badge>
               </div>
               <Progress 

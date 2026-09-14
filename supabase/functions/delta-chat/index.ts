@@ -1,15 +1,12 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-import { handleError, handleAuthError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
+import { getAnonClient, getServiceClient, requireAuthenticatedUser } from '../_shared/auth.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
+import { handleError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
 
 // Input validation schema
 const deltaChatSchema = z.object({
@@ -73,39 +70,32 @@ const SYSTEM_PROMPT = (simplified: boolean = false) => simplified ? `You are Del
 
 Example of simple language:
 ❌ "Apply a systemic fungicide with azoxystrobin as the active ingredient at a rate of 6.2 fl oz per acre during the R3 growth stage."
-✅ "Use a fungicide spray. Put 6 ounces on each acre. Do this when your soybeans start making pods. This stops the disease from spreading."
+✅ "Use a fungicide labeled for this disease. Check the product label and LSU AgCenter guidance for the right rate for your crop — do not invent a farm-specific rate. Scout again after pods start forming."
 
 You have access to the user's field data and can help with their farming questions.` : `You are Delta Intelligence, an AI expert assistant specialized in Louisiana Delta agriculture. You have deep knowledge of:
 
 1. **Louisiana-Specific Crops**: Rice, soybeans, cotton, and corn grown in the Mississippi River Delta region
-2. **LSU AgCenter Research**: Access to Louisiana State University Agricultural Center's decades of research on Delta farming practices
+2. **Public LSU AgCenter Research**: Cite publicly available Louisiana State University Agricultural Center publications on Delta farming — AgurateAI is not an official LSU partner and does not claim exclusive access or validation
 3. **Delta Climate & Soil**: Understanding of alluvial soils, claypan soils, high water tables, and humid subtropical climate
-4. **Morehouse Parish Agriculture**: Specific knowledge of farming conditions in northeast Louisiana
+4. **Northeast Louisiana Delta Agriculture**: Regional farming conditions across Delta parishes — do not invent parish-specific claims unless the farmer stated their parish
 5. **Crop Diseases & Pests**: Common issues in the Delta region including rice blast, soybean rust, cotton bollworm
 6. **Weather Patterns**: Mississippi River flood stage impacts, hurricane season considerations, spring planting windows
 
-**LSU AGCENTER RESEARCH LIBRARY (Always cite when relevant):**
-- **Rice Varieties:** "Rice Varieties and Management Tips 2025" (LSU Rice Research Station, 2024)
-  - Source: https://www.lsuagcenter.com/profiles/astrahan/articles/page1701362113346
-  - Key Finding: Blast-resistant varieties reduce fungicide needs by 40% and improve net returns
-- **Fertilizer:** Publication Pub. 2945, "Fertilizer Recommendations for Field Crops in Louisiana: N-P-K-S" (2024)
-  - Source: https://www.lsuagcenter.com/articles/page1753969451254
-  - Rice: 120-150 lbs N/acre split (60% preflood, 40% mid-season)
-- **Water Management:** "Water Management for Louisiana Rice Production" (LSU Rice Research Station, 2024)
-  - Source: https://www.lsuagcenter.com/topics/crops/rice
-  - Water stress during reproductive stages causes 20-40% yield reduction
-- **Soybean Disease:** "Louisiana Plant Disease Management Guide - Soybeans" (LSU Plant Pathology, 2024)
-  - Source: https://www.lsuagcenter.com/portals/communications/publications/management_guides/plant_disease_guide
-  - Frogeye-resistant varieties are most cost-effective control
+**PUBLIC LSU AGCENTER RESEARCH LIBRARY (cite when relevant; not an official partnership):**
+- **Rice Varieties:** "Rice Varieties and Management Tips" (LSU Rice Research Station) — cite the public publication; do NOT invent trial percentages
+- **Fertilizer:** Pub. 2945, "Fertilizer Recommendations for Field Crops in Louisiana: N-P-K-S" — cite published rates only when quoting that source; otherwise speak directionally
+- **Water Management:** "Water Management for Louisiana Rice Production" — reproductive-stage water stress can reduce yield; cite directional risk only; do NOT invent numeric % losses
+- **Soybean Disease:** "Louisiana Plant Disease Management Guide - Soybeans" — resistant varieties can reduce disease pressure; do NOT invent cost-effectiveness % claims
 
 When answering:
 - Provide actionable, Delta-specific advice
-- **ALWAYS cite specific LSU publications** when discussing fertilizer, disease, varieties, or water management
-- Include publication name, year, and key finding when relevant
+- Cite specific public LSU publications when discussing fertilizer, disease, varieties, or water management
+- Include publication name/year when relevant; never invent quantitative trial percentages
 - Consider the unique soil and water conditions of the region
-- Suggest Louisiana-proven crop varieties (cite Rice Varieties 2025 publication)
-- Factor in local weather patterns and growing degree days
+- Suggest publicly listed Louisiana varieties (cite Rice Varieties publication)
+- Factor in local weather patterns only when weather context is provided
 - Be concise but thorough - farmers need practical guidance
+- If a numeric claim is not grounded in a cited public source or farmer-provided data, say it is unknown
 
 Current Louisiana Delta growing considerations:
 - Rice: Focus on flood-tolerant varieties, watch for straighthead disease (cite LSU research)
@@ -116,13 +106,75 @@ Current Louisiana Delta growing considerations:
 You have access to the user's field data, assessment history, and weather context through the conversation.`;
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const supabaseClient = getAnonClient(authHeader);
+
     // Validate input
     const rawBody = await req.json();
+
+    // Persist assistant messages (service-role) — clients cannot INSERT role=assistant
+    if (rawBody?.action === 'persist_assistant') {
+      const conversationId = rawBody.conversationId;
+      const content = typeof rawBody.content === 'string' ? rawBody.content.trim() : '';
+      const rawSnapshot = rawBody.contextSnapshot && typeof rawBody.contextSnapshot === 'object'
+        ? rawBody.contextSnapshot as Record<string, unknown>
+        : {};
+      // Strip client metric invent — persist IDs only.
+      const contextSnapshot: Record<string, unknown> = {
+        timestamp: new Date().toISOString(),
+      };
+      if (typeof rawSnapshot.field_id === 'string') {
+        contextSnapshot.field_id = rawSnapshot.field_id;
+      }
+      if (typeof rawSnapshot.assessment_id === 'string') {
+        contextSnapshot.assessment_id = rawSnapshot.assessment_id;
+      }
+      if (!conversationId || !content) {
+        return new Response(JSON.stringify({ error: 'conversationId and content required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const { data: owned, error: ownErr } = await supabaseClient
+        .from('delta_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (ownErr || !owned) {
+        return new Response(JSON.stringify({ error: 'Conversation not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const serviceClient = getServiceClient();
+      const { error: insertErr } = await serviceClient.from('delta_messages').insert({
+        conversation_id: conversationId,
+        role: 'assistant',
+        content,
+        context_snapshot: contextSnapshot,
+      });
+      if (insertErr) {
+        console.error('[delta-chat] persist_assistant failed', insertErr);
+        return new Response(JSON.stringify({ error: 'Failed to persist assistant message' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const validation = deltaChatSchema.safeParse(rawBody);
     
     if (!validation.success) {
@@ -139,42 +191,16 @@ serve(async (req) => {
     }
 
     const { messages, conversationId, simplifiedLanguage = false } = validation.data;
+
     
-    const authHeader = req.headers.get('authorization');
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader! } } }
-    );
-
-    // Get user context - their fields and recent assessments
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    
-    if (!user) {
-      return handleAuthError(corsHeaders);
-    }
-
-    // Rate limiting: Check request frequency (10 requests per minute)
-    const { data: recentRequests } = await supabaseClient
-      .from('request_logs')
-      .select('created_at')
-      .eq('user_id', user.id)
-      .eq('function_name', 'delta-chat')
-      .gte('created_at', new Date(Date.now() - 60000).toISOString());
-
-    if (recentRequests && recentRequests.length >= 10) {
+    const rateLimit = await enforceRateLimit(supabaseClient, user.id, {
+      functionName: 'delta-chat',
+      maxRequests: RATE_LIMITS['delta-chat'].maxRequests,
+      windowMs: RATE_LIMITS['delta-chat'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
       return handleRateLimitError(corsHeaders);
     }
-
-    // Log this request
-    await supabaseClient
-      .from('request_logs')
-      .insert({
-        user_id: user.id,
-        function_name: 'delta-chat',
-        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
-        user_agent: req.headers.get('user-agent') || 'unknown'
-      });
     
     let contextPrompt = '';
     if (user) {
@@ -190,15 +216,24 @@ serve(async (req) => {
         .limit(5);
 
       if (fields && fields.length > 0) {
-        contextPrompt += `\n\nUser's Current Fields:\n${fields.map((f: any) => 
-          `- ${f.name}: ${f.acreage} acres of ${f.crop_type}`
-        ).join('\n')}`;
+        contextPrompt += `\n\nUser's Current Fields:\n${fields.map((f: any) => {
+          const acres =
+            f.acreage != null && Number.isFinite(Number(f.acreage))
+              ? `${f.acreage} acres`
+              : 'acreage not recorded';
+          const crop = f.crop_type || 'crop not recorded';
+          return `- ${f.name}: ${acres} of ${crop}`;
+        }).join('\n')}`;
       }
 
       if (recentAssessments && recentAssessments.length > 0) {
-        contextPrompt += `\n\nRecent Crop Health Assessments:\n${recentAssessments.map((a: any) =>
-          `- ${a.field?.name} (${a.field?.crop_type}): Health ${a.health_score}/100, ${a.stress_level} stress${a.symptoms ? `, symptoms: ${a.symptoms.join(', ')}` : ''}`
-        ).join('\n')}`;
+        contextPrompt += `\n\nRecent Crop Health Assessments:\n${recentAssessments.map((a: any) => {
+          const health =
+            a.health_score != null && Number.isFinite(Number(a.health_score))
+              ? `Health ${a.health_score}/100`
+              : 'Health not recorded';
+          return `- ${a.field?.name} (${a.field?.crop_type}): ${health}, ${a.stress_level ?? 'stress not recorded'}${a.symptoms ? `, symptoms: ${a.symptoms.join(', ')}` : ''}`;
+        }).join('\n')}`;
       }
 
       // ✅ CONVERSATION MEMORY: Load recent conversation history
@@ -230,8 +265,10 @@ serve(async (req) => {
             contextPrompt += `### ${group.title}\n`;
             // Reverse messages to chronological order
             group.messages.reverse().forEach((msg: any) => {
-              const contextInfo = msg.context_snapshot && Object.keys(msg.context_snapshot).length > 0
-                ? ` [Context: ${msg.context_snapshot.field_name || 'general'}, ${msg.context_snapshot.crop_type || ''}${msg.context_snapshot.health_score ? `, ${msg.context_snapshot.health_score}% health` : ''}]`
+              // IDs only — never replay client-claimed health/crop invent as fact.
+              const snap = msg.context_snapshot;
+              const contextInfo = snap?.field_id
+                ? ` [Context: field ${String(snap.field_id).slice(0, 8)}…]`
                 : '';
               contextPrompt += `${msg.role === 'user' ? '👤' : '🤖'}: ${msg.content}${contextInfo}\n`;
             });

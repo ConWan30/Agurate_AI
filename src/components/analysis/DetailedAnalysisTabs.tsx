@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Heart, Bug, Sprout, Leaf, Cloud } from "lucide-react";
+import { formatHealthPercent, hasHealthScore, toHealthPercent } from "@/lib/health-score";
+import { formatStressLabel, normalizeStressLevel } from "@/lib/stress-level";
 
 interface NutrientDeficiency {
   detected: boolean;
@@ -11,15 +13,15 @@ interface NutrientDeficiency {
 }
 
 interface DetailedAnalysisTabsProps {
-  healthScore: number;
+  healthScore: number | null;
   stressLevel: string;
   visualCues?: string;
   growthStage?: string;
   canopyCoverage?: number;
   plantDensity?: string;
   fieldUniformity?: number;
-  diseases?: any[];
-  pests?: any[];
+  diseases?: any[] | null;
+  pests?: any[] | null;
   nutrientDeficiencies?: {
     nitrogen?: NutrientDeficiency;
     phosphorus?: NutrientDeficiency;
@@ -39,8 +41,8 @@ export function DetailedAnalysisTabs({
   canopyCoverage,
   plantDensity,
   fieldUniformity,
-  diseases = [],
-  pests = [],
+  diseases,
+  pests,
   nutrientDeficiencies,
   environmentalStress,
   rootHealthIndicators,
@@ -80,14 +82,24 @@ export function DetailedAnalysisTabs({
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium">Overall Health Score</span>
-                <span className="text-sm font-bold">{Math.round(healthScore)}%</span>
+                <span className="text-sm font-bold">
+                  {formatHealthPercent(healthScore)}
+                </span>
               </div>
-              <Progress value={healthScore} className="h-3" />
+              {hasHealthScore(healthScore) ? (
+                <Progress value={toHealthPercent(healthScore)} className="h-3" />
+              ) : (
+                <p className="text-sm text-muted-foreground">Health score not recorded for this assessment.</p>
+              )}
             </div>
             
             <div className="p-4 bg-muted rounded-lg">
               <p className="text-sm font-medium mb-1">Status:</p>
-              <Badge className="text-base">{stressLevel}</Badge>
+              {normalizeStressLevel(stressLevel) ? (
+                <Badge className="text-base">{formatStressLabel(stressLevel)}</Badge>
+              ) : (
+                <Badge variant="outline" className="text-base">Stress not recorded</Badge>
+              )}
             </div>
 
             {visualCues && (
@@ -113,14 +125,18 @@ export function DetailedAnalysisTabs({
             <CardTitle>Diseases & Pests</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {diseases.length > 0 ? (
+            {diseases == null ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Disease findings were not recorded for this assessment
+              </p>
+            ) : diseases.length > 0 ? (
               <div>
                 <p className="text-sm font-semibold mb-3">Diseases Detected:</p>
                 <div className="space-y-2">
                   {diseases.map((disease, idx) => (
                     <div key={idx} className="p-3 border rounded-lg">
                       <div className="flex justify-between items-start">
-                        <p className="font-medium">{disease}</p>
+                        <p className="font-medium">{typeof disease === 'string' ? disease : disease?.name ?? 'Unknown'}</p>
                         <Badge variant="destructive">Active</Badge>
                       </div>
                     </div>
@@ -129,24 +145,28 @@ export function DetailedAnalysisTabs({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">
-                ✓ No diseases detected
+                This analysis reported no diseases
               </p>
             )}
 
-            {pests.length > 0 && (
+            {pests == null ? null : pests.length > 0 ? (
               <div className="pt-4 border-t">
                 <p className="text-sm font-semibold mb-3">Pests Detected:</p>
                 <div className="space-y-2">
                   {pests.map((pest, idx) => (
                     <div key={idx} className="p-3 border rounded-lg">
                       <div className="flex justify-between items-start">
-                        <p className="font-medium">{pest}</p>
+                        <p className="font-medium">{typeof pest === 'string' ? pest : pest?.name ?? 'Unknown'}</p>
                         <Badge variant="destructive">Active</Badge>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4 border-t pt-4">
+                This analysis reported no pests
+              </p>
             )}
           </CardContent>
         </Card>
@@ -170,9 +190,14 @@ export function DetailedAnalysisTabs({
                         <p className="font-semibold capitalize">{nutrient} Deficiency</p>
                         <Badge variant={
                           deficiency.severity === "severe" ? "destructive" :
-                          deficiency.severity === "moderate" ? "outline" : "secondary"
+                          deficiency.severity === "moderate" ? "outline" :
+                          deficiency.severity === "mild" ? "secondary" : "outline"
                         }>
-                          {deficiency.severity}
+                          {deficiency.severity === "severe" ||
+                          deficiency.severity === "moderate" ||
+                          deficiency.severity === "mild"
+                            ? deficiency.severity
+                            : "severity unknown"}
                         </Badge>
                       </div>
                       {deficiency.description && (
@@ -221,17 +246,19 @@ export function DetailedAnalysisTabs({
             )}
 
             <div className="grid grid-cols-2 gap-4">
-              {canopyCoverage !== undefined && (
+              {canopyCoverage != null && Number.isFinite(Number(canopyCoverage)) && (
                 <div className="p-4 border rounded-lg">
                   <p className="text-sm text-muted-foreground mb-2">Canopy Coverage</p>
-                  <p className="text-3xl font-bold">{Math.round(canopyCoverage)}%</p>
+                  <p className="text-3xl font-bold">{Math.round(Number(canopyCoverage))}%</p>
                 </div>
               )}
               
-              {fieldUniformity !== undefined && (
+              {fieldUniformity != null && hasHealthScore(fieldUniformity) && (
                 <div className="p-4 border rounded-lg">
                   <p className="text-sm text-muted-foreground mb-2">Field Uniformity</p>
-                  <p className="text-3xl font-bold">{Math.round(fieldUniformity * 100)}%</p>
+                  <p className="text-3xl font-bold">
+                    {formatHealthPercent(fieldUniformity)}
+                  </p>
                 </div>
               )}
             </div>

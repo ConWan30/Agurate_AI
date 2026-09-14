@@ -53,11 +53,10 @@ export function BetaConversionBanner() {
   };
 
   const handleClaimDiscount = () => {
-    toast.success("Redirecting to checkout...");
-    // Navigate to profile/subscription page
-    setTimeout(() => {
-      navigate('/profile?action=subscribe');
-    }, 500);
+    toast.message("Billing checkout is not open yet", {
+      description: "Email support@agurateai.com to join the paid-plan waitlist.",
+    });
+    window.location.href = "mailto:support@agurateai.com?subject=Beta%20Pricing%20Waitlist";
   };
 
   const handleLearnMore = () => {
@@ -100,7 +99,7 @@ export function BetaConversionBanner() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                Lock in your lifetime 50% discount before beta ends on{' '}
+                Possible 50% off the published plan rate before beta ends on{' '}
                 <span className="font-semibold text-foreground">
                   {betaEndDate?.toLocaleDateString('en-US', { 
                     month: 'long', 
@@ -108,6 +107,7 @@ export function BetaConversionBanner() {
                     year: 'numeric' 
                   })}
                 </span>
+                {' '}— not guaranteed; confirm in-app.
               </p>
             </div>
 
@@ -115,8 +115,8 @@ export function BetaConversionBanner() {
               <div className="flex items-start gap-2 text-sm">
                 <DollarSign className="h-4 w-4 text-primary mt-0.5" />
                 <div>
-                  <p className="font-medium">Lifetime 50% Discount</p>
-                  <p className="text-xs text-muted-foreground">$49/mo instead of $99/mo forever</p>
+                  <p className="font-medium">Possible discount off published rate</p>
+                  <p className="text-xs text-muted-foreground">Possible 50% off the published plan rate after paid plans launch — not guaranteed; confirm in-app</p>
                 </div>
               </div>
 
@@ -135,7 +135,7 @@ export function BetaConversionBanner() {
                 className={`gap-2 ${isUrgent ? 'bg-destructive hover:bg-destructive/90' : ''}`}
               >
                 <Sparkles className="h-4 w-4" />
-                Claim Lifetime Discount
+                Join pricing waitlist
               </Button>
               <Button variant="outline" onClick={handleLearnMore}>
                 Learn More

@@ -4,7 +4,7 @@ import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 import { useNavigate, Link } from 'react-router-dom';
-import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { PipelineStepCard, FeatureRevealCard, UseCaseRevealCard } from '@/components/HowItWorksRevealCards';
 import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
 
 export default function HowItWorks() {
@@ -27,30 +27,30 @@ export default function HowItWorks() {
     },
     {
       icon: GitBranch,
-      title: 'Parallel AI Enrichment',
-      description: 'Simultaneously runs water stress prediction, conservation impact assessment, variety recommendations, community pattern matching, and predictive analytics—all informed by vision results',
-      tech: 'Multi-Model Parallel Processing',
+      title: 'Contextual Enrichment',
+      description: 'Follow-on helpers can add water-stress context, conservation notes, variety cues, and community patterns when those features are available for your field',
+      tech: 'Contextual enrichment helpers',
       color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20'
     },
     {
       icon: Network,
       title: 'Intelligence Pool Update',
-      description: 'New insights are fed back into the central pool, creating patterns that enhance all future analyses for your field and similar farms',
-      tech: 'Circular Data Enrichment',
+      description: 'New observations can be stored with your field history so later reviews have more local context (not a guarantee of better accuracy for other farms)',
+      tech: 'Field history context',
       color: 'bg-green-500/10 text-green-700 border-green-500/20'
     },
     {
       icon: TrendingUp,
       title: 'Unified Recommendations',
-      description: 'AI synthesizes all parallel analyses into prioritized actions, matching you with LSU researchers if needed, and updating predictive forecasts',
-      tech: 'Multi-Source Recommendation Engine',
+      description: 'Results are summarized into suggested next steps and can surface the public LSU researcher directory when relevant — framed as decision support, not a validated diagnosis',
+      tech: 'Decision-aid summary',
       color: 'bg-orange-500/10 text-orange-700 border-orange-500/20'
     },
     {
       icon: Layers,
-      title: 'Continuous Learning',
-      description: 'Every analysis makes the system smarter—building variety-specific disease libraries, weather correlation patterns, and conservation effectiveness data',
-      tech: 'Self-Improving Intelligence',
+      title: 'Field History Retention',
+      description: 'Analyses are stored for your fields so later reviews can reference variety notes, weather context, and conservation observations over time',
+      tech: 'Per-field history',
       color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
     }
   ];
@@ -59,7 +59,7 @@ export default function HowItWorks() {
     { from: 'Field Photo/Video', to: 'Secure Cloud Storage', detail: 'Supabase Storage (encrypted)' },
     { from: 'Media URL', to: 'AI Analysis', detail: 'Lovable AI Gateway (Video/Image)' },
     { from: 'Visual Symptoms', to: 'Database', detail: 'PostgreSQL with RLS' },
-    { from: 'Weather API', to: 'Correlation Engine', detail: 'Real-time enrichment' },
+    { from: 'Weather API', to: 'Correlation Engine', detail: 'Weather context enrichment' },
     { from: 'Historical Data', to: 'Predictions', detail: 'Pattern recognition' },
   ];
 
@@ -67,30 +67,30 @@ export default function HowItWorks() {
     {
       icon: Zap,
       title: 'Early Disease Detection',
-      scenario: 'Detect cotton blight 10+ days before visible to naked eye',
-      impact: 'Save entire crop by treating early',
-      savings: '$500-2000/acre'
+      scenario: 'Flag cotton blight risk earlier than visual scouting alone',
+      impact: 'Act sooner with a research-framed treatment plan',
+      savings: 'Earlier intervention window'
     },
     {
       icon: Cloud,
       title: 'Weather Stress Prevention',
-      scenario: 'Predict heat stress 5-7 days ahead during Louisiana summers',
+      scenario: 'Explore multi-day heat-stress outlooks during Louisiana summers (illustrative decision aid)',
       impact: 'Adjust irrigation before damage occurs',
-      savings: '15-30% yield protection'
+      savings: 'Proactive irrigation cues'
     },
     {
       icon: MapPin,
-      title: 'Drone-Powered Field Mapping',
-      scenario: 'Upload drone video to identify stressed zones across entire 50-acre field in one analysis',
-      impact: 'Comprehensive aerial view shows patterns invisible from ground level',
-      savings: '60% faster field assessment'
+      title: 'Aerial / Field Video Mapping',
+      scenario: 'Upload field or aerial video to review stressed zones across a larger area in one pass',
+      impact: 'Broader coverage can highlight patterns that are harder to see from ground level',
+      savings: 'Broader field coverage'
     },
     {
       icon: TrendingUp,
       title: 'Seasonal Planning',
-      scenario: 'Historical analysis shows optimal planting window for your specific field',
-      impact: 'Plant at peak time for soil/weather conditions',
-      savings: '10-20% yield increase'
+      scenario: 'Historical notes can inform planting-window discussion for your field (illustrative planning aid)',
+      impact: 'Use past season context when choosing planting timing',
+      savings: 'Better-informed timing discussions'
     }
   ];
 
@@ -98,57 +98,57 @@ export default function HowItWorks() {
     {
       icon: DollarSign,
       title: 'Automated ROI Calculator',
-      description: 'AI calculates real-time return on investment for every recommendation, factoring in treatment costs, yield protection, and market prices',
-      benefit: '$8K-20K annual savings documented',
+      description: 'Optional planning calculator estimates treatment costs vs. illustrative yield protection using placeholder or last-known market figures—not live brokerage quotes',
+      benefit: 'Planning estimates',
       color: 'bg-health-good/10 text-health-good border-health-good/20'
     },
     {
       icon: Brain,
       title: 'Daily AI Briefing',
-      description: 'Wake up to personalized field intelligence: overnight weather impacts, urgent actions needed, and 7-day stress forecasts delivered to your dashboard',
-      benefit: '10 minutes saved daily',
+      description: 'Optional daily briefing summarizes overnight weather context, suggested actions, and multi-day stress outlooks on your dashboard',
+      benefit: 'Daily action focus',
       color: 'bg-secondary/10 text-secondary border-secondary/20'
     },
     {
       icon: FileText,
       title: 'Conversational Forms',
-      description: 'Just talk to your phone—AI extracts field data, planting dates, and crop varieties from natural conversation. Voice-to-data in seconds',
-      benefit: '80% faster data entry',
+      description: 'Just talk to your phone—AI extracts field data, planting dates, and crop varieties from natural conversation. Voice-to-data as a decision aid',
+      benefit: 'Faster form completion',
       color: 'bg-purple-500/10 text-purple-700 border-purple-500/20'
     },
     {
       icon: Cloud,
       title: 'Water Stress Intelligence',
-      description: 'Predictive irrigation alerts using soil moisture patterns, weather forecasts, and crop-specific water needs. Prevent stress before it starts',
-      benefit: '25% water savings',
+      description: 'Irrigation decision-aid alerts using soil moisture patterns, weather forecasts, and crop-specific water needs when those data sources are available',
+      benefit: 'Stress prevention focus',
       color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20'
     },
     {
       icon: TrendingUp,
       title: 'Variety Performance Tracking',
-      description: 'Compare rice, soybean, cotton, and corn varieties against LSU recommendations. AI matches your soil type and climate to top-performing cultivars',
-      benefit: '12-18% yield increase',
+      description: 'Compare rice, soybean, cotton, and corn varieties against published LSU guidance. Match soil type and climate to researched cultivars',
+      benefit: 'Research-informed picks',
       color: 'bg-orange-500/10 text-orange-700 border-orange-500/20'
     },
     {
       icon: Network,
       title: 'Community Intelligence',
-      description: 'Anonymous farmer network shares disease outbreaks, treatment successes, and yield trends. Early warnings when pests hit neighboring farms',
-      benefit: '3-7 day early alerts',
+      description: 'Optional anonymous farmer network for sharing disease notes, treatment outcomes, and yield trends when enough peers participate',
+      benefit: 'Neighbor early warnings',
       color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
     },
     {
       icon: Layers,
       title: 'Conservation Practice ROI',
-      description: 'Track cover crops, no-till, and precision fertilization impact on soil health, input costs, and yield. AI predicts long-term financial benefits',
-      benefit: '$40-120/acre savings',
+      description: 'Track cover crops, no-till, and precision fertilization notes on soil health, input costs, and yield. Financial figures are planning estimates, not guaranteed forecasts',
+      benefit: 'Practice cost tracking',
       color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'
     },
     {
       icon: MapPin,
-      title: 'LSU Researcher Access',
-      description: 'AI matches your crop issue to the right LSU AgCenter specialist. Direct contact info for pathologists, soil scientists, and extension agents',
-      benefit: 'Expert help in <24hrs',
+      title: 'LSU Researcher Directory',
+      description: 'Browse a public directory of LSU AgCenter specialists. Contact pathologists, soil scientists, and extension agents through official LSU channels',
+      benefit: 'Public specialist links',
       color: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20'
     }
   ];
@@ -188,7 +188,7 @@ export default function HowItWorks() {
             How AgurateAI Works
           </h1>
           <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto leading-relaxed">
-            A unified AI intelligence system where every analysis enriches every other—creating exponentially smarter insights for Louisiana Delta farmers
+            A unified analysis workflow where each scan can inform the next—helping Louisiana Delta growers review field context as a decision aid
           </p>
         </div>
       </div>
@@ -202,9 +202,9 @@ export default function HowItWorks() {
               <Network className="h-3 w-3 mr-1" />
               Unified AI Intelligence
             </Badge>
-            <h2 className="text-4xl font-heading font-bold">Synergistic Data Flow</h2>
+            <h2 className="text-4xl font-heading font-bold">Connected Field Context</h2>
             <p className="text-lg text-muted-foreground">
-              Unlike traditional AI that analyzes each photo in isolation, AgurateAI creates a <strong>circular intelligence network</strong> where every data point enhances every other analysis
+              Unlike tools that treat each photo in isolation, AgurateAI can carry prior field context forward so later reviews have more history to work with
             </p>
           </div>
 
@@ -215,9 +215,9 @@ export default function HowItWorks() {
                 <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary/20 mb-4">
                   <Database className="h-10 w-10 text-primary" aria-hidden="true" />
                 </div>
-                <h3 className="text-2xl font-heading font-bold mb-2">Central AI Intelligence Pool</h3>
+                <h3 className="text-2xl font-heading font-bold mb-2">Shared Field Context</h3>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Every analysis feeds insights into a unified context that makes all future analyses exponentially smarter
+                  Prior analyses can contribute notes into a shared field context that later reviews may reference
                 </p>
               </div>
 
@@ -227,8 +227,8 @@ export default function HowItWorks() {
                   { icon: TrendingUp, label: 'Variety-Specific Signatures', desc: 'Disease resistance & stress traits' },
                   { icon: Cloud, label: 'Weather Correlation Patterns', desc: 'Symptom triggers from climate data' },
                   { icon: Layers, label: 'Conservation Practice Impact', desc: 'Soil health improvement tracking' },
-                  { icon: Network, label: 'Community Success Patterns', desc: 'Proven interventions from peers' },
-                  { icon: Brain, label: 'Predictive Analytics Feed', desc: 'Yield trajectories & risk forecasts' }
+                  { icon: Network, label: 'Community Success Patterns', desc: 'Peer-shared treatment notes when available' },
+                  { icon: Brain, label: 'Predictive Analytics Feed', desc: 'Planning outlooks when enough history exists' }
                 ].map((item, idx) => (
                   <div key={idx} className="text-center p-4 bg-background/50 rounded-lg border">
                     <item.icon className="h-8 w-8 mx-auto mb-3 text-primary" aria-hidden="true" />
@@ -250,63 +250,21 @@ export default function HowItWorks() {
             </Badge>
             <h2 className="text-4xl font-heading font-bold">Enhanced Gemini Vision</h2>
             <p className="text-lg text-muted-foreground">
-              Every crop photo analysis is enriched with comprehensive field intelligence
+              Crop photo analysis can include available field context when that data exists
             </p>
           </div>
 
           {/* Clean Pipeline Flow */}
           <div className="relative max-w-4xl mx-auto">
             <div className="space-y-4">
-              {aiPipeline.map((step, idx) => {
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
-                const isLast = idx === aiPipeline.length - 1;
-                
-                return (
-                  <div 
-                    key={idx} 
-                    ref={ref}
-                    className={`${hasIntersected ? 'animate-fade-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
-                  >
-                    <div className="relative">
-                      <Card className="field-card hover-lift border-2 transition-all group">
-                        <CardContent className="p-6">
-                          <div className="flex items-start gap-6">
-                            {/* Step Number & Icon */}
-                            <div className="flex-shrink-0">
-                              <div className="relative">
-                                <div className={`h-16 w-16 rounded-2xl ${step.color} flex flex-col items-center justify-center shadow-field group-hover:scale-110 transition-transform`}>
-                                  <step.icon className="h-7 w-7 mb-1" aria-hidden="true" />
-                                  <span className="text-xs font-bold">{idx + 1}</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-xl font-heading font-bold mb-2">{step.title}</h3>
-                              <p className="text-muted-foreground leading-relaxed mb-3">
-                                {step.description}
-                              </p>
-                              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg border text-xs font-mono">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
-                                {step.tech}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Connecting Arrow */}
-                      {!isLast && (
-                        <div className="flex justify-center py-2">
-                          <ArrowRight className="h-6 w-6 text-primary/40 rotate-90" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              {aiPipeline.map((step, idx) => (
+              <PipelineStepCard
+                key={idx}
+                step={step}
+                index={idx}
+                isLast={idx === aiPipeline.length - 1}
+              />
+            ))}
             </div>
           </div>
         </section>
@@ -349,7 +307,7 @@ export default function HowItWorks() {
         <section className="space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-display font-bold">AI Model Details</h2>
-            <p className="text-muted-foreground">Built on cutting-edge AI technology</p>
+            <p className="text-muted-foreground">Built with modern AI models as a research-framed decision aid</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -368,8 +326,8 @@ export default function HowItWorks() {
                   <span className="font-semibold">Image + Video</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Avg Confidence:</span>
-                  <span className="font-semibold">85-95%</span>
+                  <span className="text-muted-foreground">Output style:</span>
+                  <span className="font-semibold">Confidence-aware</span>
                 </div>
               </CardContent>
             </Card>
@@ -389,8 +347,8 @@ export default function HowItWorks() {
                   <span className="font-semibold">Field + Weather</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Accuracy:</span>
-                  <span className="font-semibold">80-90%</span>
+                  <span className="text-muted-foreground">Status:</span>
+                  <span className="font-semibold">Closed beta</span>
                 </div>
               </CardContent>
             </Card>
@@ -398,16 +356,16 @@ export default function HowItWorks() {
             <Card className="field-card border-primary/20">
               <CardHeader>
                 <CardTitle>AR Analysis</CardTitle>
-                <CardDescription>Real-time Processing</CardDescription>
+                <CardDescription>Fast Field Processing</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Response Time:</span>
-                  <span className="font-semibold">&lt;2 seconds</span>
+                  <span className="font-semibold">Typically a few seconds</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Overlay Type:</span>
-                  <span className="font-semibold">Live Vision</span>
+                  <span className="font-semibold">On-device overlay</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Edge Processing:</span>
@@ -432,35 +390,9 @@ export default function HowItWorks() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {enhancedFeatures.map((feature, idx) => {
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
-              
-              return (
-                <Card 
-                  key={idx} 
-                  ref={ref}
-                  className={`field-card hover-lift border-2 ${hasIntersected ? 'animate-fade-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
-                >
-                  <CardHeader>
-                    <div className={`inline-flex h-12 w-12 rounded-xl ${feature.color} items-center justify-center mb-3`}>
-                      <feature.icon className="h-6 w-6" />
-                    </div>
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {feature.description}
-                    </p>
-                    <div className="pt-2 border-t">
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
-                        ✨ {feature.benefit}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {enhancedFeatures.map((feature, idx) => (
+              <FeatureRevealCard key={idx} feature={feature} index={idx} />
+            ))}
           </div>
         </section>
 
@@ -472,39 +404,9 @@ export default function HowItWorks() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {useCases.map((useCase, idx) => {
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
-              return (
-                <div 
-                  key={idx}
-                  ref={ref}
-                  className={`${hasIntersected ? 'animate-scale-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
-                >
-                  <Card className="field-card hover-lift glass-strong">
-                    <CardHeader>
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="h-12 w-12 rounded-xl gradient-delta shadow-glow flex items-center justify-center animate-glow-pulse">
-                          <useCase.icon className="h-6 w-6 text-white" />
-                        </div>
-                        <CardTitle className="text-xl">{useCase.title}</CardTitle>
-                      </div>
-                      <CardDescription className="text-base">{useCase.scenario}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="p-3 bg-muted/50 rounded-lg border">
-                        <p className="text-sm font-medium mb-1">Impact:</p>
-                        <p className="text-sm text-muted-foreground">{useCase.impact}</p>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-health-good/10 border border-health-good/20 rounded-lg">
-                        <span className="text-sm font-medium text-health-good">Estimated Savings:</span>
-                        <span className="text-lg font-bold text-health-good">{useCase.savings}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            })}
+            {useCases.map((useCase, idx) => (
+              <UseCaseRevealCard key={idx} useCase={useCase} index={idx} />
+            ))}
           </div>
         </section>
 

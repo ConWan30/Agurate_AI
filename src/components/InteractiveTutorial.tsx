@@ -64,7 +64,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <Sprout className="h-16 w-16 mx-auto text-primary animate-bounce delta-wave" />
               <h3 className="text-2xl font-bold text-gradient-delta">AgurateAI Platform</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Where Louisiana farming tradition meets cutting-edge AI technology
+                Where Louisiana farming tradition meets AI-assisted field tools
               </p>
             </div>
             {/* Floating elements */}
@@ -77,7 +77,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <Scan className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
               <p className="text-sm font-semibold mb-1">AI Scanner</p>
-              <p className="text-xs text-muted-foreground">Instant crop health diagnosis</p>
+              <p className="text-xs text-muted-foreground">Fast phone-camera crop health read</p>
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <TrendingUp className="h-8 w-8 text-secondary mb-2 group-hover:scale-110 transition-transform" />
@@ -92,14 +92,14 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <FileText className="h-8 w-8 text-success mb-2 group-hover:scale-110 transition-transform" />
               <p className="text-sm font-semibold mb-1">Insurance</p>
-              <p className="text-xs text-muted-foreground">Automated claim docs</p>
+              <p className="text-xs text-muted-foreground">Field notes for claims</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 p-4 rounded-lg bg-primary/5 border border-primary/20">
             <Target className="h-5 w-5 text-primary shrink-0" />
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Follow James's journey</span> – a real Louisiana Delta farmer using AI to transform his 400-acre operation
+              <span className="font-semibold text-foreground">Follow James's journey</span> – an illustrative Louisiana Delta scenario showing how a grower might use AI on a multi-field operation
             </p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                       {scanProgress > 60 && <CheckCircle2 className="h-3 w-3 inline ml-1" />}
                     </div>
                     <div className={scanProgress > 90 ? 'text-primary font-medium' : 'text-muted-foreground'}>
-                      Diagnosis
+                      Assessment
                       {scanProgress > 90 && <CheckCircle2 className="h-3 w-3 inline ml-1" />}
                     </div>
                   </div>
@@ -167,7 +167,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                     <CardContent className="p-4 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Health Score</span>
-                        <Badge className="bg-warning text-warning-foreground">68%</Badge>
+                        <Badge className="bg-warning text-warning-foreground">Example</Badge>
                       </div>
                       <Progress value={68} className="h-2" />
                       <p className="text-xs text-muted-foreground">Moderate Stress Detected</p>
@@ -181,7 +181,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                     </div>
                     <div className="p-2 rounded bg-card border">
                       <p className="text-muted-foreground mb-1">Confidence</p>
-                      <p className="font-semibold text-success">94%</p>
+                      <p className="font-semibold text-success">Model estimate</p>
                     </div>
                     <div className="p-2 rounded bg-card border">
                       <p className="text-muted-foreground mb-1">Location</p>
@@ -202,8 +202,8 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             <div>
               <p className="text-sm font-semibold mb-1">Why This Matters</p>
               <p className="text-xs text-muted-foreground">
-                Traditional diagnosis takes 3-7 days waiting for extension agent. 
-                <span className="font-semibold text-foreground"> AgurateAI delivers results in seconds</span>, 
+                Traditional field assessment takes 3-7 days waiting for extension agent. 
+                <span className="font-semibold text-foreground"> AgurateAI walks through an illustrative scan flow</span>, 
                 enabling immediate action before damage spreads.
               </p>
             </div>
@@ -219,8 +219,8 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground leading-relaxed">
-            James taps "Predictions." The AI combines his field history, current diagnosis, and 
-            weather forecasts to predict stress levels for the next 7 days.
+            James taps "Predictions." The AI combines his field history, current assessment, and 
+            weather forecasts to generate optional stress planning outlooks for the next 7 days when enough field history exists — not a guaranteed forecast.
           </p>
 
           <div className="space-y-2">
@@ -260,10 +260,10 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </Card>
 
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">🎯 LSU Research Integration:</p>
+            <p className="text-sm font-medium mb-2">🎯 LSU research framing:</p>
             <p className="text-sm text-muted-foreground">
-              AI trained on LSU historical data: <span className="font-bold">Soybeans + potassium deficiency + 
-              Louisiana heat = 72% yield loss risk.</span> Farmers act before damage is visible.
+              AI framed around public LSU research patterns: <span className="font-bold">Soybeans + potassium deficiency + 
+              Louisiana heat = elevated yield-loss risk.</span> Farmers act before damage is visible.
             </p>
           </div>
         </div>
@@ -291,30 +291,29 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               </div>
 
               <div className="bg-primary/10 p-3 rounded-lg">
-                <p className="text-sm font-medium mb-2">Delta AI (LSU-trained):</p>
+                <p className="text-sm font-medium mb-2">Delta AI (illustrative demo reply):</p>
                 <p className="text-sm text-muted-foreground">
-                  "Based on LSU AgCenter research for Morehouse Parish soybeans:
+                  "For soybeans heading into a forecast heat stretch in the Delta, publicly available LSU AgCenter nutrient guidance often discusses potassium management. In the live product, any rates or timing should come from your recorded soil tests and local AgCenter guidance — this demo does not invent a prescription.
                 </p>
                 <ul className="text-sm text-muted-foreground mt-2 space-y-1 ml-4">
-                  <li>• Apply 60-80 lbs K₂O/acre via foliar spray</li>
-                  <li>• Apply by Friday (before heat stress)</li>
-                  <li>• Early morning application (before 10 AM)</li>
-                  <li>• Expected recovery: 5-7 days</li>
-                  <li>• Prevents 50-70% yield loss in heat events</li>
+                  <li>• Review your latest soil-test K notes (farmer-recorded)</li>
+                  <li>• Check the heat-wave window in your weather forecast</li>
+                  <li>• Prefer cooler application windows when treating</li>
+                  <li>• Re-assess after stress passes — recovery timing varies</li>
+                  <li>• Ask your parish agent before changing rates</li>
                 </ul>
                 <p className="text-xs text-muted-foreground mt-3 italic">
-                  Source: LSU AgCenter Publication #3412 - Soybean Nutrient Management
+                  Illustrative decision-aid demo only — not an LSU prescription or measured outcome.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">🎯 LSU Partnership Value:</p>
+            <p className="text-sm font-medium mb-2">🎯 Research-informed value:</p>
             <p className="text-sm text-muted-foreground">
-              Every farmer interaction feeds research data back to LSU. AI learns from 
-              <span className="font-bold"> thousands of real Delta fields</span>, continuously improving 
-              recommendations. Research becomes living, not static.
+              Guidance is framed around publicly available LSU AgCenter research for Delta conditions.
+              AgurateAI is not an official LSU partner and does not claim that farmer interactions train LSU models.
             </p>
           </div>
         </div>
@@ -338,15 +337,15 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
-                  <span>Pre-storm baseline: 23 photos, Health Score 68% → 92%</span>
+                  <span>Illustrative pre-storm baseline photos and health trend</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
-                  <span>Post-storm damage: 18 photos, Health Score 41%, GPS-tagged</span>
+                  <span>Illustrative post-storm damage photos with location tags</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
-                  <span>AI damage assessment: Severe (87% confidence)</span>
+                  <span>Illustrative AI damage assessment (example confidence only)</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
@@ -363,25 +362,24 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           <div className="grid grid-cols-2 gap-3">
             <Card className="border-health-severe/20 bg-health-severe/5">
               <CardContent className="p-4 text-center">
-                <p className="text-sm text-muted-foreground mb-2">Average Response Time Before</p>
-                <p className="text-2xl font-bold text-health-severe">21 days</p>
+                <p className="text-sm text-muted-foreground mb-2">Waiting on paper trails</p>
+                <p className="text-2xl font-bold text-health-severe">Slow</p>
               </CardContent>
             </Card>
             
             <Card className="border-health-good/20 bg-health-good/5">
               <CardContent className="p-4 text-center">
-                <p className="text-sm text-muted-foreground mb-2">Average Response Time Now</p>
-                <p className="text-2xl font-bold text-health-good">8 minutes</p>
+                <p className="text-sm text-muted-foreground mb-2">With timestamped field notes</p>
+                <p className="text-2xl font-bold text-health-good">Ready sooner</p>
               </CardContent>
             </Card>
           </div>
 
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">🎯 Farmer ROI:</p>
+            <p className="text-sm font-medium mb-2">🎯 Documentation benefit:</p>
             <p className="text-sm text-muted-foreground">
-              James gets his insurance payout <span className="font-bold">3 weeks faster</span> due to 
-              AI-verified documentation. Stronger claims = better settlements. <span className="font-bold">$12,400 
-              saved</span> in this scenario.
+              James uses timestamped AI field notes to support his insurance claim. Clearer evidence can
+              help adjusters review cases — outcomes vary by carrier and are not guaranteed.
             </p>
           </div>
         </div>
@@ -390,8 +388,8 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
     },
     {
       icon: CheckCircle2,
-      title: 'The LSU AgCenter Partnership',
-      description: 'Transforming Louisiana agriculture together',
+      title: 'Research-informed Delta guidance',
+      description: 'Framed around public LSU AgCenter research — not an official partnership',
       content: (
         <div className="space-y-4">
           <p className="text-lg font-medium">James's story repeats across Louisiana Delta farms:</p>
@@ -401,16 +399,16 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <CardContent className="p-4">
                 <p className="font-semibold mb-1">📱 For Farmers</p>
                 <p className="text-sm text-muted-foreground">
-                  Instant expertise • Proactive decisions • Faster insurance payouts
+                  Research-framed guidance • Proactive decisions • Clearer insurance documentation
                 </p>
               </CardContent>
             </Card>
 
             <Card className="border-primary/20 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
               <CardContent className="p-4">
-                <p className="font-semibold mb-1">🎓 For LSU AgCenter</p>
+                <p className="font-semibold mb-1">🎓 Research framing</p>
                 <p className="text-sm text-muted-foreground">
-                  1000x reach multiplier • Live research feedback • Real Delta data
+                  Public LSU AgCenter guidance cited as context — not an official endorsement or data-sharing partnership
                 </p>
               </CardContent>
             </Card>
@@ -419,7 +417,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <CardContent className="p-4">
                 <p className="font-semibold mb-1">🌾 For Louisiana</p>
                 <p className="text-sm text-muted-foreground">
-                  Higher yields • Less crop loss • Leading precision ag innovation
+                  Decision support for Delta conditions • Documented field history
                 </p>
               </CardContent>
             </Card>
@@ -442,11 +440,15 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Every assessment James makes is <span className="font-bold">GPS-tagged automatically</span>, 
-            creating a living map of his 400-acre operation.
+            Every assessment James records can be <span className="font-bold">GPS-tagged</span>,
+            building a living map across his operation.
           </p>
           <Card className="border-primary/30 bg-gradient-to-br from-green-500/5 to-blue-500/5">
             <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-muted-foreground">Example map legend (illustrative)</p>
+                <Badge className="bg-warning text-warning-foreground">Example</Badge>
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <div className="text-center p-2 bg-green-500/10 rounded border border-green-500/30">
                   <MapPin className="h-5 w-5 text-green-600 mx-auto mb-1" />
@@ -461,7 +463,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                   <p className="text-xs font-medium">Severe: 5%</p>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">Heat map shows Section B needs immediate attention</p>
+              <p className="text-xs text-muted-foreground">Example only — not a real field heat map</p>
             </CardContent>
           </Card>
         </div>
@@ -475,21 +477,26 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            AgurateAI correlates <span className="font-bold">every assessment with weather patterns</span>, 
-            revealing cause-and-effect relationships James never saw before.
+            AgurateAI can correlate <span className="font-bold">recorded assessments with weather patterns</span>
+            when both are available — helping spot environmental context, not inventing causation.
           </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-muted-foreground">Example weather ↔ health timeline</p>
+            <Badge className="bg-warning text-warning-foreground">Example</Badge>
+          </div>
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2 p-2 bg-muted rounded">
               <span>June 8: Heat wave (98°F)</span>
               <ArrowRight className="h-4 w-4" />
-              <span className="text-destructive">Health dropped 32%</span>
+              <span className="text-destructive">Example: health down 32%</span>
             </div>
             <div className="flex items-center gap-2 p-2 bg-muted rounded">
               <span>June 15: Rainfall (2.3")</span>
               <ArrowRight className="h-4 w-4" />
-              <span className="text-primary">Health recovered 18%</span>
+              <span className="text-primary">Example: health up 18%</span>
             </div>
           </div>
+          <p className="text-xs text-muted-foreground">Illustrative only — not measured farm data.</p>
         </div>
       ),
       action: 'Next: Cooperatives'
@@ -501,17 +508,20 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            James joins <span className="font-bold">Delta Farmers Co-op</span> with 24 neighboring farms. 
-            Anonymous data sharing creates early warning systems.
+            James can join a <span className="font-bold">regional co-op</span> to share anonymized field signals
+            with neighbors — alerts only appear when real member reports exist.
           </p>
           <Card className="border-primary/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5">
-            <CardContent className="p-4">
-              <p className="font-semibold mb-2 text-sm">🚨 Early Outbreak Alert:</p>
+            <CardContent className="p-4 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-semibold text-sm">Example early outbreak alert</p>
+                <Badge className="bg-warning text-warning-foreground">Example</Badge>
+              </div>
               <p className="text-xs text-muted-foreground">
-                "3 farms within 10 miles detected <span className="font-bold text-destructive">rice blast fungus</span>. 
-                Check your fields immediately. LSU recommends preventative fungicide application."
+                "Neighboring members reported possible <span className="font-bold text-destructive">rice blast</span> symptoms.
+                Check your fields soon. Public LSU AgCenter disease guides discuss options — confirm with your parish agent before treating."
               </p>
-              <Badge className="mt-2 text-xs">Saved James from 40% yield loss</Badge>
+              <p className="text-xs text-muted-foreground">Illustrative placeholder — not a live outbreak or verified member count.</p>
             </CardContent>
           </Card>
         </div>
@@ -525,49 +535,47 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            James tracks his <span className="font-bold">conservation practices</span> for USDA compliance 
-            while AgurateAI predicts cost savings over 5 years.
+            James logs his <span className="font-bold">conservation practices</span> for USDA documentation.
+            AgurateAI helps organize practice history — it does not promise dollar savings.
           </p>
           <div className="grid grid-cols-2 gap-3">
             <Card className="border-green-500/30 bg-green-500/5">
               <CardContent className="p-3 text-center">
                 <p className="text-xs text-muted-foreground mb-1">No-Till + Cover Crops</p>
-                <p className="text-2xl font-bold text-green-600">$38/acre</p>
-                <p className="text-xs text-muted-foreground">Year 1 savings</p>
+                <p className="text-sm font-bold text-green-600">Conservation practices</p>
+                <p className="text-xs text-muted-foreground">Track locally; savings vary</p>
               </CardContent>
             </Card>
             <Card className="border-green-500/30 bg-green-500/5">
               <CardContent className="p-3 text-center">
-                <p className="text-xs text-muted-foreground mb-1">5-Year Total</p>
-                <p className="text-2xl font-bold text-green-600">$15,200</p>
-                <p className="text-xs text-muted-foreground">Projected savings</p>
+                <p className="text-xs text-muted-foreground mb-1">Multi-year outlook</p>
+                <p className="text-sm font-bold text-green-600">Illustrative only</p>
+                <p className="text-xs text-muted-foreground">Not a guaranteed return</p>
               </CardContent>
             </Card>
           </div>
         </div>
       ),
-      action: 'Next: LSU Experts'
+      action: 'Next: LSU directory'
     },
     {
       icon: GraduationCap,
-      title: 'Core Feature #9: LSU AgCenter Access',
-      description: 'Direct line to Louisiana agricultural experts',
+      title: 'Core Feature #9: LSU AgCenter directory',
+      description: 'Public researcher profiles — contact via official LSU channels',
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            When AI isn't enough, James connects directly with <span className="font-bold">LSU AgCenter researchers</span> 
-            specializing in Delta crops.
+            When AI guidance is not enough, James can browse a <span className="font-bold">public LSU AgCenter researcher directory</span> and reach specialists through official LSU channels. AgurateAI does not broker introductions.
           </p>
           <Card className="border-primary/30 bg-gradient-to-br from-blue-500/5 to-purple-500/5">
             <CardContent className="p-4">
-              <p className="font-semibold mb-2 text-sm">🎓 Expert Available:</p>
-              <p className="text-sm font-medium mb-1">Dr. Sarah Martinez</p>
+              <p className="font-semibold mb-2 text-sm">🎓 Example public profile (illustrative placeholder):</p>
+              <p className="text-sm font-medium mb-1">Rice Pathology Specialist</p>
               <p className="text-xs text-muted-foreground">
-                Rice Pathology Specialist • 15 years Louisiana Delta research
+                Louisiana Delta research focus — names come from the live public directory, not this tutorial
               </p>
               <p className="text-xs text-muted-foreground mt-2 italic">
-                "I can review your field photos and provide customized treatment plans 
-                based on your specific soil conditions and planting date."
+                Contact through official LSU AgCenter channels. AgurateAI stores your consultation note locally and does not send cases to researchers.
               </p>
             </CardContent>
           </Card>
@@ -587,16 +595,16 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </p>
           <div className="space-y-2">
             <div className="p-3 bg-primary/5 rounded border border-primary/20">
-              <p className="text-sm font-semibold mb-1">This Season's Impact:</p>
+              <p className="text-sm font-semibold mb-1">This Season&apos;s Activity:</p>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div><span className="font-bold">127</span> assessments</div>
-                <div><span className="font-bold">$8,247</span> saved</div>
-                <div><span className="font-bold">4</span> outbreaks prevented</div>
+                <div><span className="font-bold">Illustrative</span> planning value</div>
+                <div><span className="font-bold">4</span> issues flagged early</div>
               </div>
             </div>
           </div>
           <p className="text-xs text-muted-foreground italic">
-            "AgurateAI paid for itself in the first month." - James Collins
+            Example walkthrough only — not a verified customer result.
           </p>
         </div>
       ),

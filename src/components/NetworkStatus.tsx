@@ -14,12 +14,12 @@ export default function NetworkStatus() {
     const cleanup = setupNetworkListeners(
       () => {
         setOnline(true);
-        toast.success('Back online - ready to sync');
+        toast.success('Back online');
         checkSyncQueue();
       },
       () => {
         setOnline(false);
-        toast.info('Offline mode - data will sync when connected');
+        toast.info('Offline — new scans need a connection; queued items stay on this device until synced');
       }
     );
 
@@ -39,14 +39,20 @@ export default function NetworkStatus() {
     }
 
     setSyncing(true);
-    toast.info('Syncing pending data...');
-    
-    // Simulate sync - in real app, this would sync with Supabase
-    setTimeout(async () => {
+    try {
+      const queue = await getSyncQueue();
+      if (queue.length === 0) {
+        toast.message('Nothing queued to sync');
+        return;
+      }
+      // Automatic upload of queued offline captures is not enabled yet.
+      toast.message('Offline queue is stored on this device', {
+        description: `${queue.length} item(s) waiting. Re-run scans while online to upload — auto-sync is not enabled yet.`,
+      });
       await checkSyncQueue();
+    } finally {
       setSyncing(false);
-      toast.success('Sync complete');
-    }, 2000);
+    }
   };
 
   if (online && syncPending === 0) return null;

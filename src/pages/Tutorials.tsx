@@ -135,7 +135,7 @@ export default function Tutorials() {
                 Welcome Beta Farmer! 🌱
               </p>
               <p className="text-sm text-muted-foreground">
-                These tutorials will help you master all 17 AgurateAI features. 
+                These tutorials walk through the main AgurateAI workflows. 
                 Your feedback on tutorials helps us improve!
               </p>
             </div>

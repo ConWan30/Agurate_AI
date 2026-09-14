@@ -1,26 +1,45 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const waterStressSchema = z.object({
   fieldId: z.string().uuid(),
-  assessmentId: z.string().uuid().optional(),
-  healthScore: z.number().min(0).max(100),
-  symptoms: z.array(z.string()).max(50),
-  weatherData: z.any().optional()
+  assessmentId: z.string().uuid(),
+  /** @deprecated Ignored — health is loaded from the owned assessment. */
+  healthScore: z.number().min(0).max(100).optional(),
+  /** @deprecated Ignored — symptoms are loaded from the owned assessment. */
+  symptoms: z.array(z.string()).max(50).optional(),
+  weatherData: z.any().optional(), // @deprecated ignored — never trust client weather invent
 });
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const supabase = getAnonClient(authHeader);
+    const admin = getServiceClient();
+
+    const rateLimit = await enforceRateLimit(supabase, user.id, {
+      functionName: 'predict-water-stress',
+      maxRequests: RATE_LIMITS['predict-water-stress'].maxRequests,
+      windowMs: RATE_LIMITS['predict-water-stress'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const rawBody = await req.json();
     const validation = waterStressSchema.safeParse(rawBody);
     
@@ -31,37 +50,12 @@ serve(async (req) => {
       });
     }
 
-    const { fieldId, assessmentId, healthScore, symptoms, weatherData } = validation.data;
+    const { fieldId, assessmentId } = validation.data;
 
-    // Authenticate user and verify field ownership
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    
-    if (userError || !user) {
-      console.error('Authentication failed:', userError);
-      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Verify field ownership
+    // Verify field ownership + load coords for server weather (ignore client weatherData).
     const { data: field, error: fieldError } = await supabase
       .from('fields')
-      .select('user_id')
+      .select('user_id, location_lat, location_lng')
       .eq('id', fieldId)
       .single();
 
@@ -71,18 +65,79 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+
+    // Trust persisted assessment only — never client healthScore/symptoms invent.
+    const { data: assessment, error: assessmentError } = await supabase
+      .from('assessments')
+      .select('id, field_id, health_score, disease_identified, pest_identified, stress_level')
+      .eq('id', assessmentId)
+      .eq('field_id', fieldId)
+      .maybeSingle();
+
+    if (assessmentError || !assessment) {
+      return new Response(JSON.stringify({ error: 'Assessment not found for field' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const healthScore =
+      assessment.health_score != null && Number.isFinite(Number(assessment.health_score))
+        ? Number(assessment.health_score)
+        : null;
+    const labelThreat = (item: unknown): string | null => {
+      if (typeof item === 'string' && item.trim()) return item.trim();
+      if (item && typeof item === 'object') {
+        const o = item as Record<string, unknown>;
+        const name = o.name ?? o.disease ?? o.pest;
+        return typeof name === 'string' && name.trim() ? name.trim() : null;
+      }
+      return null;
+    };
+    const symptoms = [
+      ...(Array.isArray(assessment.disease_identified)
+        ? assessment.disease_identified.map(labelThreat).filter((s): s is string => !!s)
+        : []),
+      ...(Array.isArray(assessment.pest_identified)
+        ? assessment.pest_identified.map(labelThreat).filter((s): s is string => !!s)
+        : []),
+      ...(assessment.stress_level ? [String(assessment.stress_level)] : []),
+    ];
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
+    // Server-fetched weather only — never persist client weather invent.
+    let weatherContext: Record<string, unknown> | null = null;
+    const lat = field.location_lat != null ? Number(field.location_lat) : null;
+    const lng = field.location_lng != null ? Number(field.location_lng) : null;
+    if (lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng)) {
+      try {
+        const weatherRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=7&timezone=America/Chicago`,
+        );
+        if (weatherRes.ok) {
+          const weatherJson = await weatherRes.json();
+          weatherContext = {
+            source: 'open-meteo',
+            latitude: lat,
+            longitude: lng,
+            daily: weatherJson.daily ?? null,
+          };
+        }
+      } catch (weatherErr) {
+        console.error('Open-Meteo fetch failed; continuing without weather context', weatherErr);
+      }
+    }
+
     const aiPrompt = `You are AgurateAI's water stress prediction engine for Louisiana Delta crops.
 
 Current Assessment:
-- Health Score: ${healthScore}%
-- Symptoms: ${symptoms.join(', ')}
-- Weather: ${JSON.stringify(weatherData)}
+- Health Score: ${healthScore != null ? `${healthScore}%` : 'not recorded'}
+- Symptoms: ${symptoms.length ? symptoms.join(', ') : 'not recorded'}
+- Weather: ${weatherContext != null ? JSON.stringify(weatherContext) : 'not available — do not invent weather conditions'}
 
 Analyze water stress risk for next 7 days:
 1. Calculate stress probability per day (0-1 scale)
@@ -120,27 +175,43 @@ Return JSON with daily predictions and DIRT recommendation.`;
     try {
       predictionData = JSON.parse(aiResponse);
     } catch {
-      predictionData = {
-        stress_score: healthScore < 70 ? 0.7 : 0.3,
-        severity: healthScore < 60 ? 'severe' : healthScore < 75 ? 'moderate' : 'mild',
-        confidence: 0.8,
-        dirt_recommendation: healthScore < 70,
-        symptoms_detected: symptoms,
-      };
+      throw new Error('Water-stress prediction AI returned unparseable JSON — refusing to invent scores');
+    }
+    if (predictionData.confidence == null || Number.isNaN(Number(predictionData.confidence))) {
+      throw new Error('Water-stress prediction omitted confidence');
+    }
+    if (predictionData.stress_score == null || Number.isNaN(Number(predictionData.stress_score))) {
+      throw new Error('Water-stress prediction omitted stress_score');
     }
 
-    // Save to database (use regular client, RLS allows user to insert their own data)
-    const { data, error } = await supabase
+    const stressScore = Number(predictionData.stress_score);
+    if (!Number.isFinite(stressScore) || stressScore < 0 || stressScore > 1) {
+      throw new Error('Water-stress prediction stress_score must be a finite 0–1 value');
+    }
+    const confidence = Number(predictionData.confidence);
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+      throw new Error('Water-stress prediction confidence must be a finite 0–1 value');
+    }
+    const allowedSeverities = new Set(['none', 'mild', 'moderate', 'severe', 'critical', 'unknown']);
+    const severity = String(predictionData.severity ?? 'unknown');
+    if (!allowedSeverities.has(severity)) {
+      throw new Error('Water-stress prediction severity is invalid — refusing to invent severity');
+    }
+
+    // Save to database (service role — clients can no longer insert AI metric rows)
+    const { data, error } = await admin
       .from('water_stress_events')
       .insert({
         field_id: fieldId,
         assessment_id: assessmentId,
-        stress_score: predictionData.stress_score,
-        severity: predictionData.severity,
-        confidence: predictionData.confidence,
-        weather_context: weatherData,
-        symptoms_detected: predictionData.symptoms_detected,
-        dirt_recommendation: predictionData.dirt_recommendation,
+        stress_score: stressScore,
+        severity,
+        confidence,
+        weather_context: weatherContext,
+        symptoms_detected: Array.isArray(predictionData.symptoms_detected)
+          ? predictionData.symptoms_detected
+          : [],
+        dirt_recommendation: predictionData.dirt_recommendation ?? null,
       })
       .select()
       .single();

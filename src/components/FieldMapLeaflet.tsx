@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -24,9 +25,11 @@ export default function FieldMapLeaflet({ fields }: FieldMapLeafletProps) {
   const map = useRef<L.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getHealthColor = (healthScore: number = 0.5) => {
-    if (healthScore >= 0.75) return '#10b981';
-    if (healthScore >= 0.50) return '#eab308';
+  const getHealthColor = (healthScore: number | null | undefined) => {
+    if (!hasHealthScore(healthScore)) return '#94a3b8'; // slate — no assessment
+    const pct = toHealthPercent(healthScore);
+    if (pct >= 75) return '#10b981';
+    if (pct >= 50) return '#eab308';
     return '#ef4444';
   };
 
@@ -45,7 +48,7 @@ export default function FieldMapLeaflet({ fields }: FieldMapLeafletProps) {
     }).addTo(map.current);
 
     // Create custom icon function
-    const createHealthIcon = (healthScore: number = 0.5) => {
+    const createHealthIcon = (healthScore: number | null | undefined) => {
       const color = getHealthColor(healthScore);
       return L.divIcon({
         html: `
@@ -74,8 +77,10 @@ export default function FieldMapLeaflet({ fields }: FieldMapLeafletProps) {
         icon: createHealthIcon(field.health_score),
       }).addTo(map.current!);
 
-      // Add popup with field details
-      const healthPercentage = ((field.health_score || 0.5) * 100).toFixed(0);
+      // Add popup with field details — never invent a health %
+      const healthLabel = hasHealthScore(field.health_score)
+        ? `${toHealthPercent(field.health_score).toFixed(0)}%`
+        : 'No assessment yet';
       marker.bindPopup(`
         <div style="font-family: system-ui; padding: 8px;">
           <h3 style="font-weight: bold; margin: 0 0 8px 0; font-size: 16px;">${field.name}</h3>
@@ -83,10 +88,10 @@ export default function FieldMapLeaflet({ fields }: FieldMapLeafletProps) {
             <strong>Crop:</strong> ${field.crop_type}
           </p>
           <p style="margin: 4px 0; font-size: 14px; color: #666;">
-            <strong>Acreage:</strong> ${field.acreage || 'N/A'} acres
+            <strong>Acreage:</strong> ${field.acreage != null && Number.isFinite(Number(field.acreage)) ? `${field.acreage} acres` : 'not recorded'}
           </p>
           <p style="margin: 4px 0; font-size: 14px; color: #666;">
-            <strong>Health:</strong> ${healthPercentage}%
+            <strong>Health:</strong> ${healthLabel}
           </p>
           ${field.stress_level ? `
             <p style="margin: 4px 0; font-size: 14px; color: #666;">

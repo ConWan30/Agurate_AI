@@ -42,21 +42,40 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
       // Save farm profile to database
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { error } = await supabase
+        const acreageRaw = totalAcreage.trim() === '' ? null : Number(totalAcreage);
+        if (acreageRaw != null && (!Number.isFinite(acreageRaw) || acreageRaw < 0)) {
+          toast({
+            variant: "destructive",
+            title: "Invalid acreage",
+            description: "Total acreage must be a number greater than or equal to 0.",
+          });
+          return;
+        }
+        const { data: saved, error } = await supabase
           .from('profiles')
           .update({
             farm_name: farmName,
             parish: parish,
-            total_acreage: parseFloat(totalAcreage) || null,
+            total_acreage: acreageRaw,
             primary_crops: primaryCrops,
           })
-          .eq('id', user.id);
+          .eq('id', user.id)
+          .select('id')
+          .maybeSingle();
 
         if (error) {
           toast({
             variant: "destructive",
             title: "Error saving profile",
             description: error.message,
+          });
+          return;
+        }
+        if (!saved) {
+          toast({
+            variant: "destructive",
+            title: "Error saving profile",
+            description: "Profile was not updated (no matching row or update not permitted).",
           });
           return;
         }
@@ -73,22 +92,30 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   const completeOnboarding = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { error } = await supabase
+      const { data: completed, error } = await supabase
         .from('profiles')
         .update({
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
-          beta_farmer: true,
-          beta_signup_date: new Date().toISOString(),
-          lifetime_discount: 0.50, // 50% lifetime discount
+          // Entitlements (beta_farmer / lifetime_discount) are server-owned — set at beta-signup.
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select('id')
+        .maybeSingle();
 
       if (error) {
         toast({
           variant: "destructive",
           title: "Error completing onboarding",
           description: error.message,
+        });
+        return;
+      }
+      if (!completed) {
+        toast({
+          variant: "destructive",
+          title: "Error completing onboarding",
+          description: "Onboarding was not marked complete (no matching row or update not permitted).",
         });
         return;
       }
@@ -104,13 +131,23 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   const handleSkip = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      await supabase
+      const { data: skipped, error } = await supabase
         .from('profiles')
         .update({
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select('id')
+        .maybeSingle();
+      if (error || !skipped) {
+        toast({
+          variant: "destructive",
+          title: "Could not skip onboarding",
+          description: error?.message || "Profile was not updated.",
+        });
+        return;
+      }
     }
     onSkip();
   };
@@ -276,7 +313,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
               <div className="space-y-3 text-sm">
                 <div className="p-4 border rounded-lg">
                   <p className="font-medium mb-1">🔬 AI Crop Analysis</p>
-                  <p className="text-muted-foreground">Instant disease detection in &lt;2 seconds with 95%+ accuracy</p>
+                  <p className="text-muted-foreground">Fast phone-camera crop health reads — a decision aid, not a certified diagnosis</p>
                 </div>
                 <div className="p-4 border rounded-lg">
                   <p className="font-medium mb-1">📊 7-Day Stress Predictions</p>
@@ -284,7 +321,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
                 </div>
                 <div className="p-4 border rounded-lg">
                   <p className="font-medium mb-1">💬 Delta Intelligence Chat</p>
-                  <p className="text-muted-foreground">24/7 Louisiana-specific agricultural advisor</p>
+                  <p className="text-muted-foreground">On-demand Louisiana-specific agricultural advisor</p>
                 </div>
                 <div className="p-4 border rounded-lg">
                   <p className="font-medium mb-1">📋 Insurance Documentation</p>
@@ -308,12 +345,12 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
               </div>
               <div className="space-y-3 text-sm">
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <p className="font-medium mb-1">✅ Unlimited FREE Access During Beta</p>
-                  <p className="text-muted-foreground">All features, no limits, no credit card required</p>
+                  <p className="font-medium mb-1">✅ Closed-beta access at no charge</p>
+                  <p className="text-muted-foreground">Core features available during beta without a paid plan</p>
                 </div>
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <p className="font-medium mb-1">💰 Lifetime 50% Discount</p>
-                  <p className="text-muted-foreground">When we launch paid plans, you lock in 50% off forever</p>
+                  <p className="font-medium mb-1">💰 Beta pricing: possible discount off published rate</p>
+                  <p className="text-muted-foreground">When paid plans launch, a discount off the published rate may be offered (not guaranteed; confirm in-app)</p>
                 </div>
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                   <p className="font-medium mb-1">🎯 Direct Founder Support</p>

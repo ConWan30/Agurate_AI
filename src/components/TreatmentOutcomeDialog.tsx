@@ -9,6 +9,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { getErrorMessage } from '@/lib/error-handler';
+import {
+  getTreatmentType,
+  extractTreatmentName,
+  computeTreatmentSuccess,
+} from '@/lib/phase4-helpers';
 
 interface TreatmentOutcomeDialogProps {
   open: boolean;
@@ -22,7 +27,7 @@ interface TreatmentOutcomeDialogProps {
   fieldId: string;
   fieldName: string;
   cropType: string;
-  healthScoreBefore: number; // 0-100
+  healthScoreBefore?: number; // 0-100 when known — never invent 0
   stressLevel?: string;
   symptoms?: string[];
 }
@@ -45,36 +50,6 @@ export function TreatmentOutcomeDialog({
   const [costPerAcre, setCostPerAcre] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Extract treatment type from category
-  const getTreatmentType = (category: string): string => {
-    const categoryLower = category.toLowerCase();
-    if (categoryLower.includes('pest') || categoryLower.includes('disease')) return 'fungicide';
-    if (categoryLower.includes('fertil')) return 'fertilizer';
-    if (categoryLower.includes('irrigat')) return 'irrigation';
-    if (categoryLower.includes('herbic')) return 'herbicide';
-    return 'general';
-  };
-
-  // Extract treatment name from recommendation text
-  const extractTreatmentName = (text: string): string => {
-    // Common treatment names to look for
-    const treatments = [
-      'azoxystrobin', 'propiconazole', 'tebuconazole', 'flutriafol',
-      'urea', 'ammonium', 'nitrogen', 'phosphorus', 'potassium',
-      'glyphosate', '2,4-D', 'atrazine'
-    ];
-    
-    const textLower = text.toLowerCase();
-    for (const treatment of treatments) {
-      if (textLower.includes(treatment)) {
-        return treatment;
-      }
-    }
-    
-    // Fallback: extract first few words
-    return text.split(' ').slice(0, 3).join(' ');
-  };
 
   const handleSubmit = async () => {
     if (!outcome) {
@@ -106,7 +81,6 @@ export function TreatmentOutcomeDialog({
 
       const healthAfter = parseFloat(healthScoreAfter);
       const days = parseInt(daysAfter);
-      const cost = costPerAcre ? parseFloat(costPerAcre) : (recommendation.estimated_cost || 0);
 
       if (isNaN(healthAfter) || healthAfter < 0 || healthAfter > 100) {
         toast({
@@ -124,14 +98,36 @@ export function TreatmentOutcomeDialog({
         return;
       }
 
-      const improvement = healthAfter - healthScoreBefore;
-      const improvementPercentage = healthScoreBefore > 0 
-        ? (improvement / healthScoreBefore) * 100 
-        : 0;
-      
-      const success = outcome === 'success' || (outcome === 'partial' && improvementPercentage > 5);
+      if (!Number.isFinite(Number(healthAfter)) || Number(healthAfter) < 0 || Number(healthAfter) > 100) {
+        toast({
+          title: 'Enter a valid after-treatment health score (0-100)',
+          variant: 'destructive'
+        });
+        return;
+      }
 
-      const { error } = await supabase
+      const parsedCost = costPerAcre.trim() ? Number(costPerAcre) : null;
+      if (parsedCost != null && (!Number.isFinite(parsedCost) || parsedCost < 0)) {
+        toast({
+          title: 'Cost per acre must be a number greater than or equal to 0',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const { success } = computeTreatmentSuccess({
+        outcome,
+        healthScoreBefore,
+        healthScoreAfter: healthAfter,
+      });
+
+      const healthNote = `Self-reported after-treatment health: ${healthAfter}`;
+      const costNote =
+        parsedCost != null
+          ? `Self-reported cost/acre: $${parsedCost}`
+          : null;
+      const baseNotes = notes || `Treatment: ${extractTreatmentName(recommendation.recommendation_text)}`;
+      const { data: logged, error } = await supabase
         .from('peer_treatment_outcomes')
         .insert({
           farmer_id: user.id,
@@ -141,18 +137,24 @@ export function TreatmentOutcomeDialog({
           crop_type: cropType,
           problem_addressed: symptoms.join(', ') || stressLevel || 'Unknown',
           outcome: outcome === 'success' ? 'successful' : outcome === 'partial' ? 'partially_successful' : 'unsuccessful',
-          effectiveness_score: healthAfter,
-          cost_usd: costPerAcre ? parseFloat(costPerAcre) : null,
-          notes: notes,
+          // effectiveness_score is stripped server-side — keep after-health in notes only
+          notes: [baseNotes, healthNote, costNote].filter(Boolean).join(' | '),
           applied_at: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           evaluated_at: new Date().toISOString().split('T')[0],
-        });
+        })
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!logged) {
+        throw new Error('Treatment outcome was not saved (insert returned no row or not permitted)');
+      }
 
       toast({
         title: 'Treatment outcome logged successfully!',
-        description: 'Your feedback helps improve recommendations for all farmers.',
+        description: success
+          ? 'Self-reported outcome logged as a community signal — not a verified yield result.'
+          : 'Self-reported mixed result logged so community comparisons stay honest.',
       });
 
       // Reset form
@@ -233,7 +235,9 @@ export function TreatmentOutcomeDialog({
               placeholder="e.g., 85"
             />
             <p className="text-xs text-muted-foreground">
-              Current health score: {healthScoreBefore.toFixed(0)}%
+              {healthScoreBefore != null && Number.isFinite(healthScoreBefore)
+                ? `Current health score: ${healthScoreBefore.toFixed(0)}%`
+                : 'Current health score: not recorded'}
             </p>
           </div>
 
@@ -255,7 +259,7 @@ export function TreatmentOutcomeDialog({
 
           {/* Cost Per Acre */}
           <div className="space-y-2">
-            <Label htmlFor="costPerAcre">Cost Per Acre (Optional)</Label>
+            <Label htmlFor="costPerAcre">Cost Per Acre (optional notes only — not used in peer averages)</Label>
             <Input
               id="costPerAcre"
               type="number"
@@ -263,7 +267,11 @@ export function TreatmentOutcomeDialog({
               step="0.01"
               value={costPerAcre}
               onChange={(e) => setCostPerAcre(e.target.value)}
-              placeholder={`e.g., ${recommendation.estimated_cost?.toFixed(2) || '30.00'}`}
+              placeholder={
+                recommendation.estimated_cost != null && Number.isFinite(recommendation.estimated_cost)
+                  ? `Optional — your actual $/acre`
+                  : 'Enter cost if known'
+              }
             />
           </div>
 

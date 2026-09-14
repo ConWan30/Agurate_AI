@@ -35,7 +35,7 @@ import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { TrustIndicators } from "@/components/TrustIndicators";
-import { LSUPartnershipSection } from "@/components/LSUPartnershipSection";
+import { LSUResearchFramingSection } from "@/components/LSUResearchFramingSection";
 import { ComparisonSection } from "@/components/ComparisonSection";
 
 export default function Home() {
@@ -61,31 +61,31 @@ export default function Home() {
     {
       icon: Scan,
       title: "AI Crop Scanner",
-      description: "Instant crop health analysis from any smartphone camera. Detect stress, disease, and nutrient deficiency signals from a phone photo in seconds.",
+      description: "Phone-camera crop health reads as a decision aid. Surfaces possible stress, disease, and nutrient signals for grower review.",
       color: "gradient-delta"
     },
     {
       icon: TrendingUp,
       title: "Predictive Analytics",
-      description: "7-14 day stress forecasts powered by weather AI. Comprehensive predictions for water stress, disease risk, and yield optimization.",
+      description: "Optional 7-14 day stress outlooks when weather and field history are available — decision support, not a guarantee.",
       color: "gradient-sky"
     },
     {
       icon: Brain,
       title: "Delta Intelligence Chat",
-      description: "24/7 AI advisor framed around LSU AgCenter research. Field-aware conversations with image analysis and treatment recommendations.",
+      description: "On-demand AI advisor framed around LSU AgCenter research. Field-aware conversations with image analysis and treatment recommendations.",
       color: "gradient-harvest"
     },
     {
       icon: Droplets,
       title: "Water Stress Intelligence",
-      description: "Real-time water stress detection with direct integration to MSU DIRT irrigation scheduling for precision water management.",
+      description: "Water stress signals with a deep-link to the public MSU DIRT irrigation scheduling tool (opens in a new tab — not an embedded integration).",
       color: "gradient-delta"
     },
     {
       icon: Leaf,
       title: "Conservation Tracking",
-      description: "Track sustainable practices with AI-powered cost-benefit analysis. Monitor cover crops, no-till, and precision fertilization impact.",
+      description: "Track sustainable practices with planning indexes and your recorded costs. Monitor cover crops, no-till, and precision fertilization notes.",
       color: "gradient-sky"
     },
     {
@@ -103,7 +103,7 @@ export default function Home() {
     {
       icon: Network,
       title: "Community Intelligence",
-      description: "Anonymous cooperative insights from neighboring farms. Early outbreak detection and shared best practices network.",
+      description: "Anonymous cooperative insights from neighboring farms. Shared alerts and community best practices — planning signals, not confirmed outbreak detection.",
       color: "gradient-sky"
     },
     {
@@ -115,29 +115,29 @@ export default function Home() {
     {
       icon: FileText,
       title: "Insurance Documentation",
-      description: "AI-verified damage documentation with GPS-stamped photos. Automated evidence collection for faster claims processing.",
+      description: "GPS-stamped crop photos and assessment notes you can export for insurance documentation. Claim outcomes still depend on your carrier.",
       color: "gradient-delta"
     }
   ];
 
   const benefits = [
     "Phone-camera crop health reads for Delta crops",
-    "7-14 day predictive analytics for proactive decisions",
-    "Water stress monitoring with DIRT integration",
+    "Optional stress outlooks when weather and field history are available",
+    "Water stress monitoring with link to MSU DIRT",
     "Insights informed by LSU AgCenter research framing",
     "Conservation practice tracking and ROI analysis",
     "Community intelligence and cooperative insights",
     "Variety recommendations for rice and soybeans",
     "GPS-tagged field mapping and health visualization",
-    "Insurance claim automation with AI verification",
-    "Mobile-first design with offline capabilities"
+    "Insurance claim documentation support (not automated settlement)",
+    "Mobile-first design with installable PWA support"
   ];
 
   const stats = [
     { value: 7, label: "Day Stress Forecasts", suffix: "+", prefix: "" },
     { value: 4, label: "Delta Crops Supported", suffix: "", prefix: "" },
-    { value: 100, label: "Beta Partner Spots", suffix: "", prefix: "" },
-    { value: 24, label: "AI Advisor Available", suffix: "/7", prefix: "" }
+    { value: 100, label: "Closed Beta Seats", suffix: "", prefix: "" },
+    { value: 1, label: "On-Demand AI Advisor", suffix: "", prefix: "" }
   ];
 
   return (
@@ -185,7 +185,7 @@ export default function Home() {
           <div className="max-w-3xl">
             {/* Beta Badge */}
             <Badge className="mb-6 text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white border-none shadow-glow animate-fade-in">
-              🌱 FREE BETA - Limited to First 100 Louisiana Delta Farmers
+              🌱 FREE CLOSED BETA — Louisiana Delta farmers
             </Badge>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-primary-foreground mb-6 leading-tight">
@@ -320,7 +320,7 @@ export default function Home() {
                 Built for Louisiana Delta Farmers
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Guidance is framed around publicly available LSU AgCenter research and Morehouse Parish conditions. It is a decision aid, not a validated diagnosis.
+                Guidance is framed around publicly available LSU AgCenter research and Louisiana Delta growing conditions (Morehouse Parish is a focus area for early pilots). It is a decision aid, not a validated diagnosis.
               </p>
               
               <div className="space-y-3">
@@ -368,8 +368,8 @@ export default function Home() {
               
               <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group mt-8 focus-ring" tabIndex={0}>
                 <Cloud className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">Always Available</h3>
-                <p className="text-sm text-muted-foreground">24/7 crop monitoring</p>
+                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">Available When You Need It</h3>
+                <p className="text-sm text-muted-foreground">On-demand crop assessments</p>
               </Card>
             </div>
           </div>
@@ -385,7 +385,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
               <Sparkles className="h-3 w-3 mr-1" />
-              Cutting-Edge Agricultural Technology
+              Agricultural Technology for the Delta
             </Badge>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-4">
               Unified AI Intelligence System
@@ -428,7 +428,7 @@ export default function Home() {
                 <div className="flex items-center justify-center h-16 w-16 rounded-2xl gradient-harvest shadow-glow mx-auto mb-4">
                   <GraduationCap className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">LSU Research Integration</h3>
+                <h3 className="text-xl font-bold mb-2">LSU research framing</h3>
                 <p className="text-sm text-muted-foreground">
                   Recommendations are research-informed for Louisiana Delta conditions. We do not claim scientific validation or an official LSU partnership.
                 </p>
@@ -462,10 +462,10 @@ export default function Home() {
               Early Louisiana Delta beta
             </Badge>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
-              Built with Morehouse Parish growers in mind
+              Built for Louisiana Delta growers
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              We are recruiting the first 100 Louisiana Delta farmers. Real pilot stories will land here as they approve them.
+              Closed beta for Louisiana Delta farms (Morehouse Parish is a focus area, not a claim that every user farms there). Real pilot stories will land here as growers approve them.
             </p>
           </div>
 
@@ -507,8 +507,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* LSU Partnership Section */}
-      <LSUPartnershipSection />
+      {/* LSU research framing (not a partnership claim) */}
+      <LSUResearchFramingSection />
 
       {/* Comparison Section */}
       <ComparisonSection />
@@ -527,13 +527,13 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center relative z-10">
           <Badge className="mb-6 text-sm px-4 py-2 bg-primary-foreground/20 border-primary-foreground/40 text-primary-foreground backdrop-blur-md">
             <Zap className="h-3 w-3 mr-1" />
-            Start Free Today
+            Join Closed Beta
           </Badge>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
             Ready to Join the Beta?
           </h2>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90">
-            Get FREE unlimited access as one of the first 100 Louisiana Delta farmers
+            Join the free closed beta for Louisiana Delta farmers
           </p>
           <Link to="/beta-signup">
             <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 text-lg px-8 py-6 shadow-glow hover:shadow-field hover-lift animate-glow-pulse">
@@ -541,7 +541,7 @@ export default function Home() {
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Button>
           </Link>
-          <p className="text-sm mt-6 opacity-75">Free Beta Access • No credit card required • Unlimited use during beta</p>
+          <p className="text-sm mt-6 opacity-75">Free closed-beta access • No credit card required • Limits may apply</p>
         </div>
       </section>
 
@@ -641,12 +641,12 @@ export default function Home() {
           {/* Bottom Bar */}
           <div className="pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © 2025 AgurateAI. Proudly serving Morehouse Parish, Louisiana
+              © 2025 AgurateAI. Louisiana Delta closed beta
             </p>
             <div className="flex items-center gap-6">
               <Badge variant="outline" className="text-xs">
                 <MapPin className="h-3 w-3 mr-1" />
-                Morehouse Parish, LA
+                Louisiana Delta
               </Badge>
               <Badge variant="outline" className="text-xs">
                 <Award className="h-3 w-3 mr-1" />

@@ -10,6 +10,13 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
 
+// Default public env stubs so fail-fast env works without a local .env
+vi.stubEnv('VITE_SUPABASE_URL', process.env.VITE_SUPABASE_URL || 'https://example.supabase.co');
+vi.stubEnv(
+  'VITE_SUPABASE_PUBLISHABLE_KEY',
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example'
+);
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();

@@ -80,7 +80,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 <h1 className="text-2xl font-display font-bold text-foreground">
                   Agurate<span className="font-bold text-green-600">AI</span>
                 </h1>
-                <p className="text-xs text-muted-foreground">Morehouse Parish, Louisiana</p>
+                <p className="text-xs text-muted-foreground">Louisiana Delta · Closed beta</p>
               </div>
             </Link>
             
@@ -290,7 +290,7 @@ export const Layout = ({ children }: LayoutProps) => {
               </Link>
               <Link to="/lsu-researchers">
                 <Button variant="ghost" size="sm">
-                  LSU Partnership
+                  LSU Research
                 </Button>
               </Link>
             </div>

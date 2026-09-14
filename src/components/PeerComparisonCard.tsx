@@ -1,24 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, TrendingUp, DollarSign, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Users, TrendingUp, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PeerComparisonData {
-  treatment_name: string;
-  farmer_count: number;
-  avg_health_before: number;
-  avg_health_after: number;
-  avg_improvement: number;
-  avg_days_to_improvement: number;
-  avg_cost_per_acre: number;
+  treatment_type: string;
   success_rate: number;
-  success_count: number;
+  avg_effectiveness: number;
+  sample_size: number;
+  farmer_count: number;
 }
 
 interface PeerComparisonCardProps {
+  fieldId: string;
   treatmentType: string;
   cropType: string;
   stressLevel?: string;
@@ -26,10 +22,18 @@ interface PeerComparisonCardProps {
   className?: string;
 }
 
+function formatPeerMetric(value: unknown, suffix = ''): string {
+  // Number(null) === 0 — must reject null/undefined before coercing (post-scrub AVG is null).
+  if (value == null || value === '') return '—';
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '—';
+  return `${Math.round(n)}${suffix}`;
+}
+
 export function PeerComparisonCard({
+  fieldId,
   treatmentType,
   cropType,
-  stressLevel,
   currentHealthScore,
   className
 }: PeerComparisonCardProps) {
@@ -37,23 +41,29 @@ export function PeerComparisonCard({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!fieldId) {
+      setLoading(false);
+      setComparisonData([]);
+      return;
+    }
     loadPeerComparison();
-  }, [treatmentType, cropType, stressLevel]);
+  }, [fieldId, treatmentType, cropType]);
 
   const loadPeerComparison = async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.rpc('get_peer_comparison', {
-        p_field_id: '',  // TODO: Pass actual field ID
+        p_field_id: fieldId,
         p_crop_type: cropType,
         p_problem: treatmentType,
       });
 
       if (error) throw error;
-      setComparisonData((data || []) as any[] as PeerComparisonData[]);
+      setComparisonData((data || []) as PeerComparisonData[]);
     } catch (error) {
       console.error('Error loading peer comparison:', error);
       toast.error('Failed to load peer comparison data');
+      setComparisonData([]);
     } finally {
       setLoading(false);
     }
@@ -103,6 +113,14 @@ export function PeerComparisonCard({
   }
 
   const topTreatment = comparisonData[0];
+  const sampleSize =
+    topTreatment.sample_size == null || !Number.isFinite(Number(topTreatment.sample_size))
+      ? null
+      : Number(topTreatment.sample_size);
+  const farmerCount =
+    topTreatment.farmer_count == null || !Number.isFinite(Number(topTreatment.farmer_count))
+      ? null
+      : Number(topTreatment.farmer_count);
 
   return (
     <Card className={className}>
@@ -112,86 +130,76 @@ export function PeerComparisonCard({
           Community Treatment Comparison
         </CardTitle>
         <CardDescription>
-          Anonymous data from {topTreatment.farmer_count} farmer{topTreatment.farmer_count !== 1 ? 's' : ''} in your area
+          {farmerCount != null && sampleSize != null
+            ? `Self-reported anonymous outcomes from ${farmerCount} farmer${farmerCount !== 1 ? 's' : ''} (${sampleSize} outcome${sampleSize !== 1 ? 's' : ''}) for similar ${cropType} cases`
+            : `Self-reported anonymous outcomes for similar ${cropType} cases`}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Top Recommendation */}
         <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/20">
           <div className="flex items-start justify-between mb-2">
             <div>
               <h4 className="font-semibold flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-success" />
-                Most Successful Treatment
+                Highest self-reported success rate
               </h4>
               <p className="text-sm text-muted-foreground mt-1">
-                {topTreatment.treatment_name || treatmentType}
+                {topTreatment.treatment_type || treatmentType}
               </p>
             </div>
             <Badge variant="default" className="gap-1">
               <TrendingUp className="h-3 w-3" />
-              {topTreatment.success_rate}% Success
+              {formatPeerMetric(topTreatment.success_rate, '%')} Success
             </Badge>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
-              <p className="text-xs text-muted-foreground">Average Improvement</p>
+              <p className="text-xs text-muted-foreground">Avg. effectiveness (when recorded)</p>
               <p className="text-lg font-bold text-success">
-                +{topTreatment.avg_improvement.toFixed(1)}%
+                {formatPeerMetric(topTreatment.avg_effectiveness, '/100')}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Time to Improvement</p>
+              <p className="text-xs text-muted-foreground">Sample</p>
               <p className="text-lg font-bold">
-                {topTreatment.avg_days_to_improvement.toFixed(0)} days
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Average Cost</p>
-              <p className="text-lg font-bold flex items-center gap-1">
-                <DollarSign className="h-4 w-4" />
-                {topTreatment.avg_cost_per_acre.toFixed(2)}/acre
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Health Score Change</p>
-              <p className="text-lg font-bold">
-                {topTreatment.avg_health_before.toFixed(0)}% → {topTreatment.avg_health_after.toFixed(0)}%
+                {farmerCount != null ? `${farmerCount} farmers` : '—'}
+                {sampleSize != null ? ` / ${sampleSize} outcomes` : ''}
               </p>
             </div>
           </div>
         </div>
 
-        {/* All Treatments Comparison */}
         {comparisonData.length > 1 && (
           <div>
             <h4 className="font-semibold mb-3 text-sm">All Treatment Options</h4>
             <div className="space-y-2">
               {comparisonData.map((treatment, idx) => (
                 <div
-                  key={idx}
+                  key={`${treatment.treatment_type}-${idx}`}
                   className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">
-                        {treatment.treatment_name || `${treatmentType} ${idx + 1}`}
+                        {treatment.treatment_type || `${treatmentType} ${idx + 1}`}
                       </span>
                       {idx === 0 && (
                         <Badge variant="default" className="text-xs">Best</Badge>
                       )}
                     </div>
                     <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                      <span>{treatment.farmer_count} farmers</span>
-                      <span>{treatment.success_rate}% success</span>
-                      <span>+{treatment.avg_improvement.toFixed(1)}% improvement</span>
+                      <span>
+                        {Number.isFinite(Number(treatment.farmer_count))
+                          ? `${treatment.farmer_count} farmers`
+                          : '—'}
+                        {Number.isFinite(Number(treatment.sample_size))
+                          ? ` / ${treatment.sample_size} outcomes`
+                          : ''}
+                      </span>
+                      <span>{formatPeerMetric(treatment.success_rate, '%')} success</span>
+                      <span>{formatPeerMetric(treatment.avg_effectiveness, '/100')} effectiveness</span>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold">
-                      ${treatment.avg_cost_per_acre.toFixed(0)}/acre
-                    </p>
                   </div>
                 </div>
               ))}
@@ -199,28 +207,25 @@ export function PeerComparisonCard({
           </div>
         )}
 
-        {/* Projected Outcome */}
-        {currentHealthScore && topTreatment && (
+        {currentHealthScore != null && Number.isFinite(Number(currentHealthScore)) && topTreatment && (
           <div className="p-3 bg-success/10 rounded-lg border border-success/20">
-            <h4 className="font-semibold text-sm mb-2">Your Projected Outcome</h4>
+            <h4 className="font-semibold text-sm mb-2">Community context</h4>
             <p className="text-sm text-muted-foreground">
-              Based on community average, your health score could improve from{' '}
-              <span className="font-semibold">{currentHealthScore}%</span> to approximately{' '}
-              <span className="font-semibold text-success">
-                {Math.min(100, Math.round(currentHealthScore + topTreatment.avg_improvement))}%
-              </span>{' '}
-              within {topTreatment.avg_days_to_improvement.toFixed(0)} days.
+              Self-reported peer outcomes for similar {cropType} cases show about{' '}
+              <span className="font-semibold text-success">{formatPeerMetric(topTreatment.success_rate, '%')}</span>{' '}
+              success with {topTreatment.treatment_type}. Your current health score is{' '}
+              <span className="font-semibold">{Math.round(Number(currentHealthScore))}%</span>. This is
+              anonymized community signal, not a guaranteed result.
             </p>
           </div>
         )}
 
         <div className="pt-2 border-t">
           <p className="text-xs text-muted-foreground text-center">
-            Data is anonymized and aggregated. Your individual data remains private.
+            Data is anonymized, aggregated, and self-reported. Your individual data remains private.
           </p>
         </div>
       </CardContent>
     </Card>
   );
 }
-

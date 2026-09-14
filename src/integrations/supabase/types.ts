@@ -806,13 +806,17 @@ export type Database = {
           assessment_id: string | null
           created_at: string | null
           estimated_loss_usd: number | null
+          expires_at: string | null
           field_id: string | null
           id: string
+          in_app_notification_sent: boolean | null
           message: string
+          metadata: Json | null
           severity: string
           sms_sent: boolean | null
           title: string
           urgency_score: number
+          user_id: string | null
           voice_call_attempted: boolean | null
         }
         Insert: {
@@ -822,13 +826,17 @@ export type Database = {
           assessment_id?: string | null
           created_at?: string | null
           estimated_loss_usd?: number | null
+          expires_at?: string | null
           field_id?: string | null
           id?: string
+          in_app_notification_sent?: boolean | null
           message: string
+          metadata?: Json | null
           severity?: string
           sms_sent?: boolean | null
           title: string
           urgency_score: number
+          user_id?: string | null
           voice_call_attempted?: boolean | null
         }
         Update: {
@@ -838,13 +846,17 @@ export type Database = {
           assessment_id?: string | null
           created_at?: string | null
           estimated_loss_usd?: number | null
+          expires_at?: string | null
           field_id?: string | null
           id?: string
+          in_app_notification_sent?: boolean | null
           message?: string
+          metadata?: Json | null
           severity?: string
           sms_sent?: boolean | null
           title?: string
           urgency_score?: number
+          user_id?: string | null
           voice_call_attempted?: boolean | null
         }
         Relationships: [
@@ -1766,6 +1778,27 @@ export type Database = {
         }
         Relationships: []
       }
+      edge_ip_rate_limits: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: number
+          ip_hash: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: number
+          ip_hash?: string
+        }
+        Relationships: []
+      }
       success_stories: {
         Row: {
           acres_protected: number | null
@@ -1773,6 +1806,7 @@ export type Database = {
           allow_farm_name: boolean | null
           allow_name: boolean | null
           allow_public_use: boolean | null
+          approved: boolean
           assessment_id: string | null
           created_at: string | null
           estimated_savings: number | null
@@ -1788,6 +1822,7 @@ export type Database = {
           allow_farm_name?: boolean | null
           allow_name?: boolean | null
           allow_public_use?: boolean | null
+          approved?: boolean
           assessment_id?: string | null
           created_at?: string | null
           estimated_savings?: number | null
@@ -1803,6 +1838,7 @@ export type Database = {
           allow_farm_name?: boolean | null
           allow_name?: boolean | null
           allow_public_use?: boolean | null
+          approved?: boolean
           assessment_id?: string | null
           created_at?: string | null
           estimated_savings?: number | null
@@ -1954,32 +1990,32 @@ export type Database = {
         Row: {
           created_at: string | null
           current_variety: string | null
-          expected_improvement: number
+          expected_improvement: number | null
           field_id: string
           id: string
           lsu_research_basis: string[]
           recommended_variety: string
-          risk_assessment: string
+          risk_assessment: string | null
         }
         Insert: {
           created_at?: string | null
           current_variety?: string | null
-          expected_improvement: number
+          expected_improvement?: number | null
           field_id: string
           id?: string
           lsu_research_basis: string[]
           recommended_variety: string
-          risk_assessment: string
+          risk_assessment?: string | null
         }
         Update: {
           created_at?: string | null
           current_variety?: string | null
-          expected_improvement?: number
+          expected_improvement?: number | null
           field_id?: string
           id?: string
           lsu_research_basis?: string[]
           recommended_variety?: string
-          risk_assessment?: string
+          risk_assessment?: string | null
         }
         Relationships: [
           {
@@ -2204,6 +2240,18 @@ export type Database = {
         }
         Relationships: []
       }
+      lsu_researchers_directory: {
+        Row: {
+          id: string | null
+          name: string | null
+          department: string | null
+          expertise: string[] | null
+          research_areas: string[] | null
+          availability: string | null
+          created_at: string | null
+        }
+        Relationships: []
+      }
       unacknowledged_critical_alerts: {
         Row: {
           acknowledged: boolean | null
@@ -2213,14 +2261,18 @@ export type Database = {
           created_at: string | null
           crop_type: string | null
           estimated_loss_usd: number | null
+          expires_at: string | null
           field_id: string | null
           field_name: string | null
           id: string | null
+          in_app_notification_sent: boolean | null
           message: string | null
+          metadata: Json | null
           severity: string | null
           sms_sent: boolean | null
           title: string | null
           urgency_score: number | null
+          user_id: string | null
           voice_call_attempted: boolean | null
         }
         Relationships: [
@@ -2265,7 +2317,7 @@ export type Database = {
         Returns: undefined
       }
       can_view_invitation: {
-        Args: { inv_id: string; user_id: string }
+        Args: { p_inv_id: string; p_user_id: string }
         Returns: boolean
       }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
@@ -2274,7 +2326,6 @@ export type Database = {
         Returns: {
           availability: string
           department: string
-          email: string
           expertise: string[]
           id: string
           name: string
@@ -2282,31 +2333,42 @@ export type Database = {
       }
       get_beta_farmer_count: { Args: never; Returns: number }
       get_conversation_memory: {
-        Args: { p_conversation_id: string; p_user_id: string }
+        Args: {
+          p_user_id: string
+          p_limit?: number
+          p_exclude_conversation_id?: string | null
+        }
         Returns: {
-          context_data: Json
-          context_type: string
           id: string
-          last_referenced_at: string
-          relevance_score: number
+          conversation_id: string
+          role: string
+          content: string
+          context_snapshot: Json
+          created_at: string
+          conversation_title: string | null
         }[]
       }
       get_peer_comparison: {
         Args: { p_crop_type: string; p_field_id: string; p_problem: string }
         Returns: {
           avg_effectiveness: number
+          farmer_count: number
           sample_size: number
           success_rate: number
           treatment_type: string
         }[]
       }
       is_cooperative_admin: {
-        Args: { coop_id: string; user_id: string }
+        Args: { p_coop_id: string; p_user_id: string }
         Returns: boolean
       }
       is_cooperative_member: {
-        Args: { coop_id: string; user_id: string }
+        Args: { p_coop_id: string; p_user_id: string }
         Returns: boolean
+      }
+      resolve_cooperative_alert: {
+        Args: { p_alert_id: string }
+        Returns: undefined
       }
     }
     Enums: {

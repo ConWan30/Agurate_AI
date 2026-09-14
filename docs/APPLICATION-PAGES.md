@@ -2,7 +2,7 @@
 
 ## Overview
 
-AgurateAI is a comprehensive precision agriculture platform specifically designed for Louisiana Delta farmers. The application features a responsive web interface with mobile-first design, real-time AI analysis, and seamless integration with LSU AgCenter research data.
+AgurateAI is a closed-beta precision agriculture decision aid for Louisiana Delta farmers. The application features a responsive web interface with mobile-first design and AI analysis framed around publicly available LSU AgCenter research — AgurateAI is not an official LSU partner.
 
 **Navigation Structure:**
 - Bottom navigation bar (mobile)
@@ -14,34 +14,34 @@ All pages except `/auth` and `/404` require user authentication via Supabase Aut
 
 ## Screenshots and Demo Routes
 
-**Important**: Due to authentication requirements, screenshots cannot be captured via automated tools for protected pages. However, **demo routes** have been created at `/demo/*` paths that bypass authentication for documentation purposes.
+**Important**: Protected product pages require authentication. `/demo/*` routes exist **only in local development builds** (`import.meta.env.DEV`) for screenshot tooling — they are not public production bypasses and are not shipped as anonymous access.
 
-### Available Demo Routes
+### Available Demo Routes (DEV only)
 
-All screenshots were captured from these public demo routes with realistic mock data:
+Local screenshot tooling may use these routes with whatever data the signed-in or empty session provides — do not treat listed field names, health scores, or farm profiles below as live production facts:
 
 - `/demo/auth` - Authentication (Sign In/Sign Up pages)
-- `/demo/dashboard` - Main dashboard with 3 sample fields and 5 recent assessments
+- `/demo/dashboard` - Main dashboard
 - `/demo/upload` - Image/video upload interface
-- `/demo/scanner` - Mobile field scanner with GPS and AR modes
-- `/demo/fields` - Field management (North Field 150ac, Delta South 200ac, Cotton Ridge 125ac)
-- `/demo/field-map` - Interactive Leaflet map centered on Morehouse Parish
-- `/demo/history` - 5 assessment history records with health scores 58-92
-- `/demo/predictions` - AI-powered 7-day stress forecasts
-- `/demo/weather-timeline` - 30-day weather correlation timeline
+- `/demo/scanner` - Mobile field scanner
+- `/demo/fields` - Field management
+- `/demo/field-map` - Interactive Leaflet map
+- `/demo/history` - Assessment history
+- `/demo/predictions` - Stress forecasts (when recorded)
+- `/demo/weather-timeline` - Weather and health timeline
 - `/demo/delta` - Delta Intelligence AI chatbot
 - `/demo/insurance` - Insurance claims management
 - `/demo/cooperatives` - Cooperative management system
-- `/demo/profile` - User profile settings (John Farmer @ Green Acres Farm)
+- `/demo/profile` - User profile settings
 - `/demo/how-it-works` - Platform tutorial and AI pipeline
 
 **Screenshot Highlights:**
 - **Dashboard**: Quick Actions, Business Tools, field overview, recent assessments
-- **Fields**: 3 field cards with crop icons, acreage, GPS coordinates
-- **History**: Health score progression from healthy (92) to severe (58) statuses
-- **Delta AI**: LSU AgCenter-trained chatbot with quick questions
-- **Scanner**: Mobile camera interface with AR overlay toggle
-- **How It Works**: 6-step AI pipeline visualization
+- **Fields**: Field cards with crop type and acreage when recorded
+- **History**: Health scores when recorded (never invent missing scores)
+- **Delta AI**: Farming advisor chatbot framed around public LSU AgCenter research (not an official LSU-trained product)
+- **Scanner**: Mobile camera interface
+- **How It Works**: AI pipeline overview
 
 ---
 
@@ -454,12 +454,12 @@ AI-powered predictive analytics for crop stress forecasting over next 7 days.
 **Component:** `src/pages/DeltaIntelligence.tsx`
 
 **Purpose:**  
-AI-powered farming advisor trained on LSU AgCenter research and Louisiana Delta expertise.
+AI-powered farming advisor framed around publicly available LSU AgCenter research and Louisiana Delta context. Not an official LSU product or partnership.
 
 **Key Features:**
 - Conversational AI chatbot interface
-- LSU AgCenter research integration
-- Louisiana Delta-specific advice
+- References to public LSU AgCenter research themes where loaded
+- Louisiana Delta-specific framing
 - Streaming response generation
 - Quick question prompts
 - Chat history persistence
@@ -470,21 +470,21 @@ AI-powered farming advisor trained on LSU AgCenter research and Louisiana Delta 
 - Real-time streaming responses
 - Typing indicators
 - Quick question suggestions
-- Knowledge base information cards
+- Knowledge base information cards when available
 
 **User Actions:**
 - Ask agriculture questions
 - View AI responses in real-time
 - Use quick question templates
 - Review chat history
-- Get LSU AgCenter-backed recommendations
+- Get decision-aid recommendations framed around public research (verify with Extension before acting)
 
 **Integration Points:**
 - Supabase `delta-chat` edge function
 - Lovable AI (Google Gemini 2.5 Flash)
-- LSU AgCenter research database
-- Louisiana Delta climate data
-- Crop-specific knowledge base
+- Public LSU AgCenter research themes when indexed in-app
+- Louisiana Delta climate context when available
+- Crop-specific knowledge prompts
 
 **Quick Questions Available:**
 - "What are the best practices for cotton irrigation in the Delta?"
@@ -492,11 +492,11 @@ AI-powered farming advisor trained on LSU AgCenter research and Louisiana Delta 
 - "What's the optimal planting schedule for corn in Louisiana?"
 
 **Knowledge Base Coverage:**
-- LSU AgCenter Extension publications
-- Louisiana Delta climate patterns
-- Regional soil composition data
-- Crop-specific disease databases
-- Pest management strategies
+- Public LSU AgCenter Extension publications (when loaded)
+- Louisiana Delta climate patterns (when available)
+- Regional soil composition references (when available)
+- Crop-specific disease databases (when available)
+- Pest management strategies (when available)
 - Irrigation best practices
 
 **Technical Notes:**
@@ -877,7 +877,7 @@ Quick access to primary actions on mobile devices.
 1. **analyze-crop** - Image analysis for uploaded photos
 2. **ar-analyze** - Mobile scanner with AR capabilities
 3. **predict-stress** - 7-day predictive analytics
-4. **delta-chat** - LSU AgCenter AI advisor
+4. **delta-chat** - Farming advisor framed around public LSU AgCenter research
 
 ### AI Models Used:
 - Google Gemini 2.5 Flash (via Lovable AI Gateway)
@@ -964,7 +964,7 @@ Quick access to primary actions on mobile devices.
 - `docs/LSU-AGCENTER-PITCH.md` - Full pitch document
 - `docs/LIVE-DEMO-SCRIPT.md` - Video demo script
 - `docs/DELTA_CODE_CULTIVATION_SYSTEM.md` - AI architecture
-- `docs/DELTA_FIELD_COMMAND_CENTER.md` - Field management spec
+- `docs/archive/DELTA_FIELD_COMMAND_CENTER.md` - Archived field management notes (not live schema/policy)
 - `docs/architecture.md` - Technical architecture
 - `docs/research-findings.md` - LSU AgCenter integration research
 
@@ -999,7 +999,7 @@ Quick access to primary actions on mobile devices.
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** 2025  
+**Document Version:** 1.1  
+**Last Updated:** 2026  
 **Maintained By:** AgurateAI Development Team  
-**For Questions:** Contact LSU AgCenter Partnership Team
+**For Questions:** Contact the AgurateAI closed-beta operators (not an LSU partnership desk)

@@ -9,11 +9,11 @@ import { format } from "date-fns";
 
 interface WeatherAlert {
   type: "frost" | "drought" | "severe_weather" | "excessive_rain";
-  severity: "warning" | "watch" | "advisory";
+  severity: "warning" | "watch" | "advisory" | "unknown";
   title: string;
   description: string;
   start_time: string;
-  end_time: string;
+  end_time: string | null;
   affected_areas: string[];
 }
 
@@ -21,6 +21,7 @@ export function WeatherAlerts() {
   const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const [locationReady, setLocationReady] = useState(true);
 
   useEffect(() => {
     checkWeatherAlerts();
@@ -33,12 +34,32 @@ export function WeatherAlerts() {
   const checkWeatherAlerts = async () => {
     setLoading(true);
     try {
-      // Default to Morehouse Parish, LA coordinates
-      const latitude = 32.73;
-      const longitude = -91.76;
+      // Use a field with real coordinates — never invent parish defaults
+      const { data: fields, error: fieldsError } = await supabase
+        .from("fields")
+        .select("id, location_lat, location_lng")
+        .not("location_lat", "is", null)
+        .not("location_lng", "is", null)
+        .limit(1);
 
+      if (fieldsError) throw fieldsError;
+
+      const field = fields?.[0];
+      if (
+        field?.location_lat == null ||
+        field?.location_lng == null ||
+        !Number.isFinite(Number(field.location_lat)) ||
+        !Number.isFinite(Number(field.location_lng))
+      ) {
+        setAlerts([]);
+        setLocationReady(false);
+        setLastChecked(new Date());
+        return;
+      }
+
+      setLocationReady(true);
       const { data, error } = await supabase.functions.invoke("weather-alerts", {
-        body: { latitude, longitude }
+        body: { field_id: field.id }
       });
 
       if (error) throw error;
@@ -74,26 +95,42 @@ export function WeatherAlerts() {
     }
   };
 
-  const getSeverityVariant = (severity: string): "default" | "destructive" | "outline" => {
-    switch (severity) {
+  const normalizeSeverity = (severity: string): "warning" | "watch" | "advisory" | "unknown" => {
+    const s = (severity || "").toLowerCase();
+    if (s === "warning" || s === "watch" || s === "advisory") return s;
+    return "unknown";
+  };
+
+  const getSeverityVariant = (severity: string): "default" | "destructive" | "outline" | "secondary" => {
+    switch (normalizeSeverity(severity)) {
       case "warning":
         return "destructive";
       case "watch":
         return "default";
-      default:
+      case "advisory":
         return "outline";
+      default:
+        // Fail closed — unknown is not an advisory
+        return "secondary";
     }
   };
 
   const getSeverityColor = (severity: string) => {
-    switch (severity) {
+    switch (normalizeSeverity(severity)) {
       case "warning":
         return "text-destructive";
       case "watch":
         return "text-warning";
+      case "advisory":
+        return "text-muted-foreground";
       default:
         return "text-muted-foreground";
     }
+  };
+
+  const getSeverityLabel = (severity: string) => {
+    const n = normalizeSeverity(severity);
+    return n === "unknown" ? "severity not recorded" : n;
   };
 
   if (alerts.length === 0 && !loading) {
@@ -110,9 +147,13 @@ export function WeatherAlerts() {
             <div className="flex items-center justify-center h-16 w-16 rounded-full bg-success/10 mx-auto mb-4">
               <Bell className="h-8 w-8 text-success" />
             </div>
-            <p className="text-muted-foreground">No active weather alerts</p>
+            <p className="text-muted-foreground">
+              {locationReady ? "No active weather alerts" : "Weather alerts need a field location"}
+            </p>
             <p className="text-sm text-muted-foreground mt-1">
-              All clear in your area
+              {locationReady
+                ? "No active alerts for your field coordinates"
+                : "Add GPS coordinates to a field to enable location-based alerts"}
             </p>
           </div>
           <div className="flex items-center justify-between pt-4 border-t border-border">
@@ -160,7 +201,7 @@ export function WeatherAlerts() {
                 <div>
                   <h4 className="font-semibold">{alert.title}</h4>
                   <Badge variant={getSeverityVariant(alert.severity)} className="mt-1 text-xs capitalize">
-                    {alert.severity}
+                    {getSeverityLabel(alert.severity)}
                   </Badge>
                 </div>
               </div>
@@ -172,7 +213,7 @@ export function WeatherAlerts() {
 
             <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border">
               <span>
-                {format(new Date(alert.start_time), "MMM dd, h:mm a")} - {format(new Date(alert.end_time), "MMM dd, h:mm a")}
+                {format(new Date(alert.start_time), "MMM dd, h:mm a")}{alert.end_time ? ` - ${format(new Date(alert.end_time), "MMM dd, h:mm a")}` : " (end time not provided)"}
               </span>
             </div>
           </div>

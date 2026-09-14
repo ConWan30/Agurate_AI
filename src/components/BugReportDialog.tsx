@@ -74,36 +74,34 @@ export function BugReportDialog({ open, onClose }: BugReportDialogProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      let screenshotUrl = null;
+      let screenshotPath: string | null = null;
 
-      // Upload screenshot if available
+      // Upload screenshot if available — persist storage path (not a 1h signed URL)
       if (screenshot) {
-        const fileName = `bug-reports/${user.id}/${Date.now()}.png`;
+        // Owner-prefixed path required by crop-images storage RLS
+        const fileName = `${user.id}/bug-reports/${Date.now()}.png`;
         const { error: uploadError } = await supabase.storage
           .from('crop-images')
           .upload(fileName, screenshot);
 
         if (uploadError) throw uploadError;
-
-        const { data, error: signedUrlError } = await supabase.storage
-          .from('crop-images')
-          .createSignedUrl(fileName, 3600); // 1 hour expiry
-
-        if (signedUrlError) throw signedUrlError;
-        screenshotUrl = data.signedUrl;
+        screenshotPath = fileName;
       }
 
       // Insert bug report
-      const { error } = await supabase.from('bug_reports').insert({
+      const { data: report, error } = await supabase.from('bug_reports').insert({
         user_id: user.id,
         description: description.trim(),
-        screenshot_url: screenshotUrl,
+        screenshot_url: screenshotPath,
         user_agent: navigator.userAgent,
         page_url: window.location.href,
         status: 'open',
-      });
+      }).select('id').maybeSingle();
 
       if (error) throw error;
+      if (!report) {
+        throw new Error('Bug report was not saved (insert returned no row or not permitted)');
+      }
 
       toast({
         title: "🐛 Bug report submitted",

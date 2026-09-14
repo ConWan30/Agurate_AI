@@ -1,9 +1,17 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 /**
- * Shared Rate Limiter Utility
- * Provides consistent rate limiting across all edge functions
+ * Shared rate limiter for edge functions (Deno-compatible).
+ * Fail-closed: deny when rate-limit state cannot be read or written.
  */
 
-import { createClient } from '@supabase/supabase-js';
+
+/** Service-role client for request_logs — clients can no longer invent rate-limit rows. */
+function getRateLimitServiceClient() {
+  return createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  );
+}
 
 export interface RateLimitConfig {
   maxRequests: number;
@@ -18,16 +26,15 @@ export interface RateLimitResult {
   limit: number;
 }
 
-/**
- * Check if request is within rate limit
- */
 export async function checkRateLimit(
-  supabaseClient: any,
+  // deno-lint-ignore no-explicit-any
+  _supabaseClient: any,
   userId: string,
   config: RateLimitConfig
 ): Promise<RateLimitResult> {
+  const supabaseClient = getRateLimitServiceClient();
   const windowStart = new Date(Date.now() - config.windowMs);
-  
+
   const { data: recentRequests, error } = await supabaseClient
     .from('request_logs')
     .select('created_at')
@@ -36,57 +43,85 @@ export async function checkRateLimit(
     .gte('created_at', windowStart.toISOString());
 
   if (error) {
-    console.error('[rateLimiter] Error checking rate limit:', error);
-    // Fail open - allow request if we can't check
+    console.error('[rateLimiter] Error checking rate limit (fail closed):', error);
     return {
-      allowed: true,
-      remaining: config.maxRequests - 1,
+      allowed: false,
+      remaining: 0,
       resetTime: Date.now() + config.windowMs,
       limit: config.maxRequests,
     };
   }
 
   const requestCount = recentRequests?.length || 0;
-  const allowed = requestCount < config.maxRequests;
-  const remaining = Math.max(0, config.maxRequests - requestCount - 1);
-  const resetTime = Date.now() + config.windowMs;
-
   return {
-    allowed,
-    remaining,
-    resetTime,
+    allowed: requestCount < config.maxRequests,
+    remaining: Math.max(0, config.maxRequests - requestCount - 1),
+    resetTime: Date.now() + config.windowMs,
     limit: config.maxRequests,
   };
 }
 
-/**
- * Log a request for rate limiting
- */
+/** Returns false when the write fails so callers can fail closed. */
 export async function logRequest(
-  supabaseClient: any,
+  // deno-lint-ignore no-explicit-any
+  _supabaseClient: any,
   userId: string,
   functionName: string,
   ipAddress?: string | null,
   userAgent?: string | null
-): Promise<void> {
+): Promise<boolean> {
   try {
-    await supabaseClient
-      .from('request_logs')
-      .insert({
-        user_id: userId,
-        function_name: functionName,
-        ip_address: ipAddress || 'unknown',
-        user_agent: userAgent || 'unknown',
-      });
+    const supabaseClient = getRateLimitServiceClient();
+    const { error } = await supabaseClient.from('request_logs').insert({
+      user_id: userId,
+      function_name: functionName,
+      ip_address: ipAddress || 'unknown',
+      user_agent: userAgent || 'unknown',
+    });
+    if (error) {
+      console.error('[rateLimiter] Error logging request (fail closed):', error);
+      return false;
+    }
+    return true;
   } catch (error) {
-    console.error('[rateLimiter] Error logging request:', error);
-    // Don't throw - logging failure shouldn't break the request
+    console.error('[rateLimiter] Error logging request (fail closed):', error);
+    return false;
   }
 }
 
 /**
- * Get rate limit headers for response
+ * Check limit then record the request. Deny if either step fails.
  */
+export async function enforceRateLimit(
+  // deno-lint-ignore no-explicit-any
+  supabaseClient: any,
+  userId: string,
+  config: RateLimitConfig,
+  req?: Request
+): Promise<RateLimitResult> {
+  const result = await checkRateLimit(supabaseClient, userId, config);
+  if (!result.allowed) return result;
+
+  const logged = await logRequest(
+    supabaseClient,
+    userId,
+    config.functionName,
+    req?.headers.get('x-forwarded-for'),
+    req?.headers.get('user-agent')
+  );
+
+  if (!logged) {
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: result.resetTime,
+      limit: result.limit,
+    };
+  }
+
+  return result;
+}
+
 export function getRateLimitHeaders(result: RateLimitResult): Record<string, string> {
   return {
     'X-RateLimit-Limit': result.limit.toString(),
@@ -95,14 +130,94 @@ export function getRateLimitHeaders(result: RateLimitResult): Record<string, str
   };
 }
 
-/**
- * Standard rate limit configurations
- */
 export const RATE_LIMITS = {
-  'delta-chat': { maxRequests: 10, windowMs: 60000 }, // 10 per minute
-  'analyze-crop': { maxRequests: 10, windowMs: 60000 }, // 10 per minute
-  'conversational-form': { maxRequests: 20, windowMs: 60000 }, // 20 per minute
-  'predict-stress': { maxRequests: 5, windowMs: 60000 }, // 5 per minute
-  'generate-community-insights': { maxRequests: 5, windowMs: 60000 }, // 5 per minute
+  'delta-chat': { maxRequests: 10, windowMs: 60_000 },
+  'analyze-crop': { maxRequests: 10, windowMs: 60_000 },
+  'conversational-form': { maxRequests: 20, windowMs: 60_000 },
+  'predict-stress': { maxRequests: 5, windowMs: 60_000 },
+  'generate-community-insights': { maxRequests: 5, windowMs: 60_000 },
+  'detect-critical-alerts': { maxRequests: 20, windowMs: 60_000 },
+  'ar-analyze': { maxRequests: 20, windowMs: 60_000 },
+  'unified-ai-analysis': { maxRequests: 10, windowMs: 60_000 },
+  'generate-daily-briefing': { maxRequests: 5, windowMs: 60_000 },
+  'generate-predictive-questions': { maxRequests: 10, windowMs: 60_000 },
+  'generate-comprehensive-predictions': { maxRequests: 5, windowMs: 60_000 },
+  'generate-conservation-predictions': { maxRequests: 5, windowMs: 60_000 },
+  'generate-image-annotations': { maxRequests: 10, windowMs: 60_000 },
+  'get-market-prices': { maxRequests: 20, windowMs: 60_000 },
+  'recommend-varieties': { maxRequests: 10, windowMs: 60_000 },
+  'predict-water-stress': { maxRequests: 5, windowMs: 60_000 },
+  'compare-images': { maxRequests: 10, windowMs: 60_000 },
+  'weather-alerts': { maxRequests: 20, windowMs: 60_000 },
+  'get-usage-stats': { maxRequests: 30, windowMs: 60_000 },
+  'beta-signup': { maxRequests: 5, windowMs: 15 * 60_000 },
+  'setup-demo-account': { maxRequests: 5, windowMs: 15 * 60_000 },
 } as const;
 
+/** Fail-closed IP bucket limiter for public (unauthenticated) edges. */
+export async function enforceIpRateLimit(
+  // deno-lint-ignore no-explicit-any
+  serviceClient: any,
+  ip: string,
+  config: { bucket: string; maxRequests: number; windowMs: number }
+): Promise<RateLimitResult> {
+  const windowStart = new Date(Date.now() - config.windowMs).toISOString();
+  const ipHash = await hashIp(ip || 'unknown');
+
+  const { count, error } = await serviceClient
+    .from('edge_ip_rate_limits')
+    .select('id', { count: 'exact', head: true })
+    .eq('bucket', config.bucket)
+    .eq('ip_hash', ipHash)
+    .gte('created_at', windowStart);
+
+  if (error) {
+    console.error('[rateLimiter] IP rate limit read failed (fail closed):', error);
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + config.windowMs,
+      limit: config.maxRequests,
+    };
+  }
+
+  if ((count ?? 0) >= config.maxRequests) {
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + config.windowMs,
+      limit: config.maxRequests,
+    };
+  }
+
+  const { error: insertError } = await serviceClient.from('edge_ip_rate_limits').insert({
+    bucket: config.bucket,
+    ip_hash: ipHash,
+  });
+
+  if (insertError) {
+    console.error('[rateLimiter] IP rate limit write failed (fail closed):', insertError);
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + config.windowMs,
+      limit: config.maxRequests,
+    };
+  }
+
+  return {
+    allowed: true,
+    remaining: Math.max(0, config.maxRequests - (count ?? 0) - 1),
+    resetTime: Date.now() + config.windowMs,
+    limit: config.maxRequests,
+  };
+}
+
+async function hashIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode(ip);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 32);
+}

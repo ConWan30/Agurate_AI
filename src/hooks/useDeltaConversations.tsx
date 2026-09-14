@@ -96,18 +96,34 @@ export function useDeltaConversations() {
     contextSnapshot?: Record<string, unknown>
   ) => {
     try {
-      const { error } = await supabase
-        .from('delta_messages')
-        .insert({ 
-          conversation_id: conversationId, 
-          role, 
-          content,
-          context_snapshot: contextSnapshot || {}
+      if (role === 'assistant') {
+        // Assistant rows are service-role only (20260914260000). Persist via edge.
+        const { error } = await supabase.functions.invoke('delta-chat', {
+          body: {
+            action: 'persist_assistant',
+            conversationId,
+            content,
+            contextSnapshot: contextSnapshot || {},
+          },
         });
+        if (error) throw error;
+      } else {
+        const { data: savedUserMsg, error } = await supabase
+          .from('delta_messages')
+          .insert({ 
+            conversation_id: conversationId, 
+            role: 'user', 
+            content,
+            context_snapshot: contextSnapshot || {}
+          })
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        if (!savedUserMsg) {
+          throw new Error('User message was not saved (insert returned no row or not permitted)');
+        }
+      }
 
-      if (error) throw error;
-
-      // Update conversation timestamp
       await supabase
         .from('delta_conversations')
         .update({ updated_at: new Date().toISOString() })
@@ -122,12 +138,16 @@ export function useDeltaConversations() {
 
   const deleteConversation = async (conversationId: string) => {
     try {
-      const { error } = await supabase
+      const { data: deleted, error } = await supabase
         .from('delta_conversations')
         .delete()
-        .eq('id', conversationId);
+        .eq('id', conversationId)
+        .select('id');
 
       if (error) throw error;
+      if (!deleted?.length) {
+        throw new Error('Conversation was not deleted (no matching row or delete not permitted)');
+      }
 
       if (currentConversationId === conversationId) {
         setCurrentConversationId(null);
@@ -148,12 +168,18 @@ export function useDeltaConversations() {
 
   const updateConversationTitle = async (conversationId: string, title: string) => {
     try {
-      const { error } = await supabase
+      const { data: updated, error } = await supabase
         .from('delta_conversations')
         .update({ title })
-        .eq('id', conversationId);
+        .eq('id', conversationId)
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!updated) {
+        throw new Error('Conversation title was not updated (no matching row or update not permitted)');
+      }
+
       await loadConversations();
     } catch (error) {
       console.error('Error updating title:', error);

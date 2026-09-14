@@ -5,7 +5,8 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingState } from "@/components/ui/loading-state";
 import { AgriculturalBadge } from "@/components/ui/agricultural-badge";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client"
+import { formatAcreage } from "@/lib/agricultural-utils";
 import { Link } from "react-router-dom";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { BetaWelcomeBanner } from "@/components/BetaWelcomeBanner";
@@ -33,6 +34,8 @@ import { SkeletonDashboard } from "@/components/ui/skeleton-card";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { EmptyState } from "@/components/ui/empty-state";
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
 
 interface Field {
   id: string;
@@ -128,8 +131,7 @@ export default function Dashboard() {
   };
 
   const getStressIcon = (stressLevel: string) => {
-    const normalized = stressLevel?.toLowerCase();
-    switch (normalized) {
+    switch (normalizeStressLevel(stressLevel)) {
       case "healthy":
         return <CheckCircle2 className="h-5 w-5 text-health-good" />;
       case "moderate":
@@ -137,35 +139,7 @@ export default function Dashboard() {
       case "severe":
         return <AlertCircle className="h-5 w-5 text-health-severe" />;
       default:
-        return <CheckCircle2 className="h-5 w-5 text-muted-foreground" />;
-    }
-  };
-
-  const getStressBadgeVariant = (stressLevel: string): "default" | "secondary" | "destructive" | "outline" => {
-    const normalized = stressLevel?.toLowerCase();
-    switch (normalized) {
-      case "healthy":
-        return "default";
-      case "moderate":
-        return "outline";
-      case "severe":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStressBadgeClass = (stressLevel: string) => {
-    const normalized = stressLevel?.toLowerCase();
-    switch (normalized) {
-      case "healthy":
-        return "status-healthy";
-      case "moderate":
-        return "status-moderate";
-      case "severe":
-        return "status-severe";
-      default:
-        return "";
+        return null;
     }
   };
 
@@ -200,7 +174,7 @@ export default function Dashboard() {
           <div className="relative z-10 flex items-start justify-between">
             <div>
               <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                🌾 Morehouse Parish Precision Agriculture
+                🌾 Louisiana Delta Closed Beta
               </Badge>
               <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3 drop-shadow-lg">
                 Welcome to Your Farm Dashboard
@@ -263,7 +237,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">AI Crop Scanner</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Instant 95%+ accurate health analysis
+                    Phone-camera crop health reads as a decision aid
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
@@ -279,7 +253,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Predictive Analytics</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    7-14 day comprehensive forecasts
+                    Optional 7–14 day planning outlooks when data exists — not guarantees
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
@@ -295,7 +269,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Delta Intelligence</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    24/7 LSU-trained AI advisor
+                    On-demand research-informed AI advisor
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
@@ -311,7 +285,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Water Stress</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Real-time monitoring + DIRT link
+                    Water stress monitoring + DIRT link
                   </p>
                   <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>
@@ -350,16 +324,16 @@ export default function Dashboard() {
               </AnimatedCard>
             </Link>
 
-            {/* 7. LSU Researcher Access */}
+            {/* 7. LSU researcher directory */}
             <Link to="/lsu-researchers" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={250} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
                     <GraduationCap className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">LSU Experts</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">LSU Directory</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Direct AgCenter support access
+                    Public LSU AgCenter directory
                   </p>
                   <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>
@@ -407,7 +381,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Insurance Claims</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    AI-verified documentation
+                    AI-assisted field documentation
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
@@ -579,7 +553,7 @@ export default function Dashboard() {
                         <div className="flex-1">
                           <CardTitle className="text-lg group-hover:text-primary transition-colors">{field.name}</CardTitle>
                           <CardDescription className="capitalize">
-                            {field.crop_type} • {field.acreage} acres
+                            {field.crop_type} • {formatAcreage(field.acreage)}
                           </CardDescription>
                         </div>
                       </div>
@@ -624,25 +598,35 @@ export default function Dashboard() {
                           {getStressIcon(assessment.stress_level)}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-heading font-bold text-xl mb-1 group-hover:text-primary transition-colors">{assessment.field.name}</h3>
+                          <h3 className="font-heading font-bold text-xl mb-1 group-hover:text-primary transition-colors">{assessment.field?.name ?? 'Unknown field'}</h3>
                           <p className="text-sm text-muted-foreground capitalize">
-                            {assessment.field.crop_type} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy")}</time>
+                            {assessment.field?.crop_type ?? 'Crop unknown'} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy")}</time>
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-6">
                         <div className="text-right">
                           <p className="text-3xl font-mono font-bold text-primary">
-                            <AnimatedCounter value={Math.round((assessment.health_score || 0) * 100)} suffix="%" />
+                            {hasHealthScore(assessment.health_score) ? (
+                              <AnimatedCounter value={Math.round(toHealthPercent(assessment.health_score))} suffix="%" />
+                            ) : (
+                              <span aria-label="Health score not available">—</span>
+                            )}
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">Health Score</p>
                         </div>
-                        <AgriculturalBadge
-                          type={assessment.stress_level?.toLowerCase() === 'healthy' ? 'healthy' : assessment.stress_level?.toLowerCase() === 'moderate' ? 'moderate' : 'severe'}
-                          className="text-base px-4 py-2 font-semibold"
-                        >
-                          {assessment.stress_level.charAt(0).toUpperCase() + assessment.stress_level.slice(1)}
-                        </AgriculturalBadge>
+                        {normalizeStressLevel(assessment.stress_level) ? (
+                          <AgriculturalBadge
+                            type={stressBadgeType(assessment.stress_level)}
+                            className="text-base px-4 py-2 font-semibold"
+                          >
+                            {formatStressLabel(assessment.stress_level)}
+                          </AgriculturalBadge>
+                        ) : (
+                          <Badge variant="outline" className="text-base px-4 py-2 font-semibold">
+                            Stress not recorded
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </CardContent>

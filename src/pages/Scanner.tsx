@@ -14,6 +14,8 @@ import TutorialTooltip from '@/components/TutorialTooltip';
 import { useHaptics } from '@/hooks/use-haptics';
 import { useGlobalKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
+import { hasHealthScore, formatHealthPercent, requireHealthScore, toHealthPercent } from '@/lib/health-score';
+import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
 
 interface Field {
   id: string;
@@ -84,7 +86,7 @@ export default function Scanner() {
       },
       (error) => {
         console.error('GPS error:', error);
-        toast.warning('Unable to get GPS location. Using field default.');
+        toast.warning('Unable to get device GPS. Photo will be saved without GPS metadata — field weather still uses the field’s recorded coordinates when available.');
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -169,10 +171,14 @@ export default function Scanner() {
         });
 
         if (error) throw error;
+        if (!data || data.error != null || data.health_score == null) {
+          throw new Error(data?.error || 'AR analysis did not return a health score');
+        }
         setAiOverlay(data);
       };
     } catch (error) {
       console.error('AR overlay failed:', error);
+      setAiOverlay(null);
     }
   };
 
@@ -205,44 +211,37 @@ export default function Scanner() {
         .createSignedUrl(fileName, 3600); // 1 hour expiry
 
       if (signedUrlError) throw signedUrlError;
-      const imageUrl = data.signedUrl;
+      const signedImageUrl = data.signedUrl;
 
       // ✅ UNIFIED AI: Gather context before analysis
       const unifiedContext = await gatherUnifiedContext(selectedFieldId);
 
-      // Call analyze-crop edge function with unified context
+      // Call analyze-crop; edge persists scored assessment (clients cannot write health_score)
+      // Weather binds from owned field coords on the edge — send device GPS as photo metadata only.
       const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
         body: {
-          imageUrl: imageUrl,
+          imageUrl: signedImageUrl,
           cropType: selectedField.crop_type,
           fieldId: selectedFieldId,
-          unifiedContext // Include intelligence pool data
+          storagePath: fileName,
+          photoLocationLat: gpsCoords?.lat ?? undefined,
+          photoLocationLng: gpsCoords?.lng ?? undefined,
+          gpsAccuracyMeters: gpsCoords?.accuracy,
+          capturedOffline: !isOnline,
+          unifiedContext,
         }
       });
 
       if (aiError) throw aiError;
 
-      // Save assessment to database
-      const { data: assessment, error: dbError } = await supabase
-        .from('assessments')
-        .insert({
-          field_id: selectedFieldId,
-          image_url: imageUrl,
-          health_score: aiResult.health_score || 0.75,
-          stress_level: aiResult.stress_level || 'healthy',
-          symptoms: aiResult.symptoms || [],
-          confidence_score: aiResult.confidence_score || 0.85,
-          photo_location_lat: gpsCoords?.lat || selectedField.location_lat,
-          photo_location_lng: gpsCoords?.lng || selectedField.location_lng,
-          gps_accuracy_meters: gpsCoords?.accuracy,
-          captured_offline: !isOnline,
-          weather_temp_f: aiResult.weather_temp_f,
-          weather_precipitation_mm: aiResult.weather_precipitation_mm
-        })
-        .select()
-        .single();
-
-      if (dbError) throw dbError;
+      // Edge should also refuse missing scores; keep client fail-closed as defense in depth.
+      requireHealthScore(aiResult.health_score);
+      if (!aiResult.stress_level) {
+        throw new Error('AI analysis did not return a stress_level');
+      }
+      if (!aiResult.assessment_id) {
+        throw new Error('Analysis did not persist an assessment');
+      }
 
       // ✅ UNIFIED AI: Enrich intelligence pool after analysis
       await enrichUnifiedContext(selectedFieldId, aiResult);
@@ -256,7 +255,7 @@ export default function Scanner() {
       triggerHaptic('error');
 
       if (!isOnline) {
-        toast.error('Offline mode - assessment saved locally and will sync when online');
+        toast.error('You appear offline. Analysis was not saved — reconnect and try again.');
       } else {
         toast.error('Analysis failed. Please try again.');
       }
@@ -269,7 +268,7 @@ export default function Scanner() {
     {
       id: 'welcome',
       title: 'Welcome to Field Scanner! 📸',
-      content: 'Capture crop photos and get instant AI health analysis with GPS tagging.',
+      content: 'Capture crop photos and get AI health analysis with GPS tagging.',
       position: 'top' as const,
     },
     {
@@ -281,7 +280,7 @@ export default function Scanner() {
     {
       id: 'ar-mode',
       title: 'Optional: AR Overlay Mode',
-      content: 'Enable AR mode to see real-time health indicators overlaid on your camera view!',
+      content: 'Enable AR mode to see live health cues overlaid on your camera view (illustrative, not a lab diagnosis).',
       position: 'top' as const,
     },
     {
@@ -391,7 +390,7 @@ export default function Scanner() {
                       <div className="absolute top-4 right-4 bg-card/90 backdrop-blur-sm border text-card-foreground px-4 py-2 rounded-lg shadow-md">
                         <div className="text-xs text-muted-foreground">Health Score</div>
                         <div className="text-2xl font-bold text-foreground">
-                          {(aiOverlay.health_score * 100).toFixed(0)}%
+                          {formatHealthPercent(aiOverlay.health_score)}
                         </div>
                       </div>
 
@@ -399,18 +398,22 @@ export default function Scanner() {
                       <div className="absolute bottom-4 left-4 right-4 bg-card/90 backdrop-blur-sm border text-card-foreground px-4 py-3 rounded-lg shadow-md space-y-1">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-semibold text-foreground">
-                            {aiOverlay.stress_level === 'healthy' && '✓ Healthy'}
-                            {aiOverlay.stress_level === 'moderate_stress' && '⚠ Moderate Stress'}
-                            {aiOverlay.stress_level === 'severe_stress' && '⚠️ Severe Stress'}
+                            {normalizeStressLevel(aiOverlay.stress_level)
+                              ? formatStressLabel(aiOverlay.stress_level)
+                              : 'Stress not recorded'}
                           </span>
                           <span className={`text-xs px-2 py-1 rounded ${
-                            aiOverlay.stress_level === 'healthy' 
+                            stressBadgeType(aiOverlay.stress_level) === 'healthy'
                               ? 'bg-primary/20 text-primary'
-                              : aiOverlay.stress_level === 'moderate_stress'
+                              : stressBadgeType(aiOverlay.stress_level) === 'moderate'
                               ? 'bg-secondary/20 text-secondary-foreground'
-                              : 'bg-destructive/20 text-destructive'
+                              : stressBadgeType(aiOverlay.stress_level) === 'severe'
+                              ? 'bg-destructive/20 text-destructive'
+                              : 'bg-muted text-muted-foreground'
                           }`}>
-                            {aiOverlay.confidence_score && `${(aiOverlay.confidence_score * 100).toFixed(0)}% conf.`}
+                            {hasHealthScore(aiOverlay.confidence_score)
+                              ? `${toHealthPercent(aiOverlay.confidence_score).toFixed(0)}% conf.`
+                              : 'Confidence not recorded'}
                           </span>
                         </div>
                         {aiOverlay.visual_cues && (

@@ -12,6 +12,7 @@ import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import NetworkStatus from "./components/NetworkStatus";
 import { analytics } from "@/lib/analytics";
 import { errorTracker } from "@/lib/error-tracking";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Lazy load pages for better performance
 const Home = lazy(() => import("./pages/Home"));
@@ -69,10 +70,9 @@ const AnalyticsWrapper = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Error boundary wrapper
+// Global window error listeners + React error boundary
 const ErrorBoundaryWrapper = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
-    // Global error handlers
     const handleError = (event: ErrorEvent) => {
       errorTracker.captureError(event.error, {
         feature: 'global_error_handler',
@@ -103,7 +103,7 @@ const ErrorBoundaryWrapper = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  return <>{children}</>;
+  return <ErrorBoundary>{children}</ErrorBoundary>;
 };
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -206,7 +206,7 @@ const App = () => (
           <Route path="/fields" element={<ProtectedRoute><Layout><Fields /></Layout></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute><Layout><History /></Layout></ProtectedRoute>} />
           <Route path="/predictions" element={<ProtectedRoute><Layout><Predictions /></Layout></ProtectedRoute>} />
-          <Route path="/how-it-works" element={<ProtectedRoute><Layout><HowItWorks /></Layout></ProtectedRoute>} />
+          <Route path="/how-it-works" element={<main id="main-content"><HowItWorks /></main>} />
           <Route path="/insurance" element={<ProtectedRoute><Layout><Insurance /></Layout></ProtectedRoute>} />
           <Route path="/cooperatives" element={<ProtectedRoute><Layout><Cooperatives /></Layout></ProtectedRoute>} />
           <Route path="/cooperatives/join/:code" element={<ProtectedRoute><CooperativeJoin /></ProtectedRoute>} />
@@ -216,33 +216,39 @@ const App = () => (
           <Route path="/lsu-researchers" element={<ProtectedRoute><Layout><LSUResearchers /></Layout></ProtectedRoute>} />
           <Route path="/conservation-practices" element={<ProtectedRoute><Layout><ConservationPractices /></Layout></ProtectedRoute>} />
           <Route path="/conversational-forms-analytics" element={<ProtectedRoute><Layout><ConversationalFormsAnalytics /></Layout></ProtectedRoute>} />
-          <Route path="/integration-test" element={<ProtectedRoute><Layout><IntegrationTest /></Layout></ProtectedRoute>} />
+          {import.meta.env.DEV && (
+            <Route path="/integration-test" element={<ProtectedRoute><Layout><IntegrationTest /></Layout></ProtectedRoute>} />
+          )}
           <Route path="/tutorials" element={<ProtectedRoute><Layout><Tutorials /></Layout></ProtectedRoute>} />
           <Route path="/upgrade" element={<ProtectedRoute><Layout><Upgrade /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
-          {/* Demo routes for screenshots - bypasses authentication */}
-          <Route path="/demo/auth" element={<Auth />} />
-          <Route path="/demo/dashboard" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/demo/upload" element={<Layout><Upload /></Layout>} />
-          <Route path="/demo/scanner" element={<Layout><Scanner /></Layout>} />
-          <Route path="/demo/field-map" element={<Layout><FieldMap /></Layout>} />
-          <Route path="/demo/weather-timeline" element={<Layout><WeatherTimeline /></Layout>} />
-          <Route path="/demo/fields" element={<Layout><Fields /></Layout>} />
-          <Route path="/demo/history" element={<Layout><History /></Layout>} />
-          <Route path="/demo/predictions" element={<Layout><Predictions /></Layout>} />
-          <Route path="/demo/how-it-works" element={<Layout><HowItWorks /></Layout>} />
-          <Route path="/demo/insurance" element={<Layout><Insurance /></Layout>} />
-          <Route path="/demo/cooperatives" element={<Layout><Cooperatives /></Layout>} />
-          <Route path="/demo/delta" element={<Layout><DeltaIntelligence /></Layout>} />
-          <Route path="/demo/delta-intelligence" element={<Layout><DeltaIntelligence /></Layout>} />
-          <Route path="/demo/delta-ai" element={<Layout><DeltaIntelligence /></Layout>} />
-          <Route path="/demo/chat" element={<Layout><DeltaIntelligence /></Layout>} />
-          <Route path="/demo/ai-chat" element={<Layout><DeltaIntelligence /></Layout>} />
-          <Route path="/demo/predict" element={<Layout><Predictions /></Layout>} />
-          <Route path="/demo/stress-predictions" element={<Layout><Predictions /></Layout>} />
-          <Route path="/demo/analytics" element={<Layout><Analytics /></Layout>} />
-          <Route path="/demo/lsu-researchers" element={<Layout><LSUResearchers /></Layout>} />
-          <Route path="/demo/profile" element={<Layout><Profile /></Layout>} />
+          {/* Demo routes bypass auth — development / screenshot tooling only */}
+          {import.meta.env.DEV && (
+            <>
+              <Route path="/demo/auth" element={<Auth />} />
+              <Route path="/demo/dashboard" element={<Layout><Dashboard /></Layout>} />
+              <Route path="/demo/upload" element={<Layout><Upload /></Layout>} />
+              <Route path="/demo/scanner" element={<Layout><Scanner /></Layout>} />
+              <Route path="/demo/field-map" element={<Layout><FieldMap /></Layout>} />
+              <Route path="/demo/weather-timeline" element={<Layout><WeatherTimeline /></Layout>} />
+              <Route path="/demo/fields" element={<Layout><Fields /></Layout>} />
+              <Route path="/demo/history" element={<Layout><History /></Layout>} />
+              <Route path="/demo/predictions" element={<Layout><Predictions /></Layout>} />
+              <Route path="/demo/how-it-works" element={<Layout><HowItWorks /></Layout>} />
+              <Route path="/demo/insurance" element={<Layout><Insurance /></Layout>} />
+              <Route path="/demo/cooperatives" element={<Layout><Cooperatives /></Layout>} />
+              <Route path="/demo/delta" element={<Layout><DeltaIntelligence /></Layout>} />
+              <Route path="/demo/delta-intelligence" element={<Layout><DeltaIntelligence /></Layout>} />
+              <Route path="/demo/delta-ai" element={<Layout><DeltaIntelligence /></Layout>} />
+              <Route path="/demo/chat" element={<Layout><DeltaIntelligence /></Layout>} />
+              <Route path="/demo/ai-chat" element={<Layout><DeltaIntelligence /></Layout>} />
+              <Route path="/demo/predict" element={<Layout><Predictions /></Layout>} />
+              <Route path="/demo/stress-predictions" element={<Layout><Predictions /></Layout>} />
+              <Route path="/demo/analytics" element={<Layout><Analytics /></Layout>} />
+              <Route path="/demo/lsu-researchers" element={<Layout><LSUResearchers /></Layout>} />
+              <Route path="/demo/profile" element={<Layout><Profile /></Layout>} />
+            </>
+          )}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

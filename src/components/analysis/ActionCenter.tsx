@@ -41,7 +41,7 @@ export function ActionCenter({
   fieldId,
   fieldName,
   cropType,
-  healthScoreBefore = 0,
+  healthScoreBefore,
   stressLevel,
   symptoms = []
 }: ActionCenterProps) {
@@ -110,7 +110,7 @@ export function ActionCenter({
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Action Center</h2>
-      <p className="text-muted-foreground">Prioritized recommendations with ROI analysis</p>
+      <p className="text-muted-foreground">Prioritized recommendations with optional planning estimates</p>
       
       {sortedRecs.map((rec) => (
         <Card key={rec.id} className={cn("border-l-4", getBorderColor(rec.priority))}>
@@ -135,7 +135,7 @@ export function ActionCenter({
                   <p className="text-3xl font-bold text-primary">
                     +{rec.roi.roi}%
                   </p>
-                  <p className="text-xs text-muted-foreground">Expected ROI</p>
+                  <p className="text-xs text-muted-foreground">Planning ROI estimate</p>
                 </div>
               )}
             </div>
@@ -155,7 +155,7 @@ export function ActionCenter({
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    Treatment Cost:
+                    Estimated treatment cost:
                   </span>
                   <span className="text-lg font-semibold">
                     ${rec.estimated_cost.toLocaleString()}
@@ -165,17 +165,20 @@ export function ActionCenter({
                 {rec.roi && (
                   <>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Revenue Protected:</span>
+                      <span className="text-sm font-medium">Planning revenue protected:</span>
                       <span className="text-lg font-semibold text-primary">
                         ${rec.roi.revenue_protected.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between items-center pt-2 border-t">
-                      <span className="text-sm font-medium">Net Benefit:</span>
+                      <span className="text-sm font-medium">Planning net benefit:</span>
                       <span className="text-xl font-bold text-primary">
                         ${rec.roi.net_benefit.toLocaleString()}
                       </span>
                     </div>
+                    <p className="text-xs text-muted-foreground pt-1">
+                      Illustrative planning figures only — not measured farm savings.
+                    </p>
                   </>
                 )}
               </div>

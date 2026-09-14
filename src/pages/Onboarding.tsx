@@ -64,10 +64,10 @@ export default function Onboarding() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      console.log('🎯 Onboarding data extracted:', extractedData);
+      if (import.meta.env.DEV) console.log('🎯 Onboarding data extracted:', extractedData);
 
       // Update profile
-      const { error: profileError } = await supabase
+      const { data: updatedProfile, error: profileError } = await supabase
         .from('profiles')
         .update({
           farm_name: extractedData.farm_name,
@@ -78,17 +78,22 @@ export default function Onboarding() {
           phone: extractedData.phone,
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
-          beta_farmer: true,
-          beta_signup_date: new Date().toISOString()
+          // beta_farmer / lifetime_discount are set by beta-signup (service role), not the client
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select('id')
+        .maybeSingle();
 
       if (profileError) throw profileError;
+      if (!updatedProfile) {
+        throw new Error('Profile was not updated (no matching row or update not permitted)');
+      }
 
       // ✅ CREATE FIRST FIELD AUTOMATICALLY if field data was collected
       // Check if the conversational form extracted field information
       if (extractedData.field_name && extractedData.field_crop_type) {
-        console.log('🌾 Creating first field from onboarding data...');
+        const normalizedCropType = extractedData.field_crop_type === 'soybeans' ? 'soybean' : extractedData.field_crop_type;
+        if (import.meta.env.DEV) console.log('🌾 Creating first field from onboarding data...');
         
         interface FieldData {
           user_id: string;
@@ -107,23 +112,39 @@ export default function Onboarding() {
         const fieldData: FieldData = {
           user_id: user.id,
           name: extractedData.field_name!,
-          crop_type: extractedData.field_crop_type!,
-          acreage: extractedData.field_acreage || extractedData.total_acreage,
+          crop_type: normalizedCropType!,
+          // Only use explicit field acreage — never invent from farm-total acreage.
+          // Preserve recorded 0 acres (do not treat as missing).
+          ...(extractedData.field_acreage != null &&
+          Number.isFinite(Number(extractedData.field_acreage)) &&
+          Number(extractedData.field_acreage) >= 0
+            ? { acreage: Number(extractedData.field_acreage) }
+            : {}),
         };
 
-        // Add optional field data
-          if (extractedData.field_location_lat) fieldData.location_lat = parseFloat(String(extractedData.field_location_lat));
-        if (extractedData.field_location_lng) fieldData.location_lng = parseFloat(String(extractedData.field_location_lng));
+        // Add optional field data — preserve recorded 0 coords (do not treat as missing).
+        if (
+          extractedData.field_location_lat != null &&
+          Number.isFinite(Number(extractedData.field_location_lat))
+        ) {
+          fieldData.location_lat = Number(extractedData.field_location_lat);
+        }
+        if (
+          extractedData.field_location_lng != null &&
+          Number.isFinite(Number(extractedData.field_location_lng))
+        ) {
+          fieldData.location_lng = Number(extractedData.field_location_lng);
+        }
         if (extractedData.field_notes) fieldData.notes = String(extractedData.field_notes);
         
         // Add variety based on crop type
-        if (extractedData.field_crop_type === 'rice' && extractedData.rice_variety) {
+        if (normalizedCropType === 'rice' && extractedData.rice_variety) {
           fieldData.rice_variety = String(extractedData.rice_variety);
-        } else if (extractedData.field_crop_type === 'soybean' && extractedData.soybean_variety) {
+        } else if (normalizedCropType === 'soybean' && extractedData.soybean_variety) {
           fieldData.soybean_variety = String(extractedData.soybean_variety);
-        } else if (extractedData.field_crop_type === 'cotton' && extractedData.cotton_variety) {
+        } else if (normalizedCropType === 'cotton' && extractedData.cotton_variety) {
           fieldData.cotton_variety = String(extractedData.cotton_variety);
-        } else if (extractedData.field_crop_type === 'corn' && extractedData.corn_hybrid) {
+        } else if (normalizedCropType === 'corn' && extractedData.corn_hybrid) {
           fieldData.corn_hybrid = String(extractedData.corn_hybrid);
         }
 
@@ -135,10 +156,18 @@ export default function Onboarding() {
 
         if (fieldError) {
           console.error('❌ Error creating field:', fieldError);
-        } else {
-          console.log('✅ First field created successfully:', newField);
-          toast.success(`🌾 ${fieldData.name} field created!`);
+          throw new Error(
+            fieldError.message ||
+              'Profile was saved but the first field was not created. Please add the field from Fields.'
+          );
         }
+        if (!newField) {
+          throw new Error(
+            'Profile was saved but the first field was not created (insert returned no row). Please add the field from Fields.'
+          );
+        }
+        if (import.meta.env.DEV) console.log('✅ First field created successfully:', newField);
+        toast.success(`🌾 ${fieldData.name} field created!`);
       }
 
       toast.success('🎉 Welcome to AgurateAI! Your profile is all set.');
@@ -291,13 +320,20 @@ export default function Onboarding() {
               const { data: { user } } = await supabase.auth.getUser();
               if (!user) throw new Error('Not authenticated');
 
-              await supabase
+              const { data: updated, error } = await supabase
                 .from('profiles')
                 .update({
                   onboarding_completed: true,
                   onboarding_completed_at: new Date().toISOString()
                 })
-                .eq('id', user.id);
+                .eq('id', user.id)
+                .select('id')
+                .maybeSingle();
+
+              if (error) throw error;
+              if (!updated) {
+                throw new Error('Onboarding was not marked complete (no matching row or update not permitted)');
+              }
 
               toast.success('🎉 Welcome to AgurateAI!');
               setTimeout(() => navigate('/dashboard'), 1500);

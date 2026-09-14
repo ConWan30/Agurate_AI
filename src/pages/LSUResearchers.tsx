@@ -28,7 +28,7 @@ export default function LSUResearchers() {
     setLoading(true);
     try {
       const [{ data: researchersData }, { data: publicationsData }] = await Promise.all([
-        supabase.from('lsu_researchers').select('*').order('name'),
+        supabase.from('lsu_researchers_directory').select('*').order('name'),
         supabase.from('lsu_publications').select('*').order('year', { ascending: false }).limit(10)
       ]);
 
@@ -41,11 +41,15 @@ export default function LSUResearchers() {
     }
   };
 
-  const filteredResearchers = researchers.filter(r =>
-    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.expertise.some(e => e.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    r.department.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredResearchers = researchers.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    const expertise = Array.isArray(r.expertise) ? r.expertise : [];
+    return (
+      (r.name || '').toLowerCase().includes(q) ||
+      expertise.some((e) => String(e).toLowerCase().includes(q)) ||
+      (r.department || '').toLowerCase().includes(q)
+    );
+  });
 
   if (loading) {
     return (
@@ -59,10 +63,10 @@ export default function LSUResearchers() {
     <div className="space-y-8">
       <TutorialTooltip
         steps={[
-          { id: "welcome", title: "LSU AgCenter Experts", content: "Connect with Louisiana agricultural experts for specialized support", position: "bottom" },
+          { id: "welcome", title: "LSU AgCenter directory", content: "Browse publicly listed LSU AgCenter researcher profiles for Louisiana crops", position: "bottom" },
           { id: "browse", title: "Browse Researchers", content: "Filter by expertise area (rice, soybeans, pests, soil science)", position: "bottom" },
-          { id: "ask", title: "Ask Questions", content: "Submit inquiries directly to experts with your field photos", position: "bottom" },
-          { id: "publications", title: "Research Library", content: "Access LSU studies relevant to your crops and region", position: "bottom" }
+          { id: "ask", title: "Official contact channels", content: "Reach specialists through official LSU channels — AgurateAI does not broker introductions", position: "bottom" },
+          { id: "publications", title: "Research Library", content: "Find public LSU studies relevant to your crops and region", position: "bottom" }
         ]}
         storageKey="tutorial-lsu-researchers-shown"
       />
@@ -81,14 +85,14 @@ export default function LSUResearchers() {
               <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </div>
             <Badge variant="secondary" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-              LSU AgCenter Partnership
+              LSU AgCenter research directory
             </Badge>
           </div>
           <h1 className="text-3xl md:text-4xl font-heading font-bold mb-3">
             LSU AgCenter Researchers
           </h1>
           <p className="text-lg text-white/90 max-w-2xl">
-            Connect with Louisiana State University agricultural experts for specialized guidance on your crops
+            Browse publicly listed Louisiana State University AgCenter researcher profiles. Contact them through official LSU channels — AgurateAI does not broker introductions.
           </p>
         </div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float" />
@@ -126,7 +130,9 @@ export default function LSUResearchers() {
               <LSUResearcherContactCard
                 key={researcher.id}
                 researcher={researcher}
-                onContact={() => console.log('Contact researcher:', researcher.id)}
+                onContact={() => {
+                  // Contact is handled via public LSU channels in the card UI
+                }}
               />
             ))}
           </div>
@@ -141,7 +147,7 @@ export default function LSUResearchers() {
           </div>
           <div>
             <h2 className="text-2xl font-heading font-bold">Recent LSU Publications</h2>
-            <p className="text-sm text-muted-foreground">Research backing our AI recommendations</p>
+            <p className="text-sm text-muted-foreground">Public LSU studies for Louisiana crops — not an AgurateAI partnership endorsement</p>
           </div>
         </div>
         <div className="space-y-4">
@@ -152,22 +158,24 @@ export default function LSUResearchers() {
                   <div className="flex-1">
                     <CardTitle className="text-lg font-heading">{pub.title}</CardTitle>
                     <CardDescription className="mt-2">
-                      By {pub.authors.join(', ')} • {pub.year}
+                      By {(Array.isArray(pub.authors) ? pub.authors : []).join(', ') || 'Authors not listed'} • {pub.year ?? 'Year n/a'}
                     </CardDescription>
                   </div>
-                  <AgriculturalBadge type="growing">{pub.crops[0]}</AgriculturalBadge>
+                  {Array.isArray(pub.crops) && pub.crops[0] ? (
+                    <AgriculturalBadge type="growing">{pub.crops[0]}</AgriculturalBadge>
+                  ) : null}
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex flex-wrap gap-2">
-                    {pub.topics.slice(0, 3).map((topic: string) => (
+                    {(Array.isArray(pub.topics) ? pub.topics : []).slice(0, 3).map((topic: string) => (
                       <Badge key={topic} variant="secondary" className="text-xs">
                         {topic}
                       </Badge>
                     ))}
                   </div>
-                  {pub.key_findings && pub.key_findings.length > 0 && (
+                  {Array.isArray(pub.key_findings) && pub.key_findings.length > 0 && (
                     <div className="text-sm text-muted-foreground">
                       <strong>Key Findings:</strong>
                       <ul className="list-disc list-inside mt-1 space-y-1">
@@ -200,14 +208,13 @@ export default function LSUResearchers() {
               <GraduationCap className="h-6 w-6 text-accent" />
             </div>
             <div>
-              <h3 className="font-bold mb-2">Pre-Partnership Notice</h3>
+              <h3 className="font-bold mb-2">Directory notice</h3>
               <p className="text-sm text-muted-foreground mb-3">
-                We're currently in discussions with LSU AgCenter for an official partnership. 
-                All researcher contact requests are currently routed through the LSU AgCenter general office at agcenter@lsu.edu.
+                AgurateAI is not an official LSU AgCenter partner. This page lists publicly available researcher profiles for convenience.
+                Contact researchers through official LSU channels — we do not broker introductions or claim a partnership.
               </p>
               <p className="text-sm text-muted-foreground">
-                Once the partnership is finalized, you'll have direct access to researcher contact information 
-                and personalized expert guidance for your specific crop challenges.
+                For general LSU AgCenter inquiries, use official LSU contact channels such as the AgCenter website.
               </p>
             </div>
           </div>

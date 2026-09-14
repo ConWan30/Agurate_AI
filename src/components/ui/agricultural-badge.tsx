@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface AgriculturalBadgeProps {
-  type: "healthy" | "moderate" | "severe" | "planting" | "growing" | "harvest";
+  type: "healthy" | "moderate" | "severe" | "planting" | "growing" | "harvest" | "unknown";
   children: React.ReactNode;
   className?: string;
 }
@@ -13,7 +13,8 @@ const badgeStyles = {
   severe: "bg-health-severe/10 text-health-severe border-health-severe/30 hover:bg-health-severe/20",
   planting: "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20",
   growing: "bg-secondary/10 text-secondary border-secondary/30 hover:bg-secondary/20",
-  harvest: "bg-harvest-gold/10 text-harvest-gold border-harvest-gold/30 hover:bg-harvest-gold/20"
+  harvest: "bg-harvest-gold/10 text-harvest-gold border-harvest-gold/30 hover:bg-harvest-gold/20",
+  unknown: "bg-muted text-muted-foreground border-muted-foreground/30 hover:bg-muted/80",
 };
 
 export function AgriculturalBadge({ type, children, className }: AgriculturalBadgeProps) {

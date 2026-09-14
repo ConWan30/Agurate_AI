@@ -19,7 +19,10 @@ export interface DeltaConversation {
 }
 
 export interface DeltaContext {
+  fieldId?: string | null;
+  assessmentId?: string | null;
   recentAssessment?: {
+    id?: string;
     health_score?: number;
     stress_level?: string;
     analyzed_at?: string;

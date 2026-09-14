@@ -62,7 +62,7 @@ export default function Profile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase
+      const { data: updated, error } = await supabase
         .from("profiles")
         .update({
           full_name: profile.full_name,
@@ -70,9 +70,14 @@ export default function Profile() {
           farm_name: profile.farm_name,
           email: profile.email,
         })
-        .eq("id", user.id);
+        .eq("id", user.id)
+        .select("id")
+        .maybeSingle();
 
       if (error) throw error;
+      if (!updated) {
+        throw new Error("Profile was not updated (no matching row or update not permitted)");
+      }
 
       toast({
         title: "Profile updated",
@@ -194,7 +199,7 @@ export default function Profile() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>
-              AgurateAI helps farmers in Morehouse Parish, Louisiana monitor crop health using AI-powered image analysis.
+              AgurateAI helps Louisiana Delta farmers monitor crop health using AI-powered image analysis (closed beta).
             </p>
             <p className="pt-2">
               <strong>Supported Crops:</strong> Rice, Soybean, Cotton, Corn

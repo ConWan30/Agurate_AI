@@ -3,14 +3,32 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const single = vi.fn();
+const limit = vi.fn();
+const order = vi.fn();
+const eq = vi.fn();
+const select = vi.fn();
+const from = vi.fn();
+
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    from: (...args: unknown[]) => from(...args),
+  },
+}));
+
 import { gatherUnifiedContext, formatContextForAI } from '@/lib/unified-ai-intelligence';
-import { mockSupabaseClient } from '../mocks/supabase';
 import type { UnifiedContext } from '@/types';
 
-// Mock Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: mockSupabaseClient,
-}));
+function mockQueryResult(result: { data: unknown; error: null }) {
+  const builder: Record<string, unknown> = {};
+  builder.select = select.mockReturnValue(builder);
+  builder.eq = eq.mockReturnValue(builder);
+  builder.order = order.mockReturnValue(builder);
+  builder.limit = limit.mockResolvedValue(result);
+  builder.single = single.mockResolvedValue(result);
+  return builder;
+}
 
 describe('gatherUnifiedContext', () => {
   beforeEach(() => {
@@ -19,43 +37,31 @@ describe('gatherUnifiedContext', () => {
 
   it('should gather context from all systems', async () => {
     const mockField = { id: 'field-1', name: 'Test Field', crop_type: 'rice' };
-    const mockAssessments = [{ id: 'assess-1', health_score: 85 }];
+    const mockAssessments = [{ id: 'assess-1', health_score: 85, analyzed_at: '2024-01-01', stress_level: 'low', symptoms: [] }];
 
-    // Mock Supabase responses
-    mockSupabaseClient.from.mockReturnValue(mockSupabaseClient);
-    mockSupabaseClient.select.mockReturnValue(mockSupabaseClient);
-    mockSupabaseClient.eq.mockReturnValue(mockSupabaseClient);
-    mockSupabaseClient.order.mockReturnValue(mockSupabaseClient);
-    mockSupabaseClient.limit.mockReturnValue(mockSupabaseClient);
-    mockSupabaseClient.single.mockResolvedValue({ data: mockField, error: null });
-
-    // Mock Promise.all responses
-    vi.spyOn(global, 'Promise').mockImplementation((executor) => {
-      return new Promise((resolve) => {
-        resolve([
-          { data: mockField, error: null },
-          { data: mockAssessments, error: null },
-          { data: [], error: null },
-          { data: [], error: null },
-          { data: [], error: null },
-          { data: [], error: null },
-          { data: [], error: null },
-          { data: [], error: null },
-        ]);
-      });
+    from.mockImplementation((table: string) => {
+      if (table === 'fields') {
+        return mockQueryResult({ data: mockField, error: null });
+      }
+      if (table === 'assessments') {
+        return mockQueryResult({ data: mockAssessments, error: null });
+      }
+      return mockQueryResult({ data: [], error: null });
     });
 
     const context = await gatherUnifiedContext('field-1');
 
     expect(context).toBeDefined();
-    expect(context.fieldData).toBeDefined();
-    expect(context.assessmentHistory).toBeDefined();
+    expect(context.fieldData).toEqual(mockField);
+    expect(context.assessmentHistory).toEqual(mockAssessments);
     expect(context.weatherData).toBeDefined();
+    // Do not invent readings — empty object is honest until weather is wired
+    expect(context.weatherData).toEqual({});
+    expect(from).toHaveBeenCalledWith('fields');
   });
 
   it('should return empty context on error', async () => {
-    // Mock error
-    mockSupabaseClient.from.mockImplementation(() => {
+    from.mockImplementation(() => {
       throw new Error('Database error');
     });
 
@@ -92,9 +98,8 @@ describe('formatContextForAI', () => {
 
     const formatted = formatContextForAI(context);
 
-    expect(formatted).toContain('Test Field');
     expect(formatted).toContain('rice');
     expect(formatted).toContain('85');
+    expect(formatted).toContain('UNIFIED FIELD INTELLIGENCE CONTEXT');
   });
 });
-

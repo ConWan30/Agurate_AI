@@ -1,35 +1,82 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { requireSetupSecret } from '../_shared/auth.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { enforceIpRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('🌾 Starting demo account setup...');
+    const secretCheck = requireSetupSecret(req, corsHeaders);
+    if (secretCheck !== true) {
+      return secretCheck;
+    }
+
+    const ip = req.headers.get('cf-connecting-ip')
+      ?? req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      ?? req.headers.get('x-real-ip')
+      ?? 'unknown';
+    // Reuse service client created below when possible; create a minimal one for rate limiting.
+    const rateClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+    const ipLimit = await enforceIpRateLimit(rateClient, ip, {
+      bucket: 'setup-demo-account',
+      maxRequests: RATE_LIMITS['setup-demo-account'].maxRequests,
+      windowMs: RATE_LIMITS['setup-demo-account'].windowMs,
+    });
+    if (!ipLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Starting demo account setup...');
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get demo user (must be created manually first: demo@agurateai.com)
-    const { data: { users }, error: userError } = await supabase.auth.admin.listUsers();
-    const demoUser = users?.find(u => u.email === 'demo@agurateai.com');
+    // Prefer an explicit demo user id secret to avoid listing all auth users.
+    const demoUserId = Deno.env.get('DEMO_USER_ID');
+    let demoUser: { id: string; email?: string } | null = null;
 
-    if (!demoUser) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'Demo user not found. Please create demo@agurateai.com account first.' 
-        }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (demoUserId) {
+      const { data, error: userError } = await supabase.auth.admin.getUserById(demoUserId);
+      if (userError || !data.user) {
+        return new Response(
+          JSON.stringify({
+            error: 'Demo user not found for DEMO_USER_ID. Create the account first.',
+          }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      demoUser = data.user;
+    } else {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .eq('email', 'demo@agurateai.com')
+        .maybeSingle();
+
+      if (!profile?.id) {
+        return new Response(
+          JSON.stringify({
+            error:
+              'Demo user not found. Create demo@agurateai.com first, or set DEMO_USER_ID.',
+          }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      demoUser = { id: profile.id, email: profile.email ?? 'demo@agurateai.com' };
     }
 
     console.log('✅ Demo user found:', demoUser.id);
@@ -37,49 +84,43 @@ serve(async (req) => {
     // STEP 1: Create profile
     await supabase.from('profiles').upsert({
       id: demoUser.id,
-      user_id: demoUser.id,
-      name: 'Demo Farmer',
+      full_name: 'Demo Farmer',
       email: 'demo@agurateai.com',
       farm_name: 'Demo Delta Farms',
-      beta_farmer: true
+      beta_farmer: true,
+      primary_crops: ['rice', 'soybean', 'cotton'],
     });
 
-    // STEP 2: Create 3 fields
+    // STEP 2: Create 3 DEMO fields (synthetic fixtures for screenshots — not real farm data).
+    // Coordinates are labeled Morehouse Parish demo placeholders, not claimed field GPS.
     const fieldsData = [
       {
         user_id: demoUser.id,
-        name: 'North Rice Field',
+        name: '[DEMO] North Rice Field',
         crop_type: 'rice',
         acreage: 120,
-        soil_type: 'alluvial',
         location_lat: 32.7340,
         location_lng: -91.7573,
-        planting_date: '2025-04-15',
-        irrigation_type: 'flood',
-        rice_variety: 'CL153'
+        rice_variety: 'CL153',
       },
       {
         user_id: demoUser.id,
-        name: 'South Soybean Field',
-        crop_type: 'soybeans',
+        name: '[DEMO] South Soybean Field',
+        crop_type: 'soybean',
         acreage: 180,
-        soil_type: 'claypan',
         location_lat: 32.7300,
         location_lng: -91.7600,
-        planting_date: '2025-05-01',
-        soybean_variety: 'Asgrow AG48X9'
+        soybean_variety: 'Asgrow AG48X9',
       },
       {
         user_id: demoUser.id,
-        name: 'West Cotton Field',
+        name: '[DEMO] West Cotton Field',
         crop_type: 'cotton',
         acreage: 90,
-        soil_type: 'mixed',
         location_lat: 32.7380,
         location_lng: -91.7550,
-        planting_date: '2025-04-20',
-        cotton_variety: 'DP 2012 B3XF'
-      }
+        cotton_variety: 'DP 2012 B3XF',
+      },
     ];
 
     const { data: fields, error: fieldsError } = await supabase
@@ -234,22 +275,34 @@ serve(async (req) => {
 
     const { data: assessments, error: assessError } = await supabase
       .from('assessments')
-      .upsert(assessmentsData)
+      .upsert(
+        assessmentsData.map((a) => ({
+          ...a,
+          detailed_visual_analysis:
+            'SYNTHETIC DEMO FIXTURE — not a real field assessment. Scores and symptoms are placeholders for UI screenshots only.',
+          symptoms: [
+            ...(Array.isArray(a.symptoms) ? a.symptoms : []),
+            '[DEMO FIXTURE]',
+          ],
+        })),
+      )
       .select();
 
     if (assessError) throw assessError;
-    console.log(`✅ Created ${assessments.length} assessments`);
+    console.log(`✅ Created ${assessments.length} synthetic DEMO assessments`);
 
-    // STEP 4: Create insurance claim for hail damage
+    // STEP 4: Create DEMO insurance claim fixture (synthetic — not a real claim)
     const { data: claim } = await supabase
       .from('insurance_claims')
       .insert({
         field_id: fields[0].id,
         event_type: 'hail',
         event_date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        description: 'Severe hail damage during storm on June 15, 2025. Extensive damage to rice crop at panicle initiation stage.',
-        estimated_damage_cost: 28500,
-        status: 'submitted'
+        description:
+          '[DEMO SYNTHETIC FIXTURE] Example hail-damage claim for UI screenshots only — not a real loss event.',
+        // Do not invent loss percentage — leave unset for honesty
+        estimated_loss_percentage: null,
+        status: 'draft',
       })
       .select()
       .single();
@@ -260,17 +313,17 @@ serve(async (req) => {
         claim_id: claim.id,
         assessment_id: assessments[1].id // The severe rice assessment
       });
-      console.log('✅ Created insurance claim with linked assessment');
+      console.log('✅ Created DEMO insurance claim fixture with linked assessment');
     }
 
-    // STEP 5: Create cooperative
+    // STEP 5: Create DEMO cooperative (membership count is real: 1 after insert below)
     const { data: coop } = await supabase
       .from('cooperatives')
       .insert({
         created_by: demoUser.id,
-        name: 'Delta Farmers Cooperative',
-        description: 'Northeast Louisiana farmer collaborative for shared insights and bulk purchasing',
-        member_count: 25
+        name: '[DEMO] Delta Farmers Cooperative',
+        description:
+          '[DEMO SYNTHETIC FIXTURE] Example cooperative for screenshots only — not a real organization.',
       })
       .select()
       .single();
@@ -280,17 +333,18 @@ serve(async (req) => {
         cooperative_id: coop.id,
         user_id: demoUser.id,
         role: 'member',
-        data_sharing_enabled: true
       });
-      console.log('✅ Created cooperative with demo user as member');
+      console.log('✅ Created DEMO cooperative with demo user as member');
     }
 
-    console.log('✅ Demo account setup complete!');
+    console.log('✅ Demo account setup complete (all seeded rows are synthetic fixtures)!');
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        message: 'Demo account fully populated',
+        message:
+          'Demo account populated with SYNTHETIC FIXTURES only (not real farm, assessment, claim, or cooperative data).',
+        synthetic: true,
         data: {
           user_id: demoUser.id,
           fields: fields.length,

@@ -40,10 +40,17 @@ export function BetaWelcomeBanner() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase
+      const { data: updated, error } = await supabase
         .from('profiles')
         .update({ beta_welcome_dismissed: true })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select('id')
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!updated) {
+        throw new Error('Welcome banner was not dismissed (no matching row or update not permitted)');
+      }
 
       setIsDismissed(true);
     } catch (error) {
@@ -62,9 +69,8 @@ export function BetaWelcomeBanner() {
             🎉 Welcome to the AgurateAI Beta Program!
           </p>
           <p className="text-xs text-muted-foreground">
-            You're one of the first 100 Louisiana farmers with FREE unlimited access. 
-            Your feedback shapes the future of precision agriculture. Plus, you've locked in a 
-            <span className="font-semibold text-primary"> lifetime 50% discount</span> when we launch paid plans.
+            You're in the Louisiana closed beta with free access during the beta period.
+            Your feedback shapes the future of precision agriculture. A possible discount off the published plan rate may be offered when paid plans launch — not guaranteed; confirm in-app.
           </p>
         </div>
         <Button

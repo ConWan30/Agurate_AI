@@ -7,32 +7,30 @@ export function LiveCommunityActivity() {
   const { data: stats } = useQuery({
     queryKey: ['community-stats'],
     queryFn: async () => {
-      // Fetch beta farmers count
-      const { count: betaFarmers } = await supabase
-        .from('profiles')
-        .select('id', { count: 'exact', head: true });
+      // Platform-wide beta count via SECURITY DEFINER aggregate RPC (not raw profiles under RLS).
+      const { data: betaCount, error: betaError } = await supabase.rpc('get_beta_farmer_count');
+      if (betaError) throw betaError;
 
-      // Fetch total assessments
+      // Assessment counts under RLS reflect the signed-in user's own rows only.
       const { count: totalAssessments } = await supabase
         .from('assessments')
         .select('id', { count: 'exact', head: true });
 
-      // Fetch assessments this week
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      
+
       const { count: weeklyAssessments } = await supabase
         .from('assessments')
         .select('id', { count: 'exact', head: true })
         .gte('analyzed_at', oneWeekAgo.toISOString());
 
       return {
-        betaFarmers: betaFarmers || 0,
+        betaFarmers: typeof betaCount === 'number' ? betaCount : 0,
         totalAssessments: totalAssessments || 0,
-        weeklyAssessments: weeklyAssessments || 0
+        weeklyAssessments: weeklyAssessments || 0,
       };
     },
-    refetchInterval: 60000 // Refresh every minute
+    refetchInterval: 60000,
   });
 
   return (
@@ -55,21 +53,19 @@ export function LiveCommunityActivity() {
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
               <TrendingUp className="h-4 w-4 opacity-80" />
-              <p className="text-3xl font-bold">
-                {stats?.totalAssessments ? (stats.totalAssessments / 1000).toFixed(1) : 0}K
-              </p>
+              <p className="text-3xl font-bold">{stats?.totalAssessments || 0}</p>
             </div>
-            <p className="text-sm text-primary-foreground/80">Total Assessments</p>
+            <p className="text-sm text-primary-foreground/80">Your Assessments</p>
           </div>
         </div>
 
         <div className="bg-white/10 rounded-lg p-3 space-y-1 text-xs text-primary-foreground/90">
           <p className="flex items-center gap-2">
             <span className="inline-block h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-            {stats?.weeklyAssessments || 0} scans this week
+            {stats?.weeklyAssessments || 0} of your scans this week
           </p>
-          <p>💰 $127K+ total savings across Louisiana Delta</p>
-          <p>🌾 Protecting crops from Morehouse to East Carroll Parish</p>
+          <p>Closed beta for Louisiana Delta farms — savings claims not yet validated</p>
+          <p>Focus region: Louisiana Delta (parish set by each farmer)</p>
         </div>
       </CardContent>
     </Card>

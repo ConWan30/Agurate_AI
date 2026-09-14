@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
+import { healthBuildStamp } from "./vite-plugin-health-stamp";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -12,15 +13,16 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    healthBuildStamp(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: 'prompt',
-      injectRegister: null,
-      includeAssets: ['favicon.ico', 'robots.txt', 'src/assets/*.png', 'src/assets/*.jpg'],
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      includeAssets: ['favicon.ico', 'robots.txt', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'AgurateAI - Crop Health Monitoring',
         short_name: 'AgurateAI',
-        description: 'AI-powered crop health monitoring for Louisiana Delta agriculture',
+        description: 'Closed-beta AI crop health monitoring for Louisiana Delta agriculture',
         theme_color: '#16a34a',
         background_color: '#ffffff',
         display: 'standalone',
@@ -32,13 +34,25 @@ export default defineConfig(({ mode }) => ({
             src: '/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: '/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable'
           },
           {
             src: '/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ],
         categories: ['agriculture', 'productivity', 'business'],
@@ -55,7 +69,7 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            urlPattern: /^https:\/\/.*\.(supabase\.co|lovable\.cloud)\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'supabase-cache',

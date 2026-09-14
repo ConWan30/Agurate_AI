@@ -35,12 +35,16 @@ export function TutorialFeedbackDialog({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      await supabase.from('tutorial_feedback').insert({
+      const { data: saved, error } = await supabase.from('tutorial_feedback').insert({
         tutorial_id: tutorialId,
         rating,
         comment: comment.trim() || null,
         user_id: user.id
-      });
+      }).select('id').maybeSingle();
+      if (error) throw error;
+      if (!saved) {
+        throw new Error('Feedback was not saved (insert returned no row or not permitted)');
+      }
 
       toast.success('Thanks for your feedback! It helps us improve AgurateAI.');
       onClose();

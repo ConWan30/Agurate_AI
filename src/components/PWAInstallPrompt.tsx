@@ -79,7 +79,7 @@ export default function PWAInstallPrompt() {
               </div>
               <div>
                 <CardTitle className="text-base">Install AgurateAI</CardTitle>
-                <CardDescription className="text-xs">Works offline in the field</CardDescription>
+                <CardDescription className="text-xs">Install for quicker field access</CardDescription>
               </div>
             </div>
             <Button
@@ -95,7 +95,7 @@ export default function PWAInstallPrompt() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Install AgurateAI on your device for faster access and offline capabilities in areas with poor connectivity.
+            Install AgurateAI on your device for faster access when signal is weak. Some features still need a network connection.
           </p>
           <div className="flex gap-2">
             <Button 

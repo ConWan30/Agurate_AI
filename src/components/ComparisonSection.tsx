@@ -9,22 +9,22 @@ export const ComparisonSection = memo(function ComparisonSection() {
       feature: "AI Crop Analysis",
       agurate: true,
       traditional: false,
-      description: "Instant smartphone analysis vs. lab samples"
+      description: "Smartphone photo analysis vs. waiting on lab samples"
     },
     {
       feature: "Predictive Analytics",
       agurate: true,
       traditional: false,
-      description: "7-14 day forecasts vs. reactive response"
+      description: "Optional 7–14 day planning outlooks vs. reactive-only response"
     },
     {
-      feature: "LSU Research Integration",
+      feature: "LSU Research Framing",
       agurate: true,
       traditional: "Limited",
-      description: "Direct AI access to 130+ years of research"
+      description: "Guidance framed around public LSU AgCenter research (not an official partnership)"
     },
     {
-      feature: "24/7 AI Advisor",
+      feature: "On-demand AI Advisor",
       agurate: true,
       traditional: false,
       description: "Delta Intelligence chat vs. office hours"
@@ -33,7 +33,7 @@ export const ComparisonSection = memo(function ComparisonSection() {
       feature: "Water Stress Detection",
       agurate: true,
       traditional: false,
-      description: "Real-time AI + DIRT integration"
+      description: "AI water-stress cues + link out to MSU DIRT"
     },
     {
       feature: "Variety Recommendations",
@@ -57,7 +57,7 @@ export const ComparisonSection = memo(function ComparisonSection() {
       feature: "Cost",
       agurate: "Free Beta",
       traditional: "$$$",
-      description: "Free unlimited access during beta"
+      description: "Free closed-beta access during beta"
     }
   ];
 

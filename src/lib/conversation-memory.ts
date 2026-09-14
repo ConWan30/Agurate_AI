@@ -7,6 +7,8 @@ export interface ConversationMemoryMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   context_snapshot?: {
+    field_id?: string;
+    assessment_id?: string;
     field_name?: string;
     crop_type?: string;
     health_score?: number;
@@ -33,7 +35,8 @@ export async function gatherConversationMemory(
   try {
     const { data, error } = await supabase.rpc('get_conversation_memory', {
       p_user_id: userId,
-      p_conversation_id: excludeConversationId || '',
+      p_limit: limit,
+      p_exclude_conversation_id: excludeConversationId || null,
     });
 
     if (error) {
@@ -41,14 +44,14 @@ export async function gatherConversationMemory(
       return [];
     }
 
-    // Map DB response to ConversationMemoryMessage format
     return (data || []).map((item: any) => ({
       id: item.id,
-      conversation_id: '',  // Not returned by RPC
-      role: 'assistant' as const,
-      content: JSON.stringify(item.context_data),
-      context_snapshot: item.context_data as any,
-      created_at: item.last_referenced_at,
+      conversation_id: item.conversation_id,
+      role: (item.role as ConversationMemoryMessage['role']) || 'assistant',
+      content: item.content,
+      context_snapshot: item.context_snapshot as any,
+      created_at: item.created_at,
+      conversation_title: item.conversation_title,
     }));
   } catch (error) {
     console.error('Error in gatherConversationMemory:', error);
@@ -57,25 +60,21 @@ export async function gatherConversationMemory(
 }
 
 /**
- * Create context snapshot from current field context
+ * Create context snapshot from current field context.
+ * Store IDs only — never persist client-claimed health/crop/stress as fact
+ * (those must be rebound server-side from owned rows when needed).
  */
 export function createContextSnapshot(fieldContext: DeltaContext | null): Record<string, unknown> {
   const snapshot: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
   };
 
-  if (fieldContext?.recentAssessment) {
-    snapshot.health_score = fieldContext.recentAssessment.health_score;
-    snapshot.stress_level = fieldContext.recentAssessment.stress_level;
-    snapshot.analyzed_at = fieldContext.recentAssessment.analyzed_at;
+  if (fieldContext?.fieldId) {
+    snapshot.field_id = fieldContext.fieldId;
   }
-
-  if (fieldContext?.cropType) {
-    snapshot.crop_type = fieldContext.cropType;
-  }
-
-  if (fieldContext?.healthScore) {
-    snapshot.health_score = fieldContext.healthScore;
+  if (fieldContext?.assessmentId || fieldContext?.recentAssessment?.id) {
+    snapshot.assessment_id =
+      fieldContext.assessmentId || fieldContext.recentAssessment?.id;
   }
 
   return snapshot;
@@ -112,8 +111,10 @@ export function formatConversationMemoryForAI(
     formatted += `### ${group.title}\n`;
     
     group.messages.forEach((msg) => {
-      const contextInfo = msg.context_snapshot
-        ? ` [Context: ${msg.context_snapshot.field_name || 'general'}, ${msg.context_snapshot.crop_type || ''}${msg.context_snapshot.health_score ? `, ${msg.context_snapshot.health_score}% health` : ''}]`
+      // IDs only — never replay client-claimed health/crop invent as conversation fact.
+      const snap = msg.context_snapshot;
+      const contextInfo = snap?.field_id
+        ? ` [Context: field ${String(snap.field_id).slice(0, 8)}…]`
         : '';
       
       formatted += `${msg.role === 'user' ? '👤' : '🤖'}: ${msg.content}${contextInfo}\n`;

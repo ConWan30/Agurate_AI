@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { formatAcreage } from '@/lib/agricultural-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
@@ -10,6 +11,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import FieldMapLeaflet from '@/components/FieldMapLeaflet';
 import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
 import TutorialTooltip from '@/components/TutorialTooltip';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
 
 interface Field {
   id: string;
@@ -51,7 +54,11 @@ export default function FieldMap() {
       .order('created_at', { ascending: false });
 
     const validFields = (fieldsData || []).filter(
-      f => f.location_lat && f.location_lng
+      (f) =>
+        f.location_lat != null &&
+        f.location_lng != null &&
+        Number.isFinite(Number(f.location_lat)) &&
+        Number.isFinite(Number(f.location_lng))
     );
 
     // Fetch latest assessment for each field
@@ -84,19 +91,12 @@ export default function FieldMap() {
     setIsLoading(false);
   };
 
-  const getHealthColor = (healthScore: number) => {
-    if (healthScore >= 0.75) return 'bg-health-good';
-    if (healthScore >= 0.50) return 'bg-health-moderate';
+  const getHealthColor = (healthScore: number | null | undefined) => {
+    if (!hasHealthScore(healthScore)) return 'bg-muted-foreground/40';
+    const pct = toHealthPercent(healthScore);
+    if (pct >= 75) return 'bg-health-good';
+    if (pct >= 50) return 'bg-health-moderate';
     return 'bg-health-severe';
-  };
-
-  const getStressBadgeVariant = (stressLevel: string) => {
-    switch (stressLevel?.toLowerCase()) {
-      case 'healthy': return 'default';
-      case 'moderate': return 'secondary';
-      case 'severe': return 'destructive';
-      default: return 'outline';
-    }
   };
 
   const tutorialSteps = [
@@ -142,7 +142,7 @@ export default function FieldMap() {
             Delta Field Command Center
           </h1>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Real-time spatial visualization of crop health across Louisiana Delta
+            Spatial visualization of crop health across Louisiana Delta fields
           </p>
         </div>
       </div>
@@ -170,6 +170,10 @@ export default function FieldMap() {
               <div className="w-4 h-4 rounded-full bg-health-severe border-2 border-white shadow-md" />
               <span className="text-sm">Severe (0-49%)</span>
             </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-muted-foreground/40 border-2 border-white shadow-md" />
+              <span className="text-sm">No assessment yet</span>
+            </div>
           </CardContent>
         </AnimatedCard>
 
@@ -188,7 +192,8 @@ export default function FieldMap() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {fields.map((field, idx) => {
             const assessment = assessments.find(a => a.field_id === field.id);
-            const healthScore = assessment?.health_score || 0.5;
+            const healthScore = assessment?.health_score;
+            const hasScore = hasHealthScore(healthScore);
 
             return (
               <AnimatedCard key={field.id} delay={idx * 50} hover>
@@ -197,35 +202,45 @@ export default function FieldMap() {
                     <div className="space-y-1">
                       <h3 className="font-heading font-bold text-lg">{field.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {field.crop_type} • {field.acreage || 'N/A'} acres
+                        {field.crop_type} • {formatAcreage(field.acreage)}
                       </p>
                     </div>
-                    <div className={`w-6 h-6 rounded-full ${getHealthColor(healthScore)} border-2 border-white shadow-md`} aria-label={`Health indicator: ${(healthScore * 100).toFixed(0)}%`} />
+                    <div
+                      className={`w-6 h-6 rounded-full ${getHealthColor(healthScore)} border-2 border-white shadow-md`}
+                      aria-label={
+                        hasScore
+                          ? `Health indicator: ${toHealthPercent(healthScore).toFixed(0)}%`
+                          : 'Health indicator: no assessment yet'
+                      }
+                    />
                   </div>
 
-                  {assessment && (
+                  {assessment && hasScore ? (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Activity className="h-4 w-4" aria-hidden="true" />
                         <span className="font-mono font-semibold">
-                          Health: {(healthScore * 100).toFixed(0)}%
+                          Health: {toHealthPercent(healthScore).toFixed(0)}%
                         </span>
                       </div>
-                      <AgriculturalBadge type={
-                        assessment.stress_level?.toLowerCase() === 'healthy' ? 'healthy' :
-                        assessment.stress_level?.toLowerCase() === 'moderate' ? 'moderate' : 'severe'
-                      }>
-                        {assessment.stress_level}
-                      </AgriculturalBadge>
+                      {normalizeStressLevel(assessment.stress_level) ? (
+                        <AgriculturalBadge type={stressBadgeType(assessment.stress_level)}>
+                          {formatStressLabel(assessment.stress_level)}
+                        </AgriculturalBadge>
+                      ) : (
+                        <Badge variant="outline">Stress not recorded</Badge>
+                      )}
                       <p className="text-xs text-muted-foreground">
                         Last analyzed: <time dateTime={assessment.analyzed_at}>{new Date(assessment.analyzed_at).toLocaleDateString()}</time>
                       </p>
                     </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No assessment yet</p>
                   )}
 
                   <div className="pt-2 border-t">
                     <p className="text-xs text-muted-foreground">
-                      📍 {field.location_lat.toFixed(4)}, {field.location_lng.toFixed(4)}
+                      📍 {field.location_lat != null && field.location_lng != null ? `${Number(field.location_lat).toFixed(4)}, ${Number(field.location_lng).toFixed(4)}` : 'Location not set'}
                     </p>
                   </div>
                 </CardContent>

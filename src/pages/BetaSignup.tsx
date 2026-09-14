@@ -70,15 +70,13 @@ export default function BetaSignup() {
   const onSubmit = async (data: BetaSignupForm) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beta-signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const { data: result, error: invokeError } = await supabase.functions.invoke('beta-signup', {
+        body: data,
       });
 
-      const result = await response.json();
+      if (invokeError) {
+        throw invokeError;
+      }
 
       if (!result.success) {
         if (result.error === 'beta_full') {
@@ -168,14 +166,14 @@ export default function BetaSignup() {
             🌾 Join AgurateAI Beta Program
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground">
-            Free for First 100 Louisiana Delta Farmers + Lifetime 50% Discount
+            Closed beta for Louisiana Delta farmers — possible 50% off the published rate after launch
           </p>
           
           {/* Beta Status */}
           <div className="flex flex-col items-center gap-4 py-6">
             <Badge variant={isCritical ? "destructive" : showUrgency ? "default" : "secondary"} className="text-lg px-4 py-2">
               <Sparkles className="mr-2 h-4 w-4" />
-              {betaCount}/100 spots filled
+              {betaCount} beta farmers enrolled
             </Badge>
             <div className="w-full max-w-md">
               <Progress value={spotsPercentage} className="h-3" />
@@ -183,12 +181,12 @@ export default function BetaSignup() {
             {isCritical && (
               <p className="text-destructive font-semibold flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
-                Only {spotsRemaining} spots remaining! Join now to secure your lifetime discount.
+                Closed beta seats are limited. Join for a possible 50% off the published plan rate after launch.
               </p>
             )}
             {showUrgency && !isCritical && (
               <p className="text-primary font-semibold">
-                🔔 {spotsRemaining} spots remaining - Join the beta program soon!
+                🔔 Closed beta enrollment is limited — join while seats remain.
               </p>
             )}
           </div>
@@ -207,11 +205,11 @@ export default function BetaSignup() {
             <Card className="border-2 hover:border-primary transition-colors">
               <CardHeader>
                 <Rocket className="h-10 w-10 text-primary mb-2" />
-                <CardTitle className="text-xl">Free Unlimited Access</CardTitle>
+                <CardTitle className="text-xl">Closed-beta free access</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Use all 17 features completely free during beta period
+                  Use core closed-beta features at no charge while the program is open
                 </p>
               </CardContent>
             </Card>
@@ -219,11 +217,11 @@ export default function BetaSignup() {
             <Card className="border-2 hover:border-primary transition-colors">
               <CardHeader>
                 <DollarSign className="h-10 w-10 text-primary mb-2" />
-                <CardTitle className="text-xl">Lifetime 50% Discount</CardTitle>
+                <CardTitle className="text-xl">Beta pricing benefit</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Lock in 50% off forever when beta ends
+                  Possible 50% off the published plan rate when paid plans launch — not guaranteed; confirm in-app
                 </p>
               </CardContent>
             </Card>
@@ -261,14 +259,14 @@ export default function BetaSignup() {
           <h2 className="text-3xl font-heading font-bold text-center mb-8">What You'll Get</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              "AI Crop Analysis Engine (instant health assessment)",
+              "AI Crop Analysis Engine (decision-aid health assessment)",
               "7-Day Stress Predictions (proactive forecasting)",
-              "Delta Intelligence Chat (24/7 agricultural advisor)",
+              "Delta Intelligence Chat (on-demand agricultural advisor)",
               "Insurance Claim Documentation (automated evidence)",
               "Community Intelligence Network (anonymous benchmarking)",
               "Interactive Field Map with GPS tagging",
               "Weather-Correlated Health Timeline",
-              "LSU AgCenter Validated Recommendations",
+              "Recommendations framed around LSU AgCenter research",
               "Conservation Practice Tracking",
               "Variety Performance Analytics",
               "ROI Calculator for treatments",
@@ -290,7 +288,7 @@ export default function BetaSignup() {
             <CardHeader>
               <CardTitle className="text-2xl font-heading">Start Your Free Beta</CardTitle>
               <CardDescription>
-                Join the first 100 Louisiana Delta farmers to get lifetime 50% discount
+                Join the Louisiana Delta closed beta for research-framed crop health tools
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -303,7 +301,7 @@ export default function BetaSignup() {
                       <FormItem>
                         <FormLabel>Name *</FormLabel>
                         <FormControl>
-                          <Input placeholder="James Collins" {...field} />
+                          <Input placeholder="Jordan Farmer" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -379,7 +377,7 @@ export default function BetaSignup() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="rice">🌾 Rice</SelectItem>
-                            <SelectItem value="soybeans">🟢 Soybeans</SelectItem>
+                            <SelectItem value="soybean">🟢 Soybeans</SelectItem>
                             <SelectItem value="cotton">⚪ Cotton</SelectItem>
                             <SelectItem value="corn">🌽 Corn</SelectItem>
                             <SelectItem value="multiple">Multiple crops</SelectItem>
@@ -480,23 +478,23 @@ export default function BetaSignup() {
       {/* Trust Indicators */}
       <section className="container mx-auto px-4 py-12 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h2 className="text-2xl font-heading font-bold">Trusted by Louisiana Farmers</h2>
+          <h2 className="text-2xl font-heading font-bold">Closed beta for Louisiana Delta farmers</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <p className="text-3xl font-bold text-primary">95%</p>
-              <p className="text-muted-foreground">AI Accuracy</p>
+              <p className="text-3xl font-bold text-primary">100</p>
+              <p className="text-muted-foreground">Beta partner spots</p>
             </div>
             <div className="space-y-2">
               <p className="text-3xl font-bold text-primary">LSU AgCenter</p>
-              <p className="text-muted-foreground">Validated</p>
+              <p className="text-muted-foreground">Research framing only</p>
             </div>
             <div className="space-y-2">
-              <p className="text-3xl font-bold text-primary">100%</p>
-              <p className="text-muted-foreground">Data Privacy</p>
+              <p className="text-3xl font-bold text-primary">Yours</p>
+              <p className="text-muted-foreground">Farm data stays yours</p>
             </div>
           </div>
           <p className="text-sm text-muted-foreground pt-4">
-            🔒 Your data stays private - you own your farm data
+            Not scientifically validated. Decision aid for early pilot partners — not a certified diagnosis.
           </p>
         </div>
       </section>
@@ -509,14 +507,14 @@ export default function BetaSignup() {
             <AccordionItem value="item-1">
               <AccordionTrigger>How long is the beta program?</AccordionTrigger>
               <AccordionContent>
-                Beta program runs until we reach 100 farmers. After that, beta farmers continue with lifetime 50% discount.
+                Closed beta enrollment is limited. Beta farmers may be offered a discount off the published plan rate when paid plans launch (not guaranteed; confirm in-app).
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger>What happens when beta ends?</AccordionTrigger>
               <AccordionContent>
-                You'll automatically get lifetime 50% discount on all paid plans. Free access continues until paid plans launch.
+                A possible discount off the published plan rate may be offered on paid plans (not guaranteed). Free access continues until paid plans launch.
               </AccordionContent>
             </AccordionItem>
 
@@ -530,7 +528,7 @@ export default function BetaSignup() {
             <AccordionItem value="item-4">
               <AccordionTrigger>Is my data secure?</AccordionTrigger>
               <AccordionContent>
-                Absolutely. You own your farm data. We use bank-level encryption and never share individual data.
+                You own your farm data. We do not sell individual farm data. Access is protected with authenticated accounts and database row-level security.
               </AccordionContent>
             </AccordionItem>
 

@@ -41,7 +41,7 @@ export default function InstallPage() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex gap-2">
                 <span className="text-primary">✓</span>
-                <span>Works offline in areas with poor connectivity</span>
+                <span>Caches recently viewed screens for faster reloads; live AI scans still need network</span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary">✓</span>
@@ -102,7 +102,7 @@ export default function InstallPage() {
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground p-3 bg-muted/50 rounded-lg">
             <Wifi className="h-4 w-4" />
-            <span>Works offline after installation</span>
+            <span>Recently viewed screens may load faster after install; live AI scans still need network</span>
           </div>
         </CardContent>
       </Card>

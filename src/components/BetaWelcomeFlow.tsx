@@ -42,13 +42,9 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
   const { data: betaCount } = useQuery({
     queryKey: ['beta-count'],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('beta_farmer', true);
-
+      const { data, error } = await supabase.rpc('get_beta_farmer_count');
       if (error) throw error;
-      return count || 0;
+      return data ?? 0;
     }
   });
 
@@ -60,12 +56,17 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
 
   const handleGetStarted = async () => {
     try {
-      const { error } = await supabase
+      const { data: updated, error } = await supabase
         .from('profiles')
         .update({ beta_welcome_shown: true })
-        .eq('id', userId);
+        .eq('id', userId)
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!updated) {
+        throw new Error('Welcome flag was not saved (no matching row or update not permitted)');
+      }
 
       setIsOpen(false);
       toast.success('Welcome to AgurateAI! 🎉');
@@ -104,7 +105,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             Welcome to AgurateAI Beta! 🎉
           </h2>
           <p className="text-xl text-muted-foreground">
-            You're Beta Farmer #{betaCount} of 100
+            You're Beta Farmer #{betaCount}
           </p>
         </div>
 
@@ -120,18 +121,18 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             <div className="flex items-start gap-3">
               <CheckCircle className="h-6 w-6 text-health-good flex-shrink-0 mt-1" />
               <div>
-                <p className="font-semibold text-foreground">FREE Unlimited Access</p>
+                <p className="font-semibold text-foreground">Closed-beta free access</p>
                 <p className="text-sm text-muted-foreground">
-                  All 17 features completely free during beta (6-12 months)
+                  Core features available at no charge while closed beta is open
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <TrendingDown className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <div>
-                <p className="font-semibold text-foreground">Lifetime 50% Discount</p>
+                <p className="font-semibold text-foreground">Possible discount off published rate</p>
                 <p className="text-sm text-muted-foreground">
-                  Lock in $39.50/month forever (regular $79/month)
+                  Possible 50% off the published plan rate when paid plans launch — not guaranteed; confirm in-app
                 </p>
               </div>
             </div>
@@ -176,7 +177,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             </p>
             <p className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Beta ends when we reach 100 farmers or secure LSU partnership</span>
+              <span>Beta ends when we reach 100 farmers or graduate to a public launch</span>
             </p>
           </CardContent>
         </Card>

@@ -16,11 +16,12 @@ import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
 import { EnhancedPageHeader } from '@/components/EnhancedPageHeader';
 import TutorialTooltip from '@/components/TutorialTooltip';
+import { formatConfidencePercent, normalizeRiskLevel } from '@/lib/risk-confidence';
 
 interface Prediction {
   day: number;
   date: string;
-  risk_level: 'low' | 'medium' | 'high';
+  risk_level: 'low' | 'medium' | 'high' | string;
   predicted_stress: string;
   confidence: number;
   weather_factor: string;
@@ -77,9 +78,10 @@ export default function Predictions() {
       }
 
       // Check if we got back a message about needing more data
-      if (data && data.forecast && data.forecast.length === 0) {
+      if (!data || !Array.isArray(data.forecast) || data.forecast.length === 0) {
         setNeedsMoreData(true);
-        toast.info(data.summary || 'Need more assessment data to generate predictions');
+        setPredictions(null);
+        toast.info(data?.summary || 'Need more assessment data to generate predictions');
       } else {
         setPredictions(data);
       }
@@ -142,18 +144,20 @@ export default function Predictions() {
   };
 
   const getRiskColor = (level: string) => {
-    switch (level) {
+    switch (normalizeRiskLevel(level)) {
       case 'high': return 'bg-destructive/10 text-destructive border-destructive/20';
       case 'medium': return 'bg-secondary/10 text-secondary-foreground border-secondary/20';
-      default: return 'bg-primary/10 text-primary border-primary/20';
+      case 'low': return 'bg-primary/10 text-primary border-primary/20';
+      default: return 'bg-muted text-muted-foreground border-muted-foreground/20';
     }
   };
 
   const getRiskIcon = (level: string) => {
-    switch (level) {
+    switch (normalizeRiskLevel(level)) {
       case 'high': return <AlertTriangle className="h-5 w-5 text-health-severe" aria-label="High risk" />;
       case 'medium': return <AlertTriangle className="h-5 w-5 text-health-moderate" aria-label="Medium risk" />;
-      default: return <TrendingUp className="h-5 w-5 text-health-good" aria-label="Low risk" />;
+      case 'low': return <TrendingUp className="h-5 w-5 text-health-good" aria-label="Low risk" />;
+      default: return <Cloud className="h-5 w-5 text-muted-foreground" aria-label="Risk not recorded" />;
     }
   };
 
@@ -162,7 +166,7 @@ export default function Predictions() {
       target: 'predictions-header',
       id: 'header',
       title: 'Step 1: 7-Day Predictions',
-      content: 'Get AI-powered stress predictions for the next 7 days based on weather and historical data.',
+      content: 'Review model-assisted stress outlooks for the next 7 days when weather and history are available.',
       position: 'bottom' as const,
     },
     {
@@ -191,7 +195,7 @@ export default function Predictions() {
           icon={TrendingUp}
           badge={{ icon: Sparkles, text: "Unified AI Intelligence" }}
           title="Predictive Analytics"
-          description="AI-powered forecasts combining crop analysis, weather patterns, conservation practices, and community intelligence for 7-30 day predictions"
+          description="Model-assisted outlooks that may combine crop analysis, weather, conservation notes, and community signals when those inputs are available — for planning, not certainty"
           gradient="delta"
         />
       </div>
@@ -310,18 +314,22 @@ export default function Predictions() {
                     <div className="flex items-center justify-between py-2">
                       <span className="text-sm font-semibold">Risk Level:</span>
                       <Badge variant="outline" className={getRiskColor(pred.risk_level)}>
-                        {pred.risk_level.toUpperCase()}
+                        {normalizeRiskLevel(pred.risk_level)
+                          ? normalizeRiskLevel(pred.risk_level).toUpperCase()
+                          : 'NOT RECORDED'}
                       </Badge>
                     </div>
                     
                     <div className="flex items-center justify-between py-2">
                       <span className="text-sm font-semibold">Predicted Stress:</span>
-                      <span className="text-sm font-medium">{pred.predicted_stress}</span>
+                      <span className="text-sm font-medium">{pred.predicted_stress || 'Not recorded'}</span>
                     </div>
 
                     <div className="flex items-center justify-between py-2">
                       <span className="text-sm font-semibold">Confidence:</span>
-                      <span className="text-base font-bold font-mono">{(pred.confidence * 100).toFixed(0)}%</span>
+                      <span className="text-base font-bold font-mono">
+                        {formatConfidencePercent(pred.confidence)}
+                      </span>
                     </div>
 
                     <div className="pt-4 border-t space-y-2">
@@ -361,7 +369,7 @@ export default function Predictions() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
                     <Cloud className="h-4 w-4" />
-                    <span>Real-time weather correlation</span>
+                    <span>Weather correlation</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
                     <TrendingUp className="h-4 w-4" />
@@ -421,13 +429,13 @@ export default function Predictions() {
                   <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-secondary/10">
                     <Zap className="h-5 w-5 text-secondary" aria-hidden="true" />
                   </div>
-                  <CardTitle className="text-lg font-heading">LSU-Validated</CardTitle>
+                  <CardTitle className="text-lg font-heading">Research-informed</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  All predictions and recommendations are cross-referenced with LSU AgCenter research data 
-                  and validated against proven agricultural practices for Louisiana Delta conditions.
+                  Predictions and recommendations are framed around publicly available LSU AgCenter research
+                  for Louisiana Delta conditions. This is a decision aid — not scientific validation or an official LSU partnership.
                 </CardDescription>
               </CardContent>
             </Card>

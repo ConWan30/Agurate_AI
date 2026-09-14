@@ -173,8 +173,10 @@ export async function enrichFormContext(
   supabase: SupabaseClient
 ): Promise<boolean> {
   try {
-    // Log form completion analytics
-    console.log(`Form completed: ${formType}`, extractedData);
+    // Log form completion analytics in development only
+    if (import.meta.env.DEV) {
+      console.log(`Form completed: ${formType}`, extractedData);
+    }
 
     // Future: Add to intelligence pool for pattern recognition
     // This would integrate with unified-ai-intelligence.ts enrichUnifiedContext()

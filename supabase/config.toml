@@ -3,6 +3,8 @@ project_id = "rkfvefhjyuyhjmcljzev"
 [functions.analyze-crop]
 verify_jwt = true
 
+# Secret-gated admin helper (DEMO_SETUP_SECRET). Gateway JWT stays off so
+# operators can call it with the shared secret header only.
 [functions.setup-demo-account]
 verify_jwt = false
 
@@ -39,13 +41,27 @@ verify_jwt = true
 [functions.conversational-form]
 verify_jwt = true
 
-# These functions verify the user token themselves, so the gateway-level JWT
-# check is disabled to let CORS preflight (OPTIONS) requests through.
+# JWT required — functions also call requireAuthenticatedUser as defense in depth.
 [functions.get-market-prices]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-daily-briefing]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-predictive-questions]
+verify_jwt = true
+
+[functions.beta-signup]
 verify_jwt = false
+
+[functions.compare-images]
+verify_jwt = true
+
+[functions.detect-critical-alerts]
+verify_jwt = true
+
+[functions.generate-image-annotations]
+verify_jwt = true
+
+[functions.get-usage-stats]
+verify_jwt = true

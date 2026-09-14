@@ -35,6 +35,8 @@ export function handleAuthError(corsHeaders: Record<string, string>): Response {
   );
 }
 
+export { corsHeaders, getCorsHeaders } from './cors.ts';
+
 export function handleForbiddenError(corsHeaders: Record<string, string>): Response {
   return new Response(
     JSON.stringify({ error: 'Access denied' }),

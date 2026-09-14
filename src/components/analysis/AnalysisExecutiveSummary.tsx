@@ -5,16 +5,16 @@ import { HealthScoreGauge } from "./HealthScoreGauge";
 import { QuickInsightCard } from "./QuickInsightCard";
 
 interface AnalysisExecutiveSummaryProps {
-  healthScore: number;
+  healthScore: number | null;
   stressLevel: string;
   condition: string;
   yieldImpact?: number;
-  diseaseCount: number;
-  diseasePressure: "none" | "mild" | "moderate" | "severe";
-  pestCount: number;
-  pestPressure: "none" | "mild" | "moderate" | "severe";
-  nutrientDeficiencies: number;
-  highestNutrientSeverity: "none" | "mild" | "moderate" | "severe";
+  diseaseCount: number | null;
+  diseasePressure?: "none" | "mild" | "moderate" | "severe";
+  pestCount: number | null;
+  pestPressure?: "none" | "mild" | "moderate" | "severe";
+  nutrientDeficiencies: number | null;
+  highestNutrientSeverity: "none" | "mild" | "moderate" | "severe" | "unknown";
   historicalComparison?: {
     trend: "improving" | "stable" | "declining";
     context: string;
@@ -27,7 +27,7 @@ export function AnalysisExecutiveSummary({
   healthScore,
   stressLevel,
   condition,
-  yieldImpact = 0,
+  yieldImpact,
   diseaseCount,
   diseasePressure,
   pestCount,
@@ -38,7 +38,8 @@ export function AnalysisExecutiveSummary({
   criticalIssue,
   topRecommendation
 }: AnalysisExecutiveSummaryProps) {
-  const showCriticalAlert = healthScore < 50 || diseasePressure === "severe" || pestPressure === "severe";
+  const hasScore = healthScore != null && Number.isFinite(healthScore);
+  const showCriticalAlert = (hasScore && healthScore < 50) || diseasePressure === "severe" || pestPressure === "severe";
 
   const TrendIndicator = () => {
     if (!historicalComparison) return null;
@@ -60,13 +61,13 @@ export function AnalysisExecutiveSummary({
       {showCriticalAlert && criticalIssue && (
         <Alert variant="destructive" className="border-2">
           <AlertTriangle className="h-5 w-5" />
-          <AlertTitle className="text-lg font-bold">🚨 Immediate Action Required</AlertTitle>
+          <AlertTitle className="text-lg font-bold">Immediate action may be needed</AlertTitle>
           <AlertDescription className="text-base">
-            {criticalIssue} detected. 
-            {yieldImpact > 0 && ` Estimated yield impact: ${Math.abs(yieldImpact)}%.`}
+            {criticalIssue} detected.
+            {yieldImpact != null && Number.isFinite(yieldImpact) && yieldImpact !== 0 && ` Estimated yield impact: ${Math.abs(yieldImpact)}% (model estimate — verify in field).`}
             {topRecommendation && (
               <span className="block mt-2 font-semibold">
-                Recommended action: {topRecommendation}
+                Suggested next step: {topRecommendation}
               </span>
             )}
           </AlertDescription>
@@ -80,15 +81,24 @@ export function AnalysisExecutiveSummary({
             <div className="flex-1">
               <p className="text-sm text-muted-foreground mb-2 font-medium">Crop Health Score</p>
               <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-6xl font-bold text-primary">{Math.round(healthScore)}</span>
-                <span className="text-2xl text-muted-foreground">/100</span>
+                <span className="text-6xl font-bold text-primary">
+                  {hasScore ? Math.round(healthScore) : '—'}
+                </span>
+                {hasScore && <span className="text-2xl text-muted-foreground">/100</span>}
                 {historicalComparison && <TrendIndicator />}
               </div>
               <p className="text-lg font-semibold capitalize">
-                {stressLevel} - {condition}
+                {stressLevel || 'Stress not recorded'}
+                {condition ? ` - ${condition}` : ''}
               </p>
             </div>
-            <HealthScoreGauge score={healthScore} size="lg" />
+            {hasScore ? (
+              <HealthScoreGauge score={healthScore} size="lg" />
+            ) : (
+              <p className="text-sm text-muted-foreground max-w-[8rem] text-right">
+                Health score not available
+              </p>
+            )}
           </div>
           
           {historicalComparison && (
@@ -109,30 +119,46 @@ export function AnalysisExecutiveSummary({
         <QuickInsightCard
           icon={AlertTriangle}
           label="Diseases"
-          value={diseaseCount}
-          severity={diseasePressure}
-          urgent={diseasePressure === "severe"}
+          value={diseaseCount == null ? "—" : diseaseCount}
+          severity={diseaseCount == null ? "unknown" : diseasePressure}
+          urgent={diseaseCount != null && diseasePressure === "severe"}
         />
         <QuickInsightCard
           icon={Bug}
           label="Pests"
-          value={pestCount}
-          severity={pestPressure}
-          urgent={pestPressure === "severe"}
+          value={pestCount == null ? "—" : pestCount}
+          severity={pestCount == null ? "unknown" : pestPressure}
+          urgent={pestCount != null && pestPressure === "severe"}
         />
         <QuickInsightCard
           icon={Sprout}
           label="Nutrient Issues"
-          value={nutrientDeficiencies}
-          severity={highestNutrientSeverity}
-          urgent={highestNutrientSeverity === "severe"}
+          value={nutrientDeficiencies == null ? "—" : nutrientDeficiencies}
+          severity={nutrientDeficiencies == null ? "unknown" : highestNutrientSeverity}
+          urgent={nutrientDeficiencies != null && highestNutrientSeverity === "severe"}
         />
         <QuickInsightCard
           icon={Droplets}
           label="Yield Impact"
-          value={yieldImpact > 0 ? `-${Math.abs(yieldImpact)}%` : `+${Math.abs(yieldImpact)}%`}
-          severity={yieldImpact > 20 ? "severe" : yieldImpact > 10 ? "moderate" : yieldImpact > 0 ? "mild" : "none"}
-          urgent={yieldImpact > 20}
+          value={
+            yieldImpact == null || Number.isNaN(Number(yieldImpact))
+              ? 'Not estimated'
+              : yieldImpact > 0
+                ? `-${Math.abs(yieldImpact)}%`
+                : `${Math.abs(yieldImpact)}%`
+          }
+          severity={
+            yieldImpact == null || Number.isNaN(Number(yieldImpact))
+              ? 'unknown'
+              : yieldImpact > 20
+                ? 'severe'
+                : yieldImpact > 10
+                  ? 'moderate'
+                  : yieldImpact > 0
+                    ? 'mild'
+                    : 'none'
+          }
+          urgent={yieldImpact != null && yieldImpact > 20}
         />
       </div>
     </div>

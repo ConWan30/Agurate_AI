@@ -1,80 +1,116 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+function toHealthPercent(score: number | null | undefined): number {
+  if (score == null || Number.isNaN(Number(score))) return 0;
+  const n = Number(score);
+  if (n <= 1) return Math.round(n * 1000) / 10;
+  return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
+}
+
+function hasHealthScore(score: unknown): score is number {
+  return score != null && !Number.isNaN(Number(score));
+}
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    );
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const rateLimitClient = getAnonClient(authHeader);
 
-    // Get user from auth
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const rateLimit = await enforceRateLimit(rateLimitClient, user.id, {
+      functionName: 'generate-predictive-questions',
+      maxRequests: RATE_LIMITS['generate-predictive-questions'].maxRequests,
+      windowMs: RATE_LIMITS['generate-predictive-questions'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser();
-
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Parse request body
+    // Parse request body — IDs only; hydrate owned field/assessment server-side.
     const body = await req.json();
     const {
-      fieldContext,
+      fieldId,
+      assessmentId,
       conversationHistory = [],
       maxQuestions = 3,
     } = body;
 
-    // Build context prompt for AI
+    if (!fieldId || !assessmentId) {
+      return new Response(
+        JSON.stringify({ error: 'fieldId and assessmentId are required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const { data: field, error: fieldError } = await rateLimitClient
+      .from('fields')
+      .select('id, crop_type, user_id')
+      .eq('id', fieldId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (fieldError) throw fieldError;
+    if (!field) {
+      return new Response(
+        JSON.stringify({ error: 'Field not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const { data: assessment, error: assessmentError } = await rateLimitClient
+      .from('assessments')
+      .select('id, field_id, health_score, stress_level, symptoms, disease_identified, pest_identified')
+      .eq('id', assessmentId)
+      .eq('field_id', fieldId)
+      .maybeSingle();
+    if (assessmentError) throw assessmentError;
+    if (!assessment) {
+      return new Response(
+        JSON.stringify({ error: 'Assessment not found for field' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // Build context prompt for AI from persisted rows only
     let contextPrompt = 'You are Delta Intelligence, an AI assistant for Louisiana Delta farmers.\n\n';
-    
-    if (fieldContext?.recentAssessment) {
-      const healthScore = (fieldContext.healthScore || 0) * 100;
-      const cropType = fieldContext.cropType || 'crops';
-      const stressLevel = fieldContext.stressLevel || 'unknown';
-      
-      contextPrompt += `FIELD STATUS:\n`;
-      contextPrompt += `- Crop Type: ${cropType}\n`;
+
+    const cropType = field.crop_type || 'crops';
+    contextPrompt += `FIELD STATUS:\n`;
+    contextPrompt += `- Crop Type: ${cropType}\n`;
+    if (hasHealthScore(assessment.health_score)) {
+      const healthScore = toHealthPercent(assessment.health_score);
       contextPrompt += `- Health Score: ${healthScore.toFixed(0)}%\n`;
-      contextPrompt += `- Stress Level: ${stressLevel}\n`;
-      
-      if (fieldContext.symptoms && fieldContext.symptoms.length > 0) {
-        contextPrompt += `- Symptoms: ${fieldContext.symptoms.join(', ')}\n`;
+      if (assessment.stress_level) {
+        contextPrompt += `- Stress Level: ${assessment.stress_level}\n`;
       }
-      
-      if (fieldContext.diseases && fieldContext.diseases.length > 0) {
-        contextPrompt += `- Diseases Detected: ${fieldContext.diseases.join(', ')}\n`;
-      }
-      
-      if (fieldContext.pests && fieldContext.pests.length > 0) {
-        contextPrompt += `- Pests Detected: ${fieldContext.pests.join(', ')}\n`;
-      }
+    } else {
+      contextPrompt += `- Health Score: not available — do not invent health, stress, or urgency\n`;
+    }
+
+    const symptoms = Array.isArray(assessment.symptoms) ? assessment.symptoms : [];
+    const diseases = Array.isArray(assessment.disease_identified) ? assessment.disease_identified : [];
+    const pests = Array.isArray(assessment.pest_identified) ? assessment.pest_identified : [];
+    if (symptoms.length > 0) {
+      contextPrompt += `- Symptoms: ${symptoms.join(', ')}\n`;
+    }
+    if (diseases.length > 0) {
+      contextPrompt += `- Diseases Detected: ${diseases.join(', ')}\n`;
+    }
+    if (pests.length > 0) {
+      contextPrompt += `- Pests Detected: ${pests.join(', ')}\n`;
     }
 
     if (conversationHistory.length > 0) {
@@ -92,7 +128,8 @@ serve(async (req) => {
     contextPrompt += `\n- Use natural, conversational language`;
     contextPrompt += `\n- Each question should be concise (max 15 words)`;
     contextPrompt += `\n- Prioritize urgent issues if health score is low`;
-    contextPrompt += `\n\nReturn ONLY a JSON array of question strings, no other text. Example: ["Should I apply fungicide now?", "What's causing the yellowing in my rice?", "How much will treatment cost?"]`;
+    contextPrompt += `\n- Do NOT ask dollar/ROI/cost questions unless the farmer already provided cost inputs (they did not).`;
+    contextPrompt += `\n\nReturn ONLY a JSON array of question strings, no other text. Example: ["Should I apply fungicide now?", "What's causing the yellowing in my rice?", "When should I scout this field next?"]`;
 
     // Call AI Gateway
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -123,57 +160,28 @@ serve(async (req) => {
     const aiData = await aiResponse.json();
     const aiContent = aiData.choices?.[0]?.message?.content || '[]';
 
-    // Parse AI response (might be JSON or text)
+    // Parse AI response — fail closed on unparseable invent
     let questions: string[] = [];
     try {
-      // Try to parse as JSON first
       const parsed = JSON.parse(aiContent);
       if (Array.isArray(parsed)) {
-        questions = parsed;
-      } else if (typeof parsed === 'string') {
-        // Sometimes AI returns a single string, try to split it
-        questions = [parsed];
+        questions = parsed
+          .filter((q: unknown): q is string => typeof q === 'string')
+          .map((q: string) => q.trim())
+          .filter((q: string) => q.length > 10 && q.length < 100)
+          .slice(0, maxQuestions);
       }
     } catch {
-      // If not JSON, try to extract questions from text
-      const lines = aiContent.split('\n').filter((line: string) => line.trim());
-      questions = lines
-        .map((line: string) => {
-          // Remove numbering, quotes, etc.
-          return line
-            .replace(/^\d+\.\s*/, '')
-            .replace(/^[-*]\s*/, '')
-            .replace(/^["']|["']$/g, '')
-            .trim();
-        })
-        .filter((q: string) => q.length > 10 && q.length < 100)
-        .slice(0, maxQuestions);
+      throw new Error('Predictive questions AI returned unparseable JSON — refusing to invent questions');
     }
 
-    // Fallback to default questions if AI didn't generate good ones
-    if (questions.length === 0 || questions.some((q: string) => q.length < 10)) {
-      const healthScore = (fieldContext?.healthScore || 0) * 100;
-      const cropType = fieldContext?.cropType || 'crops';
-      
-      if (healthScore < 70) {
-        questions = [
-          `What's causing the stress in my ${cropType}?`,
-          'Should I treat immediately or wait?',
-          'How much will treatment cost vs. potential loss?',
-        ];
-      } else if (healthScore < 85) {
-        questions = [
-          `Is my ${cropType} recovery on track?`,
-          'Do I need additional monitoring?',
-          'What preventive measures should I take?',
-        ];
-      } else {
-        questions = [
-          `What should I monitor in my ${cropType} this week?`,
-          'Any upcoming weather concerns?',
-          'Best practices for maintaining health?',
-        ];
-      }
+    // Generic fallbacks only — never invent stress narratives from health bands
+    if (questions.length === 0) {
+      questions = [
+        `What should I check in my ${cropType} this week?`,
+        'Any weather concerns I should plan around?',
+        'When should I take my next field assessment?',
+      ].slice(0, maxQuestions);
     }
 
     return new Response(

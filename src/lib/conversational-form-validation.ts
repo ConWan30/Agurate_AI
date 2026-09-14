@@ -15,7 +15,7 @@ export const fieldRegistrationSchema = z.object({
   
   crop_type: z.union([
     z.literal('rice'),
-    z.literal('soybeans'),
+    z.literal('soybean'),
     z.literal('cotton'),
     z.literal('corn')
   ]),
@@ -139,7 +139,7 @@ export const onboardingSchema = z.object({
   
   primary_crops: z.array(z.union([
     z.literal('rice'),
-    z.literal('soybeans'),
+    z.literal('soybean'),
     z.literal('cotton'),
     z.literal('corn')
   ]))
@@ -200,5 +200,6 @@ export function sanitizeInput(input: string): string {
   return input
     .trim()
     .replace(/[<>]/g, '') // Remove potential HTML tags
-    .replace(/[\x00-\x1F\x7F]/g, ''); // Remove control characters
+    // eslint-disable-next-line no-control-regex -- intentional control-char strip
+    .replace(/[\u0000-\u001F\u007F]/g, '');
 }

@@ -29,16 +29,15 @@ interface CooperativeAlert {
   resolved_at: string | null;
 }
 
-function AcknowledgeButton({ alert, onAcknowledge }: { alert: CooperativeAlert; onAcknowledge: (id: string) => void }) {
-  const [userId, setUserId] = useState<string | null>(null);
+function AcknowledgeButton({
+  alert,
+  onAcknowledge,
+}: {
+  alert: CooperativeAlert;
+  onAcknowledge: (id: string) => Promise<boolean>;
+}) {
   const [loading, setLoading] = useState(false);
   const [acknowledged, setAcknowledged] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUserId(user?.id || null);
-    });
-  }, []);
 
   if (acknowledged) {
     return (
@@ -54,9 +53,12 @@ function AcknowledgeButton({ alert, onAcknowledge }: { alert: CooperativeAlert; 
       size="sm"
       onClick={async () => {
         setLoading(true);
-        await onAcknowledge(alert.id);
-        setAcknowledged(true);
-        setLoading(false);
+        try {
+          const ok = await onAcknowledge(alert.id);
+          if (ok) setAcknowledged(true);
+        } finally {
+          setLoading(false);
+        }
       }}
       disabled={loading}
     >
@@ -95,37 +97,70 @@ export function CooperativeAlertsManager() {
     }
   };
 
-  const acknowledgeAlert = async (alertId: string) => {
+  const acknowledgeAlert = async (alertId: string): Promise<boolean> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        toast.error('Sign in required to acknowledge alerts');
+        return false;
+      }
 
       const { error } = await supabase.rpc('acknowledge_cooperative_alert', {
         alert_id: alertId,
-        user_id: user.id,
       });
 
       if (error) throw error;
 
       toast.success('Alert acknowledged');
       fetchAlerts();
+      return true;
     } catch (error) {
       console.error('Error acknowledging alert:', error);
       toast.error('Failed to acknowledge alert');
+      return false;
     }
   };
 
+  const normalizeSeverity = (
+    severity: string
+  ): 'critical' | 'high' | 'medium' | 'low' | 'unknown' => {
+    const s = (severity || '').toLowerCase();
+    if (s === 'critical' || s === 'high' || s === 'medium' || s === 'low') return s;
+    return 'unknown';
+  };
+
   const getSeverityVariant = (severity: string): 'default' | 'destructive' | 'outline' | 'secondary' => {
-    switch (severity) {
+    switch (normalizeSeverity(severity)) {
       case 'critical':
         return 'destructive';
       case 'high':
         return 'default';
       case 'medium':
+      case 'low':
         return 'outline';
       default:
+        // Fail closed — never style unknown severity as attention blue/yellow
         return 'secondary';
     }
+  };
+
+  const getSeverityBorder = (severity: string) => {
+    switch (normalizeSeverity(severity)) {
+      case 'critical':
+        return 'border-destructive animate-pulse';
+      case 'high':
+        return 'border-orange-500';
+      case 'medium':
+      case 'low':
+        return 'border-muted';
+      default:
+        return 'border-muted';
+    }
+  };
+
+  const getSeverityLabel = (severity: string) => {
+    const n = normalizeSeverity(severity);
+    return n === 'unknown' ? 'SEVERITY UNKNOWN' : n.toUpperCase();
   };
 
   const getAlertTypeIcon = (alertType: string) => {
@@ -197,13 +232,7 @@ export function CooperativeAlertsManager() {
       {alerts.map((alert) => (
         <Card 
           key={alert.id} 
-          className={`border-2 ${
-            alert.severity === 'critical' 
-              ? 'border-destructive animate-pulse' 
-              : alert.severity === 'high'
-              ? 'border-orange-500'
-              : 'border-blue-500'
-          }`}
+          className={`border-2 ${getSeverityBorder(alert.severity)}`}
         >
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -212,7 +241,7 @@ export function CooperativeAlertsManager() {
                   <span className="text-2xl">{getAlertTypeIcon(alert.alert_type)}</span>
                   <CardTitle className="text-lg">{alert.title}</CardTitle>
                   <Badge variant={getSeverityVariant(alert.severity)}>
-                    {alert.severity}
+                    {getSeverityLabel(alert.severity)}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
@@ -236,7 +265,8 @@ export function CooperativeAlertsManager() {
           <CardContent className="space-y-3">
             <p className="text-sm leading-relaxed">{alert.message}</p>
             
-            {alert.affected_area_acres && (
+            {alert.affected_area_acres != null &&
+              Number.isFinite(Number(alert.affected_area_acres)) && (
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Affected: {alert.affected_area_acres} acres</span>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client'
+import { formatAcreage } from "@/lib/agricultural-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
@@ -20,6 +21,9 @@ import bgCropDamage from "@/assets/bg-crop-damage.jpg";
 import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalForm";
 import { Sparkles } from "lucide-react";
 import TutorialTooltip from '@/components/TutorialTooltip';
+import { formatHealthPercent, hasHealthScore } from '@/lib/health-score';
+import { parseLossPercentage, requireLossPercentage } from '@/lib/loss-percentage';
+import { validateExtractedData } from '@/lib/conversational-form-validation';
 
 export default function Insurance() {
   const [open, setOpen] = useState(false);
@@ -59,15 +63,30 @@ export default function Insurance() {
 
   const createClaim = useMutation({
     mutationFn: async (formData: FormData) => {
-      const { error } = await supabase.from('insurance_claims').insert([{
-        field_id: formData.get('field_id') as string,
-        event_type: formData.get('event_type') as string,
-        event_date: formData.get('event_date') as string,
-        estimated_loss_percentage: Number(formData.get('estimated_loss_percentage')),
-        description: formData.get('description') as string,
+      const rawLoss = formData.get('estimated_loss_percentage');
+      const estimated_loss_percentage =
+        rawLoss === null || rawLoss === ''
+          ? null
+          : requireLossPercentage(rawLoss);
+      const validated = validateExtractedData('insurance-claim', {
+        field_id: formData.get('field_id'),
+        event_type: formData.get('event_type'),
+        event_date: formData.get('event_date'),
+        description: formData.get('description') || 'Claim filed via form',
+        estimated_loss_percentage: estimated_loss_percentage ?? undefined,
+      });
+      const { data: created, error } = await supabase.from('insurance_claims').insert([{
+        field_id: validated.field_id,
+        event_type: validated.event_type,
+        event_date: validated.event_date,
+        estimated_loss_percentage: validated.estimated_loss_percentage ?? null,
+        description: validated.description,
         status: 'draft'
-      }]);
+      }]).select('id').maybeSingle();
       if (error) throw error;
+      if (!created) {
+        throw new Error('Claim was not created (insert returned no row or not permitted)');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
@@ -93,7 +112,10 @@ export default function Insurance() {
         field: {
           name: claim.field?.name || 'Unknown Field',
           crop_type: claim.field?.crop_type || 'unknown',
-          acreage: claim.field?.acreage || 0,
+          acreage:
+            claim.field?.acreage != null && Number.isFinite(Number(claim.field.acreage))
+              ? Number(claim.field.acreage)
+              : null,
         },
         assessment: claim.assessment ? {
           health_score: claim.assessment.health_score,
@@ -125,15 +147,35 @@ export default function Insurance() {
 
   const handleConversationalComplete = async (extractedData: InsuranceClaimData) => {
     try {
-      const { error } = await supabase.from('insurance_claims').insert([{
+      const estimated_loss_percentage = parseLossPercentage(
+        extractedData.estimatedLossPercentage ?? extractedData.estimated_loss_percentage,
+      );
+      if (
+        (extractedData.estimatedLossPercentage != null ||
+          extractedData.estimated_loss_percentage != null) &&
+        estimated_loss_percentage == null
+      ) {
+        throw new Error('Estimated loss must be a number between 0 and 100');
+      }
+      const validated = validateExtractedData('insurance-claim', {
         field_id: extractedData.fieldId || extractedData.field_id,
         event_type: extractedData.eventType || extractedData.event_type,
         event_date: extractedData.eventDate || extractedData.event_date,
-        estimated_loss_percentage: Number(extractedData.estimatedLossPercentage || extractedData.estimated_loss_percentage),
         description: extractedData.description,
+        estimated_loss_percentage: estimated_loss_percentage ?? undefined,
+      });
+      const { data: created, error } = await supabase.from('insurance_claims').insert([{
+        field_id: validated.field_id,
+        event_type: validated.event_type,
+        event_date: validated.event_date,
+        estimated_loss_percentage: validated.estimated_loss_percentage ?? null,
+        description: validated.description,
         status: 'draft'
-      }]);
+      }]).select('id').maybeSingle();
       if (error) throw error;
+      if (!created) {
+        throw new Error('Claim was not created (insert returned no row or not permitted)');
+      }
       
       queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
       toast.success('🎉 Insurance claim created successfully!', {
@@ -153,7 +195,7 @@ export default function Insurance() {
       target: 'insurance-header',
       id: 'header',
       title: 'Step 1: Insurance Claims',
-      content: 'Document crop damage with GPS-stamped photos for faster insurance claims.',
+      content: 'Document crop damage with GPS-stamped photos to support insurance claim documentation.',
       position: 'bottom' as const,
     },
     {
@@ -193,7 +235,7 @@ export default function Insurance() {
                 Insurance Claims
               </h1>
               <p className="text-white/90 text-base md:text-lg">
-                Document crop damage for insurance providers with AI-verified evidence
+                Document crop damage for insurance providers with AI-assisted, timestamped field notes — not insurer verification
               </p>
             </div>
             <Dialog open={conversationalOpen} onOpenChange={setConversationalOpen}>
@@ -236,7 +278,7 @@ export default function Insurance() {
               <div>
                 <h3 className="font-semibold mb-2">Purpose</h3>
                 <p className="text-sm text-muted-foreground">
-                  Document crop damage events with AI-backed evidence for faster, more accurate insurance claims. 
+                  Document crop damage events with AI-backed evidence to support insurance claim documentation. 
                   Link your AgurateAI crop assessments directly to insurance claims to provide objective, 
                   timestamped health data that supports your loss estimates.
                 </p>
@@ -273,7 +315,7 @@ export default function Insurance() {
                 <div className="p-3 bg-background rounded-lg">
                   <div className="font-semibold text-primary mb-1">2. Link AI Data</div>
                   <p className="text-muted-foreground">
-                    AI assessments from the same field are automatically available as evidence
+                    You can link field assessments from the same field as claim evidence
                   </p>
                 </div>
                 <div className="p-3 bg-background rounded-lg">
@@ -286,10 +328,10 @@ export default function Insurance() {
             </div>
 
             <div className="p-4 bg-health-good/10 border border-health-good/20 rounded-lg">
-              <p className="text-sm font-medium text-health-good mb-1">💰 Estimated Value</p>
+              <p className="text-sm font-medium text-health-good mb-1">📋 Documentation support</p>
               <p className="text-sm text-muted-foreground">
-                Farmers with documented AI evidence settle claims <strong>40% faster</strong> and recover 
-                <strong> 15-25% more</strong> in payouts due to objective, timestamped crop health data.
+                Timestamped crop-health records can help support insurance conversations. Settlement
+                speed and payout amounts vary by carrier and are not guaranteed by AgurateAI.
               </p>
             </div>
           </CardContent>
@@ -317,7 +359,7 @@ export default function Insurance() {
                         {claim.field?.name}
                       </CardTitle>
                       <CardDescription>
-                        {claim.field?.crop_type} • {claim.field?.acreage} acres
+                        {claim.field?.crop_type} • {formatAcreage(claim.field?.acreage)}
                       </CardDescription>
                     </div>
                     <Badge 
@@ -340,7 +382,12 @@ export default function Insurance() {
                     </div>
                     <div className="flex items-center gap-2">
                       <TrendingDown className="h-4 w-4 text-destructive" />
-                      <span>{claim.estimated_loss_percentage}% Est. Loss</span>
+                      <span>
+                        {claim.estimated_loss_percentage != null &&
+                        Number.isFinite(Number(claim.estimated_loss_percentage))
+                          ? `${claim.estimated_loss_percentage}% Est. Loss`
+                          : 'Est. Loss not recorded'}
+                      </span>
                     </div>
                   </div>
 
@@ -362,11 +409,17 @@ export default function Insurance() {
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
                           <span className="text-muted-foreground">Health Score:</span>
-                          <span className="ml-2 font-semibold">{claim.assessment.health_score}/100</span>
+                          <span className="ml-2 font-semibold">
+                            {hasHealthScore(claim.assessment.health_score)
+                              ? `${formatHealthPercent(claim.assessment.health_score)}`
+                              : 'Not recorded'}
+                          </span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Stress Level:</span>
-                          <span className="ml-2 font-semibold capitalize">{claim.assessment.stress_level}</span>
+                          <span className="ml-2 font-semibold capitalize">
+                            {claim.assessment.stress_level || 'not recorded'}
+                          </span>
                         </div>
                       </div>
                     </div>

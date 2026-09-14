@@ -24,7 +24,9 @@ const signUpSchema = z.object({
   email: z.string().email("Invalid email address").max(255, "Email too long"),
   password: z.string()
     .min(8, "Password must be at least 8 characters")
-    .max(72, "Password too long"),
+    .max(72, "Password too long")
+    .regex(/[A-Za-z]/, "Password must include a letter")
+    .regex(/[0-9]/, "Password must include a number"),
   fullName: z.string()
     .min(1, "Full name is required")
     .max(100, "Name too long")
@@ -83,16 +85,21 @@ export default function Auth() {
 
       if (data.user) {
         // Create profile
-        const { error: profileError } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .insert({
             id: data.user.id,
             email: signUpData.email,
             full_name: signUpData.fullName,
             farm_name: signUpData.farmName || null,
-          });
+          })
+          .select("id")
+          .maybeSingle();
 
         if (profileError) throw profileError;
+        if (!profile) {
+          throw new Error("Account was created but profile was not saved (insert returned no row or not permitted)");
+        }
 
       toast({
         title: "Account created!",
@@ -144,7 +151,7 @@ export default function Auth() {
       });
       navigate("/dashboard");
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create account';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in';
       toast({
         title: "Error",
         description: errorMessage,
@@ -198,7 +205,7 @@ export default function Auth() {
               <h1 className="text-5xl font-heading font-bold">
                 Agurate<span className="text-primary-foreground">AI</span>
               </h1>
-              <p className="text-sm opacity-75 mt-1">Morehouse Parish, Louisiana</p>
+              <p className="text-sm opacity-75 mt-1">Louisiana Delta · Closed beta</p>
             </div>
           </div>
 
@@ -212,8 +219,8 @@ export default function Auth() {
           </h2>
           
               <p className="text-lg opacity-90 mb-8 leading-relaxed">
-            Real-time crop health monitoring for rice, soybean, cotton, and corn. 
-            Built on LSU AgCenter research.
+            Crop health assessments for rice, soybean, cotton, and corn. 
+            Guidance framed around publicly available LSU AgCenter research.
           </p>
 
           {/* Feature list with icons */}
@@ -223,8 +230,8 @@ export default function Auth() {
                 <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
-                <p className="font-semibold">Real-time Crop Assessment</p>
-                <p className="text-sm opacity-75">Instant AI-powered analysis</p>
+                <p className="font-semibold">Crop Health Assessment</p>
+                <p className="text-sm opacity-75">Research-framed crop health assessments</p>
               </div>
             </div>
             
@@ -233,8 +240,8 @@ export default function Auth() {
                 <Shield className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
-                <p className="font-semibold">LSU Research-Based</p>
-                <p className="text-sm opacity-75">Built on 130+ years of research</p>
+                <p className="font-semibold">Research-informed</p>
+                <p className="text-sm opacity-75">Framed around public LSU AgCenter research</p>
               </div>
             </div>
             
@@ -281,7 +288,7 @@ export default function Auth() {
                 <span className="text-3xl font-display font-bold">
                   Agurate<span className="text-primary">AI</span>
                 </span>
-                <p className="text-xs text-muted-foreground">Morehouse Parish, LA</p>
+                <p className="text-xs text-muted-foreground">Louisiana Delta · Closed beta</p>
               </div>
             </div>
             <p className="text-muted-foreground">AI-Powered Crop Health Monitoring</p>
@@ -479,11 +486,16 @@ export default function Auth() {
                         }
                         className="h-11 border-2 focus:border-primary transition-colors"
                         required
-                        minLength={6}
+                        minLength={8}
+                        autoComplete="new-password"
                       />
-                      <p className="text-xs text-muted-foreground">
-                        Must be at least 6 characters long
-                      </p>
+                      {errors.password ? (
+                        <p className="text-sm text-destructive mt-1">{errors.password}</p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          At least 8 characters with a letter and a number
+                        </p>
+                      )}
                     </div>
 
                     {/* Trust indicators */}

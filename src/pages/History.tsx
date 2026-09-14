@@ -26,7 +26,11 @@ import { DetailedAnalysisTabs } from "@/components/analysis/DetailedAnalysisTabs
 import { ImageHistoryComparison } from "@/components/ImageHistoryComparison";
 import { ExpertEscalationCard } from "@/components/ExpertEscalationCard";
 import { PeerComparisonCard } from "@/components/PeerComparisonCard";
+import { getTreatmentType } from "@/lib/phase4-helpers";
 import { AnnotatedImage, type ImageAnnotation } from "@/components/AnnotatedImage";
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { normalizeStressLevel } from '@/lib/stress-level';
+import { resolveCropImageUrls } from '@/lib/crop-image';
 
 interface Assessment {
   id: string;
@@ -34,8 +38,8 @@ interface Assessment {
   stress_level: string;
   symptoms: string[];
   confidence_score: number;
-  weather_temp_f: number;
-  weather_precipitation_mm: number;
+  weather_temp_f: number | null;
+  weather_precipitation_mm: number | null;
   image_url: string;
   created_at: string;
   growth_stage?: string;
@@ -100,7 +104,10 @@ export default function History() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      if (data) setAssessments(data);
+      if (data) {
+        // Mint fresh signed URLs for display (image_url may be a storage path)
+        setAssessments(await resolveCropImageUrls(supabase, data as Assessment[]));
+      }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load assessments';
       toast({
@@ -115,14 +122,19 @@ export default function History() {
 
   const handleFeedback = async (assessmentId: string, wasHelpful: boolean) => {
     try {
-      const { error } = await supabase
+      const { data: saved, error } = await supabase
         .from("feedback")
         .insert({
           assessment_id: assessmentId,
           was_helpful: wasHelpful,
-        });
+        })
+        .select("id")
+        .maybeSingle();
 
       if (error) throw error;
+      if (!saved) {
+        throw new Error("Feedback was not saved (insert returned no row or not permitted)");
+      }
       toast({ title: "Thank you for your feedback!" });
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to submit feedback';
@@ -135,12 +147,12 @@ export default function History() {
   };
 
   const getStressIcon = (stressLevel: string) => {
-    switch (stressLevel) {
-      case "Healthy":
+    switch (normalizeStressLevel(stressLevel)) {
+      case "healthy":
         return <CheckCircle2 className="h-5 w-5 text-health-good" aria-label="Healthy crop status" />;
-      case "Moderate":
+      case "moderate":
         return <AlertTriangle className="h-5 w-5 text-health-moderate" aria-label="Moderate stress detected" />;
-      case "Severe":
+      case "severe":
         return <AlertCircle className="h-5 w-5 text-health-severe" aria-label="Severe stress detected" />;
       default:
         return null;
@@ -225,15 +237,17 @@ export default function History() {
                         <div className="flex items-center gap-3">
                           {getStressIcon(assessment.stress_level)}
                           <div>
-                            <CardTitle className="text-xl font-heading">{assessment.field.name}</CardTitle>
+                            <CardTitle className="text-xl font-heading">{assessment.field?.name ?? 'Unknown field'}</CardTitle>
                             <CardDescription className="capitalize">
-                              {assessment.field.crop_type} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy 'at' h:mm a")}</time>
+                              {assessment.field?.crop_type ?? 'Crop unknown'} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy 'at' h:mm a")}</time>
                             </CardDescription>
                           </div>
                         </div>
                        <div className="text-right">
                           <div className="text-3xl font-bold font-mono text-foreground">
-                            {Math.round((assessment.health_score || 0) * 100)}
+                            {hasHealthScore(assessment.health_score)
+                              ? Math.round(toHealthPercent(assessment.health_score))
+                              : '—'}
                           </div>
                           <p className="text-xs text-muted-foreground">Health Score</p>
                         </div>
@@ -242,11 +256,13 @@ export default function History() {
                      <CardContent>
                       <div className="flex items-center justify-between gap-4">
                         <AgriculturalBadge 
-                          type={assessment.stress_level === "Healthy" ? "healthy" : assessment.stress_level === "Moderate" ? "moderate" : "severe"}
+                          type={
+                            normalizeStressLevel(assessment.stress_level) || "unknown"
+                          }
                         >
-                          {assessment.stress_level}
+                          {assessment.stress_level || "Stress not recorded"}
                         </AgriculturalBadge>
-                        <Button variant="outline" size="sm" className="focus-ring flex-shrink-0" aria-label={`View details for ${assessment.field.name}`}>
+                        <Button variant="outline" size="sm" className="focus-ring flex-shrink-0" aria-label={`View details for ${assessment.field?.name ?? 'assessment'}`}>
                           View Details
                         </Button>
                       </div>
@@ -296,7 +312,7 @@ export default function History() {
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-heading flex items-center gap-3">
                     {getStressIcon(selectedAssessment.stress_level)}
-                    {selectedAssessment.field.name} - Comprehensive Analysis
+                    {selectedAssessment.field?.name ?? 'Unknown field'} - Comprehensive Analysis
                   </DialogTitle>
                 </DialogHeader>
 
@@ -332,14 +348,7 @@ export default function History() {
                                     'Authorization': `Bearer ${session?.access_token}`,
                                   },
                                   body: JSON.stringify({
-                                    image_url: selectedAssessment.image_url,
-                                    analysis_context: {
-                                      health_score: (selectedAssessment.health_score || 0) * 100,
-                                      stress_level: selectedAssessment.stress_level,
-                                      symptoms: selectedAssessment.symptoms,
-                                      diseases: selectedAssessment.disease_identified,
-                                      pests: selectedAssessment.pest_identified,
-                                    },
+                                    assessment_id: selectedAssessment.id,
                                   }),
                                 });
 
@@ -374,12 +383,12 @@ export default function History() {
                   </div>
 
                   {/* Image History Comparison Button */}
-                  {selectedAssessment.field.id && (
+                  {selectedAssessment.field?.id && (
                     <div className="flex justify-end">
                       <Button
                         variant="outline"
                         onClick={() => {
-                          setComparisonFieldId(selectedAssessment.field.id);
+                          setComparisonFieldId(selectedAssessment.field!.id);
                           setShowImageComparison(true);
                         }}
                       >
@@ -390,19 +399,49 @@ export default function History() {
 
                   {/* Executive Summary */}
                   <AnalysisExecutiveSummary
-                    healthScore={(selectedAssessment.health_score || 0) * 100}
+                    healthScore={
+                      hasHealthScore(selectedAssessment.health_score)
+                        ? toHealthPercent(selectedAssessment.health_score)
+                        : null
+                    }
                     stressLevel={selectedAssessment.stress_level}
                     condition={selectedAssessment.stress_level}
-                    yieldImpact={selectedAssessment.estimated_yield_impact_percent || 0}
-                    diseaseCount={selectedAssessment.disease_identified?.length || 0}
-                    diseasePressure={(selectedAssessment.severity_ratings?.disease_pressure as any) || "none"}
-                    pestCount={selectedAssessment.pest_identified?.length || 0}
-                    pestPressure={(selectedAssessment.severity_ratings?.pest_pressure as any) || "none"}
+                    yieldImpact={selectedAssessment.estimated_yield_impact_percent != null && Number.isFinite(Number(selectedAssessment.estimated_yield_impact_percent)) ? Number(selectedAssessment.estimated_yield_impact_percent) : undefined}
+                    diseaseCount={
+                      Array.isArray(selectedAssessment.disease_identified)
+                        ? selectedAssessment.disease_identified.length
+                        : null
+                    }
+                    diseasePressure={
+                      selectedAssessment.severity_ratings?.disease_pressure === "none" ||
+                      selectedAssessment.severity_ratings?.disease_pressure === "mild" ||
+                      selectedAssessment.severity_ratings?.disease_pressure === "moderate" ||
+                      selectedAssessment.severity_ratings?.disease_pressure === "severe"
+                        ? selectedAssessment.severity_ratings.disease_pressure
+                        : undefined
+                    }
+                    pestCount={
+                      Array.isArray(selectedAssessment.pest_identified)
+                        ? selectedAssessment.pest_identified.length
+                        : null
+                    }
+                    pestPressure={
+                      selectedAssessment.severity_ratings?.pest_pressure === "none" ||
+                      selectedAssessment.severity_ratings?.pest_pressure === "mild" ||
+                      selectedAssessment.severity_ratings?.pest_pressure === "moderate" ||
+                      selectedAssessment.severity_ratings?.pest_pressure === "severe"
+                        ? selectedAssessment.severity_ratings.pest_pressure
+                        : undefined
+                    }
                     nutrientDeficiencies={
-                      (selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ? 1 : 0) +
-                      (selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ? 1 : 0) +
-                      (selectedAssessment.nutrient_deficiencies?.potassium?.detected ? 1 : 0) +
-                      (selectedAssessment.nutrient_deficiencies?.other?.length || 0)
+                      selectedAssessment.nutrient_deficiencies == null
+                        ? null
+                        : (selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ? 1 : 0) +
+                          (selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ? 1 : 0) +
+                          (selectedAssessment.nutrient_deficiencies?.potassium?.detected ? 1 : 0) +
+                          (Array.isArray(selectedAssessment.nutrient_deficiencies?.other)
+                            ? selectedAssessment.nutrient_deficiencies.other.length
+                            : 0)
                     }
                     highestNutrientSeverity={
                       selectedAssessment.nutrient_deficiencies?.nitrogen?.severity === "severe" ||
@@ -413,14 +452,17 @@ export default function History() {
                           selectedAssessment.nutrient_deficiencies?.phosphorus?.severity === "moderate" ||
                           selectedAssessment.nutrient_deficiencies?.potassium?.severity === "moderate"
                         ? "moderate"
+                        : selectedAssessment.nutrient_deficiencies == null
+                        ? "unknown"
                         : selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ||
                           selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ||
                           selectedAssessment.nutrient_deficiencies?.potassium?.detected
-                        ? "mild"
+                        ? "unknown"
                         : "none"
                     }
                     criticalIssue={
-                      (selectedAssessment.health_score || 0) * 100 < 50
+                      hasHealthScore(selectedAssessment.health_score) &&
+                      toHealthPercent(selectedAssessment.health_score) < 50
                         ? "Severe crop stress"
                         : (selectedAssessment.severity_ratings?.disease_pressure === "severe" ||
                             selectedAssessment.severity_ratings?.disease_pressure === "high")
@@ -431,17 +473,23 @@ export default function History() {
                   />
 
                   {/* Action Center with Recommendations */}
-                  {selectedAssessment.recommendations.length > 0 && (
+                  {selectedAssessment.recommendations && selectedAssessment.recommendations.length > 0 && (
                     <>
                       <ActionCenter
                         recommendations={selectedAssessment.recommendations.map(rec => ({
                           ...rec,
-                          reasoning: rec.category ? `${rec.category.replace(/_/g, " ")} recommendation based on field analysis` : undefined
+                          reasoning: typeof rec.reasoning === 'string' && rec.reasoning.trim()
+                            ? rec.reasoning
+                            : undefined
                         }))}
-                        fieldId={selectedAssessment.field.id}
-                        fieldName={selectedAssessment.field.name}
-                        cropType={selectedAssessment.field.crop_type}
-                        healthScoreBefore={(selectedAssessment.health_score || 0) * 100}
+                        fieldId={selectedAssessment.field?.id ?? selectedAssessment.field_id}
+                        fieldName={selectedAssessment.field?.name ?? 'Unknown field'}
+                        cropType={selectedAssessment.field?.crop_type ?? 'unknown'}
+                        healthScoreBefore={
+                          hasHealthScore(selectedAssessment.health_score)
+                            ? toHealthPercent(selectedAssessment.health_score)
+                            : undefined
+                        }
                         stressLevel={selectedAssessment.stress_level}
                         symptoms={selectedAssessment.symptoms || []}
                         onSetReminder={(rec) => {
@@ -466,17 +514,22 @@ export default function History() {
                         rec.category === 'irrigation'
                       ) && (
                         <PeerComparisonCard
-                          treatmentType={
-                            selectedAssessment.recommendations.find(rec => 
-                              rec.category === 'pest_management'
-                            ) ? 'fungicide' :
-                            selectedAssessment.recommendations.find(rec => 
-                              rec.category === 'fertilization'
-                            ) ? 'fertilizer' : 'general'
-                          }
-                          cropType={selectedAssessment.field.crop_type}
+                          fieldId={selectedAssessment.field?.id ?? selectedAssessment.field_id}
+                          treatmentType={getTreatmentType(
+                            selectedAssessment.recommendations.find(
+                              (rec) =>
+                                rec.category === 'pest_management' ||
+                                rec.category === 'fertilization' ||
+                                rec.category === 'irrigation'
+                            )?.category ?? 'general'
+                          )}
+                          cropType={selectedAssessment.field?.crop_type ?? 'unknown'}
                           stressLevel={selectedAssessment.stress_level}
-                          currentHealthScore={(selectedAssessment.health_score || 0) * 100}
+                          currentHealthScore={
+                            hasHealthScore(selectedAssessment.health_score)
+                              ? toHealthPercent(selectedAssessment.health_score)
+                              : undefined
+                          }
                         />
                       )}
                     </>
@@ -494,10 +547,12 @@ export default function History() {
                       }
                       issueDescription={
                         selectedAssessment.detailed_visual_analysis ||
-                        `Health score: ${(selectedAssessment.health_score || 0) * 100}%, Stress: ${selectedAssessment.stress_level}`
+                        (hasHealthScore(selectedAssessment.health_score)
+                          ? `Health score: ${toHealthPercent(selectedAssessment.health_score)}%, Stress: ${selectedAssessment.stress_level || 'not recorded'}`
+                          : `Health score not available. Stress: ${selectedAssessment.stress_level || 'not recorded'}`)
                       }
-                      confidenceScore={(selectedAssessment.confidence_score || 0) * 100}
-                      fieldId={selectedAssessment.field.id}
+                      confidenceScore={hasHealthScore(selectedAssessment.confidence_score) ? toHealthPercent(selectedAssessment.confidence_score) : undefined}
+                      fieldId={selectedAssessment.field?.id ?? selectedAssessment.field_id}
                       assessmentId={selectedAssessment.id}
                       aiAnalysis={{
                         health_score: selectedAssessment.health_score,
@@ -513,27 +568,32 @@ export default function History() {
                   <DiseasePestDetection
                     diseases={selectedAssessment.disease_identified?.map(name => ({
                       name,
-                      severity: "moderate" as const,
-                      description: `${name} detected in field analysis`
+                      severity: "unknown" as const,
+                      description: `${name} detected in field analysis — severity not separately scored`
                     }))}
                     pests={selectedAssessment.pest_identified?.map(name => ({
                       name,
-                      severity: "moderate" as const,
-                      description: `${name} detected in field analysis`
+                      severity: "unknown" as const,
+                      description: `${name} detected in field analysis — severity not separately scored`
                     }))}
                   />
 
                   {/* Economic Impact */}
-                  {selectedAssessment.estimated_yield_impact_percent !== undefined && (
+                  {selectedAssessment.estimated_yield_impact_percent != null
+                    && Number.isFinite(Number(selectedAssessment.estimated_yield_impact_percent)) && (
                     <EconomicImpact
-                      yieldImpact={selectedAssessment.estimated_yield_impact_percent}
-                      cropType={selectedAssessment.field.crop_type}
+                      yieldImpact={Number(selectedAssessment.estimated_yield_impact_percent)}
+                      cropType={selectedAssessment.field?.crop_type ?? 'unknown'}
                     />
                   )}
 
                   {/* Detailed Analysis Tabs */}
                   <DetailedAnalysisTabs
-                    healthScore={(selectedAssessment.health_score || 0) * 100}
+                    healthScore={
+                      hasHealthScore(selectedAssessment.health_score)
+                        ? toHealthPercent(selectedAssessment.health_score)
+                        : null
+                    }
                     stressLevel={selectedAssessment.stress_level}
                     growthStage={selectedAssessment.growth_stage}
                     canopyCoverage={selectedAssessment.canopy_coverage_percent}
@@ -547,24 +607,33 @@ export default function History() {
                     detailedVisualAnalysis={selectedAssessment.detailed_visual_analysis}
                   />
 
-                  {/* Weather Conditions */}
+                  {/* Weather Conditions — only when recorded values exist */}
+                  {(selectedAssessment.weather_temp_f != null || selectedAssessment.weather_precipitation_mm != null) && (
                   <Card className="bg-muted/50">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm">Weather Conditions at Analysis</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex gap-6">
+                        {selectedAssessment.weather_temp_f != null && (
                         <div>
                           <p className="text-2xl font-bold">{selectedAssessment.weather_temp_f}°F</p>
                           <p className="text-xs text-muted-foreground">Temperature</p>
                         </div>
+                        )}
+                        {selectedAssessment.weather_precipitation_mm != null &&
+                          Number.isFinite(Number(selectedAssessment.weather_precipitation_mm)) && (
                         <div>
-                          <p className="text-2xl font-bold">{selectedAssessment.weather_precipitation_mm} mm</p>
-                          <p className="text-xs text-muted-foreground">Precipitation</p>
+                          <p className="text-2xl font-bold">
+                            {(Number(selectedAssessment.weather_precipitation_mm) / 25.4).toFixed(2)}"
+                          </p>
+                          <p className="text-xs text-muted-foreground">Precipitation (7-day)</p>
                         </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
+                  )}
 
                   {/* Symptoms */}
                   {selectedAssessment.symptoms && selectedAssessment.symptoms.length > 0 && (

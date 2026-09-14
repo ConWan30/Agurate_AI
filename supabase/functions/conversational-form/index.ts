@@ -1,11 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.1";
-import { handleError, handleAuthError, handleRateLimitError } from '../_shared/errorHandler.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getAnonClient, getServiceClient, requireAuthenticatedUser } from '../_shared/auth.ts'
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
+import { handleError, handleRateLimitError } from '../_shared/errorHandler.ts';
 
 // Sanitize user input to prevent prompt injection and XSS
 function sanitizeInput(input: string): string {
@@ -101,7 +98,7 @@ Your goal: Extract the following information through natural conversation:
 Context awareness:
 - If the farmer has existing fields, reference them ("I see you have South Rice Field...")
 - Suggest similar setups based on their farm patterns
-- Use community averages for guidance ("Most Morehouse Parish rice farmers...")
+- Use community averages only when the farmer stated their parish ("Most [parish] rice farmers...") — never invent a parish
 
 CRITICAL JSON FORMAT REQUIREMENTS:
 1. Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
@@ -150,21 +147,22 @@ INTELLIGENT AUTO-LINKING:
   * Auto-search assessments from ±7 days of event date
   * Identify assessments with health scores <70 (moderate to severe stress)
   * Calculate health score drops (compare before/after event)
-  * Auto-suggest these as evidence: "I found 3 assessments from your North Rice Field around that time showing 45% health score. Should I link these as evidence?"
+  * Auto-suggest only real matching assessments from context — never invent counts or health scores (e.g. ask whether to link assessments that were actually found)
 
 - Weather event correlation:
-  * If recent weather events match the claimed event type and date, mention it
-  * Example: "I see we had a major flood event on July 15th in Morehouse Parish. Is this what affected your field?"
+  * Only mention weather events that appear in the provided unified context / weather records
+  * Never invent parish flood/drought dates or conditions that are not in context
+  * If no matching weather record exists, say weather correlation is unavailable
 
 EVIDENCE COMPILATION INTELLIGENCE:
 - Guide them on insurance-grade documentation standards
 - Explain what crop adjusters need (LSU AgCenter damage assessment protocols)
 - Suggest additional evidence if claim seems weak
-- Calculate estimated dollar loss based on acreage × crop price × loss percentage
+- Only compute estimated dollar loss when the farmer provided acreage, crop price (or confirmed market price), AND loss percentage — otherwise leave estimated_loss_dollars null
 
 COMMUNITY CONTEXT:
-- If multiple farmers in their cooperative have similar claims, mention it (validates their claim)
-- Reference typical loss percentages for similar events in Louisiana Delta
+- Only mention cooperative peer claims when that data is present in context
+- Never invent typical loss percentages for Louisiana Delta events
 
 CRITICAL JSON FORMAT REQUIREMENTS:
 1. Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
@@ -180,8 +178,8 @@ REQUIRED FORMAT:
   "next_question": "Brief next question prompt",
   "suggestions": [...],
   "auto_linked_assessments": ["assessment_id_1", "assessment_id_2"],
-  "weather_correlation": "Match found: Flood event on 2025-07-15",
-  "estimated_loss_dollars": 12500
+  "weather_correlation": null,
+  "estimated_loss_dollars": null
 }`,
   
   'conservation-practices': `You are Delta Intelligence helping a Louisiana Delta farmer document conservation practices for USDA compliance and cost savings.
@@ -196,16 +194,16 @@ Your goal: Extract the following information through conversation:
 - Buffer strips (yes/no, width)
 - Precision fertilization (yes/no, technology used)
 
-Real-time Calculations:
-- Calculate nitrogen credit from cover crops ($15-30/acre)
-- Estimate fuel savings from reduced tillage ($8-12/acre)
-- Calculate USDA Climate-Smart Agriculture Program eligibility
-- Reference LSU AgCenter research on practice effectiveness
+Honesty rules for cost figures:
+- Do NOT invent nitrogen-credit, fuel-savings, or other $/acre dollar amounts.
+- Set cost_savings_estimate to null unless the farmer explicitly stated a dollar figure in this conversation.
+- You may discuss directional benefits (soil health, input reduction) without fabricating currency.
+- Reference publicly available LSU AgCenter guidance as framing only — not measured farm savings.
 
 Educational Approach:
 - Explain benefits of each practice during conversation
-- Cite LSU research findings
-- Provide cost-benefit analysis in real-time
+- Cite public LSU research framing when relevant
+- Ask the farmer for their recorded costs if they want dollar planning
 - Guide on USDA documentation requirements
 
 CRITICAL JSON FORMAT REQUIREMENTS:
@@ -220,7 +218,7 @@ REQUIRED FORMAT:
   "completion_percentage": 50,
   "next_question": "Brief next question prompt",
   "suggestions": [...],
-  "cost_savings_estimate": 850
+  "cost_savings_estimate": null
 }`,
   
   'onboarding': `You are Delta Intelligence, welcoming a new Louisiana Delta farmer to AgurateAI!
@@ -235,7 +233,7 @@ PROFILE INFORMATION (Required):
 - Parish (Louisiana parish location)
 - Primary crops (rice, soybeans, cotton, corn - can be multiple)
 - Total farm acreage (total across all fields)
-- Phone number (optional, for text alerts)
+- Phone number (optional — contact only; SMS/text alerts are not enabled in this build)
 
 FIRST FIELD SETUP (Strongly Encouraged):
 After getting profile basics, TRANSITION to setting up their first field:
@@ -259,14 +257,15 @@ CONVERSATION FLOW EXAMPLE:
 10. Celebrate completion! (100%)
 
 Parish-Specific Personalization:
-- Mention parish-specific farming conditions ("Morehouse Parish is known for great rice farming!")
+- Mention parish-specific conditions only when the farmer stated their parish; do not invent parish reputation claims
 - Reference common crops in their parish
-- Connect them with local LSU extension agents (future)
+- Do NOT claim AgurateAI can connect farmers to LSU extension agents (not implemented)
 
 Beta Program Communication:
-- Explain they're getting FREE access during beta (normally $790/year)
-- Mention 80% lifetime discount after beta ($158/year forever)
+- Explain they're getting free access during closed beta
+- Mention a possible 50% off the published plan rate after launch (confirm current pricing in-app; not guaranteed)
 - Explain they're helping build the future of Louisiana agriculture
+- Do not invent or quote specific dollar amounts for plan pricing
 
 CRITICAL JSON FORMAT REQUIREMENTS:
 1. Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
@@ -279,24 +278,32 @@ REQUIRED FORMAT:
   "message": "Your full conversational response that will be shown to the farmer",
   "extracted_data": {
     "farm_name": "value", 
-    "parish": "Morehouse",
-    "field_name": "North Rice Field",
-    "field_crop_type": "rice",
+    "parish": "<farmer-stated parish or omit>",
+    "field_name": "<farmer-stated field name>",
+    "field_crop_type": "<farmer-stated crop>",
     ...
   },
   "completion_percentage": 70,
   "next_question": "Brief next question prompt",
   "suggestions": ["Rice", "Soybeans", "Cotton", "Corn"],
-  "beta_benefit_highlight": "You're saving $790/year during beta!"
+  "beta_benefit_highlight": "Free during closed beta, with a possible 50% off the published plan rate after launch (confirm current pricing in-app; not guaranteed)"
 }`
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const supabaseClient = getAnonClient(authHeader);
+    const serviceClient = getServiceClient();
+
     const rawBody = await req.json();
     const { sessionId, message, formType } = rawBody;
     
@@ -310,46 +317,15 @@ serve(async (req) => {
     
     const sanitizedMessage = sanitizeInput(message);
 
-    if (!sessionId || !message || !formType) {
-      throw new Error('Missing required parameters');
-    }
-
-    // Create Supabase client with user's auth
-    const authHeader = req.headers.get('Authorization');
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader! } } }
-    );
-
-    // Get user
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      console.error('[conversational-form] Authentication failed');
-      return handleAuthError(corsHeaders);
-    }
-
-    // Rate limiting: Check request frequency (20 requests per minute for forms)
-    const { data: recentRequests } = await supabaseClient
-      .from('request_logs')
-      .select('created_at')
-      .eq('user_id', user.id)
-      .eq('function_name', 'conversational-form')
-      .gte('created_at', new Date(Date.now() - 60000).toISOString());
-
-    if (recentRequests && recentRequests.length >= 20) {
+    
+    const rateLimit = await enforceRateLimit(supabaseClient, user.id, {
+      functionName: 'conversational-form',
+      maxRequests: RATE_LIMITS['conversational-form'].maxRequests,
+      windowMs: RATE_LIMITS['conversational-form'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
       return handleRateLimitError(corsHeaders);
     }
-
-    // Log this request
-    await supabaseClient
-      .from('request_logs')
-      .insert({
-        user_id: user.id,
-        function_name: 'conversational-form',
-        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
-        user_agent: req.headers.get('user-agent') || 'unknown'
-      });
 
     // Get session
     const { data: session, error: sessionError } = await supabaseClient
@@ -466,7 +442,7 @@ serve(async (req) => {
         practice: c.practice_name,
         adopters: c.adoption_count,
         successRate: c.success_rate,
-        avgSavings: c.average_savings
+        // average_savings intentionally omitted — never feed money invent into the form AI
       })),
       
       // Variety Intelligence
@@ -483,8 +459,8 @@ serve(async (req) => {
       
       // Beta Program
       betaProgram: profile?.beta_farmer ? {
-        lifetimeDiscount: 80,
-        savingsPerYear: 632
+        access: 'free during closed beta',
+        afterBeta: 'possible 50% off the published plan rate after launch (confirm current pricing in-app; not guaranteed)'
       } : null
     };
 
@@ -546,26 +522,55 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
     // Strip markdown code blocks if present (```json ... ```)
     aiMessage = aiMessage.replace(/```json\s*/g, '').replace(/```\s*/g, '');
 
-    // Parse AI response (expect JSON)
+    // Parse AI response (expect JSON) — fail closed; never invent a success-shaped payload
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(aiMessage);
     } catch (parseError) {
       console.error('Failed to parse AI response:', aiMessage, parseError);
-      // If AI didn't return JSON, wrap it
-      parsedResponse = {
-        message: aiMessage,
-        extracted_data: {},
-        completion_percentage: 0,
-        next_question: null
-      };
+      return new Response(
+        JSON.stringify({
+          error: 'Form assistant returned unparseable JSON — refusing to invent extracted fields',
+        }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Update extracted data
+    // Update extracted data — strip AI money/loss invent (farmer confirms on Insurance form).
+    const MONEY_INVENT_KEYS = new Set([
+      'estimated_loss_percentage',
+      'estimated_loss_dollars',
+      'estimatedLossPercentage',
+      'estimatedLossDollars',
+      'estimated_loss',
+      'avgSavings',
+      'average_savings',
+      'averageSavings',
+      'cost_savings_estimate',
+      'costSavingsEstimate',
+      'roi',
+      'cost_usd',
+      'costUsd',
+    ]);
+    const isMoneyInventKey = (key: string) =>
+      MONEY_INVENT_KEYS.has(key) ||
+      /(saving|savings|roi|cost|dollar|loss|revenue|profit)/i.test(key);
+    const incomingExtracted = { ...(parsedResponse.extracted_data || {}) };
+    for (const key of Object.keys(incomingExtracted)) {
+      if (isMoneyInventKey(key)) {
+        delete incomingExtracted[key];
+      }
+    }
     const updatedData = {
       ...session.extracted_data,
-      ...parsedResponse.extracted_data
+      ...incomingExtracted,
     };
+    // Also clear any previously invented money keys left in session.
+    for (const key of Object.keys(updatedData)) {
+      if (isMoneyInventKey(key)) {
+        delete updatedData[key];
+      }
+    }
 
     // Calculate completion percentage based on required fields
     const schema = FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'];
@@ -575,23 +580,26 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
     });
     const completionPercentage = Math.round((completedFields.length / requiredFields.length) * 100);
 
-    // Update session
-    await supabaseClient
+    // Update session + assistant message via service role (client RLS freezes metrics / blocks assistant inserts)
+    await serviceClient
       .from('conversational_form_sessions')
       .update({
         extracted_data: updatedData,
         completion_percentage: completionPercentage
       })
-      .eq('id', sessionId);
+      .eq('id', sessionId)
+      .eq('user_id', user.id);
 
-    // Save assistant message
-    await supabaseClient
+    await serviceClient
       .from('conversational_form_messages')
       .insert({
         session_id: sessionId,
         role: 'assistant',
         content: parsedResponse.message || parsedResponse.next_question || aiMessage,
-        field_mapping: parsedResponse.extracted_data ? JSON.stringify(parsedResponse.extracted_data) : null
+        // Persist stripped mapping only — never store raw AI money invent keys.
+        field_mapping: Object.keys(incomingExtracted).length > 0
+          ? JSON.stringify(incomingExtracted)
+          : null
       });
 
     return new Response(

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client'
+import { formatAcreage } from '@/lib/agricultural-utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -20,7 +21,7 @@ export default function ConservationPractices() {
   const [conversationalOpen, setConversationalOpen] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
 
-  // Fetch conservation predictions
+  // Fetch conservation predictions for the user's fields (table has field_id, not user_id)
   const { data: predictions } = useQuery({
     queryKey: ['conservation-predictions'],
     queryFn: async () => {
@@ -28,18 +29,31 @@ export default function ConservationPractices() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return [];
 
-        const response = await (supabase as any)
-          .from('conservation_predictions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('predicted_date', { ascending: false })
-          .limit(3);
+        const { data: ownedFields, error: fieldsError } = await supabase
+          .from('fields')
+          .select('id')
+          .eq('user_id', user.id);
 
-        if (response.error) {
-          console.error('Error fetching predictions:', response.error);
+        if (fieldsError) {
+          console.error('Error fetching fields for predictions:', fieldsError);
           return [];
         }
-        return response.data as ConservationPrediction[];
+
+        const fieldIds = (ownedFields ?? []).map((f) => f.id);
+        if (fieldIds.length === 0) return [];
+
+        const { data, error } = await supabase
+          .from('conservation_predictions')
+          .select('*')
+          .in('field_id', fieldIds)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) {
+          console.error('Error fetching predictions:', error);
+          return [];
+        }
+        return (data ?? []) as ConservationPrediction[];
       } catch (err) {
         console.error(err);
         return [];
@@ -78,29 +92,50 @@ export default function ConservationPractices() {
 
   const handleConversationalComplete = async (extractedData: ConservationPracticesData) => {
     try {
-      // Conservation practices would typically be stored in a conservation_practices table
-      // or as JSONB on the fields table. For now, we'll update the field's notes.
-      
-      const practicesText = `
-Conservation Practices:
-- Tillage: ${extractedData.tillage_type}
-- Cover Crops: ${extractedData.cover_crops ? 'Yes' : 'No'}
-- Crop Rotation: ${extractedData.crop_rotation ? 'Yes' : 'No'}
-- Buffer Strips: ${extractedData.buffer_strips ? 'Yes' : 'No'}
-- Precision Fertilization: ${extractedData.precision_fertilization ? 'Yes' : 'No'}
-${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
-      `.trim();
+      // No dedicated conservation_practices table yet — append a dated block to field notes
+      // instead of overwriting existing notes (which destroyed prior field records).
+      const practicesBlock = [
+        `Conservation Practices (${new Date().toISOString().slice(0, 10)}):`,
+        `- Tillage: ${extractedData.tillage_type ?? 'not recorded'}`,
+        `- Cover Crops: ${extractedData.cover_crops ? 'Yes' : 'No'}`,
+        `- Crop Rotation: ${extractedData.crop_rotation ? 'Yes' : 'No'}`,
+        `- Buffer Strips: ${extractedData.buffer_strips ? 'Yes' : 'No'}`,
+        `- Precision Fertilization: ${extractedData.precision_fertilization ? 'Yes' : 'No'}`,
+        extractedData.notes ? `- Notes: ${extractedData.notes}` : null,
+      ]
+        .filter(Boolean)
+        .join('\n');
 
-      const { error } = await supabase
+      const { data: existingField, error: loadError } = await supabase
+        .from('fields')
+        .select('notes')
+        .eq('id', extractedData.field_id)
+        .maybeSingle();
+      if (loadError) throw loadError;
+
+      const priorNotes =
+        typeof existingField?.notes === 'string' && existingField.notes.trim().length > 0
+          ? existingField.notes.trim()
+          : '';
+      const mergedNotes = priorNotes
+        ? `${priorNotes}\n\n${practicesBlock}`
+        : practicesBlock;
+
+      const { data: updated, error } = await supabase
         .from('fields')
         .update({
-          notes: practicesText
+          notes: mergedNotes,
         })
-        .eq('id', extractedData.field_id);
+        .eq('id', extractedData.field_id)
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!updated) {
+        throw new Error('Conservation notes were not saved (no matching field or update not permitted)');
+      }
 
-      toast.success('🌱 Conservation practices documented successfully!');
+      toast.success('Conservation practices appended to field notes (not a compliance filing).');
       setConversationalOpen(false);
       setSelectedFieldId(null);
 
@@ -114,9 +149,9 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
     <div className="min-h-screen">
       <TutorialTooltip
         steps={[
-          { id: "welcome", title: "Conservation Practices", content: "Document conservation practices for USDA compliance and ROI tracking", position: "bottom" },
+          { id: "welcome", title: "Conservation Practices", content: "Document conservation practices as a USDA records aid (not a compliance guarantee) and track ROI notes", position: "bottom" },
           { id: "delta-ai", title: "Delta AI Assistant", content: "Use conversational form for easy documentation of your practices", position: "bottom" },
-          { id: "predictions", title: "Predictive Analytics", content: "See future savings and environmental impact from conservation", position: "bottom" },
+          { id: "predictions", title: "Predictive Analytics", content: "Review planning indexes and environmental notes for conservation — not guaranteed dollar forecasts", position: "bottom" },
           { id: "field-tracking", title: "Field-by-Field", content: "Monitor practices and performance for each field independently", position: "bottom" }
         ]}
         storageKey="tutorial-conservation-shown"
@@ -130,7 +165,7 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
         <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col justify-center text-white">
           <h1 className="text-5xl font-heading font-bold mb-4">Conservation Practices</h1>
           <p className="text-xl text-white/90 max-w-2xl mb-6">
-            Document your sustainable farming practices for USDA compliance and discover cost savings through LSU AgCenter-validated conservation methods.
+            Document your sustainable farming practices as a documentation aid for your USDA records (not a compliance guarantee) and explore conservation methods framed around publicly available LSU AgCenter research.
           </p>
           <Button
             size="lg"
@@ -153,7 +188,7 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
               <DollarSign className="h-8 w-8 text-primary mb-2" aria-hidden="true" />
               <CardTitle className="font-heading">Cost Savings</CardTitle>
               <CardDescription>
-                Save $20-50 per acre annually through reduced tillage and cover crops
+                Reduced tillage and cover crops can lower input costs and protect soil — results vary by farm and season
               </CardDescription>
             </CardHeader>
           </AnimatedCard>
@@ -219,7 +254,7 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
                           <h3 className="text-lg font-semibold mb-2">{field.name}</h3>
                           <div className="flex gap-2 flex-wrap mb-2">
                             <Badge variant="secondary">{field.crop_type}</Badge>
-                            <Badge variant="outline">{field.acreage} acres</Badge>
+                            <Badge variant="outline">{formatAcreage(field.acreage)}</Badge>
                           </div>
                           {field.notes && (
                             <p className="text-sm text-muted-foreground whitespace-pre-line">
@@ -252,25 +287,25 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
         {/* Educational Section */}
         <Card className="mt-8 bg-muted/30">
           <CardHeader>
-            <CardTitle>Conservation Practice Benefits (LSU AgCenter Research)</CardTitle>
+            <CardTitle>Conservation Practice Benefits</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <h4 className="font-semibold mb-2">No-Till / Reduced-Till</h4>
               <p className="text-sm text-muted-foreground">
-                • Fuel savings: $8-12/acre • Soil moisture retention: +15-20% • Erosion reduction: 70-90%
+                Can reduce fuel use and improve moisture retention and erosion control — outcomes vary by soil, crop, and season. See LSU AgCenter / NRCS guidance for local estimates.
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-2">Cover Crops</h4>
               <p className="text-sm text-muted-foreground">
-                • Nitrogen credit: $15-30/acre • Weed suppression: 50-70% • Soil organic matter: +0.1-0.3% annually
+                Often used for nitrogen contribution, weed suppression, and soil organic matter — results depend on species, timing, and management. Confirm with local extension resources.
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-2">Precision Fertilization</h4>
               <p className="text-sm text-muted-foreground">
-                • Input cost savings: 10-20% • Environmental impact: -30% nitrogen runoff • Yield improvement: 5-10%
+                May lower input costs and nutrient runoff versus blanket rates when calibrated to soil tests and field conditions — not a guaranteed yield lift.
               </p>
             </div>
           </CardContent>

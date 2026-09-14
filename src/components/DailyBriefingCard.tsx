@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Sunrise, TrendingUp, AlertTriangle, CheckCircle2, Droplets, Thermometer, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface BriefingData {
   date: string;
@@ -25,8 +26,8 @@ interface BriefingData {
   weatherInsights: {
     temperature: number;
     precipitation: number;
-    recommendation: string;
-  };
+    recommendation: string | null;
+  } | null;
   achievements: string[];
 }
 
@@ -76,6 +77,9 @@ export function DailyBriefingCard() {
       }
 
       const data = await response.json();
+      if (data.error || !Array.isArray(data.priorities) || data.priorities.length === 0) {
+        throw new Error(data.error || 'Daily briefing unavailable');
+      }
 
       // Fetch fields for summary
       const { data: allFields } = await supabase
@@ -105,37 +109,67 @@ export function DailyBriefingCard() {
 
       // Calculate field summary
       const healthyCount = fieldAssessments.filter(f => 
-        f.latestAssessment && (f.latestAssessment.health_score || 0) >= 0.75
+        f.latestAssessment && hasHealthScore(f.latestAssessment.health_score) && toHealthPercent(f.latestAssessment.health_score) >= 75
       ).length;
       const needingAttentionCount = fieldAssessments.filter(f => 
-        f.latestAssessment && (f.latestAssessment.health_score || 0) >= 0.5 && (f.latestAssessment.health_score || 0) < 0.75
+        f.latestAssessment && hasHealthScore(f.latestAssessment.health_score)
+          && toHealthPercent(f.latestAssessment.health_score) >= 50
+          && toHealthPercent(f.latestAssessment.health_score) < 75
       ).length;
       const criticalCount = fieldAssessments.filter(f => 
-        f.latestAssessment && (f.latestAssessment.health_score || 0) < 0.5
+        f.latestAssessment && hasHealthScore(f.latestAssessment.health_score) && toHealthPercent(f.latestAssessment.health_score) < 50
       ).length;
 
-      // Map AI priorities to our format
-      const priorities = (data.priorities || []).map((p: any) => {
-        const field = allFields.find(f => f.name === p.fieldName);
-        return {
-          fieldName: p.fieldName,
-          fieldId: field?.id || '',
-          issue: p.issue || 'Field needs attention',
-          urgency: (p.urgency || 'medium') as 'high' | 'medium' | 'low',
-          action: p.action || 'Monitor closely'
-        };
-      });
+      // Map AI priorities — require model-provided fields (no invented issue/action copy)
+      const priorities = data.priorities
+        .filter(
+          (p: { fieldName?: string; issue?: string; action?: string; urgency?: string }) =>
+            Boolean(p?.fieldName && p?.issue && p?.action)
+        )
+        .map((p: { fieldName: string; issue: string; action: string; urgency?: string }) => {
+          const field = allFields.find(f => f.name === p.fieldName);
+          return {
+            fieldName: p.fieldName,
+            fieldId: field?.id || '',
+            issue: p.issue,
+            urgency: (p.urgency === 'high' || p.urgency === 'low' || p.urgency === 'medium'
+              ? p.urgency
+              : null) as 'high' | 'medium' | 'low' | null,
+            action: p.action,
+          };
+        })
+        .filter((p): p is {
+          fieldName: string;
+          fieldId: string;
+          issue: string;
+          urgency: 'high' | 'medium' | 'low';
+          action: string;
+        } => p.urgency != null);
 
-      // Weather insights from API
-      const weatherInsights = {
-        temperature: data.weather?.highTemp || 0,
-        precipitation: data.weather?.precipitation || 0,
-        recommendation: data.weatherRecommendation || data.weather 
-          ? `High: ${data.weather.highTemp}°F, Low: ${data.weather.lowTemp}°F`
-          : 'Check local weather forecast'
-      };
+      if (priorities.length === 0) {
+        throw new Error('Daily briefing priorities incomplete');
+      }
 
-      setSprayWindow(data.sprayWindow || null);
+      // Weather insights from API — omit section when payload missing (never invent 0°F / 0")
+      const weatherInsights =
+        data.weather && data.weather.highTemp != null && data.weather.precipitation != null
+          ? {
+              temperature: data.weather.highTemp,
+              precipitation: data.weather.precipitation,
+              recommendation:
+                typeof data.weatherRecommendation === 'string' && data.weatherRecommendation.trim()
+                  ? data.weatherRecommendation.trim()
+                  : data.weather.lowTemp != null
+                    ? `High: ${data.weather.highTemp}°F, Low: ${data.weather.lowTemp}°F`
+                    : `High: ${data.weather.highTemp}°F`,
+            }
+          : null;
+
+      setSprayWindow(
+        typeof data.sprayWindow === 'string' && data.sprayWindow.trim()
+          ? data.sprayWindow.trim()
+          : null
+      );
       setBriefing({
         date: format(new Date(data.date || new Date()), 'MMMM d, yyyy'),
         fieldsSummary: {
@@ -259,33 +293,46 @@ export function DailyBriefingCard() {
           </div>
         )}
 
-        {/* Weather Insights */}
+        {/* Weather Insights — only when API provided real weather (not invented zeros) */}
+        {briefing.weatherInsights && (
         <div className="p-4 rounded-lg bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20">
           <h3 className="font-semibold text-sm text-muted-foreground mb-3 flex items-center gap-2">
             <Droplets className="h-4 w-4 text-secondary" />
             Today's Weather Impact
           </h3>
-          {briefing.weatherInsights.temperature > 0 && (
-            <div className="flex items-center gap-4 mb-2">
-              <div className="flex items-center gap-2">
-                <Thermometer className="h-4 w-4 text-health-moderate" />
-                <span className="text-sm font-medium">{briefing.weatherInsights.temperature}°F</span>
-              </div>
-              {briefing.weatherInsights.precipitation > 0 && (
-                <div className="flex items-center gap-2">
-                  <Droplets className="h-4 w-4 text-secondary" />
-                  <span className="text-sm font-medium">{briefing.weatherInsights.precipitation.toFixed(1)}mm rain</span>
-                </div>
-              )}
+          <div className="flex items-center gap-4 mb-2">
+            <div className="flex items-center gap-2">
+              <Thermometer className="h-4 w-4 text-health-moderate" />
+              <span className="text-sm font-medium">
+                {Number.isFinite(Number(briefing.weatherInsights.temperature))
+                  ? `${Number(briefing.weatherInsights.temperature)}°F`
+                  : 'Temp not recorded'}
+              </span>
             </div>
+            <div className="flex items-center gap-2">
+              <Droplets className="h-4 w-4 text-secondary" />
+              <span className="text-sm font-medium">
+                {Number.isFinite(Number(briefing.weatherInsights.precipitation))
+                  ? `${Number(briefing.weatherInsights.precipitation).toFixed(1)} in rain`
+                  : 'Rainfall not recorded'}
+              </span>
+            </div>
+          </div>
+          {briefing.weatherInsights.recommendation && (
+            <p className="text-sm text-muted-foreground">{briefing.weatherInsights.recommendation}</p>
           )}
-          <p className="text-sm text-muted-foreground">{briefing.weatherInsights.recommendation}</p>
           {sprayWindow && (
             <p className="text-xs text-muted-foreground mt-2">
               <strong>Spray Window:</strong> {sprayWindow}
             </p>
           )}
         </div>
+        )}
+        {!briefing.weatherInsights && sprayWindow && (
+          <p className="text-xs text-muted-foreground">
+            <strong>Spray Window:</strong> {sprayWindow}
+          </p>
+        )}
 
         {/* Achievements */}
         {briefing.achievements.length > 0 && (

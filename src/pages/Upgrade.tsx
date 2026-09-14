@@ -11,7 +11,6 @@ export default function Upgrade() {
   const plans = [
     {
       name: "Starter",
-      price: 49,
       description: "Perfect for small operations",
       features: [
         "1 farmer, 5 fields",
@@ -25,27 +24,24 @@ export default function Upgrade() {
     },
     {
       name: "Professional",
-      price: 99,
-      originalPrice: 99,
-      betaPrice: 39.50,
+      betaPriceLabel: "Possible beta discount",
       description: "Most popular for Louisiana farmers",
       features: [
-        "Unlimited fields & assessments",
-        "Advanced 7-day predictions",
-        "LSU researcher access",
-        "Insurance claim automation",
+        "Fields & assessments for your whole operation",
+        "Multi-day stress outlooks when data supports them",
+        "LSU researcher directory (public profiles)",
+        "Insurance claim documentation support",
         "Weather timeline analytics",
         "Priority support",
         "Early access to new features"
       ],
-      buttonText: "Claim Beta Discount",
+      buttonText: "Notify Me When Billing Opens",
       buttonVariant: "default" as const,
       isFeatured: true,
-      betaDiscount: "50% OFF LIFETIME"
+      betaDiscount: "POSSIBLE BETA DISCOUNT"
     },
     {
       name: "Cooperative",
-      price: 499,
       description: "For farming cooperatives",
       features: [
         "25+ farmers",
@@ -75,10 +71,10 @@ export default function Upgrade() {
             🌟 Beta Farmer Exclusive Offer
           </Badge>
           <h2 className="text-3xl font-bold">
-            Lock in Your Lifetime 50% Discount
+            Your Beta Pricing Benefit
           </h2>
           <p className="text-lg text-muted-foreground">
-            As a beta farmer, you've helped us build AgurateAI. Secure your lifetime discount before the beta program ends.
+            As a beta farmer, you've helped us build AgurateAI. Beta farmers may be offered a discount off the published plan rate when paid plans launch (not guaranteed; confirm in-app). Billing checkout is not open yet.
           </p>
         </div>
 
@@ -107,26 +103,26 @@ export default function Upgrade() {
                 <CardDescription>{plan.description}</CardDescription>
 
                 <div className="pt-4">
-                  {plan.betaPrice ? (
+                  {plan.betaPriceLabel ? (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-center gap-3">
-                        <p className="text-3xl font-bold line-through text-muted-foreground">
-                          ${plan.originalPrice}
-                        </p>
-                        <p className="text-5xl font-bold text-primary">
-                          ${plan.betaPrice}
-                        </p>
-                      </div>
+                      <p className="text-5xl font-bold text-primary">
+                        Beta rate
+                      </p>
                       <Badge className="bg-primary/10 text-primary border-primary/30">
                         {plan.betaDiscount}
                       </Badge>
+                      <p className="text-sm text-muted-foreground">
+                        {plan.betaPriceLabel} after conversion — confirm current published pricing in-app at signup.
+                      </p>
                     </div>
                   ) : (
                     <p className="text-4xl font-bold">
-                      ${plan.price}
+                      Custom
                     </p>
                   )}
-                  <p className="text-sm text-muted-foreground mt-2">/month</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {plan.betaPriceLabel ? "beta pricing benefit when billing launches" : "contact for pricing"}
+                  </p>
                 </div>
               </CardHeader>
 
@@ -151,8 +147,7 @@ export default function Upgrade() {
                     if (plan.name === "Cooperative") {
                       window.location.href = "mailto:support@agurateai.com?subject=Cooperative%20Plan%20Inquiry";
                     } else {
-                      // Future: Stripe integration
-                      navigate("/dashboard");
+                      window.location.href = "mailto:support@agurateai.com?subject=Beta%20Pricing%20Waitlist";
                     }
                   }}
                 >
@@ -174,7 +169,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Beta farmers who convert to paid plans will receive a lifetime 50% discount. Your data and fields will remain intact, and you'll continue to have full access to all features.
+                  Converting beta farmers may be offered a discount off the published plan rate (not guaranteed). Your data and fields remain intact with continued feature access.
                 </p>
               </CardContent>
             </Card>
@@ -185,7 +180,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Yes! You can upgrade or downgrade at any time. Beta farmers keep their 50% discount across all plan changes.
+                  Yes! You can upgrade or downgrade at any time. Any beta discount (if offered) would be confirmed in-app — not guaranteed across plan changes.
                 </p>
               </CardContent>
             </Card>
@@ -196,7 +191,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  We accept all major credit cards (Visa, Mastercard, American Express, Discover) and bank transfers for annual subscriptions.
+                  Paid checkout is not live yet. Email support@agurateai.com to join the billing waitlist when plans launch.
                 </p>
               </CardContent>
             </Card>

@@ -22,7 +22,7 @@ export function CommunityInsightsCard({ practice }: CommunityInsightsCardProps) 
           {practice.lsu_researcher_id && (
             <Badge variant="default">
               <CheckCircle2 className="mr-1 h-3 w-3" />
-              LSU Validated
+              Cites public LSU research
             </Badge>
           )}
         </div>
@@ -35,24 +35,37 @@ export function CommunityInsightsCard({ practice }: CommunityInsightsCardProps) 
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center p-3 rounded-lg bg-primary/5">
             <Users className="h-5 w-5 mx-auto mb-1 text-primary" />
-            <div className="text-lg font-bold">{practice.adoption_count}</div>
+            <div className="text-lg font-bold">
+              {practice.adoption_count != null && Number.isFinite(Number(practice.adoption_count))
+                ? practice.adoption_count
+                : '—'}
+            </div>
             <div className="text-xs text-muted-foreground">Farmers</div>
           </div>
 
           <div className="text-center p-3 rounded-lg bg-accent/10">
             <Star className="h-5 w-5 mx-auto mb-1 text-accent" />
             <div className="text-lg font-bold">
-              {(practice.success_rate * 100).toFixed(0)}%
+              {(() => {
+                const n = Number(practice.success_rate);
+                return Number.isFinite(n) && n >= 0 && n <= 1
+                  ? `${(n * 100).toFixed(0)}%`
+                  : '—';
+              })()}
             </div>
-            <div className="text-xs text-muted-foreground">Success Rate</div>
+            <div className="text-xs text-muted-foreground">Reported success</div>
           </div>
 
           <div className="text-center p-3 rounded-lg bg-secondary/10">
             <DollarSign className="h-5 w-5 mx-auto mb-1 text-secondary" />
             <div className="text-lg font-bold">
-              ${practice.average_savings.toLocaleString()}
+              {practice.average_savings != null &&
+              Number.isFinite(Number(practice.average_savings)) &&
+              Number(practice.average_savings) > 0
+                ? `$${Number(practice.average_savings).toLocaleString()}`
+                : '—'}
             </div>
-            <div className="text-xs text-muted-foreground">Avg. Savings</div>
+            <div className="text-xs text-muted-foreground">Self-reported avg. savings</div>
           </div>
         </div>
 
@@ -70,7 +83,9 @@ export function CommunityInsightsCard({ practice }: CommunityInsightsCardProps) 
         )}
 
         <div className="text-xs text-muted-foreground text-center pt-2 border-t">
-          Data aggregated from {practice.adoption_count} anonymous farmer reports
+          {practice.adoption_count != null && Number.isFinite(Number(practice.adoption_count))
+            ? `Data aggregated from ${practice.adoption_count} anonymous farmer reports`
+            : 'Adoption count not recorded for this practice'}
         </div>
       </CardContent>
     </Card>

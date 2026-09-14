@@ -43,25 +43,53 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase.from('success_stories').insert({
+      // Money/acre metrics are not client-writable — moderators set verified
+      // figures after review. Optional self-report notes stay in the testimonial.
+      const savingsNote = estimatedSavings.trim();
+      const acresNote = acresProtected.trim();
+      if (savingsNote && (!Number.isFinite(Number(savingsNote)) || Number(savingsNote) < 0)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid savings amount",
+          description: "Estimated savings must be a number greater than or equal to 0.",
+        });
+        return;
+      }
+      if (acresNote && (!Number.isFinite(Number(acresNote)) || Number(acresNote) < 0)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid acres protected",
+          description: "Acres protected must be a number greater than or equal to 0.",
+        });
+        return;
+      }
+
+      const moneyNotes = [
+        savingsNote ? `Self-reported estimated savings (unverified): $${savingsNote}` : null,
+        acresNote ? `Self-reported acres protected (unverified): ${acresNote}` : null,
+      ].filter(Boolean);
+      const testimonialBody = [testimonial.trim(), ...moneyNotes].join('\n\n');
+
+      const { data: saved, error } = await supabase.from('success_stories').insert({
         user_id: user.id,
         assessment_id: assessmentId,
         problem_encountered: problemEncountered.trim(),
         action_taken: actionTaken.trim(),
         outcome: outcome.trim(),
-        estimated_savings: estimatedSavings ? parseFloat(estimatedSavings) : null,
-        acres_protected: acresProtected ? parseFloat(acresProtected) : null,
-        testimonial: testimonial.trim(),
+        testimonial: testimonialBody,
         allow_public_use: allowPublicUse,
         allow_name: allowName,
         allow_farm_name: allowFarmName,
-      });
+      }).select('id').maybeSingle();
 
       if (error) throw error;
+      if (!saved) {
+        throw new Error('Success story was not saved (insert returned no row or not permitted)');
+      }
 
       toast({
         title: "🏆 Success story saved!",
-        description: "Thank you for sharing your experience. This helps other farmers and strengthens our LSU partnership.",
+        description: "Thanks for sharing. Dollar/acre figures stay unverified until moderation; public display requires approval.",
       });
       onClose();
     } catch (error: unknown) {
@@ -85,7 +113,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
             Share Your Success Story
           </DialogTitle>
           <DialogDescription>
-            Your experience helps other Louisiana farmers and strengthens our partnership with LSU AgCenter
+            Your experience helps other Louisiana farmers and improves this closed beta
           </DialogDescription>
         </DialogHeader>
 
@@ -126,33 +154,38 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
             />
           </div>
 
-          {/* Financial Impact */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="savings" className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
-                Estimated Savings
-              </Label>
-              <Input
-                id="savings"
-                type="number"
-                placeholder="e.g., 15000"
-                value={estimatedSavings}
-                onChange={(e) => setEstimatedSavings(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="acres" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Acres Protected
-              </Label>
-              <Input
-                id="acres"
-                type="number"
-                placeholder="e.g., 180"
-                value={acresProtected}
-                onChange={(e) => setAcresProtected(e.target.value)}
-              />
+          {/* Optional self-report notes — not stored as verified money metrics */}
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Optional self-reported figures (kept as notes only — not published as verified savings).
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="savings" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Estimated Savings (optional)
+                </Label>
+                <Input
+                  id="savings"
+                  type="number"
+                  placeholder="e.g., 15000"
+                  value={estimatedSavings}
+                  onChange={(e) => setEstimatedSavings(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="acres" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Acres Protected (optional)
+                </Label>
+                <Input
+                  id="acres"
+                  type="number"
+                  placeholder="e.g., 180"
+                  value={acresProtected}
+                  onChange={(e) => setAcresProtected(e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
@@ -161,7 +194,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
             <Label htmlFor="testimonial">Your testimonial (in your own words) *</Label>
             <Textarea
               id="testimonial"
-              placeholder="e.g., AgurateAI caught this disease days before I would have noticed it. Saved me at least $15K this season..."
+              placeholder="e.g., AgurateAI helped me spot stress earlier than I would have on my own. Here's what changed for my fields..."
               value={testimonial}
               onChange={(e) => setTestimonial(e.target.value)}
               rows={4}
@@ -182,7 +215,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
                   htmlFor="public"
                   className="text-sm cursor-pointer leading-tight"
                 >
-                  Allow AgurateAI to share this story publicly (website, presentations, LSU partnership materials)
+                  Allow AgurateAI to share this story publicly (website, presentations, closed-beta materials)
                 </label>
               </div>
               {allowPublicUse && (
@@ -211,7 +244,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Your story will help other Louisiana farmers and strengthen our LSU AgCenter partnership. 
+              Your story will help other Louisiana farmers during this closed beta. 
               You can remain anonymous if preferred.
             </p>
           </div>

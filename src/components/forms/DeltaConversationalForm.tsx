@@ -103,7 +103,9 @@ export const DeltaConversationalForm = ({
   // Handle completion
   useEffect(() => {
     if (isComplete && session && !session.completed_at) {
-      console.log('🎉 Form completion triggered:', { completion: completionPercentage, extractedData });
+      if (import.meta.env.DEV) {
+        console.log('Form completion triggered:', { completion: completionPercentage, extractedData });
+      }
       completeSession();
       onComplete(extractedData);
     }
@@ -112,7 +114,9 @@ export const DeltaConversationalForm = ({
   const handleSend = () => {
     if (!inputValue.trim() || isSendingMessage) return;
     
-    console.log('💬 Sending message:', inputValue);
+    if (import.meta.env.DEV) {
+      console.log('Sending message:', inputValue);
+    }
     
     // Validate and sanitize input
     try {

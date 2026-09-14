@@ -65,7 +65,7 @@ export function AnnotatedImage({
         const x = (annotation.x / 100) * canvas.width;
         const y = (annotation.y / 100) * canvas.height;
 
-        // Determine color based on severity
+        // Determine color based on severity — unknown fails closed to muted gray
         const color =
           annotation.color ||
           (annotation.severity === 'critical'
@@ -74,14 +74,16 @@ export function AnnotatedImage({
             ? '#f59e0b'
             : annotation.severity === 'success'
             ? '#10b981'
-            : '#3b82f6');
+            : annotation.severity === 'info'
+            ? '#64748b'
+            : '#94a3b8');
 
         ctx.strokeStyle = color;
         ctx.fillStyle = color;
         ctx.lineWidth = 3;
 
         switch (annotation.type) {
-          case 'circle':
+          case 'circle': {
             ctx.beginPath();
             const radius = annotation.radius
               ? (annotation.radius / 100) * Math.min(canvas.width, canvas.height)
@@ -89,8 +91,9 @@ export function AnnotatedImage({
             ctx.arc(x, y, radius, 0, 2 * Math.PI);
             ctx.stroke();
             break;
+            }
 
-          case 'rectangle':
+          case 'rectangle': {
             const width = annotation.width
               ? (annotation.width / 100) * canvas.width
               : 100;
@@ -99,6 +102,7 @@ export function AnnotatedImage({
               : 100;
             ctx.strokeRect(x - width / 2, y - height / 2, width, height);
             break;
+            }
 
           case 'arrow':
             ctx.beginPath();

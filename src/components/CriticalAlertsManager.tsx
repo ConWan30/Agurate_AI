@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
-import { AlertTriangle, X, CheckCircle2, Bell, Phone, MessageSquare } from 'lucide-react';
+import { AlertTriangle, X, CheckCircle2, Bell } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -73,26 +73,55 @@ export function CriticalAlertsManager() {
     }
   };
 
-  const getSeverityVariant = (severity: string): 'default' | 'destructive' | 'outline' => {
-    switch (severity) {
+  const normalizeSeverity = (severity: string): 'critical' | 'high' | 'medium' | 'unknown' => {
+    const s = (severity || '').toLowerCase();
+    if (s === 'critical' || s === 'high' || s === 'medium') return s;
+    return 'unknown';
+  };
+
+  const getSeverityVariant = (severity: string): 'default' | 'destructive' | 'outline' | 'secondary' => {
+    switch (normalizeSeverity(severity)) {
       case 'critical':
         return 'destructive';
       case 'high':
         return 'default';
-      default:
+      case 'medium':
         return 'outline';
+      default:
+        // Fail closed — never style unknown severity as medium/yellow urgency
+        return 'secondary';
     }
   };
 
   const getSeverityColor = (severity: string) => {
-    switch (severity) {
+    switch (normalizeSeverity(severity)) {
       case 'critical':
         return 'text-destructive';
       case 'high':
         return 'text-orange-600';
-      default:
+      case 'medium':
         return 'text-yellow-600';
+      default:
+        return 'text-muted-foreground';
     }
+  };
+
+  const getSeverityBorder = (severity: string) => {
+    switch (normalizeSeverity(severity)) {
+      case 'critical':
+        return 'border-destructive animate-pulse';
+      case 'high':
+        return 'border-orange-500';
+      case 'medium':
+        return 'border-yellow-500';
+      default:
+        return 'border-muted';
+    }
+  };
+
+  const getSeverityLabel = (severity: string) => {
+    const n = normalizeSeverity(severity);
+    return n === 'unknown' ? 'SEVERITY UNKNOWN' : n.toUpperCase();
   };
 
   if (loading) {
@@ -139,7 +168,7 @@ export function CriticalAlertsManager() {
             🚨 {criticalAlerts.length} Critical Alert{criticalAlerts.length > 1 ? 's' : ''} Requiring Immediate Action
           </AlertTitle>
           <AlertDescription>
-            These alerts have been escalated and may require SMS or voice call notification.
+            These alerts appear in-app. SMS/voice delivery is not enabled in this build.
           </AlertDescription>
         </Alert>
       )}
@@ -148,13 +177,7 @@ export function CriticalAlertsManager() {
       {alerts.map((alert) => (
         <Card 
           key={alert.id} 
-          className={`border-2 ${
-            alert.severity === 'critical' 
-              ? 'border-destructive animate-pulse' 
-              : alert.severity === 'high'
-              ? 'border-orange-500'
-              : 'border-yellow-500'
-          }`}
+          className={`border-2 ${getSeverityBorder(alert.severity)}`}
         >
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -163,20 +186,8 @@ export function CriticalAlertsManager() {
                   <AlertTriangle className={`h-5 w-5 ${getSeverityColor(alert.severity)}`} />
                   <CardTitle className="text-lg">{alert.title}</CardTitle>
                   <Badge variant={getSeverityVariant(alert.severity)}>
-                    {alert.severity.toUpperCase()}
+                    {getSeverityLabel(alert.severity)}
                   </Badge>
-                  {alert.sms_sent && (
-                    <Badge variant="outline" className="gap-1">
-                      <MessageSquare className="h-3 w-3" />
-                      SMS Sent
-                    </Badge>
-                  )}
-                  {alert.voice_call_attempted && (
-                    <Badge variant="outline" className="gap-1">
-                      <Phone className="h-3 w-3" />
-                      Voice Call
-                    </Badge>
-                  )}
                 </div>
                 {alert.field_name && (
                   <p className="text-sm text-muted-foreground">
@@ -200,18 +211,23 @@ export function CriticalAlertsManager() {
           <CardContent className="space-y-4">
             <p className="text-sm leading-relaxed">{alert.message}</p>
 
-            {alert.estimated_loss_usd && (
+            {Number.isFinite(Number(alert.estimated_loss_usd)) && Number(alert.estimated_loss_usd) > 0 && (
               <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg">
                 <AlertTriangle className="h-4 w-4 text-destructive" />
                 <span className="text-sm font-semibold">
-                  Estimated Potential Loss: ${alert.estimated_loss_usd.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  Illustrative planning estimate: ${Number(alert.estimated_loss_usd).toLocaleString('en-US', { maximumFractionDigits: 0 })}
                 </span>
               </div>
             )}
 
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span>Urgency: {alert.urgency_score}/100</span>
+                <span>
+                  Urgency:{' '}
+                  {Number.isFinite(Number(alert.urgency_score))
+                    ? `${Math.round(Number(alert.urgency_score))}/100`
+                    : 'not recorded'}
+                </span>
                 <span>{formatDistanceToNow(new Date(alert.created_at), { addSuffix: true })}</span>
               </div>
               {alert.assessment_id && (

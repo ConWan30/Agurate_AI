@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client"
+import { formatAcreage } from "@/lib/agricultural-utils";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Plus, Edit, Trash2 } from "lucide-react";
 import riceIcon from "@/assets/rice-icon.png";
@@ -23,6 +24,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalForm";
 import { Sparkles } from "lucide-react";
 import { VarietyRecommendationCard } from "@/components/VarietyRecommendationCard";
+import { validateExtractedData } from "@/lib/conversational-form-validation";
 import { VarietyRecommendation } from "@/types/enhanced-features";
 import { useQuery } from "@tanstack/react-query";
 
@@ -144,28 +146,51 @@ export default function Fields() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      const acreage = Number(formData.acreage);
+      if (!Number.isFinite(acreage) || acreage < 0) {
+        throw new Error('Acreage must be a number greater than or equal to 0');
+      }
+
       const fieldData = {
         user_id: user.id,
         name: formData.name,
         crop_type: formData.crop_type,
-        acreage: parseFloat(formData.acreage),
-        location_lat: formData.location_lat ? parseFloat(formData.location_lat) : null,
-        location_lng: formData.location_lng ? parseFloat(formData.location_lng) : null,
+        acreage,
+        location_lat:
+          formData.location_lat.trim() !== '' && Number.isFinite(Number(formData.location_lat))
+            ? Number(formData.location_lat)
+            : null,
+        location_lng:
+          formData.location_lng.trim() !== '' && Number.isFinite(Number(formData.location_lng))
+            ? Number(formData.location_lng)
+            : null,
         notes: formData.notes || null,
       };
 
       if (editingField) {
-        const { error } = await supabase
+        const { data: updated, error } = await supabase
           .from("fields")
           .update(fieldData)
-          .eq("id", editingField.id);
+          .eq("id", editingField.id)
+          .select("id")
+          .maybeSingle();
 
         if (error) throw error;
+        if (!updated) {
+          throw new Error("Field was not updated (no matching row or update not permitted)");
+        }
         toast({ title: "Field updated successfully" });
       } else {
-        const { error } = await supabase.from("fields").insert(fieldData);
+        const { data: inserted, error } = await supabase
+          .from("fields")
+          .insert(fieldData)
+          .select("id")
+          .maybeSingle();
 
         if (error) throw error;
+        if (!inserted) {
+          throw new Error("Field was not created (insert returned no row)");
+        }
         toast({ title: "Field added successfully" });
       }
 
@@ -188,9 +213,16 @@ export default function Fields() {
     if (!confirm("Are you sure you want to delete this field?")) return;
 
     try {
-      const { error } = await supabase.from("fields").delete().eq("id", id);
+      const { data: deleted, error } = await supabase
+        .from("fields")
+        .delete()
+        .eq("id", id)
+        .select("id");
 
       if (error) throw error;
+      if (!deleted?.length) {
+        throw new Error("Field was not deleted (no matching row or delete not permitted)");
+      }
       toast({ title: "Field deleted successfully" });
       fetchFields();
     } catch (error: unknown) {
@@ -208,7 +240,7 @@ export default function Fields() {
     setFormData({
       name: field.name,
       crop_type: field.crop_type,
-      acreage: field.acreage.toString(),
+      acreage: field.acreage != null ? String(field.acreage) : "",
       location_lat: field.location_lat?.toString() || "",
       location_lng: field.location_lng?.toString() || "",
       notes: field.notes || "",
@@ -241,36 +273,44 @@ export default function Fields() {
   }
 
   const handleConversationalComplete = async (extractedData: FieldRegistrationData) => {
-    console.log('🎯 Conversational form completed with data:', extractedData);
+    if (import.meta.env.DEV) console.log('🎯 Conversational form completed with data:', extractedData);
     setLoading(true);
     
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Map the extracted data to field schema
+      // Map the extracted data to field schema (DB CHECK expects singular soybean)
+      const rawCrop = String(extractedData.crop_type || extractedData.cropType || '');
+      const cropType = rawCrop === 'soybeans' ? 'soybean' : rawCrop;
+      const acreage = Number(extractedData.acreage);
+      const location_lat = extractedData.location_lat != null
+        ? Number(extractedData.location_lat)
+        : undefined;
+      const location_lng = extractedData.location_lng != null
+        ? Number(extractedData.location_lng)
+        : undefined;
+
+      const validated = validateExtractedData('field-registration', {
+        name: extractedData.name || extractedData.fieldName,
+        crop_type: cropType,
+        acreage,
+        location_lat: Number.isFinite(location_lat as number) ? location_lat : undefined,
+        location_lng: Number.isFinite(location_lng as number) ? location_lng : undefined,
+        notes: extractedData.notes ? String(extractedData.notes) : undefined,
+      });
+
       const fieldData = {
         user_id: user.id,
-        name: extractedData.name || extractedData.fieldName,
-        crop_type: extractedData.crop_type || extractedData.cropType,
-        acreage: parseFloat(String(extractedData.acreage)),
-        location_lat: extractedData.location_lat ? parseFloat(String(extractedData.location_lat)) : null,
-        location_lng: extractedData.location_lng ? parseFloat(String(extractedData.location_lng)) : null,
-        notes: extractedData.notes ? String(extractedData.notes) : null,
+        name: validated.name,
+        crop_type: validated.crop_type,
+        acreage: validated.acreage,
+        location_lat: validated.location_lat ?? null,
+        location_lng: validated.location_lng ?? null,
+        notes: validated.notes ?? null,
       };
 
-      console.log('💾 Inserting field with data:', fieldData);
-
-      // Validate required fields
-      if (!fieldData.name) {
-        throw new Error("Field name is required");
-      }
-      if (!fieldData.crop_type) {
-        throw new Error("Crop type is required");
-      }
-      if (!fieldData.acreage || isNaN(fieldData.acreage)) {
-        throw new Error("Valid acreage is required");
-      }
+      if (import.meta.env.DEV) console.log('💾 Inserting field with data:', fieldData);
 
       const { data: insertedField, error } = await supabase
         .from("fields")
@@ -283,7 +323,7 @@ export default function Fields() {
         throw error;
       }
 
-      console.log('✅ Field created successfully:', insertedField);
+      if (import.meta.env.DEV) console.log('✅ Field created successfully:', insertedField);
 
       toast({ 
         title: "🎉 Field registered successfully!",
@@ -347,7 +387,7 @@ export default function Fields() {
       {/* Variety Recommendations */}
       {varietyRecommendations && varietyRecommendations.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">LSU Variety Recommendations for Your Fields</h2>
+          <h2 className="text-2xl font-bold">AI variety suggestions (public LSU research framing — not an official partnership)</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {varietyRecommendations.map((recommendation) => (
               <VarietyRecommendationCard 
@@ -356,7 +396,7 @@ export default function Fields() {
                 onAdopt={() => {
                   toast({ 
                     title: "Variety Noted",
-                    description: `${recommendation.recommended_variety} saved to your field records.`
+                    description: `${recommendation.recommended_variety} noted for your review (not saved to field records yet).`
                   });
                 }}
               />
@@ -454,13 +494,16 @@ export default function Fields() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Acreage:</span>
-                      <span className="font-mono font-medium">{field.acreage} acres</span>
+                      <span className="font-mono font-medium">{formatAcreage(field.acreage)}</span>
                     </div>
-                    {field.location_lat && field.location_lng && (
+                    {field.location_lat != null &&
+                      field.location_lng != null &&
+                      Number.isFinite(Number(field.location_lat)) &&
+                      Number.isFinite(Number(field.location_lng)) && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
                         <span className="font-mono font-medium text-xs">
-                          {field.location_lat.toFixed(4)}, {field.location_lng.toFixed(4)}
+                          {`${Number(field.location_lat).toFixed(4)}, ${Number(field.location_lng).toFixed(4)}`}
                         </span>
                       </div>
                     )}

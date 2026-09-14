@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client'
+import { formatAcreage } from '@/lib/agricultural-utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Calendar, Camera, FileText, Send, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { resolveCropImageUrls } from '@/lib/crop-image';
+import { formatHealthPercent, hasHealthScore } from '@/lib/health-score';
 
 type ClaimDetailProps = {
   claimId: string;
@@ -45,7 +48,28 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
         .single();
       
       if (error) throw error;
-      return data;
+
+      const linked = data.linked_assessments ?? [];
+      const assessments = linked
+        .map((la: { assessment: { id: string; image_url: string } | null }) => la.assessment)
+        .filter((a): a is { id: string; image_url: string } => Boolean(a));
+      const resolved = await resolveCropImageUrls(supabase, assessments);
+      const byId = new Map(resolved.map((a) => [a.id, a.image_url]));
+
+      return {
+        ...data,
+        linked_assessments: linked.map(
+          (la: { assessment: { id: string; image_url: string } | null }) => ({
+            ...la,
+            assessment: la.assessment
+              ? {
+                  ...la.assessment,
+                  image_url: byId.get(la.assessment.id) ?? la.assessment.image_url,
+                }
+              : null,
+          })
+        ),
+      };
     },
     enabled: open
   });
@@ -62,58 +86,85 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
         .limit(10);
       
       if (error) throw error;
-      return data;
+      return resolveCropImageUrls(supabase, data ?? []);
     },
     enabled: !!claim?.field_id && open
   });
 
   const linkAssessment = useMutation({
     mutationFn: async (assessmentId: string) => {
-      const { error } = await supabase.from('claim_assessments').insert({
-        claim_id: claimId,
-        assessment_id: assessmentId
-      });
+      const { data, error } = await supabase
+        .from('claim_assessments')
+        .insert({
+          claim_id: claimId,
+          assessment_id: assessmentId,
+        })
+        .select('id')
+        .maybeSingle();
       if (error) throw error;
+      if (!data) {
+        throw new Error('Assessment was not linked (no row returned)');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['insurance-claim', claimId] });
       toast.success('Assessment linked to claim');
-    }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to link assessment');
+    },
   });
 
   const unlinkAssessment = useMutation({
     mutationFn: async (assessmentId: string) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('claim_assessments')
         .delete()
         .eq('claim_id', claimId)
-        .eq('assessment_id', assessmentId);
+        .eq('assessment_id', assessmentId)
+        .select('id');
       if (error) throw error;
+      if (!data?.length) {
+        throw new Error('Assessment was not unlinked (no matching row)');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['insurance-claim', claimId] });
       toast.success('Assessment unlinked');
-    }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to unlink assessment');
+    },
   });
 
   const submitClaim = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('insurance_claims')
         .update({
           status: 'submitted',
           submitted_at: new Date().toISOString(),
-          notes: notes || claim?.notes
+          notes: notes || claim?.notes,
         })
-        .eq('id', claimId);
+        .eq('id', claimId)
+        .select('id')
+        .maybeSingle();
       if (error) throw error;
+      if (!data) {
+        throw new Error(
+          'Claim was not submitted (no matching draft row or update not permitted)'
+        );
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
       queryClient.invalidateQueries({ queryKey: ['insurance-claim', claimId] });
       toast.success('Claim submitted successfully');
       onClose();
-    }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to submit claim');
+    },
   });
 
   const linkedAssessmentIds = claim?.linked_assessments?.map((la: any) => la.assessment?.id) || [];
@@ -143,7 +194,7 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
                   <p className="text-muted-foreground mb-1">Field</p>
                   <p className="font-semibold">{claim?.field?.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {claim?.field?.crop_type} • {claim?.field?.acreage} acres
+                    {claim?.field?.crop_type} • {formatAcreage(claim?.field?.acreage)}
                   </p>
                 </div>
                 <div>
@@ -161,7 +212,12 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
                 </div>
                 <div>
                   <p className="text-muted-foreground mb-1">Estimated Loss</p>
-                  <p className="font-semibold text-destructive">{claim?.estimated_loss_percentage}%</p>
+                  <p className="font-semibold text-destructive">
+                    {claim?.estimated_loss_percentage != null &&
+                    Number.isFinite(Number(claim.estimated_loss_percentage))
+                      ? `${claim.estimated_loss_percentage}%`
+                      : 'Not recorded'}
+                  </p>
                 </div>
               </div>
 
@@ -195,8 +251,13 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
                     />
                     <CardContent className="p-3 space-y-2">
                       <div className="flex justify-between text-xs">
-                        <span>Health: {assessment.health_score}/100</span>
-                        <span className="capitalize">{assessment.stress_level}</span>
+                        <span>
+                          Health:{' '}
+                          {hasHealthScore(assessment.health_score)
+                            ? formatHealthPercent(assessment.health_score)
+                            : 'Not recorded'}
+                        </span>
+                        <span className="capitalize">{assessment.stress_level || 'not recorded'}</span>
                       </div>
                       <p className="text-xs text-muted-foreground">
                         {new Date(assessment.analyzed_at).toLocaleDateString()}

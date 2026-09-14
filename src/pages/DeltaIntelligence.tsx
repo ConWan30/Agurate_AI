@@ -17,9 +17,22 @@ import { DeltaChatInput } from '@/components/DeltaChatInput';
 import { PredictiveQuestions } from '@/components/PredictiveQuestions';
 import { gatherUnifiedContext, formatContextForAI, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
 import { createContextSnapshot } from '@/lib/conversation-memory';
+import { resolveCropImageUrl } from '@/lib/crop-image';
 import TutorialTooltip from '@/components/TutorialTooltip';
 import { useTextToSpeech } from '@/hooks/use-text-to-speech';
 import type { DeltaContext } from '@/types';
+
+/** Persist storage paths; mint signed URLs only when calling the model. */
+async function resolveMessageImageRefs(content: string): Promise<string> {
+  const match = content.match(/^\[Image: ([^\]]+)\]\n?([\s\S]*)$/);
+  if (!match) return content;
+  const ref = match[1];
+  const rest = match[2] ?? '';
+  const path = ref.startsWith('storage:') ? ref.slice('storage:'.length) : ref;
+  const signed = await resolveCropImageUrl(supabase, path);
+  if (!signed) return rest || content;
+  return `[Image: ${signed}]\n${rest}`;
+}
 
 export default function DeltaIntelligence() {
   const {
@@ -49,7 +62,7 @@ export default function DeltaIntelligence() {
   // Show welcome message only for new conversations
   const displayMessages = messages.length === 0 ? [{
     role: 'assistant' as const,
-    content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor, trained on LSU AgCenter research and decades of Louisiana Delta agriculture data.\n\n💡 **Try asking me:**\n- Crop-specific advice for rice, soybeans, cotton, or corn\n- Pest & disease identification\n- Soil management strategies\n- Weather-based planting guidance\n\nWhat can I help you with today?"
+    content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor, framed around publicly available LSU AgCenter research and Louisiana Delta agronomy context.\n\n💡 **Try asking me:**\n- Crop-specific advice for rice, soybeans, cotton, or corn\n- Pest & disease identification\n- Soil management strategies\n- Weather-based planting guidance\n\nWhat can I help you with today?"
   }] : messages;
 
   // Smooth scroll only when messages length changes (new message added), not during streaming updates
@@ -90,13 +103,15 @@ export default function DeltaIntelligence() {
       if (fields) {
         const { data: assessment } = await supabase
           .from('assessments')
-          .select('health_score, stress_level, analyzed_at')
+          .select('id, health_score, stress_level, analyzed_at')
           .eq('field_id', fields.id)
           .order('analyzed_at', { ascending: false })
           .limit(1)
           .single();
 
         setFieldContext({
+          fieldId: fields.id,
+          assessmentId: assessment?.id ?? null,
           recentAssessment: assessment,
           cropType: fields.crop_type,
           healthScore: assessment?.health_score,
@@ -115,9 +130,9 @@ export default function DeltaIntelligence() {
       conversationId = await createConversation(userMessage);
     }
 
-    // Save user message with optional image and context snapshot
-    const messageContent = imageUrl 
-      ? `[Image: ${imageUrl}]\n${userMessage}`
+    // Persist durable storage path (not a 1h signed URL) when an image is attached
+    const messageContent = imageUrl
+      ? `[Image: storage:${imageUrl}]\n${userMessage}`
       : userMessage;
     const contextSnapshot = createContextSnapshot(fieldContext);
     await saveMessage(conversationId, 'user', messageContent, contextSnapshot);
@@ -145,6 +160,14 @@ export default function DeltaIntelligence() {
         }
       }
 
+      // Mint fresh signed URLs for the model from durable paths
+      const apiMessages = await Promise.all(
+        newMessages.map(async (m) => ({
+          ...m,
+          content: await resolveMessageImageRefs(m.content),
+        }))
+      );
+
       const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delta-chat`, {
         method: 'POST',
@@ -153,7 +176,7 @@ export default function DeltaIntelligence() {
           'Authorization': `Bearer ${session?.access_token}`,
         },
         body: JSON.stringify({ 
-          messages: newMessages,
+          messages: apiMessages,
           unifiedContext: unifiedContext ? formatContextForAI(unifiedContext) : null,
           simplifiedLanguage: simplifiedLanguage
         }),
@@ -294,21 +317,21 @@ export default function DeltaIntelligence() {
       target: 'delta-header',
       id: 'header',
       title: 'Step 1: Your AI Advisor',
-      content: 'Delta Intelligence is your 24/7 Louisiana farming expert powered by LSU AgCenter research.',
+      content: 'Delta Intelligence is your on-demand Louisiana farming assistant framed around publicly available LSU AgCenter research.',
       position: 'bottom' as const,
     },
     {
       target: 'predictive-questions',
       id: 'questions',
       title: 'Step 2: Quick Questions',
-      content: 'Click any suggested question for instant field-specific advice based on your data.',
+      content: 'Click any suggested question for field-specific advice based on your data.',
       position: 'top' as const,
     },
     {
       target: 'chat-input',
       id: 'chat',
       title: 'Step 3: Ask Anything',
-      content: 'Type your farming questions and get LSU-backed recommendations tailored to Louisiana Delta!',
+      content: 'Type your farming questions and get research-informed recommendations tailored to Louisiana Delta conditions!',
       position: 'top' as const,
     },
     {
@@ -344,11 +367,11 @@ export default function DeltaIntelligence() {
                 <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-1">
                   Delta Intelligence AI
                 </h1>
-                <p className="text-white/80 text-sm">LSU AgCenter Research • Louisiana Delta Expertise</p>
+                <p className="text-white/80 text-sm">Framed around public LSU AgCenter research · Louisiana Delta</p>
               </div>
             </div>
             <p className="text-white/90 text-base leading-relaxed">
-              Get instant, Louisiana-specific farming advice powered by decades of LSU research and real Delta field data
+              Louisiana-specific farming guidance framed around publicly available LSU AgCenter research and Delta agronomy context
             </p>
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
@@ -567,11 +590,11 @@ export default function DeltaIntelligence() {
             <CardContent className="space-y-3">
               <div className="flex items-start gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
-                <p className="text-sm text-muted-foreground">LSU AgCenter production recommendations</p>
+                <p className="text-sm text-muted-foreground">Public LSU AgCenter guidance (research framing — not a partnership endorsement)</p>
               </div>
               <div className="flex items-start gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
-                <p className="text-sm text-muted-foreground">Louisiana-proven crop varieties & soil management</p>
+                <p className="text-sm text-muted-foreground">Louisiana crop varieties & soil management guidance</p>
               </div>
               <div className="flex items-start gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
