@@ -138,12 +138,10 @@ Return ONLY valid JSON array, no markdown, no code blocks. Example format:
       const jsonStr = jsonMatch ? jsonMatch[1] : aiResponse;
       annotations = JSON.parse(jsonStr);
     } catch {
-      // Fallback: Try to parse as-is
       try {
         annotations = JSON.parse(aiResponse);
       } catch {
-        // If parsing fails, return empty annotations
-        annotations = [];
+        throw new Error('Image annotation AI returned unparseable JSON — refusing to invent annotations');
       }
     }
 

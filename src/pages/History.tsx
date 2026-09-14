@@ -557,13 +557,13 @@ export default function History() {
                   <DiseasePestDetection
                     diseases={selectedAssessment.disease_identified?.map(name => ({
                       name,
-                      severity: "moderate" as const,
-                      description: `${name} detected in field analysis`
+                      severity: "unknown" as const,
+                      description: `${name} detected in field analysis — severity not separately scored`
                     }))}
                     pests={selectedAssessment.pest_identified?.map(name => ({
                       name,
-                      severity: "moderate" as const,
-                      description: `${name} detected in field analysis`
+                      severity: "unknown" as const,
+                      description: `${name} detected in field analysis — severity not separately scored`
                     }))}
                   />
 

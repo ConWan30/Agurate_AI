@@ -62,7 +62,7 @@ export function generateFallbackPredictiveQuestions(input: {
 
   if (!input.hasRecentAssessment) {
     return [
-      'What rice varieties work best in Morehouse Parish?',
+      'What rice varieties work best in the Louisiana Delta?',
       'How do I identify soybean rust early?',
       'Best cotton planting practices for Delta soils?',
       'When should I apply nitrogen to corn fields?',

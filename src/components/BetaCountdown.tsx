@@ -123,7 +123,7 @@ export function BetaCountdown() {
                   Spots Filling Fast!
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Closed beta enrollment is limited. Beta farmers may keep 50% off the published plan rate after launch.
+                  Closed beta enrollment is limited. A discount off the published plan rate may be offered after launch (not guaranteed; confirm in-app).
                 </p>
               </div>
             </div>
@@ -135,7 +135,7 @@ export function BetaCountdown() {
               <p className="font-medium text-foreground">Beta Benefits:</p>
               <ul className="list-disc list-inside space-y-0.5 ml-2">
                 <li>Free access during the closed beta</li>
-                <li>Possible 50% off published rate when paid plans launch</li>
+                <li>Possible discount off published rate when paid plans launch (not guaranteed)</li>
                 <li>Direct founder support</li>
               </ul>
             </div>

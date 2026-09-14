@@ -6,7 +6,8 @@ import { AlertCircle, Bug, BookOpen } from "lucide-react";
 interface DiseaseOrPest {
   name: string;
   description?: string;
-  severity: "mild" | "moderate" | "severe";
+  /** Omit or "unknown" when AI did not return severity — never invent moderate. */
+  severity?: "mild" | "moderate" | "severe" | "unknown";
   treatment?: string;
   lsu_publication?: {
     title: string;
@@ -20,12 +21,14 @@ interface DiseasePestDetectionProps {
 }
 
 export function DiseasePestDetection({ diseases = [], pests = [] }: DiseasePestDetectionProps) {
-  const getSeverityBadge = (severity: string) => {
+  const getSeverityBadge = (severity?: string) => {
     switch (severity) {
       case "severe":
         return "destructive";
       case "moderate":
         return "outline";
+      case "mild":
+        return "secondary";
       default:
         return "secondary";
     }
@@ -41,7 +44,7 @@ export function DiseasePestDetection({ diseases = [], pests = [] }: DiseasePestD
           )}
         </div>
         <Badge variant={getSeverityBadge(issue.severity)} className="shrink-0">
-          {issue.severity}
+          {issue.severity && issue.severity !== "unknown" ? issue.severity : "severity unknown"}
         </Badge>
       </div>
       

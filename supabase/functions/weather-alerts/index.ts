@@ -33,7 +33,7 @@ interface WeatherAlert {
   title: string;
   description: string;
   start_time: string;
-  end_time: string;
+  end_time: string | null;
   affected_areas: string[];
 }
 
@@ -122,7 +122,7 @@ serve(async (req) => {
         title: props.event || "Weather Alert",
         description: props.headline || props.description || "Weather alert in your area",
         start_time: props.onset || new Date().toISOString(),
-        end_time: props.ends || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        end_time: props.ends || null,
         affected_areas: props.areaDesc?.split(";") || []
       };
     });

@@ -114,7 +114,7 @@ export function BetaConversionBanner() {
               <div className="flex items-start gap-2 text-sm">
                 <DollarSign className="h-4 w-4 text-primary mt-0.5" />
                 <div>
-                  <p className="font-medium">Possible 50% off published rate</p>
+                  <p className="font-medium">Possible discount off published rate</p>
                   <p className="text-xs text-muted-foreground">Possible 50% off the published plan rate after paid plans launch</p>
                 </div>
               </div>

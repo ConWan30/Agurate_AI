@@ -18,6 +18,8 @@ interface CriticalAlertInput {
   estimated_yield_impact_percent?: number;
   field_acreage?: number;
   crop_type?: string;
+  /** Optional $/acre from caller — USD loss omitted when not provided. */
+  crop_value_per_acre?: number;
 }
 
 interface UrgencyFactors {
@@ -27,7 +29,7 @@ interface UrgencyFactors {
   pestSeverity: number;
   yieldImpact: number;
   fieldSize: number;
-  cropValue: number;
+  cropValue: number | null;
 }
 
 
@@ -35,13 +37,13 @@ function normalizeThreatList(raw: unknown): Array<{ name: string; severity: stri
   if (!Array.isArray(raw)) return [];
   return raw.map((item) => {
     if (typeof item === 'string') {
-      return { name: item, severity: 'moderate', confidence: 0 };
+      return { name: item, severity: 'unknown', confidence: 0 };
     }
     if (item && typeof item === 'object') {
       const o = item as Record<string, unknown>;
       return {
         name: String(o.name ?? o.disease ?? o.pest ?? 'unknown'),
-        severity: String(o.severity ?? 'moderate'),
+        severity: String(o.severity ?? 'unknown'),
         confidence: typeof o.confidence === 'number' ? o.confidence : 0,
       };
     }
@@ -81,6 +83,7 @@ serve(async (req) => {
       estimated_yield_impact_percent,
       field_acreage,
       crop_type,
+      crop_value_per_acre,
     }: CriticalAlertInput = await req.json();
 
     const normalizedDiseases = normalizeThreatList(diseases);
@@ -122,7 +125,7 @@ serve(async (req) => {
         }, 0),
       yieldImpact: estimated_yield_impact_percent || 0,
       fieldSize: field_acreage ?? 0,
-      cropValue: getCropValuePerAcre(crop_type || 'rice'),
+      cropValue: resolveCropValuePerAcre(crop_value_per_acre),
     });
 
     if (urgencyScore < 60) {
@@ -148,7 +151,7 @@ serve(async (req) => {
       pests: normalizedPests,
       yieldImpact,
       acreage: field_acreage ?? 0,
-      cropValue: getCropValuePerAcre(crop_type || 'rice'),
+      cropValue: resolveCropValuePerAcre(crop_value_per_acre),
     });
 
     const { data: alert, error: alertError } = await supabaseClient
@@ -234,10 +237,10 @@ function generateAlertContent(params: {
   pests?: Array<{ name: string; severity: string; confidence: number }>;
   yieldImpact: number | null;
   acreage: number;
-  cropValue: number;
+  cropValue: number | null;
 }): { title: string; message: string; estimatedLoss: number | null } {
   const { alertType, cropType, diseases, pests, yieldImpact, acreage, cropValue } = params;
-  const hasYieldImpact = yieldImpact != null && Number.isFinite(yieldImpact) && acreage > 0;
+  const hasYieldImpact = yieldImpact != null && Number.isFinite(yieldImpact) && acreage > 0 && cropValue != null && Number.isFinite(cropValue) && cropValue > 0;
   const estimatedLoss = hasYieldImpact
     ? (Number(yieldImpact) / 100) * acreage * cropValue
     : null;
@@ -275,13 +278,8 @@ function generateAlertContent(params: {
   };
 }
 
-function getCropValuePerAcre(cropType: string): number {
-  const values: Record<string, number> = {
-    rice: 1387,
-    soybean: 702,
-    soybeans: 702,
-    cotton: 825,
-    corn: 1044,
-  };
-  return values[cropType.toLowerCase()] || 1000;
+/** Only use caller-provided crop $/acre — never invent commodity defaults. */
+function resolveCropValuePerAcre(raw: unknown): number | null {
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }

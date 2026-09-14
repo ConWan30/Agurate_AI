@@ -24,7 +24,7 @@ export default function Upgrade() {
     },
     {
       name: "Professional",
-      betaPriceLabel: "50% off published rate",
+      betaPriceLabel: "Possible beta discount",
       description: "Most popular for Louisiana farmers",
       features: [
         "Fields & assessments for your whole operation",
@@ -38,7 +38,7 @@ export default function Upgrade() {
       buttonText: "Notify Me When Billing Opens",
       buttonVariant: "default" as const,
       isFeatured: true,
-      betaDiscount: "50% OFF PUBLISHED RATE"
+      betaDiscount: "POSSIBLE BETA DISCOUNT"
     },
     {
       name: "Cooperative",
@@ -74,7 +74,7 @@ export default function Upgrade() {
             Your Beta Pricing Benefit
           </h2>
           <p className="text-lg text-muted-foreground">
-            As a beta farmer, you've helped us build AgurateAI. Beta farmers may keep 50% off the published plan rate when paid plans launch. Billing checkout is not open yet.
+            As a beta farmer, you've helped us build AgurateAI. Beta farmers may be offered a discount off the published plan rate when paid plans launch (not guaranteed; confirm in-app). Billing checkout is not open yet.
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Beta farmers who convert may keep 50% off the published plan rate. Your data and fields remain intact with continued feature access.
+                  Converting beta farmers may be offered a discount off the published plan rate (not guaranteed). Your data and fields remain intact with continued feature access.
                 </p>
               </CardContent>
             </Card>
@@ -180,7 +180,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Yes! You can upgrade or downgrade at any time. Beta farmers may keep 50% off the published rate across plan changes.
+                  Yes! You can upgrade or downgrade at any time. Any beta discount (if offered) would be confirmed in-app — not guaranteed across plan changes.
                 </p>
               </CardContent>
             </Card>

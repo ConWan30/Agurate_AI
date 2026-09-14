@@ -153,7 +153,7 @@ export default function Insurance() {
       target: 'insurance-header',
       id: 'header',
       title: 'Step 1: Insurance Claims',
-      content: 'Document crop damage with GPS-stamped photos for faster insurance claims.',
+      content: 'Document crop damage with GPS-stamped photos to support insurance claim documentation.',
       position: 'bottom' as const,
     },
     {
@@ -236,7 +236,7 @@ export default function Insurance() {
               <div>
                 <h3 className="font-semibold mb-2">Purpose</h3>
                 <p className="text-sm text-muted-foreground">
-                  Document crop damage events with AI-backed evidence for faster, more accurate insurance claims. 
+                  Document crop damage events with AI-backed evidence to support insurance claim documentation. 
                   Link your AgurateAI crop assessments directly to insurance claims to provide objective, 
                   timestamped health data that supports your loss estimates.
                 </p>

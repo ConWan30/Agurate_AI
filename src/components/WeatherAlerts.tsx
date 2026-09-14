@@ -13,7 +13,7 @@ interface WeatherAlert {
   title: string;
   description: string;
   start_time: string;
-  end_time: string;
+  end_time: string | null;
   affected_areas: string[];
 }
 
@@ -195,7 +195,7 @@ export function WeatherAlerts() {
 
             <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border">
               <span>
-                {format(new Date(alert.start_time), "MMM dd, h:mm a")} - {format(new Date(alert.end_time), "MMM dd, h:mm a")}
+                {format(new Date(alert.start_time), "MMM dd, h:mm a")}{alert.end_time ? ` - ${format(new Date(alert.end_time), "MMM dd, h:mm a")}` : " (end time not provided)"}
               </span>
             </div>
           </div>

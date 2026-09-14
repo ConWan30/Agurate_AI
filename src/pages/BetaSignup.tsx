@@ -507,14 +507,14 @@ export default function BetaSignup() {
             <AccordionItem value="item-1">
               <AccordionTrigger>How long is the beta program?</AccordionTrigger>
               <AccordionContent>
-                Closed beta enrollment is limited. Beta farmers may keep 50% off the published plan rate when paid plans launch.
+                Closed beta enrollment is limited. Beta farmers may be offered a discount off the published plan rate when paid plans launch (not guaranteed; confirm in-app).
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger>What happens when beta ends?</AccordionTrigger>
               <AccordionContent>
-                You may keep 50% off the published plan rate on paid plans. Free access continues until paid plans launch.
+                A possible discount off the published plan rate may be offered on paid plans (not guaranteed). Free access continues until paid plans launch.
               </AccordionContent>
             </AccordionItem>
 
