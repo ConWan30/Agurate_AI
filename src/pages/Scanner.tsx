@@ -170,10 +170,14 @@ export default function Scanner() {
         });
 
         if (error) throw error;
+        if (!data || data.error != null || data.health_score == null) {
+          throw new Error(data?.error || 'AR analysis did not return a health score');
+        }
         setAiOverlay(data);
       };
     } catch (error) {
       console.error('AR overlay failed:', error);
+      setAiOverlay(null);
     }
   };
 

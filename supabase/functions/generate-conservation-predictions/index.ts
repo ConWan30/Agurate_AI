@@ -165,16 +165,10 @@ Return JSON with: current_impact, predicted_impact_1_year, predicted_impact_5_ye
     try {
       predictionData = JSON.parse(aiResponse);
     } catch {
-      // If not JSON, create structured response from text
-      predictionData = {
-        current_impact: 500,
-        predicted_impact_1_year: 750,
-        predicted_impact_5_year: 1500,
-        climate_factor: 0.75,
-        soil_health_improvement: 0.8,
-        confidence_score: 0.85,
-        reasoning: aiResponse
-      };
+      throw new Error('Conservation prediction AI returned unparseable JSON — refusing to invent scores');
+    }
+    if (predictionData.confidence_score == null || Number.isNaN(Number(predictionData.confidence_score))) {
+      throw new Error('Conservation prediction omitted confidence_score');
     }
 
     // Save to database (use regular client, RLS allows user to insert their own data)

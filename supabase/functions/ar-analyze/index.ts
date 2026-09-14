@@ -101,6 +101,9 @@ serve(async (req) => {
     }
 
     const result = JSON.parse(toolCall.function.arguments);
+    if (result.health_score == null || Number.isNaN(Number(result.health_score))) {
+      throw new Error('AR analysis omitted health_score');
+    }
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -108,17 +111,14 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('AR analysis error:', error);
+    // Fail closed — never invent health/stress scores on error
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error instanceof Error ? error.message : 'AR analysis failed',
-        health_score: 0.5,
-        stress_level: 'moderate_stress',
-        visual_cues: 'Analysis unavailable',
-        confidence_score: 0
       }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
+        status: 500,
       }
     );
   }

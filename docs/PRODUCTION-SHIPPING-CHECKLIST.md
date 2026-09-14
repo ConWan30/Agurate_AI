@@ -84,6 +84,7 @@ Last updated: 2026-09-14
 - [x] Lock subscription_tier from client self-writes (`20260914160000`)
 - [x] Soften BetaValueTracker / HowItWorks residual forecast claims
 - [x] Shared requireHealthScore helper + tests
+- [x] AR analyze + prediction edges fail closed (no invented scores)
 
 ## Platform gates (external)
 
