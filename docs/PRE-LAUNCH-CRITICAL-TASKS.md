@@ -27,9 +27,11 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914180000` (researcher PII is
-   `20260914100000`; `subscription_status` lock is `20260914170000`; beta_metrics
-   approved-story sync is `20260914180000`; plus prior RLS/RPC/storage/soybean checks)
+1. Apply pending Supabase migrations through `20260914200000` (claim INSERT status
+   lock + coop-alert member INSERT drop; prior tip `20260914190000` claim UPDATE/
+   invitation freeze; researcher PII is `20260914100000`; `subscription_status`
+   lock is `20260914170000`; beta_metrics approved-story sync is `20260914180000`;
+   plus prior RLS/RPC/storage/soybean checks)
 2. Enable Auth **Leaked Password Protection**
 3. Deploy updated edge functions
 4. Set `DEMO_SETUP_SECRET` (or leave unset to keep demo setup disabled)

@@ -123,7 +123,12 @@ serve(async (req) => {
         return;
       }
       const healthScore = toHealthPercent(field.latestAssessment.health_score);
-      contextPrompt += `- ${field.name} (${field.crop_type}): ${healthScore.toFixed(0)}% health, ${field.latestAssessment?.stress_level || 'unknown'} stress\n`;
+      const stressLabel =
+        field.latestAssessment?.stress_level &&
+        String(field.latestAssessment.stress_level).trim().length > 0
+          ? field.latestAssessment.stress_level
+          : 'stress not recorded';
+      contextPrompt += `- ${field.name} (${field.crop_type}): ${healthScore.toFixed(0)}% health, ${stressLabel}\n`;
       if (field.latestAssessment?.disease_identified) {
         contextPrompt += `  Diseases: ${field.latestAssessment.disease_identified.join(', ')}\n`;
       }

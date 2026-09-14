@@ -233,7 +233,7 @@ PROFILE INFORMATION (Required):
 - Parish (Louisiana parish location)
 - Primary crops (rice, soybeans, cotton, corn - can be multiple)
 - Total farm acreage (total across all fields)
-- Phone number (optional, for text alerts)
+- Phone number (optional — contact only; SMS/text alerts are not enabled in this build)
 
 FIRST FIELD SETUP (Strongly Encouraged):
 After getting profile basics, TRANSITION to setting up their first field:

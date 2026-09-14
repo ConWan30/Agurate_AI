@@ -474,16 +474,16 @@ Respond ONLY in JSON format.`
             content: `Generate recommendations for this ${cropType} field${location ? ` in ${location}` : ' (location unknown — do not invent a parish)'}:
 
 **FIELD ANALYSIS:**
-- Stress Score: ${imageAnalysis.stress_score.toFixed(2)}/1.0
-- Condition: ${imageAnalysis.condition}
-- Visual Cues: ${imageAnalysis.visual_cues}
-- Symptoms: ${imageAnalysis.symptoms?.join(', ')}
-- Confidence: ${imageAnalysis.confidence_score.toFixed(2)}
+- Stress Score: ${imageAnalysis.stress_score != null && Number.isFinite(Number(imageAnalysis.stress_score)) ? Number(imageAnalysis.stress_score).toFixed(2) : 'not recorded'}/1.0
+- Condition: ${imageAnalysis.condition ?? 'not recorded'}
+- Visual Cues: ${imageAnalysis.visual_cues ?? 'not recorded'}
+- Symptoms: ${Array.isArray(imageAnalysis.symptoms) ? imageAnalysis.symptoms.join(', ') : 'not recorded'}
+- Confidence: ${imageAnalysis.confidence_score != null && Number.isFinite(Number(imageAnalysis.confidence_score)) ? Number(imageAnalysis.confidence_score).toFixed(2) : 'not recorded'}
 
 ${weatherData ? `**CURRENT WEATHER (at field coordinates):**
-- Current Temp: ${weatherData.temp_f}°F
-- 7-Day Rainfall: ${weatherData.precipitation_7day.toFixed(2)} inches
-- High: ${weatherData.temp_max}°F | Low: ${weatherData.temp_min}°F` : '**WEATHER:** Data unavailable'}
+- Current Temp: ${weatherData.temp_f != null && Number.isFinite(Number(weatherData.temp_f)) ? weatherData.temp_f : 'not recorded'}°F
+- 7-Day Rainfall: ${weatherData.precipitation_7day != null && Number.isFinite(Number(weatherData.precipitation_7day)) ? Number(weatherData.precipitation_7day).toFixed(2) : 'not recorded'} inches
+- High: ${weatherData.temp_max != null && Number.isFinite(Number(weatherData.temp_max)) ? weatherData.temp_max : 'not recorded'}°F | Low: ${weatherData.temp_min != null && Number.isFinite(Number(weatherData.temp_min)) ? weatherData.temp_min : 'not recorded'}°F` : '**WEATHER:** Data unavailable'}
 
 **TASK:**
 Provide 1-3 specific, actionable recommendations. Prioritize based on stress severity and weather conditions.

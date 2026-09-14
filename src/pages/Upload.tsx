@@ -286,16 +286,22 @@ export default function Upload() {
       category: 'irrigation' | 'fertilization' | 'pest_management' | 'weather_alert' | 'general';
     }
     
-    const recommendations = (aiResult.recommendations as Recommendation[]).map((rec) => ({
-      assessment_id: assessment.id,
-      recommendation_text: rec.text,
-      priority: rec.priority,
-      category: rec.category,
-    }));
+    const recommendationList = Array.isArray(aiResult.recommendations)
+      ? (aiResult.recommendations as Recommendation[])
+      : [];
 
-    const { error: recError } = await supabase.from("recommendations").insert(recommendations);
+    if (recommendationList.length > 0) {
+      const recommendations = recommendationList.map((rec) => ({
+        assessment_id: assessment.id,
+        recommendation_text: rec.text,
+        priority: rec.priority,
+        category: rec.category,
+      }));
 
-    if (recError) throw recError;
+      const { error: recError } = await supabase.from("recommendations").insert(recommendations);
+
+      if (recError) throw recError;
+    }
 
     // ✅ UNIFIED AI: Enrich intelligence pool after analysis
     await enrichUnifiedContext(fieldId, aiResult);
