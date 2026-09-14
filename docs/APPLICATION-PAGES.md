@@ -964,7 +964,7 @@ Quick access to primary actions on mobile devices.
 - `docs/LSU-AGCENTER-PITCH.md` - Full pitch document
 - `docs/LIVE-DEMO-SCRIPT.md` - Video demo script
 - `docs/DELTA_CODE_CULTIVATION_SYSTEM.md` - AI architecture
-- `docs/DELTA_FIELD_COMMAND_CENTER.md` - Field management spec
+- `docs/archive/DELTA_FIELD_COMMAND_CENTER.md` - Archived field management notes (not live schema/policy)
 - `docs/architecture.md` - Technical architecture
 - `docs/research-findings.md` - LSU AgCenter integration research
 
