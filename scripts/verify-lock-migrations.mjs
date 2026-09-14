@@ -106,6 +106,16 @@ const required = [
       'reject_client_insert_conversation_memory_trg',
     ],
   },
+  {
+    id: '20260914280000_lock_claim_loss_priority_form_complete',
+    needles: [
+      'insurance_claims_estimated_loss_percentage_check',
+      'estimated_loss_percentage must be between 0 and 100',
+      "NEW.priority := 'medium'",
+      'cannot be marked completed below 100%% completion',
+      'assessments_field_uniformity_score_check',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -126,11 +136,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091427') &&
-  tip < '20260914270000_lock_alert_ack_and_conversation_memory'
+  !tip.startsWith('2026091428') &&
+  tip < '20260914280000_lock_claim_loss_priority_form_complete'
 ) {
   fail(
-    `tip migration ${tip} should include alert-ack / conversation_memory invent lock (20260914270000+)`
+    `tip migration ${tip} should include claim-loss / priority / form-complete invent lock (20260914280000+)`
   );
 }
 

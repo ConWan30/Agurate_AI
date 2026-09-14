@@ -21,6 +21,7 @@ import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalF
 import { Sparkles } from "lucide-react";
 import TutorialTooltip from '@/components/TutorialTooltip';
 import { formatHealthPercent, hasHealthScore } from '@/lib/health-score';
+import { parseLossPercentage, requireLossPercentage } from '@/lib/loss-percentage';
 
 export default function Insurance() {
   const [open, setOpen] = useState(false);
@@ -60,12 +61,16 @@ export default function Insurance() {
 
   const createClaim = useMutation({
     mutationFn: async (formData: FormData) => {
-      const rawLoss = Number(formData.get('estimated_loss_percentage'));
+      const rawLoss = formData.get('estimated_loss_percentage');
+      const estimated_loss_percentage =
+        rawLoss === null || rawLoss === ''
+          ? null
+          : requireLossPercentage(rawLoss);
       const { error } = await supabase.from('insurance_claims').insert([{
         field_id: formData.get('field_id') as string,
         event_type: formData.get('event_type') as string,
         event_date: formData.get('event_date') as string,
-        estimated_loss_percentage: Number.isFinite(rawLoss) ? rawLoss : null,
+        estimated_loss_percentage,
         description: formData.get('description') as string,
         status: 'draft'
       }]);
@@ -130,14 +135,21 @@ export default function Insurance() {
 
   const handleConversationalComplete = async (extractedData: InsuranceClaimData) => {
     try {
-      const rawExtractedLoss = Number(
-        extractedData.estimatedLossPercentage || extractedData.estimated_loss_percentage,
+      const estimated_loss_percentage = parseLossPercentage(
+        extractedData.estimatedLossPercentage ?? extractedData.estimated_loss_percentage,
       );
+      if (
+        (extractedData.estimatedLossPercentage != null ||
+          extractedData.estimated_loss_percentage != null) &&
+        estimated_loss_percentage == null
+      ) {
+        throw new Error('Estimated loss must be a number between 0 and 100');
+      }
       const { error } = await supabase.from('insurance_claims').insert([{
         field_id: extractedData.fieldId || extractedData.field_id,
         event_type: extractedData.eventType || extractedData.event_type,
         event_date: extractedData.eventDate || extractedData.event_date,
-        estimated_loss_percentage: Number.isFinite(rawExtractedLoss) ? rawExtractedLoss : null,
+        estimated_loss_percentage,
         description: extractedData.description,
         status: 'draft'
       }]);

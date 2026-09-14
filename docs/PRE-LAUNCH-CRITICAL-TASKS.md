@@ -30,10 +30,12 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] Conversational-form metrics/messages + request_logs invent lock (`20260914250000`)
 - [x] Delta assistant invent lock + peer field ownership + expert/LSU response freeze (`20260914260000`)
 - [x] Alert acknowledgments + conversation_memory client INSERT lock (`20260914270000`); unknown stress no longer invents “severe” in Dashboard/FieldMap/WeatherTimeline/Scanner
+- [x] Claim loss % CHECK + expert priority freeze + form completed@100% + field_uniformity CHECK (`20260914280000`)
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914270000` (alert-ack + conversation_memory invent lock;
+1. Apply pending Supabase migrations through `20260914280000` (claim loss / priority / form-complete;
+   alert-ack + conversation_memory invent lock `20260914270000`;
    delta/peer/expert invent `20260914260000`; critical-alert UPDATE freeze + claim
    assessment field match; peer effectiveness CHECK `20260914230000`; AI metric client-write lock
    `20260914220000` + assessment AI-score service-role persist `20260914210000`; claim INSERT status

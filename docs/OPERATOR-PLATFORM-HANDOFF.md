@@ -21,13 +21,13 @@ Verify local gates anytime:
 npm run verify:local-gates
 ```
 
-Latest migration in repo: `20260914270000_lock_alert_ack_and_conversation_memory`
+Latest migration in repo: `20260914280000_lock_claim_loss_priority_form_complete`
 
 ## 1. Apply Supabase migrations
 
 Apply **all** pending migrations through tip  
-`20260914270000_lock_alert_ack_and_conversation_memory`  
-(includes alert-acknowledgment + conversation_memory client INSERT lock, delta/peer/expert invent locks, critical-alert UPDATE freeze + claim↔assessment field match, peer effectiveness CHECK, AI metric client-write locks, insurance claim status lock + invitation column freeze, entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
+`20260914280000_lock_claim_loss_priority_form_complete`  
+(includes claim loss % CHECK, expert priority freeze, conversational completed@100%, field_uniformity CHECK, alert-ack + conversation_memory locks, delta/peer/expert invent locks, critical-alert UPDATE freeze + claim↔assessment field match, peer effectiveness CHECK, AI metric client-write locks, insurance claim status lock + invitation column freeze, entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
 
 ```bash
 # Linked project
@@ -36,7 +36,7 @@ supabase db push
 # Or via Dashboard → SQL → run each pending migration in timestamp order
 ```
 
-**Evidence receipt:** paste Supabase migration history showing tip `20260914270000_…` applied with no errors.
+**Evidence receipt:** paste Supabase migration history showing tip `20260914280000_…` applied with no errors.
 
 ## 2. Enable Auth Leaked Password Protection
 

@@ -118,13 +118,8 @@ export function ExpertEscalationCard({
           researcher_id: researcher.id,
           question: issueDescription,
           status: 'pending',
-          priority: !hasConfidence
-            ? 'medium'
-            : Number(confidenceScore) < 50
-              ? 'urgent'
-              : Number(confidenceScore) < 70
-                ? 'high'
-                : 'medium',
+          // Priority is not forged from confidence — DB trigger also forces medium
+          priority: 'medium',
         })
         .select()
         .single();

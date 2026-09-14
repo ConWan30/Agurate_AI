@@ -76,6 +76,16 @@ function formatHealthForPrompt(score: unknown): string {
   return `${toHealthPercent(Number(score))}%`;
 }
 
+/** field_uniformity_score is stored 0–1; AI may emit 0–100. Reject invent outside range. */
+function toUniformityFraction(score: unknown): number | null {
+  if (!hasHealthScore(score)) return null;
+  const n = Number(score);
+  if (n < 0) return null;
+  if (n <= 1) return Math.round(n * 1000) / 1000;
+  if (n <= 100) return Math.round(n * 10) / 1000;
+  return null;
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -587,7 +597,7 @@ Respond with JSON:
       pest_identified: imageAnalysis.pest_identified,
       nutrient_deficiencies: imageAnalysis.nutrient_deficiencies,
       severity_ratings: imageAnalysis.severity_ratings,
-      field_uniformity_score: imageAnalysis.field_uniformity_score,
+      field_uniformity_score: toUniformityFraction(imageAnalysis.field_uniformity_score),
       estimated_yield_impact_percent: imageAnalysis.estimated_yield_impact_percent,
       canopy_coverage_percent: imageAnalysis.canopy_coverage_percent,
       plant_density_assessment: imageAnalysis.plant_density_assessment,
@@ -631,7 +641,7 @@ Respond with JSON:
           pest_identified: imageAnalysis.pest_identified ?? null,
           nutrient_deficiencies: imageAnalysis.nutrient_deficiencies ?? null,
           severity_ratings: imageAnalysis.severity_ratings ?? null,
-          field_uniformity_score: imageAnalysis.field_uniformity_score ?? null,
+          field_uniformity_score: toUniformityFraction(imageAnalysis.field_uniformity_score),
           estimated_yield_impact_percent: imageAnalysis.estimated_yield_impact_percent ?? null,
           canopy_coverage_percent: imageAnalysis.canopy_coverage_percent ?? null,
           plant_density_assessment: imageAnalysis.plant_density_assessment ?? null,

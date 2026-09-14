@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Heart, Bug, Sprout, Leaf, Cloud } from "lucide-react";
+import { formatHealthPercent, hasHealthScore, toHealthPercent } from "@/lib/health-score";
+import { formatStressLabel, normalizeStressLevel } from "@/lib/stress-level";
 
 interface NutrientDeficiency {
   detected: boolean;
@@ -81,13 +83,11 @@ export function DetailedAnalysisTabs({
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium">Overall Health Score</span>
                 <span className="text-sm font-bold">
-                  {healthScore != null && Number.isFinite(healthScore)
-                    ? `${Math.round(healthScore)}%`
-                    : '—'}
+                  {formatHealthPercent(healthScore)}
                 </span>
               </div>
-              {healthScore != null && Number.isFinite(healthScore) ? (
-                <Progress value={healthScore} className="h-3" />
+              {hasHealthScore(healthScore) ? (
+                <Progress value={toHealthPercent(healthScore)} className="h-3" />
               ) : (
                 <p className="text-sm text-muted-foreground">Health score not recorded for this assessment.</p>
               )}
@@ -95,7 +95,11 @@ export function DetailedAnalysisTabs({
             
             <div className="p-4 bg-muted rounded-lg">
               <p className="text-sm font-medium mb-1">Status:</p>
-              <Badge className="text-base">{stressLevel}</Badge>
+              {normalizeStressLevel(stressLevel) ? (
+                <Badge className="text-base">{formatStressLabel(stressLevel)}</Badge>
+              ) : (
+                <Badge variant="outline" className="text-base">Stress not recorded</Badge>
+              )}
             </div>
 
             {visualCues && (
@@ -244,10 +248,12 @@ export function DetailedAnalysisTabs({
                 </div>
               )}
               
-              {fieldUniformity != null && Number.isFinite(Number(fieldUniformity)) && (
+              {fieldUniformity != null && hasHealthScore(fieldUniformity) && (
                 <div className="p-4 border rounded-lg">
                   <p className="text-sm text-muted-foreground mb-2">Field Uniformity</p>
-                  <p className="text-3xl font-bold">{Math.round(Number(fieldUniformity) * 100)}%</p>
+                  <p className="text-3xl font-bold">
+                    {formatHealthPercent(fieldUniformity)}
+                  </p>
                 </div>
               )}
             </div>
