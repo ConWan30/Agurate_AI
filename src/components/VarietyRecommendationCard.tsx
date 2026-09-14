@@ -10,11 +10,21 @@ interface VarietyRecommendationCardProps {
 }
 
 export function VarietyRecommendationCard({ recommendation, onAdopt }: VarietyRecommendationCardProps) {
-  const riskColors = {
+  const riskColors: Record<string, string> = {
     low: 'bg-health-good/10 text-health-good border-health-good/30',
     medium: 'bg-health-moderate/10 text-health-moderate border-health-moderate/30',
     high: 'bg-health-severe/10 text-health-severe border-health-severe/30',
   };
+  const riskKey = String(recommendation.risk_assessment ?? '').trim().toLowerCase();
+  const knownRisk = riskKey === 'low' || riskKey === 'medium' || riskKey === 'high'
+    ? riskKey
+    : '';
+  const improvement = Number(recommendation.expected_improvement);
+  const hasImprovement =
+    recommendation.expected_improvement != null &&
+    Number.isFinite(improvement) &&
+    improvement >= 0 &&
+    improvement <= 1;
 
   return (
     <Card className="border-primary/20">
@@ -29,9 +39,15 @@ export function VarietyRecommendationCard({ recommendation, onAdopt }: VarietyRe
               {recommendation.current_variety && `Current: ${recommendation.current_variety}`}
             </CardDescription>
           </div>
-          <Badge className={riskColors[recommendation.risk_assessment]}>
-            {recommendation.risk_assessment} risk
-          </Badge>
+          {knownRisk ? (
+            <Badge className={riskColors[knownRisk]}>
+              {knownRisk} risk
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-muted-foreground">
+              Risk not recorded
+            </Badge>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -42,14 +58,13 @@ export function VarietyRecommendationCard({ recommendation, onAdopt }: VarietyRe
           </div>
         </div>
 
-        {recommendation.expected_improvement != null &&
-        Number.isFinite(Number(recommendation.expected_improvement)) ? (
+        {hasImprovement ? (
           <div className="flex items-center gap-4 p-3 rounded-lg bg-accent/10">
             <TrendingUp className="h-8 w-8 text-accent" />
             <div>
               <div className="text-sm text-muted-foreground">Planning yield delta</div>
               <div className="text-xl font-bold text-accent">
-                +{(Number(recommendation.expected_improvement) * 100).toFixed(0)}%
+                +{(improvement * 100).toFixed(0)}%
               </div>
               <div className="text-xs text-muted-foreground">
                 Illustrative estimate from cited public trial ranges — not a measured farm outcome

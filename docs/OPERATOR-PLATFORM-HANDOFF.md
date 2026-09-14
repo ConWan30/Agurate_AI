@@ -21,13 +21,13 @@ Verify local gates anytime:
 npm run verify:local-gates
 ```
 
-Latest migration in repo: `20260914300000_lock_success_peer_cost_recommendation_update`
+Latest migration in repo: `20260914310000_lock_expert_coop_variety_extracted`
 
 ## 1. Apply Supabase migrations
 
 Apply **all** pending migrations through tip  
-`20260914300000_lock_success_peer_cost_recommendation_update`  
-(includes success-story / peer cost CHECKs + recommendation UPDATE freeze, yield/canopy CHECKs, feedback assessment RLS, insurance event_type allowlist, bug_report status freeze, fields.acreage CHECK, claim loss % CHECK, expert priority freeze, conversational completed@100%, field_uniformity CHECK, alert-ack + conversation_memory locks, delta/peer/expert invent locks, critical-alert UPDATE freeze + claim↔assessment field match, peer effectiveness CHECK, AI metric client-write locks, insurance claim status lock + invitation column freeze, entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
+`20260914310000_lock_expert_coop_variety_extracted`  
+(includes expert consultation field ownership, cooperative alert content freeze, variety recommendation honesty, conversational extracted_data invent lock, success-story / peer cost CHECKs + recommendation UPDATE freeze, yield/canopy CHECKs, feedback assessment RLS, insurance event_type allowlist, bug_report status freeze, fields.acreage CHECK, claim loss % CHECK, expert priority freeze, conversational completed@100%, field_uniformity CHECK, alert-ack + conversation_memory locks, delta/peer/expert invent locks, critical-alert UPDATE freeze + claim↔assessment field match, peer effectiveness CHECK, AI metric client-write locks, insurance claim status lock + invitation column freeze, entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
 
 ```bash
 # Linked project
@@ -36,7 +36,7 @@ supabase db push
 # Or via Dashboard → SQL → run each pending migration in timestamp order
 ```
 
-**Evidence receipt:** paste Supabase migration history showing tip `20260914300000_…` applied with no errors.
+**Evidence receipt:** paste Supabase migration history showing tip `20260914310000_…` applied with no errors.
 
 ## 2. Enable Auth Leaked Password Protection
 
@@ -121,7 +121,7 @@ This environment has **no** Supabase access token, DB password, service-role key
 ## Done means
 
 - [x] Local gates green (`npm run verify:local-gates` + CI) — tip of `cursor/launch-readiness-honesty-38b2`
-- [ ] Migrations applied through tip (`20260914300000_…`)
+- [ ] Migrations applied through tip (`20260914310000_…`)
 - [ ] Leaked password protection on
 - [ ] Edge functions deployed + demo secret policy set
 - [ ] App published

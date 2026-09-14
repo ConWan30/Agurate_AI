@@ -1969,32 +1969,32 @@ export type Database = {
         Row: {
           created_at: string | null
           current_variety: string | null
-          expected_improvement: number
+          expected_improvement: number | null
           field_id: string
           id: string
           lsu_research_basis: string[]
           recommended_variety: string
-          risk_assessment: string
+          risk_assessment: string | null
         }
         Insert: {
           created_at?: string | null
           current_variety?: string | null
-          expected_improvement: number
+          expected_improvement?: number | null
           field_id: string
           id?: string
           lsu_research_basis: string[]
           recommended_variety: string
-          risk_assessment: string
+          risk_assessment?: string | null
         }
         Update: {
           created_at?: string | null
           current_variety?: string | null
-          expected_improvement?: number
+          expected_improvement?: number | null
           field_id?: string
           id?: string
           lsu_research_basis?: string[]
           recommended_variety?: string
-          risk_assessment?: string
+          risk_assessment?: string | null
         }
         Relationships: [
           {

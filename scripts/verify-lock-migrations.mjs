@@ -137,6 +137,16 @@ const required = [
       'NEW.recommendation_text := OLD.recommendation_text',
     ],
   },
+  {
+    id: '20260914310000_lock_expert_coop_variety_extracted',
+    needles: [
+      'Farmers can create consultations for own fields',
+      'cooperative_alerts_affected_area_acres_check',
+      'cooperative_alerts content columns may only be updated by trusted backends',
+      'variety_recommendations_expected_improvement_check',
+      "NEW.extracted_data := '{}'::jsonb",
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -157,11 +167,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091430') &&
-  tip < '20260914300000_lock_success_peer_cost_recommendation_update'
+  !tip.startsWith('2026091431') &&
+  tip < '20260914310000_lock_expert_coop_variety_extracted'
 ) {
   fail(
-    `tip migration ${tip} should include success/peer-cost/recommendation-update invent lock (20260914300000+)`
+    `tip migration ${tip} should include expert/coop/variety/extracted invent lock (20260914310000+)`
   );
 }
 

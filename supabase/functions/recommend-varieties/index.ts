@@ -201,6 +201,14 @@ Return JSON with: recommended_variety, expected_improvement (decimal 0-1 or null
         ? Number(rawImprovement)
         : null;
 
+    const rawRisk = String(recommendationData.risk_assessment ?? '')
+      .trim()
+      .toLowerCase();
+    const riskAssessment =
+      rawRisk === 'low' || rawRisk === 'medium' || rawRisk === 'high'
+        ? rawRisk
+        : null;
+
     // Save to database (service role — clients can no longer insert AI metric rows)
     const { data, error } = await admin
       .from('variety_recommendations')
@@ -209,7 +217,7 @@ Return JSON with: recommended_variety, expected_improvement (decimal 0-1 or null
         current_variety: currentVariety,
         recommended_variety: recommendationData.recommended_variety,
         expected_improvement: expectedImprovement,
-        risk_assessment: recommendationData.risk_assessment,
+        risk_assessment: riskAssessment,
         lsu_research_basis: recommendationData.lsu_research_basis,
       })
       .select()
