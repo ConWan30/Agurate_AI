@@ -67,7 +67,7 @@ export default function HowItWorks() {
     {
       icon: Zap,
       title: 'Early Disease Detection',
-      scenario: 'Flag cotton blight risk earlier than visual scouting alone',
+      scenario: 'Flag possible soybean foliar stress earlier than visual scouting alone',
       impact: 'Act sooner with a research-framed treatment plan',
       savings: 'Earlier intervention window'
     },

@@ -62,7 +62,7 @@ export default function DeltaIntelligence() {
   // Show welcome message only for new conversations
   const displayMessages = messages.length === 0 ? [{
     role: 'assistant' as const,
-    content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor, framed around publicly available LSU AgCenter research and Louisiana Delta agronomy context.\n\n💡 **Try asking me:**\n- Crop-specific advice for rice, soybeans, cotton, or corn\n- Pest & disease identification\n- Soil management strategies\n- Weather-based planting guidance\n\nWhat can I help you with today?"
+    content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor for the **Morehouse Parish soybean** closed beta, framed around publicly available LSU AgCenter research.\n\n💡 **Try asking me:**\n- Soybean stress or yellowing questions for Morehouse fields\n- Frogeye / foliar symptom research framing (not a diagnosis)\n- Weather context for irrigation or scouting timing\n\nWhat can I help you with today?"
   }] : messages;
 
   // Smooth scroll only when messages length changes (new message added), not during streaming updates
@@ -367,11 +367,11 @@ export default function DeltaIntelligence() {
                 <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-1">
                   Delta Intelligence AI
                 </h1>
-                <p className="text-white/80 text-sm">Framed around public LSU AgCenter research · Louisiana Delta</p>
+                <p className="text-white/80 text-sm">Morehouse Parish soybeans · public LSU AgCenter framing</p>
               </div>
             </div>
             <p className="text-white/90 text-base leading-relaxed">
-              Louisiana-specific farming guidance framed around publicly available LSU AgCenter research and Delta agronomy context
+              Louisiana-specific soybean guidance for the Morehouse closed beta, framed around publicly available LSU AgCenter research — not a diagnosis.
             </p>
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
@@ -616,16 +616,16 @@ export default function DeltaIntelligence() {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                💬 "My soybean field shows yellowing—what could it be?"
+                💬 "My Morehouse soybean field shows yellowing—what should I check?"
               </p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                ⏰ "Best nitrogen timing for corn in June?"
+                ⏰ "When should I scout soybeans for frogeye after humid weather?"
               </p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                🐛 "How to manage rice water weevils organically?"
+                🐛 "How do public LSU notes describe potassium deficiency in soybeans?"
               </p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                🌾 "Should I plant cotton after May floods?"
+                🌾 "What weather context should I record before a soybean fungicide decision?"
               </p>
             </CardContent>
           </AnimatedCard>

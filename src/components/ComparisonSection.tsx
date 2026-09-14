@@ -42,10 +42,10 @@ export const ComparisonSection = memo(function ComparisonSection() {
       description: "Morehouse soybean variety context from public LSU materials"
     },
     {
-      feature: "Community Intelligence",
+      feature: "Field History Ledger",
       agurate: true,
       traditional: false,
-      description: "Anonymous cooperative insights"
+      description: "Your soybean scans stay attributable — no invented peer outcomes in pilot"
     },
     {
       feature: "Mobile-First Design",

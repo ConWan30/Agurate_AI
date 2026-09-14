@@ -82,24 +82,24 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <TrendingUp className="h-8 w-8 text-secondary mb-2 group-hover:scale-110 transition-transform" />
               <p className="text-sm font-semibold mb-1">Weather Timeline</p>
-              <p className="text-xs text-muted-foreground">7-day stress forecasting</p>
+              <p className="text-xs text-muted-foreground">Parish weather beside field history</p>
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <Brain className="h-8 w-8 text-accent mb-2 group-hover:scale-110 transition-transform" />
               <p className="text-sm font-semibold mb-1">Delta AI</p>
-              <p className="text-xs text-muted-foreground">Research-backed advisor</p>
+              <p className="text-xs text-muted-foreground">Research-framed advisor</p>
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <FileText className="h-8 w-8 text-success mb-2 group-hover:scale-110 transition-transform" />
-              <p className="text-sm font-semibold mb-1">Insurance</p>
-              <p className="text-xs text-muted-foreground">Field notes for claims</p>
+              <p className="text-sm font-semibold mb-1">Field Notes</p>
+              <p className="text-xs text-muted-foreground">Scan history for your soybean fields</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 p-4 rounded-lg bg-primary/5 border border-primary/20">
             <Target className="h-5 w-5 text-primary shrink-0" />
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Follow James's journey</span> – an illustrative Louisiana Delta scenario showing how a grower might use AI on a multi-field operation
+              <span className="font-semibold text-foreground">Follow James's journey</span> – an illustrative Morehouse Parish soybean scenario showing how a grower might use the pilot tools
             </p>
           </div>
         </div>
