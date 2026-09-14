@@ -261,7 +261,7 @@ export default function BetaSignup() {
           <h2 className="text-3xl font-heading font-bold text-center mb-8">What You'll Get</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              "AI Crop Analysis Engine (instant health assessment)",
+              "AI Crop Analysis Engine (decision-aid health assessment)",
               "7-Day Stress Predictions (proactive forecasting)",
               "Delta Intelligence Chat (24/7 agricultural advisor)",
               "Insurance Claim Documentation (automated evidence)",
@@ -303,7 +303,7 @@ export default function BetaSignup() {
                       <FormItem>
                         <FormLabel>Name *</FormLabel>
                         <FormControl>
-                          <Input placeholder="James Collins" {...field} />
+                          <Input placeholder="Jordan Farmer" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

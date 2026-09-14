@@ -25,17 +25,38 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get demo user (must be created manually first: demo@agurateai.com)
-    const { data: { users }, error: userError } = await supabase.auth.admin.listUsers();
-    const demoUser = users?.find(u => u.email === 'demo@agurateai.com');
+    // Prefer an explicit demo user id secret to avoid listing all auth users.
+    const demoUserId = Deno.env.get('DEMO_USER_ID');
+    let demoUser: { id: string; email?: string } | null = null;
 
-    if (!demoUser) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'Demo user not found. Please create demo@agurateai.com account first.' 
-        }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (demoUserId) {
+      const { data, error: userError } = await supabase.auth.admin.getUserById(demoUserId);
+      if (userError || !data.user) {
+        return new Response(
+          JSON.stringify({
+            error: 'Demo user not found for DEMO_USER_ID. Create the account first.',
+          }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      demoUser = data.user;
+    } else {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .eq('email', 'demo@agurateai.com')
+        .maybeSingle();
+
+      if (!profile?.id) {
+        return new Response(
+          JSON.stringify({
+            error:
+              'Demo user not found. Create demo@agurateai.com first, or set DEMO_USER_ID.',
+          }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      demoUser = { id: profile.id, email: profile.email ?? 'demo@agurateai.com' };
     }
 
     console.log('✅ Demo user found:', demoUser.id);

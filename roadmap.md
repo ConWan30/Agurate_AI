@@ -6,5 +6,6 @@
 - [x] Add production fail-safes (env validation, ErrorBoundary, auth password rules, CI, SEO/security headers)
 - [x] Remove tracked secrets/artifacts; lock down demo setup + market/weather/AR edge auth
 - [x] Harden beta signup + daily briefing/predictive questions auth; gate demo routes; honesty CI
+- [x] Fix password reset, seeded testimonials, CSP/host, critical-alert authz, demo setup lookup
 - [ ] Apply Supabase migrations + enable leaked-password protection
 - [ ] Publish updated app (Lovable / production deploy)

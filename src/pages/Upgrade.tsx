@@ -32,8 +32,8 @@ export default function Upgrade() {
       features: [
         "Unlimited fields & assessments",
         "Advanced 7-day predictions",
-        "LSU researcher access",
-        "Insurance claim automation",
+        "LSU researcher directory (public profiles)",
+        "Insurance claim documentation support",
         "Weather timeline analytics",
         "Priority support",
         "Early access to new features"

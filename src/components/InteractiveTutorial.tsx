@@ -181,7 +181,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                     </div>
                     <div className="p-2 rounded bg-card border">
                       <p className="text-muted-foreground mb-1">Confidence</p>
-                      <p className="font-semibold text-success">94%</p>
+                      <p className="font-semibold text-success">Model estimate</p>
                     </div>
                     <div className="p-2 rounded bg-card border">
                       <p className="text-muted-foreground mb-1">Location</p>
@@ -583,16 +583,16 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </p>
           <div className="space-y-2">
             <div className="p-3 bg-primary/5 rounded border border-primary/20">
-              <p className="text-sm font-semibold mb-1">This Season's Impact:</p>
+              <p className="text-sm font-semibold mb-1">This Season&apos;s Activity:</p>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div><span className="font-bold">127</span> assessments</div>
-                <div><span className="font-bold">$8,247</span> saved</div>
-                <div><span className="font-bold">4</span> outbreaks prevented</div>
+                <div><span className="font-bold">Illustrative</span> planning value</div>
+                <div><span className="font-bold">4</span> issues flagged early</div>
               </div>
             </div>
           </div>
           <p className="text-xs text-muted-foreground italic">
-            "AgurateAI paid for itself in the first month." - James Collins
+            Example walkthrough only — not a verified customer result.
           </p>
         </div>
       ),

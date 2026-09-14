@@ -350,14 +350,14 @@ export default function Dashboard() {
               </AnimatedCard>
             </Link>
 
-            {/* 7. LSU Researcher Access */}
+            {/* 7. LSU researcher directory */}
             <Link to="/lsu-researchers" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={250} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
                     <GraduationCap className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">LSU Experts</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">LSU Directory</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     Direct AgCenter support access
                   </p>

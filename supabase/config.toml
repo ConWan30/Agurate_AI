@@ -3,8 +3,10 @@ project_id = "rkfvefhjyuyhjmcljzev"
 [functions.analyze-crop]
 verify_jwt = true
 
+# Secret-gated admin helper (DEMO_SETUP_SECRET). Gateway JWT stays off so
+# operators can call it with the shared secret header only.
 [functions.setup-demo-account]
-verify_jwt = true
+verify_jwt = false
 
 [functions.ar-analyze]
 verify_jwt = true

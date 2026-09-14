@@ -59,10 +59,10 @@ export default function LSUResearchers() {
     <div className="space-y-8">
       <TutorialTooltip
         steps={[
-          { id: "welcome", title: "LSU AgCenter Experts", content: "Connect with Louisiana agricultural experts for specialized support", position: "bottom" },
+          { id: "welcome", title: "LSU AgCenter directory", content: "Browse publicly listed LSU AgCenter researcher profiles for Louisiana crops", position: "bottom" },
           { id: "browse", title: "Browse Researchers", content: "Filter by expertise area (rice, soybeans, pests, soil science)", position: "bottom" },
-          { id: "ask", title: "Ask Questions", content: "Submit inquiries directly to experts with your field photos", position: "bottom" },
-          { id: "publications", title: "Research Library", content: "Access LSU studies relevant to your crops and region", position: "bottom" }
+          { id: "ask", title: "Official contact channels", content: "Reach specialists through official LSU channels — AgurateAI does not broker introductions", position: "bottom" },
+          { id: "publications", title: "Research Library", content: "Find public LSU studies relevant to your crops and region", position: "bottom" }
         ]}
         storageKey="tutorial-lsu-researchers-shown"
       />
@@ -88,7 +88,7 @@ export default function LSUResearchers() {
             LSU AgCenter Researchers
           </h1>
           <p className="text-lg text-white/90 max-w-2xl">
-            Connect with Louisiana State University agricultural experts for specialized guidance on your crops
+            Browse publicly listed Louisiana State University AgCenter researcher profiles. Contact them through official LSU channels — AgurateAI does not broker introductions.
           </p>
         </div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float" />

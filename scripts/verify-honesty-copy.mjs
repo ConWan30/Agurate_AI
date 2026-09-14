@@ -36,7 +36,7 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const results = [];
 
 for (const check of checks) {
-  await page.goto(`http://127.0.0.1:5173${check.path}`, { waitUntil: 'networkidle' });
+  await page.goto(`http://127.0.0.1:8080${check.path}`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
   const text = await page.locator('body').innerText();
   const missing = check.mustInclude.filter((s) => !text.includes(s));

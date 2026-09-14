@@ -129,7 +129,7 @@ export default function Home() {
     "Community intelligence and cooperative insights",
     "Variety recommendations for rice and soybeans",
     "GPS-tagged field mapping and health visualization",
-    "Insurance claim automation with AI verification",
+    "Insurance claim documentation support (not automated settlement)",
     "Mobile-first design with installable PWA support"
   ];
 

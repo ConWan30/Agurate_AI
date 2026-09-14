@@ -23,8 +23,14 @@ const FORBIDDEN = [
   { name: '40% faster claims claim', re: /40%\s*faster/i },
   { name: '15-25% more payouts claim', re: /15-25%\s*more/i },
   { name: 'fabricated community savings total', re: /\$127K\+?\s*total savings/i },
-  { name: 'fabricated tutorial ROI dollars', re: /\$12,400|\$15,200/ },
+  { name: 'fabricated tutorial ROI dollars', re: /\$8,247|\$12,400|\$15,200/ },
   { name: 'LSU AgCenter Access brokerage claim', re: /LSU AgCenter Access/i },
+  { name: 'fabricated James Collins testimonial', re: /paid for itself in the first month.*James Collins|James Collins.*paid for itself/i },
+  { name: 'insurance claim automation claim', re: /Insurance claim automation/i },
+  { name: 'direct LSU inquiry brokerage claim', re: /Submit inquiries directly to experts/i },
+  { name: 'LSU researcher access plan claim', re: /LSU researcher access/i },
+  { name: 'instant health assessment claim', re: /instant health assessment/i },
+  { name: 'fabricated 94% confidence claim', re: /\b94%\b/ },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

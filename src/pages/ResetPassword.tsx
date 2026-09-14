@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,38 +7,101 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Sprout, ArrowLeft, Mail, CheckCircle2 } from "lucide-react";
+import { Sprout, ArrowLeft, Mail, CheckCircle2, KeyRound } from "lucide-react";
 import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
+import { z } from "zod";
+
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .max(72, "Password too long")
+  .regex(/[A-Za-z]/, "Password must include a letter")
+  .regex(/[0-9]/, "Password must include a number");
 
 export default function ResetPassword() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [email, setEmail] = useState("");
+  const [recoveryMode, setRecoveryMode] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  useEffect(() => {
+    let mounted = true;
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (!mounted) return;
+      if (event === "PASSWORD_RECOVERY") {
+        setRecoveryMode(true);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted || !session) return;
+      const hash = window.location.hash;
+      if (hash.includes("type=recovery") || hash.includes("type%3Drecovery")) {
+        setRecoveryMode(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleRequestReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
-
       if (error) throw error;
-
       setEmailSent(true);
       toast({
         title: "Email sent!",
         description: "Check your inbox for password reset instructions.",
       });
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to send reset email';
+      const message = error instanceof Error ? error.message : "Failed to send reset email";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+
+    const parsed = passwordSchema.safeParse(newPassword);
+    if (!parsed.success) {
+      setPasswordError(parsed.error.issues[0]?.message ?? "Invalid password");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
       toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
+        title: "Password updated",
+        description: "You can now sign in with your new password.",
       });
+      navigate("/auth");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to update password";
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -46,26 +109,22 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen flex relative overflow-hidden">
-      {/* Background */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${bgDeltaRice})` }}
       />
       <div className="absolute inset-0 bg-background/30 backdrop-blur-[2px]" />
 
-      {/* Content */}
       <div className="w-full flex items-center justify-center p-8 bg-background relative">
         <div className="w-full max-w-md relative z-10">
-          {/* Back link */}
-          <Link 
-            to="/auth" 
+          <Link
+            to="/auth"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8 group"
           >
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Back to Sign In
           </Link>
 
-          {/* Mobile header */}
           <div className="text-center mb-8 animate-fade-in">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="relative">
@@ -83,7 +142,67 @@ export default function ResetPassword() {
             </div>
           </div>
 
-          {!emailSent ? (
+          {recoveryMode ? (
+            <Card className="border-2 shadow-field hover-lift transition-all animate-fade-in">
+              <CardHeader className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-xl gradient-delta shadow-glow flex items-center justify-center">
+                    <KeyRound className="h-6 w-6 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">Choose a New Password</CardTitle>
+                    <CardDescription>Enter a new password for your account</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleUpdatePassword} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password" className="text-sm font-semibold">
+                      New Password
+                    </Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="h-11 border-2 focus:border-primary transition-colors"
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password" className="text-sm font-semibold">
+                      Confirm Password
+                    </Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="h-11 border-2 focus:border-primary transition-colors"
+                      autoComplete="new-password"
+                      required
+                    />
+                    {passwordError ? (
+                      <p className="text-sm text-destructive">{passwordError}</p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        At least 8 characters with a letter and a number
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full h-11 shadow-glow hover:shadow-field transition-all hover-lift text-base font-semibold"
+                    disabled={loading}
+                  >
+                    {loading ? "Updating..." : "Update Password"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          ) : !emailSent ? (
             <Card className="border-2 shadow-field hover-lift transition-all animate-fade-in">
               <CardHeader className="space-y-3">
                 <div className="flex items-center gap-3">
@@ -97,7 +216,7 @@ export default function ResetPassword() {
                 </div>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleResetPassword} className="space-y-5">
+                <form onSubmit={handleRequestReset} className="space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-semibold">
                       Email Address
@@ -113,29 +232,17 @@ export default function ResetPassword() {
                       required
                     />
                   </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full h-11 shadow-glow hover:shadow-field transition-all hover-lift text-base font-semibold" 
+                  <Button
+                    type="submit"
+                    className="w-full h-11 shadow-glow hover:shadow-field transition-all hover-lift text-base font-semibold"
                     disabled={loading}
                   >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                        Sending...
-                      </span>
-                    ) : (
-                      "Send Reset Link"
-                    )}
+                    {loading ? "Sending..." : "Send Reset Link"}
                   </Button>
-
                   <div className="pt-4 text-center">
                     <p className="text-sm text-muted-foreground">
                       Remember your password?{" "}
-                      <Link
-                        to="/auth"
-                        className="text-primary font-semibold hover:underline"
-                      >
+                      <Link to="/auth" className="text-primary font-semibold hover:underline">
                         Sign in
                       </Link>
                     </p>
@@ -153,19 +260,17 @@ export default function ResetPassword() {
                 </div>
                 <h3 className="text-2xl font-bold mb-2">Check Your Email</h3>
                 <p className="text-muted-foreground mb-6">
-                  We've sent password reset instructions to <strong>{email}</strong>
+                  We&apos;ve sent password reset instructions to <strong>{email}</strong>
                 </p>
                 <Badge variant="outline" className="mb-6">
                   <Mail className="h-3 w-3 mr-1" />
                   Email sent successfully
                 </Badge>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Didn't receive the email? Check your spam folder or try again.
+                  Open the link in that email to choose a new password. It returns you to this page.
                 </p>
                 <Link to="/auth">
-                  <Button className="w-full">
-                    Back to Sign In
-                  </Button>
+                  <Button className="w-full">Back to Sign In</Button>
                 </Link>
               </CardContent>
             </Card>

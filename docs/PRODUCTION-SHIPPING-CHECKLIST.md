@@ -23,6 +23,11 @@ Last updated: 2026-09-14
 - [x] Demo/integration routes gated to `import.meta.env.DEV`
 - [x] Public honesty Playwright smoke spec + static honesty script
 - [x] Production build passes
+- [x] Password reset completes in-app (PASSWORD_RECOVERY + updateUser)
+- [x] Seeded fabricated testimonials unapproved via migration
+- [x] CSP allows lovable.cloud + supabase hosts
+- [x] detect-critical-alerts ownership + rate-limit fixed
+- [x] setup-demo-account avoids listUsers; verify_jwt=false for secret gate
 
 ## Platform gates (external)
 

@@ -1,9 +1,6 @@
 /**
- * Shared Rate Limiter Utility
- * Provides consistent rate limiting across all edge functions
+ * Shared rate limiter for edge functions (Deno-compatible).
  */
-
-import { createClient } from '@supabase/supabase-js';
 
 export interface RateLimitConfig {
   maxRequests: number;
@@ -18,16 +15,14 @@ export interface RateLimitResult {
   limit: number;
 }
 
-/**
- * Check if request is within rate limit
- */
 export async function checkRateLimit(
+  // deno-lint-ignore no-explicit-any
   supabaseClient: any,
   userId: string,
   config: RateLimitConfig
 ): Promise<RateLimitResult> {
   const windowStart = new Date(Date.now() - config.windowMs);
-  
+
   const { data: recentRequests, error } = await supabaseClient
     .from('request_logs')
     .select('created_at')
@@ -37,7 +32,6 @@ export async function checkRateLimit(
 
   if (error) {
     console.error('[rateLimiter] Error checking rate limit:', error);
-    // Fail open - allow request if we can't check
     return {
       allowed: true,
       remaining: config.maxRequests - 1,
@@ -47,22 +41,16 @@ export async function checkRateLimit(
   }
 
   const requestCount = recentRequests?.length || 0;
-  const allowed = requestCount < config.maxRequests;
-  const remaining = Math.max(0, config.maxRequests - requestCount - 1);
-  const resetTime = Date.now() + config.windowMs;
-
   return {
-    allowed,
-    remaining,
-    resetTime,
+    allowed: requestCount < config.maxRequests,
+    remaining: Math.max(0, config.maxRequests - requestCount - 1),
+    resetTime: Date.now() + config.windowMs,
     limit: config.maxRequests,
   };
 }
 
-/**
- * Log a request for rate limiting
- */
 export async function logRequest(
+  // deno-lint-ignore no-explicit-any
   supabaseClient: any,
   userId: string,
   functionName: string,
@@ -70,23 +58,17 @@ export async function logRequest(
   userAgent?: string | null
 ): Promise<void> {
   try {
-    await supabaseClient
-      .from('request_logs')
-      .insert({
-        user_id: userId,
-        function_name: functionName,
-        ip_address: ipAddress || 'unknown',
-        user_agent: userAgent || 'unknown',
-      });
+    await supabaseClient.from('request_logs').insert({
+      user_id: userId,
+      function_name: functionName,
+      ip_address: ipAddress || 'unknown',
+      user_agent: userAgent || 'unknown',
+    });
   } catch (error) {
     console.error('[rateLimiter] Error logging request:', error);
-    // Don't throw - logging failure shouldn't break the request
   }
 }
 
-/**
- * Get rate limit headers for response
- */
 export function getRateLimitHeaders(result: RateLimitResult): Record<string, string> {
   return {
     'X-RateLimit-Limit': result.limit.toString(),
@@ -95,14 +77,11 @@ export function getRateLimitHeaders(result: RateLimitResult): Record<string, str
   };
 }
 
-/**
- * Standard rate limit configurations
- */
 export const RATE_LIMITS = {
-  'delta-chat': { maxRequests: 10, windowMs: 60000 }, // 10 per minute
-  'analyze-crop': { maxRequests: 10, windowMs: 60000 }, // 10 per minute
-  'conversational-form': { maxRequests: 20, windowMs: 60000 }, // 20 per minute
-  'predict-stress': { maxRequests: 5, windowMs: 60000 }, // 5 per minute
-  'generate-community-insights': { maxRequests: 5, windowMs: 60000 }, // 5 per minute
+  'delta-chat': { maxRequests: 10, windowMs: 60_000 },
+  'analyze-crop': { maxRequests: 10, windowMs: 60_000 },
+  'conversational-form': { maxRequests: 20, windowMs: 60_000 },
+  'predict-stress': { maxRequests: 5, windowMs: 60_000 },
+  'generate-community-insights': { maxRequests: 5, windowMs: 60_000 },
+  'detect-critical-alerts': { maxRequests: 20, windowMs: 60_000 },
 } as const;
-

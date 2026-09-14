@@ -79,7 +79,7 @@ export default function PWAInstallPrompt() {
               </div>
               <div>
                 <CardTitle className="text-base">Install AgurateAI</CardTitle>
-                <CardDescription className="text-xs">Works offline in the field</CardDescription>
+                <CardDescription className="text-xs">Install for quicker field access</CardDescription>
               </div>
             </div>
             <Button
