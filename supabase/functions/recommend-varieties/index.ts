@@ -105,9 +105,12 @@ serve(async (req) => {
     const lsuVarieties = LSU_VARIETIES[cropType as keyof typeof LSU_VARIETIES] || [];
 
     // Calculate field performance metrics
-    const avgHealth = fieldAssessments.length > 0
-      ? fieldAssessments.reduce((sum, a) => sum + (a.health_score || 0), 0) / fieldAssessments.length
-      : 0;
+    const scoredAssessments = fieldAssessments.filter(
+      (a) => a.health_score != null && !Number.isNaN(Number(a.health_score))
+    );
+    const avgHealth = scoredAssessments.length > 0
+      ? scoredAssessments.reduce((sum, a) => sum + Number(a.health_score), 0) / scoredAssessments.length
+      : null;
     
     const diseaseSymptoms = fieldAssessments
       .filter(a => a.symptoms)
@@ -122,7 +125,7 @@ Field Profile:
 - Acreage: ${fieldData.acreage}
 - Soil Type: ${fieldData.soil_type}
 - Current Variety: ${currentVariety}
-- Average Health Score: ${avgHealth.toFixed(1)}
+- Average Health Score: ${avgHealth == null ? "no scored assessments yet" : avgHealth.toFixed(1)}
 
 Historical Performance (Last 20 Assessments):
 ${fieldAssessments.map((a, i) => `  ${i + 1}. Health: ${a.health_score}, Stress: ${a.stress_level}`).join('\n')}

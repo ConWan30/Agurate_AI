@@ -10,6 +10,10 @@ function toHealthPercent(score: number | null | undefined): number {
   return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
 }
 
+function hasHealthScore(score: unknown): score is number {
+  return score != null && !Number.isNaN(Number(score));
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -143,29 +147,36 @@ serve(async (req) => {
         .slice(0, maxQuestions);
     }
 
-    // Fallback to default questions if AI didn't generate good ones
+    // Fallback questions — never invent stress narratives from a missing health score
     if (questions.length === 0 || questions.some((q: string) => q.length < 10)) {
-      const healthScore = toHealthPercent(fieldContext?.healthScore);
       const cropType = fieldContext?.cropType || 'crops';
-      
-      if (healthScore < 70) {
+      if (!hasHealthScore(fieldContext?.healthScore)) {
         questions = [
-          `What's causing the stress in my ${cropType}?`,
-          'Should I treat immediately or wait?',
-          'How much will treatment cost vs. potential loss?',
-        ];
-      } else if (healthScore < 85) {
-        questions = [
-          `Is my ${cropType} recovery on track?`,
-          'Do I need additional monitoring?',
-          'What preventive measures should I take?',
+          `What should I check in my ${cropType} this week?`,
+          'Any weather concerns I should plan around?',
+          'When should I take my next field assessment?',
         ];
       } else {
-        questions = [
-          `What should I monitor in my ${cropType} this week?`,
-          'Any upcoming weather concerns?',
-          'Best practices for maintaining health?',
-        ];
+        const healthScore = toHealthPercent(fieldContext.healthScore);
+        if (healthScore < 70) {
+          questions = [
+            `What's causing the stress in my ${cropType}?`,
+            'Should I treat immediately or wait?',
+            'How much will treatment cost vs. potential loss?',
+          ];
+        } else if (healthScore < 85) {
+          questions = [
+            `Is my ${cropType} recovery on track?`,
+            'Do I need additional monitoring?',
+            'What preventive measures should I take?',
+          ];
+        } else {
+          questions = [
+            `What should I monitor in my ${cropType} this week?`,
+            'Any upcoming weather concerns?',
+            'Best practices for maintaining health?',
+          ];
+        }
       }
     }
 

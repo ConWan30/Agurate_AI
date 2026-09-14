@@ -107,6 +107,10 @@ Last updated: 2026-09-14
 - [x] Persist durable `crop-images` storage paths (not ephemeral signed URLs) on assessments
 - [x] Image history comparison fail-closed (no invented visual comparison on edge failure)
 - [x] Daily briefing fail-closed (no invented spray windows / soft priorities)
+- [x] Bug reports + Delta chat persist storage paths (not 1h signed URLs)
+- [x] Daily briefing omits invented 0% health / parish-default weather when data missing
+- [x] Predictive-question fallbacks refuse stress narratives without a real health score
+- [x] Analytics/variety recs do not treat null health as 0 or invent yield from health×factor
 
 ## Platform gates (external)
 

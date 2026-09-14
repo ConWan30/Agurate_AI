@@ -30,16 +30,15 @@ const getWeatherData = async (latitude: number, longitude: number) => {
   }
 };
 
-// Default coordinates for Louisiana Delta (Morehouse Parish)
-const DEFAULT_LAT = 32.8;
-const DEFAULT_LON = -91.8;
-
-
 function toHealthPercent(score: number | null | undefined): number {
   if (score == null || Number.isNaN(Number(score))) return 0;
   const n = Number(score);
   if (n <= 1) return Math.round(n * 1000) / 10;
   return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
+}
+
+function hasHealthScore(score: unknown): score is number {
+  return score != null && !Number.isNaN(Number(score));
 }
 
 serve(async (req) => {
@@ -80,11 +79,13 @@ serve(async (req) => {
       );
     }
 
-    // Get weather data (use first field's location or default)
-    const firstField = fields[0];
-    const lat = firstField.location_lat || DEFAULT_LAT;
-    const lon = firstField.location_lng || DEFAULT_LON;
-    const weather = await getWeatherData(lat, lon);
+    // Weather only when a field has real coordinates — never invent parish defaults
+    const locatedField = fields.find(
+      (f) => f.location_lat != null && f.location_lng != null
+    );
+    const weather = locatedField
+      ? await getWeatherData(Number(locatedField.location_lat), Number(locatedField.location_lng))
+      : null;
 
     // Fetch recent assessments for each field
     const fieldAssessments = await Promise.all(
@@ -117,7 +118,11 @@ serve(async (req) => {
 
     contextPrompt += `FIELD STATUS:\n`;
     fieldAssessments.forEach((field) => {
-      const healthScore = toHealthPercent(field.latestAssessment?.health_score);
+      if (!hasHealthScore(field.latestAssessment?.health_score)) {
+        contextPrompt += `- ${field.name} (${field.crop_type}): no assessment yet — do not invent health or stress\n`;
+        return;
+      }
+      const healthScore = toHealthPercent(field.latestAssessment.health_score);
       contextPrompt += `- ${field.name} (${field.crop_type}): ${healthScore.toFixed(0)}% health, ${field.latestAssessment?.stress_level || 'unknown'} stress\n`;
       if (field.latestAssessment?.disease_identified) {
         contextPrompt += `  Diseases: ${field.latestAssessment.disease_identified.join(', ')}\n`;

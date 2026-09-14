@@ -181,7 +181,7 @@ export default function BetaSignup() {
             {isCritical && (
               <p className="text-destructive font-semibold flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
-                Closed beta seats are limited. Join to keep 50% off the published plan rate after launch.
+                Closed beta seats are limited. Join for a possible 50% off the published plan rate after launch.
               </p>
             )}
             {showUrgency && !isCritical && (
@@ -507,14 +507,14 @@ export default function BetaSignup() {
             <AccordionItem value="item-1">
               <AccordionTrigger>How long is the beta program?</AccordionTrigger>
               <AccordionContent>
-                Closed beta enrollment is limited. Beta farmers keep 50% off the published plan rate when paid plans launch.
+                Closed beta enrollment is limited. Beta farmers may keep 50% off the published plan rate when paid plans launch.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger>What happens when beta ends?</AccordionTrigger>
               <AccordionContent>
-                You'll keep 50% off the published plan rate on paid plans. Free access continues until paid plans launch.
+                You may keep 50% off the published plan rate on paid plans. Free access continues until paid plans launch.
               </AccordionContent>
             </AccordionItem>
 

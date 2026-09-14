@@ -74,9 +74,9 @@ export function BugReportDialog({ open, onClose }: BugReportDialogProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      let screenshotUrl = null;
+      let screenshotPath: string | null = null;
 
-      // Upload screenshot if available
+      // Upload screenshot if available — persist storage path (not a 1h signed URL)
       if (screenshot) {
         // Owner-prefixed path required by crop-images storage RLS
         const fileName = `${user.id}/bug-reports/${Date.now()}.png`;
@@ -85,20 +85,14 @@ export function BugReportDialog({ open, onClose }: BugReportDialogProps) {
           .upload(fileName, screenshot);
 
         if (uploadError) throw uploadError;
-
-        const { data, error: signedUrlError } = await supabase.storage
-          .from('crop-images')
-          .createSignedUrl(fileName, 3600); // 1 hour expiry
-
-        if (signedUrlError) throw signedUrlError;
-        screenshotUrl = data.signedUrl;
+        screenshotPath = fileName;
       }
 
       // Insert bug report
       const { error } = await supabase.from('bug_reports').insert({
         user_id: user.id,
         description: description.trim(),
-        screenshot_url: screenshotUrl,
+        screenshot_url: screenshotPath,
         user_agent: navigator.userAgent,
         page_url: window.location.href,
         status: 'open',

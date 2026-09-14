@@ -17,9 +17,22 @@ import { DeltaChatInput } from '@/components/DeltaChatInput';
 import { PredictiveQuestions } from '@/components/PredictiveQuestions';
 import { gatherUnifiedContext, formatContextForAI, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
 import { createContextSnapshot } from '@/lib/conversation-memory';
+import { resolveCropImageUrl } from '@/lib/crop-image';
 import TutorialTooltip from '@/components/TutorialTooltip';
 import { useTextToSpeech } from '@/hooks/use-text-to-speech';
 import type { DeltaContext } from '@/types';
+
+/** Persist storage paths; mint signed URLs only when calling the model. */
+async function resolveMessageImageRefs(content: string): Promise<string> {
+  const match = content.match(/^\[Image: ([^\]]+)\]\n?([\s\S]*)$/);
+  if (!match) return content;
+  const ref = match[1];
+  const rest = match[2] ?? '';
+  const path = ref.startsWith('storage:') ? ref.slice('storage:'.length) : ref;
+  const signed = await resolveCropImageUrl(supabase, path);
+  if (!signed) return rest || content;
+  return `[Image: ${signed}]\n${rest}`;
+}
 
 export default function DeltaIntelligence() {
   const {
@@ -115,9 +128,9 @@ export default function DeltaIntelligence() {
       conversationId = await createConversation(userMessage);
     }
 
-    // Save user message with optional image and context snapshot
-    const messageContent = imageUrl 
-      ? `[Image: ${imageUrl}]\n${userMessage}`
+    // Persist durable storage path (not a 1h signed URL) when an image is attached
+    const messageContent = imageUrl
+      ? `[Image: storage:${imageUrl}]\n${userMessage}`
       : userMessage;
     const contextSnapshot = createContextSnapshot(fieldContext);
     await saveMessage(conversationId, 'user', messageContent, contextSnapshot);
@@ -145,6 +158,14 @@ export default function DeltaIntelligence() {
         }
       }
 
+      // Mint fresh signed URLs for the model from durable paths
+      const apiMessages = await Promise.all(
+        newMessages.map(async (m) => ({
+          ...m,
+          content: await resolveMessageImageRefs(m.content),
+        }))
+      );
+
       const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delta-chat`, {
         method: 'POST',
@@ -153,7 +174,7 @@ export default function DeltaIntelligence() {
           'Authorization': `Bearer ${session?.access_token}`,
         },
         body: JSON.stringify({ 
-          messages: newMessages,
+          messages: apiMessages,
           unifiedContext: unifiedContext ? formatContextForAI(unifiedContext) : null,
           simplifiedLanguage: simplifiedLanguage
         }),

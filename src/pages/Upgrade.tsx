@@ -27,8 +27,8 @@ export default function Upgrade() {
       betaPriceLabel: "50% off published rate",
       description: "Most popular for Louisiana farmers",
       features: [
-        "Unlimited fields & assessments",
-        "Advanced 7-day predictions",
+        "Fields & assessments for your whole operation",
+        "Multi-day stress outlooks when data supports them",
         "LSU researcher directory (public profiles)",
         "Insurance claim documentation support",
         "Weather timeline analytics",
@@ -169,7 +169,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Beta farmers who convert keep 50% off the published plan rate. Your data and fields remain intact with continued feature access.
+                  Beta farmers who convert may keep 50% off the published plan rate. Your data and fields remain intact with continued feature access.
                 </p>
               </CardContent>
             </Card>
@@ -180,7 +180,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Yes! You can upgrade or downgrade at any time. Beta farmers keep 50% off the published rate across plan changes.
+                  Yes! You can upgrade or downgrade at any time. Beta farmers may keep 50% off the published rate across plan changes.
                 </p>
               </CardContent>
             </Card>

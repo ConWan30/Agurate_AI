@@ -23,7 +23,7 @@ export function VarietyRecommendationCard({ recommendation, onAdopt }: VarietyRe
           <div>
             <CardTitle className="text-lg flex items-center gap-2">
               <Award className="h-5 w-5 text-primary" />
-              LSU Variety Recommendation
+              Variety recommendation
             </CardTitle>
             <CardDescription>
               {recommendation.current_variety && `Current: ${recommendation.current_variety}`}
@@ -57,7 +57,7 @@ export function VarietyRecommendationCard({ recommendation, onAdopt }: VarietyRe
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Shield className="h-4 w-4 text-primary" />
-              <span>LSU Research Backing:</span>
+              <span>Research framing:</span>
             </div>
             <ul className="space-y-1 pl-6">
               {recommendation.lsu_research_basis.map((citation, idx) => (

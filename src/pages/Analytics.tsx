@@ -16,7 +16,7 @@ interface FieldData {
   id: string;
   name: string;
   crop_type: string;
-  avgHealth: number;
+  avgHealth: number | null;
   trend: number;
   lastAssessment: string;
 }
@@ -57,9 +57,12 @@ export default function Analytics() {
       if (fieldsData) {
         const processedFields = fieldsData.map((field: any) => {
           const assessments = field.assessments || [];
-          const avgHealth = assessments.length > 0
-            ? assessments.reduce((sum: number, a: any) => sum + (a.health_score || 0), 0) / assessments.length
-            : 0;
+          const scored = assessments.filter(
+            (a: any) => a.health_score != null && !Number.isNaN(Number(a.health_score))
+          );
+          const avgHealth = scored.length > 0
+            ? scored.reduce((sum: number, a: any) => sum + Number(a.health_score), 0) / scored.length
+            : null;
           
           const recentAssessments = assessments.slice(-2);
           const trend = recentAssessments.length === 2
@@ -70,7 +73,7 @@ export default function Analytics() {
             id: field.id,
             name: field.name,
             crop_type: field.crop_type,
-            avgHealth: Math.round(avgHealth),
+            avgHealth: avgHealth == null ? null : Math.round(avgHealth),
             trend: Math.round(trend),
             lastAssessment: assessments[assessments.length - 1]?.analyzed_at || "N/A"
           };
@@ -248,8 +251,8 @@ export default function Analytics() {
                 <CardHeader>
                   <CardTitle className="font-heading flex items-center justify-between">
                     {field.name}
-                    <AgriculturalBadge type={field.avgHealth > 80 ? "healthy" : field.avgHealth > 60 ? "moderate" : "severe"}>
-                      {field.avgHealth}% Health
+                    <AgriculturalBadge type={field.avgHealth == null ? "moderate" : field.avgHealth > 80 ? "healthy" : field.avgHealth > 60 ? "moderate" : "severe"}>
+                      {field.avgHealth == null ? "No score" : `${field.avgHealth}% Health`}
                     </AgriculturalBadge>
                   </CardTitle>
                   <CardDescription className="capitalize">{field.crop_type}</CardDescription>
@@ -259,8 +262,9 @@ export default function Analytics() {
                   <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Projected Yield</p>
                       <p className="text-2xl font-mono font-bold text-primary">
-                        {Math.round(field.avgHealth * 1.2)} bu/ac
+                        Not estimated
                       </p>
+                      <p className="text-xs text-muted-foreground">Yield is not derived from health score alone</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Trend</p>
@@ -290,7 +294,7 @@ export default function Analytics() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={fields}>
+                <BarChart data={fields.filter((f) => f.avgHealth != null)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
                   <YAxis stroke="hsl(var(--muted-foreground))" domain={[0, 100]} />
