@@ -9,6 +9,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { getErrorMessage } from '@/lib/error-handler';
+import {
+  getTreatmentType,
+  extractTreatmentName,
+  computeTreatmentSuccess,
+} from '@/lib/phase4-helpers';
 
 interface TreatmentOutcomeDialogProps {
   open: boolean;
@@ -45,36 +50,6 @@ export function TreatmentOutcomeDialog({
   const [costPerAcre, setCostPerAcre] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Extract treatment type from category
-  const getTreatmentType = (category: string): string => {
-    const categoryLower = category.toLowerCase();
-    if (categoryLower.includes('pest') || categoryLower.includes('disease')) return 'fungicide';
-    if (categoryLower.includes('fertil')) return 'fertilizer';
-    if (categoryLower.includes('irrigat')) return 'irrigation';
-    if (categoryLower.includes('herbic')) return 'herbicide';
-    return 'general';
-  };
-
-  // Extract treatment name from recommendation text
-  const extractTreatmentName = (text: string): string => {
-    // Common treatment names to look for
-    const treatments = [
-      'azoxystrobin', 'propiconazole', 'tebuconazole', 'flutriafol',
-      'urea', 'ammonium', 'nitrogen', 'phosphorus', 'potassium',
-      'glyphosate', '2,4-D', 'atrazine'
-    ];
-    
-    const textLower = text.toLowerCase();
-    for (const treatment of treatments) {
-      if (textLower.includes(treatment)) {
-        return treatment;
-      }
-    }
-    
-    // Fallback: extract first few words
-    return text.split(' ').slice(0, 3).join(' ');
-  };
 
   const handleSubmit = async () => {
     if (!outcome) {
@@ -124,12 +99,11 @@ export function TreatmentOutcomeDialog({
         return;
       }
 
-      const improvement = healthAfter - healthScoreBefore;
-      const improvementPercentage = healthScoreBefore > 0 
-        ? (improvement / healthScoreBefore) * 100 
-        : 0;
-      
-      const success = outcome === 'success' || (outcome === 'partial' && improvementPercentage > 5);
+      const { success } = computeTreatmentSuccess({
+        outcome,
+        healthScoreBefore,
+        healthScoreAfter: healthAfter,
+      });
 
       const { error } = await supabase
         .from('peer_treatment_outcomes')
@@ -143,7 +117,7 @@ export function TreatmentOutcomeDialog({
           outcome: outcome === 'success' ? 'successful' : outcome === 'partial' ? 'partially_successful' : 'unsuccessful',
           effectiveness_score: healthAfter,
           cost_usd: costPerAcre ? parseFloat(costPerAcre) : null,
-          notes: notes,
+          notes: notes || `Treatment: ${extractTreatmentName(recommendation.recommendation_text)}`,
           applied_at: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           evaluated_at: new Date().toISOString().split('T')[0],
         });
@@ -152,7 +126,9 @@ export function TreatmentOutcomeDialog({
 
       toast({
         title: 'Treatment outcome logged successfully!',
-        description: 'Your feedback helps improve recommendations for all farmers.',
+        description: success
+          ? 'Logged as a positive community signal to improve future recommendations.'
+          : 'Logged so community comparisons stay honest about mixed results.',
       });
 
       // Reset form

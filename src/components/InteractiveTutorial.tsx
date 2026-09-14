@@ -291,30 +291,29 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               </div>
 
               <div className="bg-primary/10 p-3 rounded-lg">
-                <p className="text-sm font-medium mb-2">Delta AI (LSU-trained):</p>
+                <p className="text-sm font-medium mb-2">Delta AI (research-framed):</p>
                 <p className="text-sm text-muted-foreground">
-                  "Based on LSU AgCenter research for Morehouse Parish soybeans:
+                  "Based on publicly available LSU AgCenter research for Morehouse Parish soybeans:
                 </p>
                 <ul className="text-sm text-muted-foreground mt-2 space-y-1 ml-4">
                   <li>• Apply 60-80 lbs K₂O/acre via foliar spray</li>
                   <li>• Apply by Friday (before heat stress)</li>
                   <li>• Early morning application (before 10 AM)</li>
                   <li>• Expected recovery: 5-7 days</li>
-                  <li>• Prevents 50-70% yield loss in heat events</li>
+                  <li>• Helps reduce heat-stress yield risk</li>
                 </ul>
                 <p className="text-xs text-muted-foreground mt-3 italic">
-                  Source: LSU AgCenter Publication #3412 - Soybean Nutrient Management
+                  Source framing: LSU AgCenter soybean nutrient / potassium guidance (public research). Decision aid only — not an official LSU validation.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">🎯 LSU Partnership Value:</p>
+            <p className="text-sm font-medium mb-2">🎯 Research-informed value:</p>
             <p className="text-sm text-muted-foreground">
-              Every farmer interaction feeds research data back to LSU. AI learns from 
-              <span className="font-bold"> thousands of real Delta fields</span>, continuously improving 
-              recommendations. Research becomes living, not static.
+              Guidance is framed around publicly available LSU AgCenter research for Delta conditions.
+              AgurateAI is not an official LSU partner and does not claim that farmer interactions train LSU models.
             </p>
           </div>
         </div>

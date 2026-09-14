@@ -2,6 +2,7 @@ import { memo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { generateFallbackPredictiveQuestions } from '@/lib/phase4-helpers';
 
 import type { DeltaContext } from '@/types/delta';
 
@@ -21,75 +22,11 @@ export const PredictiveQuestions = memo(function PredictiveQuestions({
 
   // Generate contextual questions based on field data (fallback)
   const generateFallbackQuestions = () => {
-    const questions = [];
-    
-    if (fieldContext?.recentAssessment) {
-      const healthScore = fieldContext.healthScore || 100;
-      const cropType = fieldContext.cropType || 'crops';
-      
-      if (healthScore < 70) {
-        questions.push({
-          q: `What's causing the stress in my ${cropType}?`,
-          icon: '🔍'
-        });
-        questions.push({
-          q: 'Should I treat immediately or wait?',
-          icon: '⏰'
-        });
-        questions.push({
-          q: 'How much will treatment cost vs. potential loss?',
-          icon: '💰'
-        });
-        questions.push({
-          q: 'Will weather affect my treatment timing?',
-          icon: '🌦️'
-        });
-      } else if (healthScore < 85) {
-        questions.push({
-          q: `Is my ${cropType} recovery on track?`,
-          icon: '📈'
-        });
-        questions.push({
-          q: 'Do I need additional monitoring?',
-          icon: '👁️'
-        });
-        questions.push({
-          q: 'What preventive measures should I take?',
-          icon: '🛡️'
-        });
-      } else {
-        questions.push({
-          q: `What should I monitor in my ${cropType} this week?`,
-          icon: '📋'
-        });
-        questions.push({
-          q: 'Any upcoming weather concerns?',
-          icon: '🌤️'
-        });
-        questions.push({
-          q: 'Best practices for maintaining health?',
-          icon: '✅'
-        });
-      }
-    } else {
-      // Default questions when no field context
-      questions.push({
-        q: 'What rice varieties work best in Morehouse Parish?',
-        icon: '🌾'
-      });
-      questions.push({
-        q: 'How do I identify soybean rust early?',
-        icon: '🔍'
-      });
-      questions.push({
-        q: 'Best cotton planting practices for Delta soils?',
-        icon: '☁️'
-      });
-      questions.push({
-        q: 'When should I apply nitrogen to corn fields?',
-        icon: '🌽'
-      });
-    }
+    const questions = generateFallbackPredictiveQuestions({
+      hasRecentAssessment: Boolean(fieldContext?.recentAssessment),
+      healthScore: fieldContext?.healthScore,
+      cropType: fieldContext?.cropType,
+    }).map((q) => ({ q, icon: '💡' }));
     
     return questions.slice(0, 4);
   };

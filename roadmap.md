@@ -2,4 +2,6 @@
 - [x] Apply honest closed-beta copy and metadata corrections
 - [x] Remove fabricated testimonials, ratings, accuracy, validation, partnership, and user-count claims
 - [x] Verify preview and security hardening (view SECURITY INVOKER migration; build + public-page honesty checks)
+- [x] Fix PeerComparison RPC/UI mismatch and expand Phase 4 unit coverage
+- [ ] Apply Supabase migrations + enable leaked-password protection
 - [ ] Publish updated app (Lovable / production deploy)

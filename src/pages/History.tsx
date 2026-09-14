@@ -466,6 +466,7 @@ export default function History() {
                         rec.category === 'irrigation'
                       ) && (
                         <PeerComparisonCard
+                          fieldId={selectedAssessment.field.id}
                           treatmentType={
                             selectedAssessment.recommendations.find(rec => 
                               rec.category === 'pest_management'
