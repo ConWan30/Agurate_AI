@@ -50,6 +50,7 @@ const FORBIDDEN = [
   { name: 'fabricated tutorial 87% confidence', re: /87%\s*confidence/i },
   { name: 'fabricated tutorial health 68%→92%', re: /Health Score 68%\s*→\s*92%/i },
   { name: 'default USDA source without estimate label', re: /source:\s*priceData\.source\s*\|\|\s*'USDA'/ },
+  { name: 'exponentially smarter claim', re: /exponentially smarter/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

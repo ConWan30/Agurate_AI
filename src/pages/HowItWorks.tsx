@@ -188,7 +188,7 @@ export default function HowItWorks() {
             How AgurateAI Works
           </h1>
           <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto leading-relaxed">
-            A unified AI intelligence system where every analysis enriches every other—creating exponentially smarter insights for Louisiana Delta farmers
+            A unified analysis workflow where each scan can inform the next—helping Louisiana Delta growers review field context as a decision aid
           </p>
         </div>
       </div>
@@ -202,9 +202,9 @@ export default function HowItWorks() {
               <Network className="h-3 w-3 mr-1" />
               Unified AI Intelligence
             </Badge>
-            <h2 className="text-4xl font-heading font-bold">Synergistic Data Flow</h2>
+            <h2 className="text-4xl font-heading font-bold">Connected Field Context</h2>
             <p className="text-lg text-muted-foreground">
-              Unlike traditional AI that analyzes each photo in isolation, AgurateAI creates a <strong>circular intelligence network</strong> where every data point enhances every other analysis
+              Unlike tools that treat each photo in isolation, AgurateAI can carry prior field context forward so later reviews have more history to work with
             </p>
           </div>
 
@@ -215,9 +215,9 @@ export default function HowItWorks() {
                 <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary/20 mb-4">
                   <Database className="h-10 w-10 text-primary" aria-hidden="true" />
                 </div>
-                <h3 className="text-2xl font-heading font-bold mb-2">Central AI Intelligence Pool</h3>
+                <h3 className="text-2xl font-heading font-bold mb-2">Shared Field Context</h3>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Every analysis feeds insights into a unified context that makes all future analyses exponentially smarter
+                  Prior analyses can contribute notes into a shared field context that later reviews may reference
                 </p>
               </div>
 
