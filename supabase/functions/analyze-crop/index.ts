@@ -9,7 +9,7 @@ import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 const analyzeCropSchema = z
   .object({
     imageUrl: z.string().url().max(2048),
-    cropType: z.enum(['rice', 'soybean', 'cotton', 'corn']),
+    cropType: z.enum(['rice', 'soybean', 'cotton', 'corn']).optional(),
     fieldId: z.string().uuid().optional(),
     location: z.string().max(200).optional(),
     mediaType: z.enum(['image', 'video']).default('image'),
@@ -126,7 +126,6 @@ serve(async (req) => {
 
     const {
       imageUrl,
-      cropType,
       fieldId,
       location,
       mediaType,
@@ -138,6 +137,7 @@ serve(async (req) => {
       gpsAccuracyMeters,
       capturedOffline,
     } = validation.data;
+    let cropType = validation.data.cropType;
     
     // Validate image/video file format
     if (!validateImageUrl(imageUrl, mediaType)) {
@@ -152,32 +152,50 @@ serve(async (req) => {
       );
     }
     
-    console.log('🌾 Analyzing crop media with unified context:', { imageUrl, cropType, fieldId, location, mediaType });
 
-    // Verify field ownership if fieldId provided
+    // When fieldId is present, field.crop_type is authoritative — never trust client crop invent.
+    let resolvedCropType = cropType ?? null;
     if (fieldId) {
-      const { data: field, error: fieldError } = await supabaseAuth
+      const { data: ownedField, error: cropFieldError } = await supabaseAuth
         .from('fields')
-        .select('user_id, location_lat, location_lng')
+        .select('user_id, crop_type, location_lat, location_lng')
         .eq('id', fieldId)
-        .single();
+        .maybeSingle();
 
-      if (fieldError || !field) {
-        console.error('Field not found:', fieldError);
+      if (cropFieldError || !ownedField) {
         return new Response(JSON.stringify({ error: 'Field not found' }), {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
-
-      if (field.user_id !== user.id) {
-        console.error('Unauthorized field access attempt');
+      if (ownedField.user_id !== user.id) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
+      const fieldCrop = typeof ownedField.crop_type === 'string'
+        ? (ownedField.crop_type.toLowerCase() === 'soybeans' ? 'soybean' : ownedField.crop_type.toLowerCase())
+        : null;
+      if (!fieldCrop || !['rice', 'soybean', 'cotton', 'corn'].includes(fieldCrop)) {
+        return new Response(JSON.stringify({ error: 'Field crop_type is missing or unsupported' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      resolvedCropType = fieldCrop as 'rice' | 'soybean' | 'cotton' | 'corn';
     }
+    if (!resolvedCropType) {
+      return new Response(JSON.stringify({ error: 'cropType is required when fieldId is not provided' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    cropType = resolvedCropType;
+
+
+    console.log('Analyzing crop media with unified context:', { imageUrl, cropType, fieldId, location, mediaType });
+
 
     const rateLimit = await enforceRateLimit(supabaseAuth, user.id, {
       functionName: 'analyze-crop',

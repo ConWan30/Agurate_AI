@@ -268,6 +268,15 @@ const required = [
       'peer_treatment_outcomes.recommendation_id is required',
     ],
   },
+  {
+    id: '20260914420000_lock_coop_alert_severity_crop_acres',
+    needles: [
+      "NEW.severity := 'info'",
+      'NEW.crop_type := field_crop',
+      'NEW.affected_area_acres := field_acres',
+      'cooperative_alerts.field_id must be owned by the authenticated user',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -288,11 +297,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091441') &&
-  tip < '20260914410000_lock_peer_crop_bind_cost_strip'
+  !tip.startsWith('2026091442') &&
+  tip < '20260914420000_lock_coop_alert_severity_crop_acres'
 ) {
   fail(
-    `tip migration ${tip} should include peer crop-bind/cost-strip invent lock (20260914410000+)`
+    `tip migration ${tip} should include coop-alert severity/crop/acres invent lock (20260914420000+)`
   );
 }
 

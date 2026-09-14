@@ -4,11 +4,21 @@ import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_s
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
+const cropEnum = z.enum(['rice', 'soybean', 'cotton', 'corn']);
 const comprehensivePredictionSchema = z.object({
   fieldId: z.string().uuid(),
-  cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), z.enum(['rice', 'soybean', 'cotton', 'corn'])),
+  /** @deprecated Ignored when field crop_type is present — field crop is authoritative. */
+  cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), cropEnum).optional(),
+  /** @deprecated Ignored — client weather invent is not trusted. */
   weatherForecast: z.any().optional()
 });
+
+function normalizeCrop(raw: unknown): z.infer<typeof cropEnum> | null {
+  if (typeof raw !== 'string') return null;
+  const v = raw.toLowerCase() === 'soybeans' ? 'soybean' : raw.toLowerCase();
+  const parsed = cropEnum.safeParse(v);
+  return parsed.success ? parsed.data : null;
+}
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -46,28 +56,30 @@ serve(async (req) => {
       });
     }
 
-    const { fieldId, cropType, weatherForecast } = validation.data;
+    const { fieldId } = validation.data;
 
-    // Verify field ownership
-    const { data: verifyField, error: verifyError } = await supabase
+    // Verify field ownership and load authoritative crop (ignore client crop/weather invent).
+    const { data: field, error: fieldError } = await supabase
       .from('fields')
-      .select('user_id')
+      .select('*')
       .eq('id', fieldId)
-      .single();
+      .maybeSingle();
 
-    if (verifyError || !verifyField || verifyField.user_id !== user.id) {
+    if (fieldError || !field || field.user_id !== user.id) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    // Get field data and recent assessments
-    const { data: field } = await supabase
-      .from('fields')
-      .select('*')
-      .eq('id', fieldId)
-      .single();
+    const cropType = normalizeCrop(field.crop_type);
+    if (!cropType) {
+      return new Response(
+        JSON.stringify({ error: 'Field crop_type is missing or unsupported for predictions' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+    const weatherForecast = null; // never trust client-supplied weather invent
 
     const { data: assessments } = await supabase
       .from('assessments')
@@ -92,7 +104,7 @@ Field Data:
 - Crop: ${cropType}
 - Acreage: ${field?.acreage ?? 'not recorded'}
 - Scored Assessments (health only when recorded): ${JSON.stringify(scoredAssessments)}
-- Weather Forecast: ${JSON.stringify(weatherForecast)}
+- Weather Forecast: not provided (do not invent weather conditions)
 
 HONESTY RULES:
 - Do NOT invent bushels/acre yield numbers or dollar profitability.

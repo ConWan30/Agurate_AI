@@ -36,7 +36,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914410000` (peer-crop-bind/cost-strip; prior peer-insert/beta-metrics/coop/dirt; prior `20260914390000` peer-sample/success-insert/weather; prior `20260914380000` catalog/community/variety/money-caps; prior `20260914370000` coop-alert-coop-match/ai-update/dirt; prior success/peer-cost/recommendation-update;
+1. Apply pending Supabase migrations through `20260914420000` (coop-alert severity/crop/acres; prior peer-crop-bind/cost-strip; prior peer-insert/beta-metrics/coop/dirt; prior `20260914390000` peer-sample/success-insert/weather; prior `20260914380000` catalog/community/variety/money-caps; prior `20260914370000` coop-alert-coop-match/ai-update/dirt; prior success/peer-cost/recommendation-update;
    yield/feedback/event/bug/acreage `20260914290000`;
    claim loss / priority / form-complete `20260914280000`;
    alert-ack + conversation_memory invent lock `20260914270000`;

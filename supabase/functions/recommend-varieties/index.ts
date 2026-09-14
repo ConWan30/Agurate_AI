@@ -4,13 +4,24 @@ import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_s
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
+const cropEnum = z.enum(['rice', 'soybean', 'cotton', 'corn']);
 const varietySchema = z.object({
   fieldId: z.string().uuid(),
-  cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), z.enum(['rice', 'soybean', 'cotton', 'corn'])),
+  /** @deprecated Ignored when field crop_type is present — field crop is authoritative. */
+  cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), cropEnum).optional(),
   currentVariety: z.string().max(100).optional(),
+  /** @deprecated Ignored — disease pressure is derived from owned assessments. */
   fieldHistory: z.any().optional(),
+  /** @deprecated Ignored — disease pressure is derived from owned assessments. */
   diseasePressure: z.any().optional()
 });
+
+function normalizeCrop(raw: unknown): z.infer<typeof cropEnum> | null {
+  if (typeof raw !== 'string') return null;
+  const v = raw.toLowerCase() === 'soybeans' ? 'soybean' : raw.toLowerCase();
+  const parsed = cropEnum.safeParse(v);
+  return parsed.success ? parsed.data : null;
+}
 
 const LSU_VARIETIES = {
   rice: ['CL163', 'Titan', 'Diamond', 'Jupiter', 'LaKast', 'PVL01', 'PVL02'],
@@ -55,17 +66,31 @@ serve(async (req) => {
       });
     }
 
-    const { fieldId, cropType, currentVariety, fieldHistory, diseasePressure } = validation.data;
+    const { fieldId, currentVariety } = validation.data;
 
-    // Gather comprehensive field context
-    const [fieldData, fieldAssessments, communityInsights, conservationData] = await Promise.all([
-      supabase
-        .from('fields')
-        .select('*')
-        .eq('id', fieldId)
-        .single()
-        .then(res => res.data),
-      
+    // Load owned field first — crop_type is authoritative (ignore client crop/disease invent).
+    const { data: fieldData, error: fieldError } = await supabase
+      .from('fields')
+      .select('*')
+      .eq('id', fieldId)
+      .maybeSingle();
+
+    if (fieldError || !fieldData || fieldData.user_id !== user.id) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const cropType = normalizeCrop(fieldData.crop_type);
+    if (!cropType) {
+      return new Response(
+        JSON.stringify({ error: 'Field crop_type is missing or unsupported for variety recommendations' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const [fieldAssessments, communityInsights, conservationData] = await Promise.all([
       supabase
         .from('assessments')
         .select('health_score, stress_level, symptoms, analyzed_at')
@@ -90,20 +115,13 @@ serve(async (req) => {
         .limit(3)
         .then(res => res.data || [])
     ]);
-
-    if (!fieldData || fieldData.user_id !== user.id) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const lsuVarieties = LSU_VARIETIES[cropType as keyof typeof LSU_VARIETIES] || [];
+    const lsuVarieties = LSU_VARIETIES[cropType] || [];
 
     // Calculate field performance metrics
     const scoredAssessments = fieldAssessments.filter(
@@ -132,7 +150,7 @@ Historical Performance (Last 20 Assessments):
 ${fieldAssessments.map((a, i) => `  ${i + 1}. Health: ${a.health_score != null && Number.isFinite(Number(a.health_score)) ? a.health_score : 'not recorded'}, Stress: ${a.stress_level ?? 'not recorded'}`).join('\n')}
 
 Disease Pressure Patterns:
-${diseaseSymptoms.length > 0 ? diseaseSymptoms.slice(0, 10).join(', ') : 'No significant disease pressure'}
+${diseaseSymptoms.length > 0 ? diseaseSymptoms.slice(0, 10).join(', ') : 'Disease symptoms not recorded in recent assessments'}
 
 Community Intelligence (Best Performing Varieties):
 ${communityInsights.map(c => {
@@ -148,7 +166,9 @@ ${(() => {
   if (!conservationData.length) return 'No conservation data';
   const n = Number(conservationData[0].soil_health_improvement);
   if (!Number.isFinite(n)) return 'Soil health trend not recorded';
-  return `Soil health trending ${n > 0.5 ? 'upward' : 'stable'}`;
+  if (n > 0.5) return 'Soil health delta recorded as upward';
+  if (n < -0.5) return 'Soil health delta recorded as downward';
+  return `Soil health delta recorded near baseline (${n})`;
 })()}
 
 LSU AgCenter published variety references: ${lsuVarieties.join(', ')}
