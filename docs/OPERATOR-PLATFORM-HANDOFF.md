@@ -4,7 +4,7 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| In-repo honesty, security, quality | **Complete** | Tip `d5ab23d` on `cursor/launch-readiness-honesty-38b2`; local `npm run verify:local-gates` PASS; GitHub CI `build-and-test` PASS on tip |
+| In-repo honesty, security, quality | **Complete** | Tip `53014f5` on `cursor/launch-readiness-honesty-38b2`; local `npm run verify:local-gates` PASS; GitHub CI `build-and-test` PASS on tip |
 | Apply Supabase migrations through tip | **Blocked** | Needs project DB credentials (`supabase db push` or Dashboard SQL) |
 | Auth Leaked Password Protection | **Blocked** | Needs Supabase Dashboard access |
 | Deploy edge functions | **Blocked** | Needs Supabase CLI linked project + secrets |
@@ -71,7 +71,7 @@ supabase secrets set DEMO_SETUP_SECRET="$(openssl rand -hex 32)"
 ## 5. Publish the app
 
 Use Lovable **Publish** (or your production host) so the live URL serves the
-branch/build that includes tip `d5ab23d` (or a later tip on this branch).
+branch/build that includes tip `53014f5` (or a later tip on this branch).
 
 Evidence: production HTML/JS matches tip commit; `/health.json` loads with that commit.
 
@@ -102,7 +102,7 @@ error — never a silent invented score.
 
 ## Done means
 
-- [x] Local gates green (`npm run verify:local-gates` + CI) — tip `d5ab23d`
+- [x] Local gates green (`npm run verify:local-gates` + CI) — tip `53014f5`
 - [ ] Migrations applied through `20260914180000_…`
 - [ ] Leaked password protection on
 - [ ] Edge functions deployed + demo secret policy set
