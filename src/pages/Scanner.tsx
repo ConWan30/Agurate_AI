@@ -282,7 +282,7 @@ export default function Scanner() {
     {
       id: 'ar-mode',
       title: 'Optional: AR Overlay Mode',
-      content: 'Enable AR mode to see real-time health indicators overlaid on your camera view!',
+      content: 'Enable AR mode to see live health cues overlaid on your camera view (illustrative, not a lab diagnosis).',
       position: 'top' as const,
     },
     {

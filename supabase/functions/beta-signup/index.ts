@@ -177,21 +177,26 @@ serve(async (req) => {
         const c = raw.toLowerCase().replace(/\s+/g, '');
         if (c === 'soybeans' || c === 'soybean') return 'soybean';
         if (c === 'rice' || c === 'cotton' || c === 'corn') return c;
-        return 'rice';
+        return null; // e.g. "multiple" — do not invent a field crop
       };
-      const { error: fieldError } = await supabase
-        .from('fields')
-        .insert({
-          user_id: authData.user.id,
-          name: formData.farm_name || 'Main Field',
-          crop_type: normalizeCrop(formData.primary_crop),
-          acreage: formData.acreage,
-          location_lat: 32.73,
-          location_lng: -91.76,
-        });
+      const cropType = normalizeCrop(formData.primary_crop);
+      if (cropType) {
+        const { error: fieldError } = await supabase
+          .from('fields')
+          .insert({
+            user_id: authData.user.id,
+            name: formData.farm_name || 'Main Field',
+            crop_type: cropType,
+            acreage: formData.acreage,
+            location_lat: 32.73,
+            location_lng: -91.76,
+          });
 
-      if (fieldError) {
-        console.error('Error creating field:', fieldError);
+        if (fieldError) {
+          console.error('Error creating field:', fieldError);
+        }
+      } else {
+        console.log('Skipping default field create for non-specific primary_crop:', formData.primary_crop);
       }
     }
 

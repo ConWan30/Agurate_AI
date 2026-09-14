@@ -294,7 +294,7 @@ export default function DeltaIntelligence() {
       target: 'delta-header',
       id: 'header',
       title: 'Step 1: Your AI Advisor',
-      content: 'Delta Intelligence is your 24/7 Louisiana farming assistant framed around publicly available LSU AgCenter research.',
+      content: 'Delta Intelligence is your on-demand Louisiana farming assistant framed around publicly available LSU AgCenter research.',
       position: 'bottom' as const,
     },
     {

@@ -24,7 +24,7 @@ export const ComparisonSection = memo(function ComparisonSection() {
       description: "Guidance framed around public LSU AgCenter research (not an official partnership)"
     },
     {
-      feature: "24/7 AI Advisor",
+      feature: "On-demand AI Advisor",
       agurate: true,
       traditional: false,
       description: "Delta Intelligence chat vs. office hours"

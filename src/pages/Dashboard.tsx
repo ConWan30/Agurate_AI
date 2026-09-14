@@ -296,7 +296,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Delta Intelligence</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    24/7 research-informed AI advisor
+                    On-demand research-informed AI advisor
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>

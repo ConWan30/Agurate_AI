@@ -57,6 +57,9 @@ Last updated: 2026-09-14
 - [x] Demo fields UNIQUE(user_id,name) + durable beta-signup IP rate limits
 - [x] Soften DIRT “direct integration” / Instant analysis / hard 100-spot claims
 - [x] Daily briefing + predictive questions use canonical 0–100 health scores
+- [x] Soften 24/7 advisor / real-time AR overlay claims
+- [x] beta-signup skips field create for "multiple" crop
+- [x] Catalog SELECT policies authenticated-only (`20260914130000`)
 - [x] Demo mock assessments use 0–100 scores + symptoms arrays
 - [x] Soften FREE-unlimited / acre-dollar prompt claims; honesty scan covers edge functions
 - [x] setup-demo-account durable IP rate limit; onboarding crop normalize for varieties
@@ -66,7 +69,7 @@ Last updated: 2026-09-14
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (through `20260914120000` researcher PII + crop checks, plus prior RLS/RPC/storage)
+- [ ] Apply pending Supabase migrations (through `20260914130000` researcher PII + crop checks, plus prior RLS/RPC/storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

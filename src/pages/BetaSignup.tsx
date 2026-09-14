@@ -263,7 +263,7 @@ export default function BetaSignup() {
             {[
               "AI Crop Analysis Engine (decision-aid health assessment)",
               "7-Day Stress Predictions (proactive forecasting)",
-              "Delta Intelligence Chat (24/7 agricultural advisor)",
+              "Delta Intelligence Chat (on-demand agricultural advisor)",
               "Insurance Claim Documentation (automated evidence)",
               "Community Intelligence Network (anonymous benchmarking)",
               "Interactive Field Map with GPS tagging",

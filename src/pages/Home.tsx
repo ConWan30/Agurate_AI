@@ -73,7 +73,7 @@ export default function Home() {
     {
       icon: Brain,
       title: "Delta Intelligence Chat",
-      description: "24/7 AI advisor framed around LSU AgCenter research. Field-aware conversations with image analysis and treatment recommendations.",
+      description: "On-demand AI advisor framed around LSU AgCenter research. Field-aware conversations with image analysis and treatment recommendations.",
       color: "gradient-harvest"
     },
     {
