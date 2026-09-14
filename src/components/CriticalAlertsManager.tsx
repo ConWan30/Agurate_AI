@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
-import { AlertTriangle, X, CheckCircle2, Bell, Phone, MessageSquare } from 'lucide-react';
+import { AlertTriangle, X, CheckCircle2, Bell } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -165,19 +165,6 @@ export function CriticalAlertsManager() {
                   <Badge variant={getSeverityVariant(alert.severity)}>
                     {alert.severity.toUpperCase()}
                   </Badge>
-                  {/* SMS/voice delivery is not enabled — do not render delivery badges */}
-                  {false && alert.sms_sent && (
-                    <Badge variant="outline" className="gap-1">
-                      <MessageSquare className="h-3 w-3" />
-                      SMS Sent
-                    </Badge>
-                  )}
-                  {false && alert.voice_call_attempted && (
-                    <Badge variant="outline" className="gap-1">
-                      <Phone className="h-3 w-3" />
-                      Voice Call
-                    </Badge>
-                  )}
                 </div>
                 {alert.field_name && (
                   <p className="text-sm text-muted-foreground">
