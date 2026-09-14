@@ -21,6 +21,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] Soften Home unlimited-beta + tutorial “Diagnosis” framing
 - [x] Analytics/phase4/unified-AI omit invented weather & score defaults; soften forecast marketing copy
 - [x] ROI requires explicit yield-at-risk % (no invent from health); executive summary shows “Not estimated”; beta_metrics counts only approved stories (`20260914180000`)
+- [x] Public route alignment gate (`verify:public-routes`) keeps App ↔ robots ↔ sitemap in sync
 - [x] `npm run verify:local-gates` + `docs/OPERATOR-PLATFORM-HANDOFF.md` for credentialed shipping steps
 - [x] `/health.json` build stamp includes git commit for post-publish verification
 

@@ -21,6 +21,7 @@
     "test:e2e:debug": "playwright test --debug",
     "verify:honesty": "node scripts/verify-honesty-copy.mjs",
     "verify:honesty:static": "node scripts/verify-honesty-static.mjs",
+    "verify:public-routes": "node scripts/verify-public-routes.mjs",
     "verify:local-gates": "node scripts/verify-local-production-gates.mjs",
     "check:edge": "bash scripts/check-edge-functions.sh"
   },

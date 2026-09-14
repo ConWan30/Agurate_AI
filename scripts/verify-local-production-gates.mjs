@@ -10,6 +10,7 @@ import path from 'node:path';
 const ROOT = process.cwd();
 
 const GATES = [
+  { name: 'public routes', cmd: 'npm', args: ['run', 'verify:public-routes'] },
   { name: 'typecheck', cmd: 'npm', args: ['run', 'typecheck'] },
   { name: 'unit tests', cmd: 'npm', args: ['run', 'test:ci'] },
   { name: 'honesty static', cmd: 'npm', args: ['run', 'verify:honesty:static'] },
