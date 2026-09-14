@@ -229,17 +229,17 @@ export function DetailedAnalysisTabs({
             )}
 
             <div className="grid grid-cols-2 gap-4">
-              {canopyCoverage !== undefined && (
+              {canopyCoverage != null && Number.isFinite(Number(canopyCoverage)) && (
                 <div className="p-4 border rounded-lg">
                   <p className="text-sm text-muted-foreground mb-2">Canopy Coverage</p>
-                  <p className="text-3xl font-bold">{Math.round(canopyCoverage)}%</p>
+                  <p className="text-3xl font-bold">{Math.round(Number(canopyCoverage))}%</p>
                 </div>
               )}
               
-              {fieldUniformity !== undefined && (
+              {fieldUniformity != null && Number.isFinite(Number(fieldUniformity)) && (
                 <div className="p-4 border rounded-lg">
                   <p className="text-sm text-muted-foreground mb-2">Field Uniformity</p>
-                  <p className="text-3xl font-bold">{Math.round(fieldUniformity * 100)}%</p>
+                  <p className="text-3xl font-bold">{Math.round(Number(fieldUniformity) * 100)}%</p>
                 </div>
               )}
             </div>

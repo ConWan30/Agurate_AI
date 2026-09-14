@@ -147,7 +147,7 @@ INTELLIGENT AUTO-LINKING:
   * Auto-search assessments from ±7 days of event date
   * Identify assessments with health scores <70 (moderate to severe stress)
   * Calculate health score drops (compare before/after event)
-  * Auto-suggest these as evidence: "I found 3 assessments from your North Rice Field around that time showing 45% health score. Should I link these as evidence?"
+  * Auto-suggest only real matching assessments from context — never invent counts or health scores (e.g. ask whether to link assessments that were actually found)
 
 - Weather event correlation:
   * Only mention weather events that appear in the provided unified context / weather records

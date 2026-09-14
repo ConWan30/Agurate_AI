@@ -151,4 +151,4 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 3. Live production URL showing honest closed-beta copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
 
-In-repo honesty residuals closed on this tip batch (critical-alerts null-health invent, insurance/upload confidence invent, predict-stress invented LSU %, Morehouse chrome overclaim, null confidence UI, edge prompt null leaks, HowItWorks dollar-savings framing). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).
+In-repo honesty residuals closed on this tip batch (delta-chat LSU trial-% invent, compare-images null health arithmetic, DetailedAnalysisTabs null→0% uniformity/canopy, water-stress severity NaN%, analyze-crop null metric prompt leaks, conversational-form invented evidence example, tutorial fabricated specialist name, Morehouse-as-default geography soft claim). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).

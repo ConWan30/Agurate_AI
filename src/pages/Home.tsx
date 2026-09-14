@@ -320,7 +320,7 @@ export default function Home() {
                 Built for Louisiana Delta Farmers
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Guidance is framed around publicly available LSU AgCenter research and Morehouse Parish conditions. It is a decision aid, not a validated diagnosis.
+                Guidance is framed around publicly available LSU AgCenter research and Louisiana Delta growing conditions (Morehouse Parish is a focus area for early pilots). It is a decision aid, not a validated diagnosis.
               </p>
               
               <div className="space-y-3">
@@ -462,10 +462,10 @@ export default function Home() {
               Early Louisiana Delta beta
             </Badge>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
-              Built with Morehouse Parish growers in mind
+              Built for Louisiana Delta growers
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              We are recruiting the first 100 Louisiana Delta farmers. Real pilot stories will land here as they approve them.
+              Closed beta for Louisiana Delta farms (Morehouse Parish is a focus area, not a claim that every user farms there). Real pilot stories will land here as growers approve them.
             </p>
           </div>
 

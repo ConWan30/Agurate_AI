@@ -557,10 +557,10 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </p>
           <Card className="border-primary/30 bg-gradient-to-br from-blue-500/5 to-purple-500/5">
             <CardContent className="p-4">
-              <p className="font-semibold mb-2 text-sm">🎓 Example public profile:</p>
-              <p className="text-sm font-medium mb-1">Dr. Sarah Martinez</p>
+              <p className="font-semibold mb-2 text-sm">🎓 Example public profile (illustrative placeholder):</p>
+              <p className="text-sm font-medium mb-1">Rice Pathology Specialist</p>
               <p className="text-xs text-muted-foreground">
-                Rice Pathology Specialist • Louisiana Delta research focus
+                Louisiana Delta research focus — names come from the live public directory, not this tutorial
               </p>
               <p className="text-xs text-muted-foreground mt-2 italic">
                 Contact through official LSU AgCenter channels. AgurateAI stores your consultation note locally and does not send cases to researchers.

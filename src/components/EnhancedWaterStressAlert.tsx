@@ -55,7 +55,9 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
       <AlertTitle className="flex items-center gap-2 mb-2">
         <span className={config.color}>Water Stress Detected - {waterStress.severity.toUpperCase()}</span>
         <Badge variant="outline" className="text-xs">
-          {(waterStress.stress_score * 100).toFixed(0)}% severity
+          {waterStress.stress_score != null && Number.isFinite(Number(waterStress.stress_score))
+            ? `${(Number(waterStress.stress_score) * 100).toFixed(0)}% severity`
+            : 'severity not recorded'}
         </Badge>
       </AlertTitle>
       <AlertDescription className="space-y-3">

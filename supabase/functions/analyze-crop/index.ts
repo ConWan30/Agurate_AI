@@ -195,12 +195,25 @@ ${conservationData && conservationData.length > 0
 
 🔬 VARIETY PERFORMANCE INTELLIGENCE:
 ${varietyData && varietyData.length > 0
-  ? varietyData.map((v: any) => `- ${v.variety_name}: Performance ${(v.performance_score * 100).toFixed(0)}%, Disease Resistance ${(v.disease_resistance * 100).toFixed(0)}%`).join('\n')
+  ? varietyData.map((v: any) => {
+      const perf = v.performance_score != null && Number.isFinite(Number(v.performance_score))
+        ? `${(Number(v.performance_score) <= 1 ? Number(v.performance_score) * 100 : Number(v.performance_score)).toFixed(0)}%`
+        : 'not recorded';
+      const resist = v.disease_resistance != null && Number.isFinite(Number(v.disease_resistance))
+        ? `${(Number(v.disease_resistance) <= 1 ? Number(v.disease_resistance) * 100 : Number(v.disease_resistance)).toFixed(0)}%`
+        : 'not recorded';
+      return `- ${v.variety_name}: Performance ${perf}, Disease Resistance ${resist}`;
+    }).join('\n')
   : '- No variety performance data available'}
 
 💧 RECENT WATER STRESS EVENTS (Last 30 days):
 ${waterStressData && waterStressData.length > 0
-  ? waterStressData.map((w: any) => `- ${new Date(w.created_at).toLocaleDateString()}: Stress Score ${(w.stress_score * 100).toFixed(0)}%, Severity: ${w.severity}`).join('\n')
+  ? waterStressData.map((w: any) => {
+      const stress = w.stress_score != null && Number.isFinite(Number(w.stress_score))
+        ? `${(Number(w.stress_score) <= 1 ? Number(w.stress_score) * 100 : Number(w.stress_score)).toFixed(0)}%`
+        : 'not recorded';
+      return `- ${new Date(w.created_at).toLocaleDateString()}: Stress Score ${stress}, Severity: ${w.severity ?? 'not recorded'}`;
+    }).join('\n')
   : '- No water stress events recorded'}
 
 🎯 CRITICAL ANALYSIS DIRECTIVE:

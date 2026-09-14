@@ -40,21 +40,36 @@ serve(async (req) => {
       );
     }
 
-    // Calculate basic comparison from assessment data
-    const healthChange = assessment2_data.health_score - assessment1_data.health_score;
-    const healthTrend = healthChange > 5 ? 'improving' : healthChange < -5 ? 'declining' : 'stable';
+    // Calculate basic comparison from assessment data — fail closed when scores are missing
+    const health1 =
+      assessment1_data?.health_score != null && Number.isFinite(Number(assessment1_data.health_score))
+        ? Number(assessment1_data.health_score)
+        : null;
+    const health2 =
+      assessment2_data?.health_score != null && Number.isFinite(Number(assessment2_data.health_score))
+        ? Number(assessment2_data.health_score)
+        : null;
+    const healthChange = health1 != null && health2 != null ? health2 - health1 : null;
+    const healthTrend =
+      healthChange == null
+        ? 'unknown'
+        : healthChange > 5
+          ? 'improving'
+          : healthChange < -5
+            ? 'declining'
+            : 'stable';
 
     // Use Gemini Vision to analyze visual differences
     const comparisonPrompt = `You are analyzing two crop health assessment images taken at different times.
 
 FIRST IMAGE (${new Date(assessment1_data.analyzed_at).toLocaleDateString()}):
-- Health Score: ${assessment1_data.health_score}%
-- Stress Level: ${assessment1_data.stress_level}
+- Health Score: ${health1 != null ? `${health1}%` : 'not recorded'}
+- Stress Level: ${assessment1_data.stress_level ?? 'not recorded'}
 - Symptoms: ${(assessment1_data.symptoms || []).join(', ') || 'None detected'}
 
 SECOND IMAGE (${new Date(assessment2_data.analyzed_at).toLocaleDateString()}):
-- Health Score: ${assessment2_data.health_score}%
-- Stress Level: ${assessment2_data.stress_level}
+- Health Score: ${health2 != null ? `${health2}%` : 'not recorded'}
+- Stress Level: ${assessment2_data.stress_level ?? 'not recorded'}
 - Symptoms: ${(assessment2_data.symptoms || []).join(', ') || 'None detected'}
 
 Analyze the visual differences between these two images and provide:
@@ -124,6 +139,7 @@ Return your analysis as a JSON object with:
     const result = {
       health_trend: healthTrend,
       health_change: healthChange,
+      health_scores_recorded: health1 != null && health2 != null,
       symptom_progression: parsedAnalysis.symptom_progression || [],
       visual_changes: parsedAnalysis.visual_changes || [],
       treatment_effectiveness: parsedAnalysis.treatment_effectiveness || null,
