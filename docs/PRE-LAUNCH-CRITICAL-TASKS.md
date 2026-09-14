@@ -26,13 +26,15 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] `/health.json` build stamp includes git commit for post-publish verification
 - [x] Assessment health/AI scores persisted only via analyze-crop service role (`20260914210000`)
 - [x] AI metric tables locked from client invent; DIRT click via RPC (`20260914220000`)
+- [x] Peer effectiveness_score CHECK 0–100 (`20260914230000`); critical-alert UPDATE freeze + claim↔assessment field match (`20260914240000`)
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914220000` (AI metric client-write lock + assessment AI-score
-   service-role persist; prior `20260914210000` assessment lock; `20260914200000` claim INSERT status
-   lock + coop-alert member INSERT drop; `20260914190000` claim UPDATE/
-   invitation freeze; researcher PII is `20260914100000`; `subscription_status`
+1. Apply pending Supabase migrations through `20260914240000` (critical-alert UPDATE freeze + claim
+   assessment field match; peer effectiveness CHECK `20260914230000`; AI metric client-write lock
+   `20260914220000` + assessment AI-score service-role persist `20260914210000`; claim INSERT status
+   lock + coop-alert member INSERT drop `20260914200000`; claim UPDATE/
+   invitation freeze `20260914190000`; researcher PII is `20260914100000`; `subscription_status`
    lock is `20260914170000`; beta_metrics approved-story sync is `20260914180000`;
    plus prior RLS/RPC/storage/soybean checks)
 2. Enable Auth **Leaked Password Protection**

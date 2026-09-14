@@ -188,18 +188,23 @@ export function CriticalAlertsManager() {
           <CardContent className="space-y-4">
             <p className="text-sm leading-relaxed">{alert.message}</p>
 
-            {alert.estimated_loss_usd && (
+            {Number.isFinite(Number(alert.estimated_loss_usd)) && Number(alert.estimated_loss_usd) > 0 && (
               <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg">
                 <AlertTriangle className="h-4 w-4 text-destructive" />
                 <span className="text-sm font-semibold">
-                  Illustrative planning estimate: ${alert.estimated_loss_usd.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  Illustrative planning estimate: ${Number(alert.estimated_loss_usd).toLocaleString('en-US', { maximumFractionDigits: 0 })}
                 </span>
               </div>
             )}
 
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span>Urgency: {alert.urgency_score}/100</span>
+                <span>
+                  Urgency:{' '}
+                  {Number.isFinite(Number(alert.urgency_score))
+                    ? `${Math.round(Number(alert.urgency_score))}/100`
+                    : 'not recorded'}
+                </span>
                 <span>{formatDistanceToNow(new Date(alert.created_at), { addSuffix: true })}</span>
               </div>
               {alert.assessment_id && (

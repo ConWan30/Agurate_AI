@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { format, subDays } from "date-fns";
 import TutorialTooltip from "@/components/TutorialTooltip";
 import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
+import { hasHealthScore, toHealthPercent } from "@/lib/health-score";
 
 interface FieldData {
   id: string;
@@ -23,9 +24,9 @@ interface FieldData {
 
 interface TimeSeriesPoint {
   date: string;
-  health_score: number;
-  temp_f: number;
-  precipitation: number;
+  health_score: number | null;
+  temp_f: number | null;
+  precipitation: number | null;
 }
 
 export default function Analytics() {
@@ -57,16 +58,16 @@ export default function Analytics() {
       if (fieldsData) {
         const processedFields = fieldsData.map((field: any) => {
           const assessments = field.assessments || [];
-          const scored = assessments.filter(
-            (a: any) => a.health_score != null && !Number.isNaN(Number(a.health_score))
-          );
+          const scored = assessments
+            .filter((a: any) => hasHealthScore(a.health_score))
+            .map((a: any) => ({ ...a, health_score: toHealthPercent(a.health_score) }));
           const avgHealth = scored.length > 0
-            ? scored.reduce((sum: number, a: any) => sum + Number(a.health_score), 0) / scored.length
+            ? scored.reduce((sum: number, a: any) => sum + a.health_score, 0) / scored.length
             : null;
           
           const scoredRecent = scored.slice(-2);
           const trend = scoredRecent.length === 2
-            ? Number(scoredRecent[1].health_score) - Number(scoredRecent[0].health_score)
+            ? scoredRecent[1].health_score - scoredRecent[0].health_score
             : null;
 
           return {
@@ -107,13 +108,14 @@ export default function Analytics() {
           const date = format(new Date(assessment.analyzed_at), "MMM dd");
           const existing = acc.find(d => d.date === date);
           
-          const hasScore = assessment.health_score != null && !Number.isNaN(Number(assessment.health_score));
+          const hasScore = hasHealthScore(assessment.health_score);
+          const normalizedScore = hasScore ? toHealthPercent(assessment.health_score) : null;
           if (existing) {
-            if (hasScore) {
+            if (normalizedScore != null) {
               if (existing.health_score == null) {
-                existing.health_score = Number(assessment.health_score);
+                existing.health_score = normalizedScore;
               } else {
-                existing.health_score = (Number(existing.health_score) + Number(assessment.health_score)) / 2;
+                existing.health_score = (existing.health_score + normalizedScore) / 2;
               }
             }
             existing.temp_f = assessment.weather_temp_f ?? existing.temp_f;
@@ -121,7 +123,7 @@ export default function Analytics() {
           } else {
             acc.push({
               date,
-              health_score: hasScore ? Number(assessment.health_score) : null,
+              health_score: normalizedScore,
               temp_f: assessment.weather_temp_f ?? null,
               precipitation: assessment.weather_precipitation_mm ?? null
             });

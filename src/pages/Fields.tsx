@@ -359,7 +359,7 @@ export default function Fields() {
                 onAdopt={() => {
                   toast({ 
                     title: "Variety Noted",
-                    description: `${recommendation.recommended_variety} saved to your field records.`
+                    description: `${recommendation.recommended_variety} noted for your review (not saved to field records yet).`
                   });
                 }}
               />

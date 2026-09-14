@@ -77,9 +77,10 @@ export default function Predictions() {
       }
 
       // Check if we got back a message about needing more data
-      if (data && data.forecast && data.forecast.length === 0) {
+      if (!data || !Array.isArray(data.forecast) || data.forecast.length === 0) {
         setNeedsMoreData(true);
-        toast.info(data.summary || 'Need more assessment data to generate predictions');
+        setPredictions(null);
+        toast.info(data?.summary || 'Need more assessment data to generate predictions');
       } else {
         setPredictions(data);
       }

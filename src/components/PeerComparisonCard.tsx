@@ -21,6 +21,12 @@ interface PeerComparisonCardProps {
   className?: string;
 }
 
+function formatPeerMetric(value: unknown, suffix = ''): string {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '—';
+  return `${Math.round(n)}${suffix}`;
+}
+
 export function PeerComparisonCard({
   fieldId,
   treatmentType,
@@ -104,6 +110,9 @@ export function PeerComparisonCard({
   }
 
   const topTreatment = comparisonData[0];
+  const sampleSize = Number.isFinite(Number(topTreatment.sample_size))
+    ? Number(topTreatment.sample_size)
+    : 0;
 
   return (
     <Card className={className}>
@@ -113,8 +122,8 @@ export function PeerComparisonCard({
           Community Treatment Comparison
         </CardTitle>
         <CardDescription>
-          Anonymous data from {topTreatment.sample_size} outcome
-          {topTreatment.sample_size !== 1 ? 's' : ''} for similar {cropType} cases
+          Self-reported anonymous outcomes from {sampleSize} record
+          {sampleSize !== 1 ? 's' : ''} for similar {cropType} cases
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -131,7 +140,7 @@ export function PeerComparisonCard({
             </div>
             <Badge variant="default" className="gap-1">
               <TrendingUp className="h-3 w-3" />
-              {topTreatment.success_rate}% Success
+              {formatPeerMetric(topTreatment.success_rate, '%')} Success
             </Badge>
           </div>
 
@@ -139,13 +148,13 @@ export function PeerComparisonCard({
             <div>
               <p className="text-xs text-muted-foreground">Avg. Effectiveness</p>
               <p className="text-lg font-bold text-success">
-                {topTreatment.avg_effectiveness}/100
+                {formatPeerMetric(topTreatment.avg_effectiveness, '/100')}
               </p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Sample Size</p>
               <p className="text-lg font-bold">
-                {topTreatment.sample_size} outcomes
+                {sampleSize} outcomes
               </p>
             </div>
           </div>
@@ -170,9 +179,9 @@ export function PeerComparisonCard({
                       )}
                     </div>
                     <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                      <span>{treatment.sample_size} outcomes</span>
-                      <span>{treatment.success_rate}% success</span>
-                      <span>{treatment.avg_effectiveness}/100 effectiveness</span>
+                      <span>{formatPeerMetric(treatment.sample_size)} outcomes</span>
+                      <span>{formatPeerMetric(treatment.success_rate, '%')} success</span>
+                      <span>{formatPeerMetric(treatment.avg_effectiveness, '/100')} effectiveness</span>
                     </div>
                   </div>
                 </div>
@@ -181,14 +190,14 @@ export function PeerComparisonCard({
           </div>
         )}
 
-        {currentHealthScore != null && topTreatment && (
+        {currentHealthScore != null && Number.isFinite(Number(currentHealthScore)) && topTreatment && (
           <div className="p-3 bg-success/10 rounded-lg border border-success/20">
             <h4 className="font-semibold text-sm mb-2">Community context</h4>
             <p className="text-sm text-muted-foreground">
-              Peer outcomes for similar {cropType} cases show about{' '}
-              <span className="font-semibold text-success">{topTreatment.success_rate}%</span>{' '}
+              Self-reported peer outcomes for similar {cropType} cases show about{' '}
+              <span className="font-semibold text-success">{formatPeerMetric(topTreatment.success_rate, '%')}</span>{' '}
               success with {topTreatment.treatment_type}. Your current health score is{' '}
-              <span className="font-semibold">{currentHealthScore}%</span>. This is
+              <span className="font-semibold">{Math.round(Number(currentHealthScore))}%</span>. This is
               anonymized community signal, not a guaranteed result.
             </p>
           </div>
@@ -196,7 +205,7 @@ export function PeerComparisonCard({
 
         <div className="pt-2 border-t">
           <p className="text-xs text-muted-foreground text-center">
-            Data is anonymized and aggregated. Your individual data remains private.
+            Data is anonymized, aggregated, and self-reported. Your individual data remains private.
           </p>
         </div>
       </CardContent>

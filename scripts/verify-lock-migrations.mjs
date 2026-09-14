@@ -61,6 +61,22 @@ const required = [
       'System can create community insights',
     ],
   },
+  {
+    id: '20260914230000_peer_effectiveness_score_check',
+    needles: [
+      'peer_treatment_outcomes_effectiveness_score_check',
+      'effectiveness_score >= 0',
+      'effectiveness_score <= 100',
+    ],
+  },
+  {
+    id: '20260914240000_protect_critical_alerts_and_claim_link',
+    needles: [
+      'protect_critical_alerts_ai_columns',
+      'critical_alerts content columns may only be updated by trusted backends',
+      'a.field_id = ic.field_id',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -80,8 +96,8 @@ for (const req of required) {
 
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
-if (!tip.startsWith('2026091422') && tip < '20260914220000_lock_ai_metric_client_writes') {
-  fail(`tip migration ${tip} should include AI metric client-write lock (20260914220000+)`);
+if (!tip.startsWith('2026091424') && tip < '20260914240000_protect_critical_alerts_and_claim_link') {
+  fail(`tip migration ${tip} should include critical-alert UPDATE + claim-link lock (20260914240000+)`);
 }
 
 if (process.exitCode) {

@@ -28,6 +28,8 @@ jobs:
           VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
       - name: Honesty copy (static)
         run: npm run verify:honesty:static
+      - name: Lock migration markers
+        run: npm run verify:lock-migrations
       - name: Public route alignment
         run: npm run verify:public-routes
       - name: Setup Deno

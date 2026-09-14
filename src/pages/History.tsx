@@ -231,9 +231,9 @@ export default function History() {
                         <div className="flex items-center gap-3">
                           {getStressIcon(assessment.stress_level)}
                           <div>
-                            <CardTitle className="text-xl font-heading">{assessment.field.name}</CardTitle>
+                            <CardTitle className="text-xl font-heading">{assessment.field?.name ?? 'Unknown field'}</CardTitle>
                             <CardDescription className="capitalize">
-                              {assessment.field.crop_type} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy 'at' h:mm a")}</time>
+                              {assessment.field?.crop_type ?? 'Crop unknown'} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy 'at' h:mm a")}</time>
                             </CardDescription>
                           </div>
                         </div>
@@ -256,7 +256,7 @@ export default function History() {
                         >
                           {assessment.stress_level || "Stress not recorded"}
                         </AgriculturalBadge>
-                        <Button variant="outline" size="sm" className="focus-ring flex-shrink-0" aria-label={`View details for ${assessment.field.name}`}>
+                        <Button variant="outline" size="sm" className="focus-ring flex-shrink-0" aria-label={`View details for ${assessment.field?.name ?? 'assessment'}`}>
                           View Details
                         </Button>
                       </div>
@@ -306,7 +306,7 @@ export default function History() {
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-heading flex items-center gap-3">
                     {getStressIcon(selectedAssessment.stress_level)}
-                    {selectedAssessment.field.name} - Comprehensive Analysis
+                    {selectedAssessment.field?.name ?? 'Unknown field'} - Comprehensive Analysis
                   </DialogTitle>
                 </DialogHeader>
 
@@ -386,12 +386,12 @@ export default function History() {
                   </div>
 
                   {/* Image History Comparison Button */}
-                  {selectedAssessment.field.id && (
+                  {selectedAssessment.field?.id && (
                     <div className="flex justify-end">
                       <Button
                         variant="outline"
                         onClick={() => {
-                          setComparisonFieldId(selectedAssessment.field.id);
+                          setComparisonFieldId(selectedAssessment.field!.id);
                           setShowImageComparison(true);
                         }}
                       >
@@ -473,9 +473,9 @@ export default function History() {
                             ? rec.reasoning
                             : undefined
                         }))}
-                        fieldId={selectedAssessment.field.id}
-                        fieldName={selectedAssessment.field.name}
-                        cropType={selectedAssessment.field.crop_type}
+                        fieldId={selectedAssessment.field?.id ?? selectedAssessment.field_id}
+                        fieldName={selectedAssessment.field?.name ?? 'Unknown field'}
+                        cropType={selectedAssessment.field?.crop_type ?? 'unknown'}
                         healthScoreBefore={
                           hasHealthScore(selectedAssessment.health_score)
                             ? toHealthPercent(selectedAssessment.health_score)
@@ -505,7 +505,7 @@ export default function History() {
                         rec.category === 'irrigation'
                       ) && (
                         <PeerComparisonCard
-                          fieldId={selectedAssessment.field.id}
+                          fieldId={selectedAssessment.field?.id ?? selectedAssessment.field_id}
                           treatmentType={
                             selectedAssessment.recommendations.find(rec => 
                               rec.category === 'pest_management'
@@ -514,7 +514,7 @@ export default function History() {
                               rec.category === 'fertilization'
                             ) ? 'fertilizer' : 'general'
                           }
-                          cropType={selectedAssessment.field.crop_type}
+                          cropType={selectedAssessment.field?.crop_type ?? 'unknown'}
                           stressLevel={selectedAssessment.stress_level}
                           currentHealthScore={
                             hasHealthScore(selectedAssessment.health_score)
@@ -543,7 +543,7 @@ export default function History() {
                           : `Health score not available. Stress: ${selectedAssessment.stress_level || 'not recorded'}`)
                       }
                       confidenceScore={hasHealthScore(selectedAssessment.confidence_score) ? toHealthPercent(selectedAssessment.confidence_score) : undefined}
-                      fieldId={selectedAssessment.field.id}
+                      fieldId={selectedAssessment.field?.id ?? selectedAssessment.field_id}
                       assessmentId={selectedAssessment.id}
                       aiAnalysis={{
                         health_score: selectedAssessment.health_score,
@@ -574,7 +574,7 @@ export default function History() {
                     && Number.isFinite(Number(selectedAssessment.estimated_yield_impact_percent)) && (
                     <EconomicImpact
                       yieldImpact={Number(selectedAssessment.estimated_yield_impact_percent)}
-                      cropType={selectedAssessment.field.crop_type}
+                      cropType={selectedAssessment.field?.crop_type ?? 'unknown'}
                     />
                   )}
 

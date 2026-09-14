@@ -625,9 +625,9 @@ export default function Dashboard() {
                           {getStressIcon(assessment.stress_level)}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-heading font-bold text-xl mb-1 group-hover:text-primary transition-colors">{assessment.field.name}</h3>
+                          <h3 className="font-heading font-bold text-xl mb-1 group-hover:text-primary transition-colors">{assessment.field?.name ?? 'Unknown field'}</h3>
                           <p className="text-sm text-muted-foreground capitalize">
-                            {assessment.field.crop_type} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy")}</time>
+                            {assessment.field?.crop_type ?? 'Crop unknown'} • <time dateTime={assessment.created_at}>{format(new Date(assessment.created_at), "MMM d, yyyy")}</time>
                           </p>
                         </div>
                       </div>

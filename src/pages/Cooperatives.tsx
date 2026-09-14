@@ -186,7 +186,7 @@ export default function Cooperatives() {
           { id: "welcome", title: "Welcome to Cooperatives!", content: "Join or create farming networks to share insights with neighboring farms", position: "bottom" },
           { id: "create", title: "Create Cooperative", content: "Start your own multi-farm network for collaborative intelligence", position: "bottom" },
           { id: "stats", title: "View Stats", content: "See aggregate health data, total acreage, and member insights", position: "bottom" },
-          { id: "insights", title: "Community Insights", content: "Access shared best practices and early disease outbreak warnings", position: "bottom" },
+          { id: "insights", title: "Community Insights", content: "Access shared best practices and member-reported alerts — planning signals, not confirmed outbreak detection", position: "bottom" },
           { id: "invite", title: "Invite Members", content: "Grow your cooperative with email invitations for better analytics", position: "bottom" }
         ]}
         storageKey="tutorial-cooperatives-shown"

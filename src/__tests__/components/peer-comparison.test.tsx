@@ -50,7 +50,8 @@ describe('PeerComparisonCard', () => {
       p_crop_type: 'rice',
       p_problem: 'fungicide',
     });
-    expect(screen.getByText(/82.5% Success/i)).toBeInTheDocument();
+    // formatPeerMetric rounds non-integer rates for display honesty
+    expect(screen.getByText(/83% Success/i)).toBeInTheDocument();
     expect(screen.getAllByText(/12 outcomes?/i).length).toBeGreaterThan(0);
   });
 

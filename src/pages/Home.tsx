@@ -103,7 +103,7 @@ export default function Home() {
     {
       icon: Network,
       title: "Community Intelligence",
-      description: "Anonymous cooperative insights from neighboring farms. Early outbreak detection and shared best practices network.",
+      description: "Anonymous cooperative insights from neighboring farms. Shared alerts and community best practices — planning signals, not confirmed outbreak detection.",
       color: "gradient-sky"
     },
     {

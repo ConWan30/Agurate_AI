@@ -153,10 +153,23 @@ VARIETY PERFORMANCE HISTORY:
 ${varietyData.length > 0 ? varietyData.map(v => `- ${v.variety_name}: Performance ${v.performance_score}, Disease Resistance ${v.disease_resistance}`).join('\n') : '- No variety data available'}
 
 CURRENT WEATHER CONDITIONS:
-- Temperature: ${weatherData.current_temp}°F
-- Humidity: ${weatherData.humidity}%
-- Days Since Rain: ${weatherData.days_since_rain}
-- Precipitation Forecast (7-day): ${weatherData.precipitation_forecast?.join(', ') || 'N/A'} inches
+${
+  weatherData.current_temp != null ||
+  weatherData.humidity != null ||
+  weatherData.days_since_rain != null ||
+  (weatherData.precipitation_forecast && weatherData.precipitation_forecast.length > 0)
+    ? [
+        weatherData.current_temp != null ? `- Temperature: ${weatherData.current_temp}°F` : null,
+        weatherData.humidity != null ? `- Humidity: ${weatherData.humidity}%` : null,
+        weatherData.days_since_rain != null ? `- Days Since Rain: ${weatherData.days_since_rain}` : null,
+        weatherData.precipitation_forecast?.length
+          ? `- Precipitation Forecast (7-day): ${weatherData.precipitation_forecast.join(', ')} inches`
+          : null,
+      ]
+        .filter(Boolean)
+        .join('\n')
+    : '- Weather: not available — do not infer temperature, humidity, rain, or forecasts'
+}
 
 WATER STRESS HISTORY:
 ${waterStressData.length > 0 ? waterStressData.map(w => `- ${new Date(w.created_at).toLocaleDateString()}: Stress Score ${w.stress_score}, Severity: ${w.severity}`).join('\n') : '- No water stress events recorded'}
