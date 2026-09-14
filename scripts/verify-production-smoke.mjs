@@ -53,7 +53,7 @@ async function check(path, assertFn) {
   try {
     const res = await fetch(url, { redirect: 'follow' });
     const text = await res.text();
-    assertFn(res, text, url);
+    await assertFn(res, text, url);
     console.log(`PASS  ${path}`);
   } catch (err) {
     failures.push(`${path}: ${err instanceof Error ? err.message : String(err)}`);
@@ -87,7 +87,7 @@ await check('/health.json', (res, text, url) => {
 });
 
 for (const route of ['/', '/beta-signup', '/auth', '/how-it-works']) {
-  await check(route, (res, text, url) => {
+  await check(route, async (res, text, url) => {
     if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
     if (route === '/') {
       for (const rule of LIVE_FORBIDDEN) {
@@ -95,6 +95,21 @@ for (const route of ['/', '/beta-signup', '/auth', '/how-it-works']) {
           throw new Error(`live honesty regression: ${rule.name}`);
         }
       }
+      // SPA shells often omit marketing copy; also scan linked JS bundles.
+      const assetPaths = [...text.matchAll(/\/assets\/[^"'>\s]+\.js/g)].map((m) => m[0]);
+      const uniqueAssets = [...new Set(assetPaths)].slice(0, 8);
+      for (const assetPath of uniqueAssets) {
+        const assetUrl = `${base}${assetPath}`;
+        const assetRes = await fetch(assetUrl, { redirect: 'follow' });
+        if (!assetRes.ok) continue;
+        const assetText = await assetRes.text();
+        for (const rule of LIVE_FORBIDDEN) {
+          if (rule.re.test(assetText)) {
+            throw new Error(`live honesty regression in ${assetPath}: ${rule.name}`);
+          }
+        }
+      }
+      console.log(`      scanned ${uniqueAssets.length} JS asset(s) for dishonest phrases`);
     }
   });
 }
