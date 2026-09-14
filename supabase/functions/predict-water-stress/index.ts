@@ -11,7 +11,7 @@ const waterStressSchema = z.object({
   healthScore: z.number().min(0).max(100).optional(),
   /** @deprecated Ignored — symptoms are loaded from the owned assessment. */
   symptoms: z.array(z.string()).max(50).optional(),
-  weatherData: z.any().optional()
+  weatherData: z.any().optional(), // @deprecated ignored — never trust client weather invent
 });
 
 serve(async (req) => {
@@ -50,12 +50,12 @@ serve(async (req) => {
       });
     }
 
-    const { fieldId, assessmentId, weatherData } = validation.data;
+    const { fieldId, assessmentId } = validation.data;
 
-    // Verify field ownership
+    // Verify field ownership + load coords for server weather (ignore client weatherData).
     const { data: field, error: fieldError } = await supabase
       .from('fields')
-      .select('user_id')
+      .select('user_id, location_lat, location_lng')
       .eq('id', fieldId)
       .single();
 
@@ -109,12 +109,35 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
+    // Server-fetched weather only — never persist client weather invent.
+    let weatherContext: Record<string, unknown> | null = null;
+    const lat = field.location_lat != null ? Number(field.location_lat) : null;
+    const lng = field.location_lng != null ? Number(field.location_lng) : null;
+    if (lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng)) {
+      try {
+        const weatherRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=7&timezone=America/Chicago`,
+        );
+        if (weatherRes.ok) {
+          const weatherJson = await weatherRes.json();
+          weatherContext = {
+            source: 'open-meteo',
+            latitude: lat,
+            longitude: lng,
+            daily: weatherJson.daily ?? null,
+          };
+        }
+      } catch (weatherErr) {
+        console.error('Open-Meteo fetch failed; continuing without weather context', weatherErr);
+      }
+    }
+
     const aiPrompt = `You are AgurateAI's water stress prediction engine for Louisiana Delta crops.
 
 Current Assessment:
 - Health Score: ${healthScore != null ? `${healthScore}%` : 'not recorded'}
 - Symptoms: ${symptoms.length ? symptoms.join(', ') : 'not recorded'}
-- Weather: ${weatherData != null ? JSON.stringify(weatherData) : 'not provided'}
+- Weather: ${weatherContext != null ? JSON.stringify(weatherContext) : 'not available — do not invent weather conditions'}
 
 Analyze water stress risk for next 7 days:
 1. Calculate stress probability per day (0-1 scale)
@@ -184,7 +207,7 @@ Return JSON with daily predictions and DIRT recommendation.`;
         stress_score: stressScore,
         severity,
         confidence,
-        weather_context: weatherData,
+        weather_context: weatherContext,
         symptoms_detected: Array.isArray(predictionData.symptoms_detected)
           ? predictionData.symptoms_detected
           : [],

@@ -277,6 +277,13 @@ const required = [
       'cooperative_alerts.field_id must be owned by the authenticated user',
     ],
   },
+  {
+    id: '20260914430000_drop_legacy_peer_comparison_data_view',
+    needles: [
+      'DROP VIEW IF EXISTS public.peer_comparison_data',
+      'REVOKE ALL ON TABLE public.peer_comparison_data',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -297,11 +304,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091442') &&
-  tip < '20260914420000_lock_coop_alert_severity_crop_acres'
+  !tip.startsWith('2026091443') &&
+  tip < '20260914430000_drop_legacy_peer_comparison_data_view'
 ) {
   fail(
-    `tip migration ${tip} should include coop-alert severity/crop/acres invent lock (20260914420000+)`
+    `tip migration ${tip} should include legacy peer_comparison_data view drop (20260914430000+)`
   );
 }
 

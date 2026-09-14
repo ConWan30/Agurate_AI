@@ -4,11 +4,22 @@ import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_s
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
+const cropEnum = z.enum(['rice', 'soybean', 'cotton', 'corn']);
 const communityInsightsSchema = z.object({
-  cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), z.enum(['rice', 'soybean', 'cotton', 'corn'])),
+  fieldId: z.string().uuid(),
   practiceType: z.string().min(1).max(100),
+  /** @deprecated Ignored — crop is loaded from the owned field. */
+  cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), cropEnum).optional(),
+  /** @deprecated Ignored — region is not trusted from the client. */
   region: z.string().max(100).optional()
 });
+
+function normalizeCrop(raw: unknown): z.infer<typeof cropEnum> | null {
+  if (typeof raw !== 'string') return null;
+  const v = raw.toLowerCase() === 'soybeans' ? 'soybean' : raw.toLowerCase();
+  const parsed = cropEnum.safeParse(v);
+  return parsed.success ? parsed.data : null;
+}
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -45,15 +56,37 @@ serve(async (req) => {
       });
     }
 
-    const { cropType, practiceType, region } = validation.data;
+    const { fieldId, practiceType } = validation.data;
     
     const supabase = getServiceClient();
+    const anon = getAnonClient(authHeader);
 
-    // Aggregate anonymous community data
+    // Bind crop from owned field — never trust client cropType/region invent.
+    const { data: ownedField, error: fieldError } = await anon
+      .from('fields')
+      .select('id, crop_type, user_id')
+      .eq('id', fieldId)
+      .maybeSingle();
+    if (fieldError || !ownedField || ownedField.user_id !== user.id) {
+      return new Response(JSON.stringify({ error: 'Field not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const cropType = normalizeCrop(ownedField.crop_type);
+    if (!cropType) {
+      return new Response(JSON.stringify({ error: 'Field crop_type is missing or unsupported' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Aggregate anonymous community data for the same crop only (via owned field join).
     const { data: insights, error: insightsError } = await supabase
       .from('community_insights')
-      .select('practice, outcome, savings_achieved, community_rating')
+      .select('practice, outcome, savings_achieved, community_rating, fields!inner(crop_type)')
       .eq('insight_type', practiceType)
+      .eq('fields.crop_type', cropType)
       .gte('community_rating', 3.5)
       .limit(50);
 
@@ -86,7 +119,7 @@ serve(async (req) => {
 Aggregate Community Data (anonymous):
 - Crop: ${cropType}
 - Practice Type: ${practiceType}
-- Region: Louisiana Delta
+- Region: not asserted (crop-filtered community sample only)
 - Report count: ${rows.length}
 - Self-reported savings samples (finite > 0 only): ${JSON.stringify(reportedSavings)}
 - Outcomes/ratings (no invented dollars): ${JSON.stringify(rows.map((r: { practice?: string; outcome?: string; community_rating?: number }) => ({

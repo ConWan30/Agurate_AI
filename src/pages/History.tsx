@@ -402,7 +402,11 @@ export default function History() {
                     stressLevel={selectedAssessment.stress_level}
                     condition={selectedAssessment.stress_level}
                     yieldImpact={selectedAssessment.estimated_yield_impact_percent != null && Number.isFinite(Number(selectedAssessment.estimated_yield_impact_percent)) ? Number(selectedAssessment.estimated_yield_impact_percent) : undefined}
-                    diseaseCount={selectedAssessment.disease_identified?.length || 0}
+                    diseaseCount={
+                      Array.isArray(selectedAssessment.disease_identified)
+                        ? selectedAssessment.disease_identified.length
+                        : null
+                    }
                     diseasePressure={
                       selectedAssessment.severity_ratings?.disease_pressure === "none" ||
                       selectedAssessment.severity_ratings?.disease_pressure === "mild" ||
@@ -411,7 +415,11 @@ export default function History() {
                         ? selectedAssessment.severity_ratings.disease_pressure
                         : undefined
                     }
-                    pestCount={selectedAssessment.pest_identified?.length || 0}
+                    pestCount={
+                      Array.isArray(selectedAssessment.pest_identified)
+                        ? selectedAssessment.pest_identified.length
+                        : null
+                    }
                     pestPressure={
                       selectedAssessment.severity_ratings?.pest_pressure === "none" ||
                       selectedAssessment.severity_ratings?.pest_pressure === "mild" ||
@@ -421,10 +429,14 @@ export default function History() {
                         : undefined
                     }
                     nutrientDeficiencies={
-                      (selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ? 1 : 0) +
-                      (selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ? 1 : 0) +
-                      (selectedAssessment.nutrient_deficiencies?.potassium?.detected ? 1 : 0) +
-                      (selectedAssessment.nutrient_deficiencies?.other?.length || 0)
+                      selectedAssessment.nutrient_deficiencies == null
+                        ? null
+                        : (selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ? 1 : 0) +
+                          (selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ? 1 : 0) +
+                          (selectedAssessment.nutrient_deficiencies?.potassium?.detected ? 1 : 0) +
+                          (Array.isArray(selectedAssessment.nutrient_deficiencies?.other)
+                            ? selectedAssessment.nutrient_deficiencies.other.length
+                            : 0)
                     }
                     highestNutrientSeverity={
                       selectedAssessment.nutrient_deficiencies?.nitrogen?.severity === "severe" ||

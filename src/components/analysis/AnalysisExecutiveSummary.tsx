@@ -9,11 +9,11 @@ interface AnalysisExecutiveSummaryProps {
   stressLevel: string;
   condition: string;
   yieldImpact?: number;
-  diseaseCount: number;
+  diseaseCount: number | null;
   diseasePressure?: "none" | "mild" | "moderate" | "severe";
-  pestCount: number;
+  pestCount: number | null;
   pestPressure?: "none" | "mild" | "moderate" | "severe";
-  nutrientDeficiencies: number;
+  nutrientDeficiencies: number | null;
   highestNutrientSeverity: "none" | "mild" | "moderate" | "severe" | "unknown";
   historicalComparison?: {
     trend: "improving" | "stable" | "declining";
@@ -119,23 +119,23 @@ export function AnalysisExecutiveSummary({
         <QuickInsightCard
           icon={AlertTriangle}
           label="Diseases"
-          value={diseaseCount}
-          severity={diseasePressure}
-          urgent={diseasePressure === "severe"}
+          value={diseaseCount == null ? "—" : diseaseCount}
+          severity={diseaseCount == null ? "unknown" : diseasePressure}
+          urgent={diseaseCount != null && diseasePressure === "severe"}
         />
         <QuickInsightCard
           icon={Bug}
           label="Pests"
-          value={pestCount}
-          severity={pestPressure}
-          urgent={pestPressure === "severe"}
+          value={pestCount == null ? "—" : pestCount}
+          severity={pestCount == null ? "unknown" : pestPressure}
+          urgent={pestCount != null && pestPressure === "severe"}
         />
         <QuickInsightCard
           icon={Sprout}
           label="Nutrient Issues"
-          value={nutrientDeficiencies}
-          severity={highestNutrientSeverity}
-          urgent={highestNutrientSeverity === "severe"}
+          value={nutrientDeficiencies == null ? "—" : nutrientDeficiencies}
+          severity={nutrientDeficiencies == null ? "unknown" : highestNutrientSeverity}
+          urgent={nutrientDeficiencies != null && highestNutrientSeverity === "severe"}
         />
         <QuickInsightCard
           icon={Droplets}

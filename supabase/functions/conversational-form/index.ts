@@ -442,7 +442,7 @@ serve(async (req) => {
         practice: c.practice_name,
         adopters: c.adoption_count,
         successRate: c.success_rate,
-        avgSavings: c.average_savings
+        // average_savings intentionally omitted — never feed money invent into the form AI
       })),
       
       // Variety Intelligence
@@ -536,11 +536,36 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
       );
     }
 
-    // Update extracted data
+    // Update extracted data — strip AI money/loss invent (farmer confirms on Insurance form).
+    const MONEY_INVENT_KEYS = new Set([
+      'estimated_loss_percentage',
+      'estimated_loss_dollars',
+      'estimatedLossPercentage',
+      'estimatedLossDollars',
+      'estimated_loss',
+      'avgSavings',
+      'average_savings',
+      'averageSavings',
+      'roi',
+      'cost_usd',
+      'costUsd',
+    ]);
+    const incomingExtracted = { ...(parsedResponse.extracted_data || {}) };
+    for (const key of Object.keys(incomingExtracted)) {
+      if (MONEY_INVENT_KEYS.has(key) || /^(estimated_?).*(loss|saving|roi|cost|dollar)/i.test(key)) {
+        delete incomingExtracted[key];
+      }
+    }
     const updatedData = {
       ...session.extracted_data,
-      ...parsedResponse.extracted_data
+      ...incomingExtracted,
     };
+    // Also clear any previously invented money keys left in session.
+    for (const key of Object.keys(updatedData)) {
+      if (MONEY_INVENT_KEYS.has(key) || /^(estimated_?).*(loss|saving|roi|cost|dollar)/i.test(key)) {
+        delete updatedData[key];
+      }
+    }
 
     // Calculate completion percentage based on required fields
     const schema = FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'];
