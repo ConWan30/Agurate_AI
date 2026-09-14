@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, BookOpen, Users, Award, ExternalLink, Shield } from "lucide-react";
+import { GraduationCap, BookOpen, Users, ExternalLink, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function LSUPartnershipSection() {
@@ -17,14 +17,13 @@ export function LSUPartnershipSection() {
         <div className="text-center mb-16">
           <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
             <GraduationCap className="h-3 w-3 mr-1" />
-            Built on 130+ Years of Research
+            Research-informed
           </Badge>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
-            Powered by LSU AgCenter Excellence
+            Framed around LSU AgCenter research
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Every recommendation is backed by Louisiana State University's Agricultural Center—
-            the trusted source for Louisiana farmers since 1888.
+            Guidance is informed by publicly available LSU AgCenter research. LSU AgCenter has served Louisiana farmers since 1888. AgurateAI is not an official LSU partner and is not scientifically validated by them.
           </p>
         </div>
 
@@ -39,23 +38,17 @@ export function LSUPartnershipSection() {
                   </div>
                 </div>
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-2xl font-bold mb-3">LSU AgCenter Research Integration</h3>
+                  <h3 className="text-2xl font-bold mb-3">Research framing</h3>
                   <p className="text-muted-foreground mb-4">
-                    Our AI models are trained on comprehensive research from LSU AgCenter's 12 research stations 
-                    across Louisiana, with specialized data from the Northeast Research Station in Morehouse Parish.
+                    We frame crop guidance around published LSU AgCenter research, including Northeast Louisiana and Morehouse Parish context. This is not a data-sharing partnership and not a claim that their stations trained our model.
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                     <Badge variant="secondary">
                       <Shield className="h-3 w-3 mr-1" />
-                      Scientifically Validated
+                      Research-informed
                     </Badge>
                     <Badge variant="secondary">
-                      <Award className="h-3 w-3 mr-1" />
-                      Peer Reviewed
-                    </Badge>
-                    <Badge variant="secondary">
-                      <Users className="h-3 w-3 mr-1" />
-                      Field Tested
+                      Not an official partnership
                     </Badge>
                   </div>
                 </div>
@@ -93,10 +86,9 @@ export function LSUPartnershipSection() {
           <Card className="border-2 hover:border-primary transition-all hover-lift group">
             <CardContent className="p-6">
               <Users className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="text-xl font-bold mb-3">Connect with Experts</h3>
+              <h3 className="text-xl font-bold mb-3">Researcher Directory</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Get direct access to LSU AgCenter researchers for complex crop issues. 
-                Our platform connects you with specialists in crop pathology, entomology, and agronomy.
+                A directory of public LSU AgCenter researcher profiles. Contact them through official LSU channels — we do not broker introductions.
               </p>
               <Link to="/lsu-researchers">
                 <Button variant="outline" size="sm" className="w-full gap-2">
@@ -109,22 +101,14 @@ export function LSUPartnershipSection() {
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
           <div className="text-center p-6 rounded-lg glass border border-border/50">
-            <div className="text-4xl font-bold text-primary mb-2">130+</div>
-            <div className="text-sm text-muted-foreground">Years of Research</div>
+            <div className="text-4xl font-bold text-primary mb-2">1888</div>
+            <div className="text-sm text-muted-foreground">AgCenter founded</div>
           </div>
           <div className="text-center p-6 rounded-lg glass border border-border/50">
-            <div className="text-4xl font-bold text-primary mb-2">12</div>
-            <div className="text-sm text-muted-foreground">Research Stations</div>
-          </div>
-          <div className="text-center p-6 rounded-lg glass border border-border/50">
-            <div className="text-4xl font-bold text-primary mb-2">100+</div>
-            <div className="text-sm text-muted-foreground">Publications</div>
-          </div>
-          <div className="text-center p-6 rounded-lg glass border border-border/50">
-            <div className="text-4xl font-bold text-primary mb-2">8+</div>
-            <div className="text-sm text-muted-foreground">Expert Researchers</div>
+            <div className="text-2xl font-bold text-primary mb-2">Public research</div>
+            <div className="text-sm text-muted-foreground">Not our validation</div>
           </div>
         </div>
 

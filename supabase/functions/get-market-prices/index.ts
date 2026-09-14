@@ -1,5 +1,10 @@
 import { serve } from 'https://deno.land/std@0.178.0/http/server.ts';
-import { corsHeaders, handleAuthError, handleError } from '../_shared/errorHandler.ts';
+import { handleAuthError, handleError } from '../_shared/errorHandler.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 // Market price data structure
 interface MarketPrice {
