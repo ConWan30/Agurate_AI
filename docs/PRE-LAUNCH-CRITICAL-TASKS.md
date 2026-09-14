@@ -22,6 +22,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] Analytics/phase4/unified-AI omit invented weather & score defaults; soften forecast marketing copy
 - [x] ROI requires explicit yield-at-risk % (no invent from health); executive summary shows “Not estimated”; beta_metrics counts only approved stories (`20260914180000`)
 - [x] `npm run verify:local-gates` + `docs/OPERATOR-PLATFORM-HANDOFF.md` for credentialed shipping steps
+- [x] `/health.json` build stamp includes git commit for post-publish verification
 
 ## Still open (platform / external)
 

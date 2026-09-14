@@ -44,5 +44,12 @@ test.describe('Public honesty smoke', () => {
       const res = await request.get(path);
       expect(res.ok(), path).toBeTruthy();
     }
+
+    const health = await request.get('/health.json');
+    const body = await health.json();
+    expect(body.status).toBe('ok');
+    expect(body.stage).toBe('closed-beta');
+    expect(typeof body.commit).toBe('string');
+    expect(body.commit.length).toBeGreaterThan(6);
   });
 });

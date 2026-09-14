@@ -54,7 +54,13 @@ supabase secrets set DEMO_SETUP_SECRET="$(openssl rand -hex 32)"
 Use Lovable **Publish** (or your production host) so the live URL serves the
 branch/build that includes the honesty + security tip.
 
-Evidence: production HTML/JS matches tip commit; `/health.json` (or equivalent) loads.
+Evidence: production HTML/JS matches tip commit; `/health.json` loads with that commit.
+
+```bash
+# After publish — confirm the live build identity matches the tip SHA you intended
+curl -sS https://YOUR_PRODUCTION_HOST/health.json
+# Expect: "status":"ok", "stage":"closed-beta", "commit":"<tip sha>"
+```
 
 ## 6. Production smoke
 
@@ -66,6 +72,7 @@ On the live URL, confirm:
 | `/beta-signup` | Signup form loads |
 | `/auth` | Auth loads |
 | `/how-it-works` | Honest capability copy |
+| `/health.json` | `status=ok`, `stage=closed-beta`, `commit` equals published tip SHA |
 
 Also: one authenticated scan/upload path returns a real health score or a clear
 error — never a silent invented score.

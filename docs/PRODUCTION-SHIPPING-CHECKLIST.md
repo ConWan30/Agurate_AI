@@ -102,6 +102,7 @@ Last updated: 2026-09-14
 - [x] Analytics/phase4/unified-AI omit invented weather & score defaults; soften forecast marketing copy
 - [x] ROI requires explicit yield-at-risk % (no invent from health); executive summary shows “Not estimated”; beta_metrics counts only approved stories (`20260914180000`)
 - [x] `npm run verify:local-gates` orchestrates typecheck + unit + honesty static + edge check + build; operator handoff doc for platform steps
+- [x] `/health.json` stamped with git commit/branch/builtAt (vite plugin) for post-publish identity verification
 
 ## Platform gates (external)
 

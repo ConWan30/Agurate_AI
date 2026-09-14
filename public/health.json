@@ -2,5 +2,9 @@
   "status": "ok",
   "service": "agurateai",
   "stage": "closed-beta",
-  "checkedAt": "build-time"
+  "commit": "unknown",
+  "commitShort": "unknown",
+  "branch": "unknown",
+  "builtAt": "build-time",
+  "note": "Production builds overwrite this file in dist/ with git SHA via vite-plugin-health-stamp"
 }
