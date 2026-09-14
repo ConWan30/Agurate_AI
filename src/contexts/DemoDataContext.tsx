@@ -19,7 +19,7 @@ interface DemoAssessment {
   stress_level: string;
   created_at: string;
   image_url: string;
-  symptoms: string;
+  symptoms: string[];
   field: DemoField;
 }
 
@@ -68,51 +68,51 @@ const mockAssessments: DemoAssessment[] = [
   {
     id: 'demo-assess-1',
     field_id: 'demo-field-1',
-    health_score: 0.92,
+    health_score: 92,
     stress_level: 'healthy',
     created_at: '2025-01-18T14:30:00Z',
     image_url: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d',
-    symptoms: 'No significant stress detected. Healthy growth patterns observed.',
+    symptoms: ['No significant stress detected', 'Healthy growth patterns observed'],
     field: mockFields[0]
   },
   {
     id: 'demo-assess-2',
     field_id: 'demo-field-2',
-    health_score: 0.75,
+    health_score: 75,
     stress_level: 'moderate',
     created_at: '2025-01-17T11:15:00Z',
     image_url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449',
-    symptoms: 'Minor drought stress indicators. Recommend irrigation assessment.',
+    symptoms: ['Minor drought stress indicators', 'Recommend irrigation assessment'],
     field: mockFields[1]
   },
   {
     id: 'demo-assess-3',
     field_id: 'demo-field-3',
-    health_score: 0.88,
+    health_score: 88,
     stress_level: 'healthy',
     created_at: '2025-01-16T09:45:00Z',
     image_url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef',
-    symptoms: 'Excellent crop vigor. Optimal growth conditions.',
+    symptoms: ['Excellent crop vigor', 'Optimal growth conditions'],
     field: mockFields[2]
   },
   {
     id: 'demo-assess-4',
     field_id: 'demo-field-1',
-    health_score: 0.65,
+    health_score: 65,
     stress_level: 'moderate',
     created_at: '2025-01-15T16:20:00Z',
     image_url: 'https://images.unsplash.com/photo-1560493676-04071c5f467b',
-    symptoms: 'Nutrient deficiency detected in lower leaves. Consider nitrogen supplementation.',
+    symptoms: ['Nutrient deficiency detected in lower leaves', 'Consider nitrogen supplementation'],
     field: mockFields[0]
   },
   {
     id: 'demo-assess-5',
     field_id: 'demo-field-2',
-    health_score: 0.58,
+    health_score: 57,
     stress_level: 'severe',
     created_at: '2025-01-14T13:00:00Z',
     image_url: 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488',
-    symptoms: 'Significant pest damage observed. Immediate intervention recommended.',
+    symptoms: ['Significant pest damage observed', 'Immediate intervention recommended'],
     field: mockFields[1]
   }
 ];

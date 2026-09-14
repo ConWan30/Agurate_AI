@@ -123,8 +123,8 @@ Weather Context (Recent Events):
 ${weatherData.slice(0, 5).map(w => `- ${w.event_type}: ${w.event_date}`).join('\n')}
 
 LSU AgCenter Research:
-- No-till: $8-12/acre fuel savings, +15-20% soil moisture
-- Cover crops: $15-30/acre nitrogen credit
+- No-till: illustrative low double-digit $/acre fuel savings, +15-20% soil moisture
+- Cover crops: illustrative mid double-digit $/acre nitrogen credit
 - Precision fertilization: 10-20% input savings
 
 TASK: Generate predictive conservation impact analysis:

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { requireSetupSecret } from '../_shared/auth.ts';
+import { enforceIpRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,6 +17,27 @@ serve(async (req) => {
     const secretCheck = requireSetupSecret(req, corsHeaders);
     if (secretCheck !== true) {
       return secretCheck;
+    }
+
+    const ip = req.headers.get('cf-connecting-ip')
+      ?? req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      ?? req.headers.get('x-real-ip')
+      ?? 'unknown';
+    // Reuse service client created below when possible; create a minimal one for rate limiting.
+    const rateClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+    const ipLimit = await enforceIpRateLimit(rateClient, ip, {
+      bucket: 'setup-demo-account',
+      maxRequests: RATE_LIMITS['setup-demo-account'].maxRequests,
+      windowMs: RATE_LIMITS['setup-demo-account'].windowMs,
+    });
+    if (!ipLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log('Starting demo account setup...');

@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
-const SCAN_DIRS = ['src', 'index.html', 'public'];
+const SCAN_DIRS = ['src', 'index.html', 'public', 'supabase/functions'];
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.html', '.md', '.json']);
 
 const FORBIDDEN = [
@@ -62,6 +62,10 @@ const FORBIDDEN = [
   { name: 'real-time AI + DIRT integration claim', re: /Real-time AI \+ DIRT integration/i },
   { name: 'instant smartphone analysis claim', re: /Instant smartphone analysis/i },
   { name: 'lifetime 50% discount claim', re: /lifetime 50% discount/i },
+  { name: 'first 100 Louisiana farmers FREE claim', re: /first 100 Louisiana farmers with FREE/i },
+  { name: 'instant visual assessment claim', re: /instant visual assessment/i },
+  { name: 'FREE unlimited access claim', re: /FREE unlimited access/i },
+  { name: '24/7 crop monitoring claim', re: /24\/7 crop monitoring/i },
   { name: 'first 100 louisiana delta farmers claim', re: /Limited to First 100 Louisiana Delta Farmers/i },
   { name: 'direct DIRT integration claim', re: /direct integration to MSU DIRT/i },
 ];

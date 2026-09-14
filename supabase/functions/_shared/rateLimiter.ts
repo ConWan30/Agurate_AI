@@ -139,6 +139,7 @@ export const RATE_LIMITS = {
   'weather-alerts': { maxRequests: 20, windowMs: 60_000 },
   'get-usage-stats': { maxRequests: 30, windowMs: 60_000 },
   'beta-signup': { maxRequests: 5, windowMs: 15 * 60_000 },
+  'setup-demo-account': { maxRequests: 5, windowMs: 15 * 60_000 },
 } as const;
 
 /** Fail-closed IP bucket limiter for public (unauthenticated) edges. */

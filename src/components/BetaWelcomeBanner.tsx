@@ -62,7 +62,7 @@ export function BetaWelcomeBanner() {
             🎉 Welcome to the AgurateAI Beta Program!
           </p>
           <p className="text-xs text-muted-foreground">
-            You're one of the first 100 Louisiana farmers with FREE unlimited access. 
+            You're in the Louisiana closed beta with free access during the beta period. 
             Your feedback shapes the future of precision agriculture. Plus, you've locked in a 
             <span className="font-semibold text-primary"> 50% off the published plan rate</span> when we launch paid plans.
           </p>

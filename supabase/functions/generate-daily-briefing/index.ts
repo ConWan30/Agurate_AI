@@ -38,6 +38,14 @@ const getWeatherData = async (latitude: number, longitude: number) => {
 const DEFAULT_LAT = 32.8;
 const DEFAULT_LON = -91.8;
 
+
+function toHealthPercent(score: number | null | undefined): number {
+  if (score == null || Number.isNaN(Number(score))) return 0;
+  const n = Number(score);
+  if (n <= 1) return Math.round(n * 1000) / 10;
+  return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -111,7 +119,7 @@ serve(async (req) => {
 
     contextPrompt += `FIELD STATUS:\n`;
     fieldAssessments.forEach((field) => {
-      const healthScore = (field.latestAssessment?.health_score || 0) * 100;
+      const healthScore = toHealthPercent(field.latestAssessment?.health_score);
       contextPrompt += `- ${field.name} (${field.crop_type}): ${healthScore.toFixed(0)}% health, ${field.latestAssessment?.stress_level || 'unknown'} stress\n`;
       if (field.latestAssessment?.disease_identified) {
         contextPrompt += `  Diseases: ${field.latestAssessment.disease_identified.join(', ')}\n`;
@@ -184,7 +192,7 @@ serve(async (req) => {
           .slice(0, 3)
           .map((field) => ({
             fieldName: field.name,
-            issue: `Health score: ${((field.latestAssessment?.health_score || 0) * 100).toFixed(0)}%`,
+            issue: `Health score: ${toHealthPercent(field.latestAssessment?.health_score).toFixed(0)}%`,
             urgency: (field.latestAssessment?.health_score || 0) < 0.5 ? 'high' : 'medium',
             action: 'Monitor closely and consider treatment if symptoms worsen.',
           })),

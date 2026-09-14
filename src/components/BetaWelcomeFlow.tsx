@@ -116,7 +116,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             <div className="flex items-start gap-3">
               <CheckCircle className="h-6 w-6 text-health-good flex-shrink-0 mt-1" />
               <div>
-                <p className="font-semibold text-foreground">FREE Unlimited Access</p>
+                <p className="font-semibold text-foreground">Closed-beta free access</p>
                 <p className="text-sm text-muted-foreground">
                   All 17 features completely free during beta (6-12 months)
                 </p>

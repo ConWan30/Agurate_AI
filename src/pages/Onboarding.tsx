@@ -88,6 +88,7 @@ export default function Onboarding() {
       // ✅ CREATE FIRST FIELD AUTOMATICALLY if field data was collected
       // Check if the conversational form extracted field information
       if (extractedData.field_name && extractedData.field_crop_type) {
+        const normalizedCropType = extractedData.field_crop_type === 'soybeans' ? 'soybean' : extractedData.field_crop_type;
         if (import.meta.env.DEV) console.log('🌾 Creating first field from onboarding data...');
         
         interface FieldData {
@@ -107,7 +108,7 @@ export default function Onboarding() {
         const fieldData: FieldData = {
           user_id: user.id,
           name: extractedData.field_name!,
-          crop_type: (extractedData.field_crop_type === 'soybeans' ? 'soybean' : extractedData.field_crop_type)!,
+          crop_type: normalizedCropType!,
           acreage: extractedData.field_acreage || extractedData.total_acreage,
         };
 
@@ -117,13 +118,13 @@ export default function Onboarding() {
         if (extractedData.field_notes) fieldData.notes = String(extractedData.field_notes);
         
         // Add variety based on crop type
-        if (extractedData.field_crop_type === 'rice' && extractedData.rice_variety) {
+        if (normalizedCropType === 'rice' && extractedData.rice_variety) {
           fieldData.rice_variety = String(extractedData.rice_variety);
-        } else if (extractedData.field_crop_type === 'soybean' && extractedData.soybean_variety) {
+        } else if (normalizedCropType === 'soybean' && extractedData.soybean_variety) {
           fieldData.soybean_variety = String(extractedData.soybean_variety);
-        } else if (extractedData.field_crop_type === 'cotton' && extractedData.cotton_variety) {
+        } else if (normalizedCropType === 'cotton' && extractedData.cotton_variety) {
           fieldData.cotton_variety = String(extractedData.cotton_variety);
-        } else if (extractedData.field_crop_type === 'corn' && extractedData.corn_hybrid) {
+        } else if (normalizedCropType === 'corn' && extractedData.corn_hybrid) {
           fieldData.corn_hybrid = String(extractedData.corn_hybrid);
         }
 

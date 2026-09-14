@@ -368,8 +368,8 @@ export default function Home() {
               
               <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group mt-8 focus-ring" tabIndex={0}>
                 <Cloud className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">Always Available</h3>
-                <p className="text-sm text-muted-foreground">24/7 crop monitoring</p>
+                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">Available When You Need It</h3>
+                <p className="text-sm text-muted-foreground">On-demand crop assessments</p>
               </Card>
             </div>
           </div>
@@ -533,7 +533,7 @@ export default function Home() {
             Ready to Join the Beta?
           </h2>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90">
-            Get FREE unlimited access as one of the first 100 Louisiana Delta farmers
+            Join the free closed beta for Louisiana Delta farmers
           </p>
           <Link to="/beta-signup">
             <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 text-lg px-8 py-6 shadow-glow hover:shadow-field hover-lift animate-glow-pulse">

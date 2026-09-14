@@ -7,6 +7,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+
+function toHealthPercent(score: number | null | undefined): number {
+  if (score == null || Number.isNaN(Number(score))) return 0;
+  const n = Number(score);
+  if (n <= 1) return Math.round(n * 1000) / 10;
+  return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -43,7 +51,7 @@ serve(async (req) => {
     let contextPrompt = 'You are Delta Intelligence, an AI assistant for Louisiana Delta farmers.\n\n';
     
     if (fieldContext?.recentAssessment) {
-      const healthScore = (fieldContext.healthScore || 0) * 100;
+      const healthScore = toHealthPercent(fieldContext.healthScore);
       const cropType = fieldContext.cropType || 'crops';
       const stressLevel = fieldContext.stressLevel || 'unknown';
       
@@ -140,7 +148,7 @@ serve(async (req) => {
 
     // Fallback to default questions if AI didn't generate good ones
     if (questions.length === 0 || questions.some((q: string) => q.length < 10)) {
-      const healthScore = (fieldContext?.healthScore || 0) * 100;
+      const healthScore = toHealthPercent(fieldContext?.healthScore);
       const cropType = fieldContext?.cropType || 'crops';
       
       if (healthScore < 70) {

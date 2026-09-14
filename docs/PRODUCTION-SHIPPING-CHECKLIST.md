@@ -56,6 +56,10 @@ Last updated: 2026-09-14
 - [x] Canonical health_score/confidence 0–100 across analyze-crop + UI
 - [x] Demo fields UNIQUE(user_id,name) + durable beta-signup IP rate limits
 - [x] Soften DIRT “direct integration” / Instant analysis / hard 100-spot claims
+- [x] Daily briefing + predictive questions use canonical 0–100 health scores
+- [x] Demo mock assessments use 0–100 scores + symptoms arrays
+- [x] Soften FREE-unlimited / acre-dollar prompt claims; honesty scan covers edge functions
+- [x] setup-demo-account durable IP rate limit; onboarding crop normalize for varieties
 - [x] Researcher match uses crop tokens; onboarding soybeans→soybean
 - [x] get-usage-stats fail-closed rate limit
 - [x] Soften expert-escalation “researcher will receive” delivery claim

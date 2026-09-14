@@ -207,7 +207,7 @@ export default function BetaSignup() {
             <Card className="border-2 hover:border-primary transition-colors">
               <CardHeader>
                 <Rocket className="h-10 w-10 text-primary mb-2" />
-                <CardTitle className="text-xl">Free Unlimited Access</CardTitle>
+                <CardTitle className="text-xl">Closed-beta free access</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">

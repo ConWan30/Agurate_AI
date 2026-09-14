@@ -57,7 +57,7 @@ export const ComparisonSection = memo(function ComparisonSection() {
       feature: "Cost",
       agurate: "Free Beta",
       traditional: "$$$",
-      description: "Free unlimited access during beta"
+      description: "Free closed-beta access during beta"
     }
   ];
 

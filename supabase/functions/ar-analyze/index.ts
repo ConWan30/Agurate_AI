@@ -51,7 +51,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a crop health AR analyzer. Provide instant visual assessment in JSON format only.'
+            content: 'You are a crop health AR analyzer. Provide a brief visual assessment in JSON format only.'
           },
           {
             role: 'user',

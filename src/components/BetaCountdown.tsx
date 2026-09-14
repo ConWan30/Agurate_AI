@@ -134,7 +134,7 @@ export function BetaCountdown() {
             <div className="text-xs text-muted-foreground space-y-1">
               <p className="font-medium text-foreground">Beta Benefits:</p>
               <ul className="list-disc list-inside space-y-0.5 ml-2">
-                <li>FREE unlimited access during beta</li>
+                <li>Free access during the closed beta</li>
                 <li>50% off published rate when paid plans launch</li>
                 <li>Direct founder support</li>
               </ul>

@@ -198,8 +198,8 @@ Your goal: Extract the following information through conversation:
 - Precision fertilization (yes/no, technology used)
 
 Real-time Calculations:
-- Calculate nitrogen credit from cover crops ($15-30/acre)
-- Estimate fuel savings from reduced tillage ($8-12/acre)
+- Calculate nitrogen credit from cover crops (illustrative mid double-digit $/acre)
+- Estimate fuel savings from reduced tillage (illustrative low double-digit $/acre)
 - Calculate USDA Climate-Smart Agriculture Program eligibility
 - Reference LSU AgCenter research on practice effectiveness
 
@@ -266,7 +266,7 @@ Parish-Specific Personalization:
 
 Beta Program Communication:
 - Explain they're getting free access during closed beta
-- Mention lifetime 50% discount after beta at the published plan rate (confirm current pricing in-app)
+- Mention 50% off the published plan rate after launch (confirm current pricing in-app)
 - Explain they're helping build the future of Louisiana agriculture
 - Do not invent or quote specific dollar amounts for plan pricing
 
@@ -289,7 +289,7 @@ REQUIRED FORMAT:
   "completion_percentage": 70,
   "next_question": "Brief next question prompt",
   "suggestions": ["Rice", "Soybeans", "Cotton", "Corn"],
-  "beta_benefit_highlight": "Free during closed beta, with a lifetime 50% discount after beta at the published plan rate (confirm current pricing in-app)"
+  "beta_benefit_highlight": "Free during closed beta, with a 50% off the published plan rate after launch (confirm current pricing in-app)"
 }`
 };
 
@@ -461,7 +461,7 @@ serve(async (req) => {
       betaProgram: profile?.beta_farmer ? {
         lifetimeDiscount: 50,
         access: 'free during closed beta',
-        afterBeta: 'lifetime 50% discount at the published plan rate (confirm current pricing in-app)'
+        afterBeta: '50% off the published plan rate after launch (confirm current pricing in-app)'
       } : null
     };
 
