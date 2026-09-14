@@ -33,7 +33,7 @@ import { SkeletonDashboard } from "@/components/ui/skeleton-card";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { EmptyState } from "@/components/ui/empty-state";
-import { toHealthPercent } from '@/lib/health-score';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -634,16 +634,26 @@ export default function Dashboard() {
                       <div className="flex items-center gap-6">
                         <div className="text-right">
                           <p className="text-3xl font-mono font-bold text-primary">
-                            <AnimatedCounter value={Math.round(toHealthPercent(assessment.health_score))} suffix="%" />
+                            {hasHealthScore(assessment.health_score) ? (
+                              <AnimatedCounter value={Math.round(toHealthPercent(assessment.health_score))} suffix="%" />
+                            ) : (
+                              <span aria-label="Health score not available">—</span>
+                            )}
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">Health Score</p>
                         </div>
-                        <AgriculturalBadge
-                          type={assessment.stress_level?.toLowerCase() === 'healthy' ? 'healthy' : assessment.stress_level?.toLowerCase() === 'moderate' ? 'moderate' : 'severe'}
-                          className="text-base px-4 py-2 font-semibold"
-                        >
-                          {assessment.stress_level.charAt(0).toUpperCase() + assessment.stress_level.slice(1)}
-                        </AgriculturalBadge>
+                        {assessment.stress_level ? (
+                          <AgriculturalBadge
+                            type={assessment.stress_level?.toLowerCase() === 'healthy' ? 'healthy' : assessment.stress_level?.toLowerCase() === 'moderate' ? 'moderate' : 'severe'}
+                            className="text-base px-4 py-2 font-semibold"
+                          >
+                            {assessment.stress_level.charAt(0).toUpperCase() + assessment.stress_level.slice(1)}
+                          </AgriculturalBadge>
+                        ) : (
+                          <Badge variant="outline" className="text-base px-4 py-2 font-semibold">
+                            Stress not recorded
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </CardContent>

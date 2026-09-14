@@ -98,7 +98,7 @@ Your goal: Extract the following information through natural conversation:
 Context awareness:
 - If the farmer has existing fields, reference them ("I see you have South Rice Field...")
 - Suggest similar setups based on their farm patterns
-- Use community averages for guidance ("Most Morehouse Parish rice farmers...")
+- Use community averages only when the farmer stated their parish ("Most [parish] rice farmers...") — never invent a parish
 
 CRITICAL JSON FORMAT REQUIREMENTS:
 1. Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
@@ -278,9 +278,9 @@ REQUIRED FORMAT:
   "message": "Your full conversational response that will be shown to the farmer",
   "extracted_data": {
     "farm_name": "value", 
-    "parish": "Morehouse",
-    "field_name": "North Rice Field",
-    "field_crop_type": "rice",
+    "parish": "<farmer-stated parish or omit>",
+    "field_name": "<farmer-stated field name>",
+    "field_crop_type": "<farmer-stated crop>",
     ...
   },
   "completion_percentage": 70,

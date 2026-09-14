@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { TrendingUp, AlertTriangle, DollarSign, Sprout } from "lucide-react";
 import { PredictiveModel } from "@/types/enhanced-features";
-import { toHealthPercent } from '@/lib/health-score';
+import { formatHealthPercent, hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface PredictiveAnalyticsDashboardProps {
   predictions: PredictiveModel[];
@@ -23,7 +23,7 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
   }
 
   const predictionData = latestPrediction.prediction_data;
-  const confidencePercent = toHealthPercent(latestPrediction.confidence_score).toFixed(0);
+  const hasConfidence = hasHealthScore(latestPrediction.confidence_score);
 
   return (
     <div className="space-y-8">
@@ -36,8 +36,13 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
                 30-day forecast based on current field conditions
               </CardDescription>
             </div>
-            <Badge variant={toHealthPercent(latestPrediction.confidence_score) > 75 ? "default" : "secondary"} className="text-sm px-3 py-1 w-fit">
-              {confidencePercent}% confidence
+            <Badge
+              variant={hasConfidence && toHealthPercent(latestPrediction.confidence_score) > 75 ? "default" : "secondary"}
+              className="text-sm px-3 py-1 w-fit"
+            >
+              {hasConfidence
+                ? `${formatHealthPercent(latestPrediction.confidence_score)} confidence`
+                : 'Confidence not available'}
             </Badge>
           </div>
         </CardHeader>

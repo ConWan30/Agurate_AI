@@ -120,6 +120,18 @@ Last updated: 2026-09-14
 - [x] Predictive-question AI prompt omits invented 0% health
 - [x] Daily briefing summary buckets require hasHealthScore
 - [x] analyze-crop prompts do not default location to Morehouse Parish
+- [x] Analytics trends require two scored assessments (null health not treated as 0)
+- [x] Weather timeline omits invented 0% when health score missing
+- [x] Cooperative avg health averages scored assessments only
+- [x] History weather card hidden when temp/precip not recorded
+- [x] Soften residual absolute "Lock in / Keep 50%" beta pricing copy
+- [x] Upload omits invented "Louisiana Delta region" when field GPS missing
+- [x] History EconomicImpact requires finite yield-at-risk (null ≠ +0%)
+- [x] Conversational-form beta discount copy is contingent (not guaranteed)
+- [x] Critical alerts omit USD loss unless yield impact is recorded; UI labeled illustrative
+- [x] ROI requires explicit acres + protection % (no silent 100-acre / 15% defaults)
+- [x] History executive summary does not invent "none" pressure or critical stress from null health
+- [x] Conversational-form insurance prompts fail closed on invented weather events / USD loss
 
 ## Platform gates (external)
 
@@ -134,19 +146,9 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
 ## Evidence expected before production-complete
 
-1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build)
-2. Migration applied confirmation in Supabase (including critical_alerts reconcile through tip)
-3. Live production URL showing honest closed-beta copy
-4. Auth + one authenticated scan path working on production
-- [x] Analytics trends require two scored assessments (null health not treated as 0)
-- [x] Weather timeline omits invented 0% when health score missing
-- [x] Cooperative avg health averages scored assessments only
-- [x] History weather card hidden when temp/precip not recorded
-- [x] Soften residual absolute "Lock in / Keep 50%" beta pricing copy
-- [x] Upload omits invented "Louisiana Delta region" when field GPS missing
-- [x] History EconomicImpact requires finite yield-at-risk (null ≠ +0%)
-- [x] Conversational-form beta discount copy is contingent (not guaranteed)
-- [x] Critical alerts omit USD loss unless yield impact is recorded; UI labeled illustrative
-- [x] ROI requires explicit acres + protection % (no silent 100-acre / 15% defaults)
-- [x] History executive summary does not invent "none" pressure or critical stress from null health
-- [x] Conversational-form insurance prompts fail closed on invented weather events / USD loss
+1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build) — **PASS on tip `273b98b`**
+2. Migration applied confirmation in Supabase through `20260914180000_beta_metrics_require_approved_stories` — **pending credentials**
+3. Live production URL showing honest closed-beta copy — **pending publish**
+4. Auth + one authenticated scan path working on production — **pending publish**
+
+In-repo code gates are complete. Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).

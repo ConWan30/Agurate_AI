@@ -1,7 +1,19 @@
 # Operator platform handoff
 
-In-repo launch readiness is complete on `cursor/launch-readiness-honesty-38b2`.
-**Production-complete requires these external steps** (credentials not available to the coding agent).
+## Status (in-repo vs production-complete)
+
+| Gate | Status | Evidence |
+|------|--------|----------|
+| In-repo honesty, security, quality | **Complete** | Tip `273b98b` on `cursor/launch-readiness-honesty-38b2`; local `npm run verify:local-gates` PASS; GitHub CI `build-and-test` PASS on tip |
+| Apply Supabase migrations through tip | **Blocked** | Needs project DB credentials (`supabase db push` or Dashboard SQL) |
+| Auth Leaked Password Protection | **Blocked** | Needs Supabase Dashboard access |
+| Deploy edge functions | **Blocked** | Needs Supabase CLI linked project + secrets |
+| `DEMO_SETUP_SECRET` policy | **Blocked** | Needs function secrets access |
+| Publish app + live `/health.json` | **Blocked** | Needs Lovable Publish / host credentials |
+| Production smoke | **Blocked** | Needs live production URL |
+
+**Production-complete is not achieved until every row above is evidenced.**  
+The coding agent cannot complete platform rows without service-role / Dashboard / publish credentials.
 
 Verify local gates anytime:
 
@@ -9,10 +21,13 @@ Verify local gates anytime:
 npm run verify:local-gates
 ```
 
+Latest migration in repo: `20260914180000_beta_metrics_require_approved_stories`
+
 ## 1. Apply Supabase migrations
 
-Apply **all** pending migrations through the latest file under `supabase/migrations/`
-(currently includes entitlement locks through `20260914170000`, beta_metrics approved-story sync `20260914180000`; researcher PII revoke is `20260914100000`).
+Apply **all** pending migrations through tip  
+`20260914180000_beta_metrics_require_approved_stories`  
+(includes entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
 
 ```bash
 # Linked project
@@ -21,14 +36,14 @@ supabase db push
 # Or via Dashboard → SQL → run each pending migration in timestamp order
 ```
 
-Evidence: Supabase migration history shows tip migration applied with no errors.
+**Evidence receipt:** paste Supabase migration history showing tip `20260914180000_…` applied with no errors.
 
 ## 2. Enable Auth Leaked Password Protection
 
-Supabase Dashboard → **Authentication** → **Providers / Security** → enable
+Supabase Dashboard → **Authentication** → **Providers / Security** → enable  
 **Leaked password protection** (Have I Been Pwned check).
 
-Evidence: setting shows enabled in the Auth security panel.
+**Evidence receipt:** screenshot or note that the Auth security panel shows Leaked password protection **enabled**.
 
 ## 3. Deploy edge functions
 
@@ -37,8 +52,10 @@ supabase functions deploy
 # Or deploy individually if your workflow prefers per-function deploys
 ```
 
-Ensure function secrets include project URL/anon/service role as already configured
+Ensure function secrets include project URL / anon / service role as already configured
 for this project.
+
+**Evidence receipt:** deploy command output listing functions updated to tip.
 
 ## 4. Demo setup secret
 
@@ -49,10 +66,12 @@ supabase secrets set DEMO_SETUP_SECRET="$(openssl rand -hex 32)"
 # Or leave unset so setup-demo-account stays disabled (fail-closed).
 ```
 
+**Evidence receipt:** note whether secret is set or intentionally left unset.
+
 ## 5. Publish the app
 
 Use Lovable **Publish** (or your production host) so the live URL serves the
-branch/build that includes the honesty + security tip.
+branch/build that includes tip `273b98b` (or a later tip on this branch).
 
 Evidence: production HTML/JS matches tip commit; `/health.json` loads with that commit.
 
@@ -61,6 +80,8 @@ Evidence: production HTML/JS matches tip commit; `/health.json` loads with that 
 curl -sS https://YOUR_PRODUCTION_HOST/health.json
 # Expect: "status":"ok", "stage":"closed-beta", "commit":"<tip sha>"
 ```
+
+**Evidence receipt:** `curl` JSON with `commit` equal to published tip SHA.
 
 ## 6. Production smoke
 
@@ -77,10 +98,12 @@ On the live URL, confirm:
 Also: one authenticated scan/upload path returns a real health score or a clear
 error — never a silent invented score.
 
+**Evidence receipt:** checklist of routes OK + note of authenticated scan result.
+
 ## Done means
 
-- [x] Local gates green (`npm run verify:local-gates` + CI)
-- [ ] Migrations applied through tip
+- [x] Local gates green (`npm run verify:local-gates` + CI) — tip `273b98b`
+- [ ] Migrations applied through `20260914180000_…`
 - [ ] Leaked password protection on
 - [ ] Edge functions deployed + demo secret policy set
 - [ ] App published

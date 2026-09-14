@@ -87,6 +87,8 @@ const FORBIDDEN = [
   { name: 'Beta Lifetime Discount marketing', re: /Beta Lifetime Discount/i },
   { name: 'Lock in 50% off published rate CTA', re: /Lock in 50% off the published plan rate/i },
   { name: 'Predict heat stress 5-7 days claim', re: /Predict heat stress 5-7 days ahead/i },
+  { name: 'LSU AgCenter-aligned advisor claim', re: /LSU AgCenter-aligned/i },
+  { name: 'decades of LSU research access claim', re: /Access to Louisiana State University Agricultural Center's decades of research/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

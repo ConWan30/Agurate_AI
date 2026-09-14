@@ -33,11 +33,14 @@ describe('health-score helpers', () => {
     expect(toHealthPercent(2)).toBe(2);
   });
 
-  it('formats and classifies tones', () => {
+  it('formats and classifies tones without inventing missing scores', () => {
     expect(formatHealthPercent(0.8)).toBe('80%');
+    expect(formatHealthPercent(null)).toBe('—');
+    expect(formatHealthPercent(undefined)).toBe('—');
     expect(healthTone(0.9)).toBe('good');
     expect(healthTone(60)).toBe('moderate');
     expect(healthTone(0.2)).toBe('severe');
+    expect(healthTone(null)).toBe('unknown');
     expect(toHealthFraction(80)).toBe(0.8);
   });
 

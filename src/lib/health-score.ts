@@ -30,17 +30,19 @@ export function toHealthFraction(score: number | null | undefined): number {
   return toHealthPercent(score) / 100;
 }
 
-/** Display helper, e.g. "72%". */
+/** Display helper, e.g. "72%". Missing scores render as an em dash — never invent 0%. */
 export function formatHealthPercent(
   score: number | null | undefined,
   digits = 0
 ): string {
+  if (!hasHealthScore(score)) return '—';
   return `${toHealthPercent(score).toFixed(digits)}%`;
 }
 
 export function healthTone(
   score: number | null | undefined
-): 'good' | 'moderate' | 'severe' {
+): 'good' | 'moderate' | 'severe' | 'unknown' {
+  if (!hasHealthScore(score)) return 'unknown';
   const pct = toHealthPercent(score);
   if (pct >= 75) return 'good';
   if (pct >= 50) return 'moderate';

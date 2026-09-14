@@ -238,7 +238,9 @@ export default function History() {
                         </div>
                        <div className="text-right">
                           <div className="text-3xl font-bold font-mono text-foreground">
-                            {Math.round(toHealthPercent(assessment.health_score))}
+                            {hasHealthScore(assessment.health_score)
+                              ? Math.round(toHealthPercent(assessment.health_score))
+                              : '—'}
                           </div>
                           <p className="text-xs text-muted-foreground">Health Score</p>
                         </div>
@@ -247,9 +249,14 @@ export default function History() {
                      <CardContent>
                       <div className="flex items-center justify-between gap-4">
                         <AgriculturalBadge 
-                          type={assessment.stress_level === "Healthy" ? "healthy" : assessment.stress_level === "Moderate" ? "moderate" : "severe"}
+                          type={
+                            assessment.stress_level === "Healthy" ? "healthy"
+                              : assessment.stress_level === "Moderate" ? "moderate"
+                              : assessment.stress_level === "Severe" ? "severe"
+                              : "moderate"
+                          }
                         >
-                          {assessment.stress_level}
+                          {assessment.stress_level || "Stress not recorded"}
                         </AgriculturalBadge>
                         <Button variant="outline" size="sm" className="focus-ring flex-shrink-0" aria-label={`View details for ${assessment.field.name}`}>
                           View Details
