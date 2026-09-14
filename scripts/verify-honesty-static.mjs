@@ -53,6 +53,10 @@ const FORBIDDEN = [
   { name: 'exponentially smarter claim', re: /exponentially smarter/i },
   { name: 'false email invite delivery claim', re: /They'll receive an email with instructions to join/i },
   { name: 'brokered researcher notification claim', re: /You will be notified when the researcher responds/i },
+  { name: 'false researcher delivery claim', re: /(?:The )?researcher will receive (?:your|the) (?:case|case details)/i },
+  { name: 'every analysis makes smarter claim', re: /Every analysis makes the system smarter/i },
+  { name: 'real-time ROI for every recommendation', re: /(?:real-time|realtime) return on investment for every recommendation/i },
+  { name: 'instant AI-powered analysis claim', re: /Instant AI-powered analysis/i },
   { name: 'contact request implies email sent', re: /Contact request sent(?![^.\n]*(?:no email|recorded only))/i },
 ];
 

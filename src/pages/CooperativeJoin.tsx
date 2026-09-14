@@ -16,6 +16,13 @@ export default function CooperativeJoin() {
   const { code } = useParams();
   const navigate = useNavigate();
   const [manualCode, setManualCode] = useState(code || '');
+  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setSessionEmail(user?.email ?? null);
+    });
+  }, []);
 
   const { data: invitation, isLoading, error } = useQuery({
     queryKey: ['invitation', manualCode],
@@ -50,6 +57,9 @@ export default function CooperativeJoin() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Please log in with the invited email address to accept this invitation');
       if (!invitation) throw new Error('No invitation found');
+      if (user.email && invitation.email && user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+        throw new Error(`Sign in as ${invitation.email} to accept this invitation (currently ${user.email})`);
+      }
 
       // Add user to cooperative
       const { error: memberError } = await supabase
@@ -162,9 +172,17 @@ export default function CooperativeJoin() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="p-4 bg-primary/5 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">You've been invited to join:</p>
+              <div className="p-4 bg-primary/5 rounded-lg space-y-2">
+                <p className="text-sm text-muted-foreground">You've been invited to join:</p>
                 <p className="font-semibold text-lg">{invitation.cooperative?.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  This invite is bound to <span className="font-medium text-foreground">{invitation.email}</span>.
+                  {sessionEmail
+                    ? sessionEmail.toLowerCase() === invitation.email.toLowerCase()
+                      ? ' You are signed in with a matching email.'
+                      : ` You are signed in as ${sessionEmail} — switch accounts to accept.`
+                    : ' Sign in with that email before accepting.'}
+                </p>
               </div>
 
               <div className="space-y-2 text-sm">
@@ -188,7 +206,11 @@ export default function CooperativeJoin() {
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={() => acceptInvitation.mutate()}
-                  disabled={acceptInvitation.isPending}
+                  disabled={
+                    acceptInvitation.isPending
+                    || !sessionEmail
+                    || sessionEmail.toLowerCase() !== invitation.email.toLowerCase()
+                  }
                   className="flex-1 gap-2 focus-ring"
                   aria-label="Accept invitation and join cooperative"
                 >

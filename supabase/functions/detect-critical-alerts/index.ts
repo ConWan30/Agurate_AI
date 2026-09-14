@@ -245,6 +245,7 @@ function generateAlertContent(params: {
 function getCropValuePerAcre(cropType: string): number {
   const values: Record<string, number> = {
     rice: 1387,
+    soybean: 702,
     soybeans: 702,
     cotton: 825,
     corn: 1044,

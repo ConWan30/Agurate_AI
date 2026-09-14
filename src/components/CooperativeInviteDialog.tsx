@@ -145,8 +145,8 @@ export function CooperativeInviteDialog({ cooperativeId, cooperativeName, open, 
             <p className="font-semibold">How it works:</p>
             <ol className="list-decimal list-inside space-y-1 text-xs">
               <li>Enter the farmer's email address and click "Invite"</li>
-              <li>They'll receive an invitation code</li>
-              <li>They can use the code or click the link to join your cooperative</li>
+              <li>Share the invitation code or link with them (no email is sent automatically)</li>
+              <li>They must sign in with the invited email, then use the code or link to join</li>
               <li>Once accepted, they can share their fields with the co-op</li>
             </ol>
           </div>

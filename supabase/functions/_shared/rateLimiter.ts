@@ -137,4 +137,5 @@ export const RATE_LIMITS = {
   'predict-water-stress': { maxRequests: 5, windowMs: 60_000 },
   'compare-images': { maxRequests: 10, windowMs: 60_000 },
   'weather-alerts': { maxRequests: 20, windowMs: 60_000 },
+  'get-usage-stats': { maxRequests: 30, windowMs: 60_000 },
 } as const;

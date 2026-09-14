@@ -43,7 +43,7 @@ export function LSUResearcherContactCard({ researcher, onContact }: LSUResearche
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "Failed to send contact request",
+        description: "Failed to record contact request",
         variant: "destructive",
       });
     }

@@ -12,7 +12,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations (through `20260914100000` researcher PII
+1. Apply pending Supabase migrations (through `20260914110000` researcher PII
    + soybean crop checks, plus view invoker, RLS lock-down, testimonials,
    critical_alerts, secure RPCs, coop auth, peer/expert/coop reconcile,
    crop-images storage)

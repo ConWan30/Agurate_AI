@@ -22,6 +22,7 @@ export function EconomicImpact({
   // Illustrative crop values per acre for decision-aid math (not live market quotes)
   const cropValues: Record<string, number> = {
     rice: 850,
+    soybean: 400,
     soybeans: 400,
     cotton: 750,
     corn: 600

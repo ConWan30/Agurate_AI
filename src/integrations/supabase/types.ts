@@ -2216,6 +2216,18 @@ export type Database = {
         }
         Relationships: []
       }
+      lsu_researchers_directory: {
+        Row: {
+          id: string | null
+          name: string | null
+          department: string | null
+          expertise: string[] | null
+          research_areas: string[] | null
+          availability: string | null
+          created_at: string | null
+        }
+        Relationships: []
+      }
       unacknowledged_critical_alerts: {
         Row: {
           acknowledged: boolean | null
@@ -2290,7 +2302,6 @@ export type Database = {
         Returns: {
           availability: string
           department: string
-          email: string
           expertise: string[]
           id: string
           name: string

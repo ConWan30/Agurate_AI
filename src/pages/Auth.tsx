@@ -226,7 +226,7 @@ export default function Auth() {
               </div>
               <div>
                 <p className="font-semibold">Real-time Crop Assessment</p>
-                <p className="text-sm opacity-75">Instant AI-powered analysis</p>
+                <p className="text-sm opacity-75">Research-framed crop health assessments</p>
               </div>
             </div>
             

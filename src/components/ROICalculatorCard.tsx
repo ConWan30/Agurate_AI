@@ -49,7 +49,8 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
   // Fallback prices (used if market price API fails)
   const fallbackPrices: Record<string, { price: number; unit: string; avgYield: number }> = {
     rice: { price: 18.50, unit: 'cwt', avgYield: 75 }, // $18.50/cwt, 75 cwt/acre
-    soybeans: { price: 13.50, unit: 'bu', avgYield: 52 }, // $13.50/bu, 52 bu/acre
+    soybean: { price: 13.50, unit: 'bu', avgYield: 52 },
+    soybeans: { price: 13.50, unit: 'bu', avgYield: 52 }, // alias
     cotton: { price: 0.75, unit: 'lb', avgYield: 1100 }, // $0.75/lb, 1100 lb/acre
     corn: { price: 5.80, unit: 'bu', avgYield: 180 }, // $5.80/bu, 180 bu/acre
   };
@@ -257,7 +258,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="rice">Rice</SelectItem>
-                    <SelectItem value="soybeans">Soybeans</SelectItem>
+                    <SelectItem value="soybean">Soybeans</SelectItem>
                     <SelectItem value="cotton">Cotton</SelectItem>
                     <SelectItem value="corn">Corn</SelectItem>
                   </SelectContent>

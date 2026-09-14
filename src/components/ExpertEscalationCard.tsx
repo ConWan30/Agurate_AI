@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
-import { GraduationCap, Clock, Mail, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
+import { GraduationCap, Clock, FileText, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface LSUResearcher {
@@ -206,18 +206,18 @@ export function ExpertEscalationCard({
                   {escalating ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Requesting Consultation...
+                      Saving consultation note...
                     </>
                   ) : (
                     <>
-                      <Mail className="h-4 w-4 mr-2" />
-                      Request Expert Consultation
+                      <FileText className="h-4 w-4 mr-2" />
+                      Save Consultation Note
                     </>
                   )}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  The researcher will receive your case details, field history, and AI analysis.
+                  Saves a note in AgurateAI only. It does not email or notify LSU staff — use public AgCenter channels for follow-up.
                 </p>
               </>
             )}

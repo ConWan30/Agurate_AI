@@ -49,8 +49,8 @@ export default function HowItWorks() {
     {
       icon: Layers,
       title: 'Continuous Learning',
-      description: 'Every analysis makes the system smarter—building variety-specific disease libraries, weather correlation patterns, and conservation effectiveness data',
-      tech: 'Self-Improving Intelligence',
+      description: 'Analyses are stored for your fields so patterns over time can inform later recommendations—variety notes, weather context, and conservation observations',
+      tech: 'Field History Context',
       color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
     }
   ];
@@ -98,8 +98,8 @@ export default function HowItWorks() {
     {
       icon: DollarSign,
       title: 'Automated ROI Calculator',
-      description: 'AI calculates real-time return on investment for every recommendation, factoring in treatment costs, yield protection, and market prices',
-      benefit: 'Cost/benefit estimates',
+      description: 'Optional planning calculator estimates treatment costs vs. illustrative yield protection using placeholder or last-known market figures—not live brokerage quotes',
+      benefit: 'Planning estimates',
       color: 'bg-health-good/10 text-health-good border-health-good/20'
     },
     {

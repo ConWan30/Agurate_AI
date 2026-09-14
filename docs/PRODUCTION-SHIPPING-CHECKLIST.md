@@ -52,10 +52,13 @@ Last updated: 2026-09-14
 - [x] Daily briefing uses `location_lat` / `location_lng`
 - [x] Soften false invite-email / researcher-notification delivery claims
 - [x] `verify_jwt=true` for get-market-prices / generate-daily-briefing / generate-predictive-questions
+- [x] Case-insensitive cooperative invitation SELECT + join email-binding UX
+- [x] get-usage-stats fail-closed rate limit
+- [x] Soften expert-escalation “researcher will receive” delivery claim
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (through `20260914100000` researcher PII + crop checks, plus prior RLS/RPC/storage)
+- [ ] Apply pending Supabase migrations (through `20260914110000` researcher PII + crop checks, plus prior RLS/RPC/storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
