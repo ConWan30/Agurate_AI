@@ -116,6 +116,17 @@ const required = [
       'assessments_field_uniformity_score_check',
     ],
   },
+  {
+    id: '20260914290000_lock_yield_feedback_event_bug_acreage',
+    needles: [
+      'assessments_estimated_yield_impact_percent_check',
+      'assessments_canopy_coverage_percent_check',
+      'Users can insert own feedback',
+      'insurance_claims_event_type_check',
+      'protect_bug_report_status',
+      'fields_acreage_check',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -136,11 +147,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091428') &&
-  tip < '20260914280000_lock_claim_loss_priority_form_complete'
+  !tip.startsWith('2026091429') &&
+  tip < '20260914290000_lock_yield_feedback_event_bug_acreage'
 ) {
   fail(
-    `tip migration ${tip} should include claim-loss / priority / form-complete invent lock (20260914280000+)`
+    `tip migration ${tip} should include yield/feedback/event/bug/acreage invent lock (20260914290000+)`
   );
 }
 

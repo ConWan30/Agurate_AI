@@ -20,7 +20,7 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
       - name: Lint
-        run: npm run lint -- --max-warnings=9999
+        run: npm run lint -- --max-warnings=110
       - name: Unit tests
         run: npm run test:ci
         env:

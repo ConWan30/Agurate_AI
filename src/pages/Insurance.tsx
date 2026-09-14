@@ -22,6 +22,7 @@ import { Sparkles } from "lucide-react";
 import TutorialTooltip from '@/components/TutorialTooltip';
 import { formatHealthPercent, hasHealthScore } from '@/lib/health-score';
 import { parseLossPercentage, requireLossPercentage } from '@/lib/loss-percentage';
+import { validateExtractedData } from '@/lib/conversational-form-validation';
 
 export default function Insurance() {
   const [open, setOpen] = useState(false);
@@ -66,12 +67,19 @@ export default function Insurance() {
         rawLoss === null || rawLoss === ''
           ? null
           : requireLossPercentage(rawLoss);
+      const validated = validateExtractedData('insurance-claim', {
+        field_id: formData.get('field_id'),
+        event_type: formData.get('event_type'),
+        event_date: formData.get('event_date'),
+        description: formData.get('description') || 'Claim filed via form',
+        estimated_loss_percentage: estimated_loss_percentage ?? undefined,
+      });
       const { error } = await supabase.from('insurance_claims').insert([{
-        field_id: formData.get('field_id') as string,
-        event_type: formData.get('event_type') as string,
-        event_date: formData.get('event_date') as string,
-        estimated_loss_percentage,
-        description: formData.get('description') as string,
+        field_id: validated.field_id,
+        event_type: validated.event_type,
+        event_date: validated.event_date,
+        estimated_loss_percentage: validated.estimated_loss_percentage ?? null,
+        description: validated.description,
         status: 'draft'
       }]);
       if (error) throw error;
@@ -145,12 +153,19 @@ export default function Insurance() {
       ) {
         throw new Error('Estimated loss must be a number between 0 and 100');
       }
-      const { error } = await supabase.from('insurance_claims').insert([{
+      const validated = validateExtractedData('insurance-claim', {
         field_id: extractedData.fieldId || extractedData.field_id,
         event_type: extractedData.eventType || extractedData.event_type,
         event_date: extractedData.eventDate || extractedData.event_date,
-        estimated_loss_percentage,
         description: extractedData.description,
+        estimated_loss_percentage: estimated_loss_percentage ?? undefined,
+      });
+      const { error } = await supabase.from('insurance_claims').insert([{
+        field_id: validated.field_id,
+        event_type: validated.event_type,
+        event_date: validated.event_date,
+        estimated_loss_percentage: validated.estimated_loss_percentage ?? null,
+        description: validated.description,
         status: 'draft'
       }]);
       if (error) throw error;

@@ -86,6 +86,14 @@ function toUniformityFraction(score: unknown): number | null {
   return null;
 }
 
+/** Yield/canopy percents are 0–100. Reject invent outside range (do not clamp). */
+function toPercentScore(score: unknown): number | null {
+  if (!hasHealthScore(score)) return null;
+  const n = Number(score);
+  if (n < 0 || n > 100) return null;
+  return Math.round(n * 10) / 10;
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -598,8 +606,8 @@ Respond with JSON:
       nutrient_deficiencies: imageAnalysis.nutrient_deficiencies,
       severity_ratings: imageAnalysis.severity_ratings,
       field_uniformity_score: toUniformityFraction(imageAnalysis.field_uniformity_score),
-      estimated_yield_impact_percent: imageAnalysis.estimated_yield_impact_percent,
-      canopy_coverage_percent: imageAnalysis.canopy_coverage_percent,
+      estimated_yield_impact_percent: toPercentScore(imageAnalysis.estimated_yield_impact_percent),
+      canopy_coverage_percent: toPercentScore(imageAnalysis.canopy_coverage_percent),
       plant_density_assessment: imageAnalysis.plant_density_assessment,
       root_health_indicators: imageAnalysis.root_health_indicators,
       detailed_visual_analysis: imageAnalysis.detailed_visual_analysis,
@@ -642,8 +650,8 @@ Respond with JSON:
           nutrient_deficiencies: imageAnalysis.nutrient_deficiencies ?? null,
           severity_ratings: imageAnalysis.severity_ratings ?? null,
           field_uniformity_score: toUniformityFraction(imageAnalysis.field_uniformity_score),
-          estimated_yield_impact_percent: imageAnalysis.estimated_yield_impact_percent ?? null,
-          canopy_coverage_percent: imageAnalysis.canopy_coverage_percent ?? null,
+          estimated_yield_impact_percent: toPercentScore(imageAnalysis.estimated_yield_impact_percent),
+          canopy_coverage_percent: toPercentScore(imageAnalysis.canopy_coverage_percent),
           plant_density_assessment: imageAnalysis.plant_density_assessment ?? null,
           root_health_indicators: imageAnalysis.root_health_indicators ?? null,
           detailed_visual_analysis: imageAnalysis.detailed_visual_analysis ?? null,

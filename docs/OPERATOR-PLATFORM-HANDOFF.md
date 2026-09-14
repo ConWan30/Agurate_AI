@@ -36,7 +36,7 @@ supabase db push
 # Or via Dashboard → SQL → run each pending migration in timestamp order
 ```
 
-**Evidence receipt:** paste Supabase migration history showing tip `20260914280000_…` applied with no errors.
+**Evidence receipt:** paste Supabase migration history showing tip `20260914290000_…` applied with no errors.
 
 ## 2. Enable Auth Leaked Password Protection
 

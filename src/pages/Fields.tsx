@@ -23,6 +23,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalForm";
 import { Sparkles } from "lucide-react";
 import { VarietyRecommendationCard } from "@/components/VarietyRecommendationCard";
+import { validateExtractedData } from "@/lib/conversational-form-validation";
 import { VarietyRecommendation } from "@/types/enhanced-features";
 import { useQuery } from "@tanstack/react-query";
 
@@ -144,11 +145,16 @@ export default function Fields() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      const acreage = Number(formData.acreage);
+      if (!Number.isFinite(acreage) || acreage < 0) {
+        throw new Error('Acreage must be a number greater than or equal to 0');
+      }
+
       const fieldData = {
         user_id: user.id,
         name: formData.name,
         crop_type: formData.crop_type,
-        acreage: parseFloat(formData.acreage),
+        acreage,
         location_lat: formData.location_lat ? parseFloat(formData.location_lat) : null,
         location_lng: formData.location_lng ? parseFloat(formData.location_lng) : null,
         notes: formData.notes || null,
@@ -208,7 +214,7 @@ export default function Fields() {
     setFormData({
       name: field.name,
       crop_type: field.crop_type,
-      acreage: field.acreage.toString(),
+      acreage: field.acreage != null ? String(field.acreage) : "",
       location_lat: field.location_lat?.toString() || "",
       location_lng: field.location_lng?.toString() || "",
       notes: field.notes || "",
@@ -251,29 +257,34 @@ export default function Fields() {
       // Map the extracted data to field schema (DB CHECK expects singular soybean)
       const rawCrop = String(extractedData.crop_type || extractedData.cropType || '');
       const cropType = rawCrop === 'soybeans' ? 'soybean' : rawCrop;
+      const acreage = Number(extractedData.acreage);
+      const location_lat = extractedData.location_lat != null
+        ? Number(extractedData.location_lat)
+        : undefined;
+      const location_lng = extractedData.location_lng != null
+        ? Number(extractedData.location_lng)
+        : undefined;
+
+      const validated = validateExtractedData('field-registration', {
+        name: extractedData.name || extractedData.fieldName,
+        crop_type: cropType,
+        acreage,
+        location_lat: Number.isFinite(location_lat as number) ? location_lat : undefined,
+        location_lng: Number.isFinite(location_lng as number) ? location_lng : undefined,
+        notes: extractedData.notes ? String(extractedData.notes) : undefined,
+      });
 
       const fieldData = {
         user_id: user.id,
-        name: extractedData.name || extractedData.fieldName,
-        crop_type: cropType,
-        acreage: parseFloat(String(extractedData.acreage)),
-        location_lat: extractedData.location_lat ? parseFloat(String(extractedData.location_lat)) : null,
-        location_lng: extractedData.location_lng ? parseFloat(String(extractedData.location_lng)) : null,
-        notes: extractedData.notes ? String(extractedData.notes) : null,
+        name: validated.name,
+        crop_type: validated.crop_type,
+        acreage: validated.acreage,
+        location_lat: validated.location_lat ?? null,
+        location_lng: validated.location_lng ?? null,
+        notes: validated.notes ?? null,
       };
 
       if (import.meta.env.DEV) console.log('💾 Inserting field with data:', fieldData);
-
-      // Validate required fields
-      if (!fieldData.name) {
-        throw new Error("Field name is required");
-      }
-      if (!fieldData.crop_type) {
-        throw new Error("Crop type is required");
-      }
-      if (!fieldData.acreage || isNaN(fieldData.acreage)) {
-        throw new Error("Valid acreage is required");
-      }
 
       const { data: insertedField, error } = await supabase
         .from("fields")
