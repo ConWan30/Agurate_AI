@@ -21,6 +21,7 @@ export function WeatherAlerts() {
   const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const [locationReady, setLocationReady] = useState(true);
 
   useEffect(() => {
     checkWeatherAlerts();
@@ -33,9 +34,27 @@ export function WeatherAlerts() {
   const checkWeatherAlerts = async () => {
     setLoading(true);
     try {
-      // Default to Morehouse Parish, LA coordinates
-      const latitude = 32.73;
-      const longitude = -91.76;
+      // Use a field with real coordinates — never invent parish defaults
+      const { data: fields, error: fieldsError } = await supabase
+        .from("fields")
+        .select("location_lat, location_lng")
+        .not("location_lat", "is", null)
+        .not("location_lng", "is", null)
+        .limit(1);
+
+      if (fieldsError) throw fieldsError;
+
+      const field = fields?.[0];
+      if (!field?.location_lat || !field?.location_lng) {
+        setAlerts([]);
+        setLocationReady(false);
+        setLastChecked(new Date());
+        return;
+      }
+
+      setLocationReady(true);
+      const latitude = Number(field.location_lat);
+      const longitude = Number(field.location_lng);
 
       const { data, error } = await supabase.functions.invoke("weather-alerts", {
         body: { latitude, longitude }
@@ -110,9 +129,13 @@ export function WeatherAlerts() {
             <div className="flex items-center justify-center h-16 w-16 rounded-full bg-success/10 mx-auto mb-4">
               <Bell className="h-8 w-8 text-success" />
             </div>
-            <p className="text-muted-foreground">No active weather alerts</p>
+            <p className="text-muted-foreground">
+              {locationReady ? "No active weather alerts" : "Weather alerts need a field location"}
+            </p>
             <p className="text-sm text-muted-foreground mt-1">
-              All clear in your area
+              {locationReady
+                ? "No active alerts for your field coordinates"
+                : "Add GPS coordinates to a field to enable location-based alerts"}
             </p>
           </div>
           <div className="flex items-center justify-between pt-4 border-t border-border">

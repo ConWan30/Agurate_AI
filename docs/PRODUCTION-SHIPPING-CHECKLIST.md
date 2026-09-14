@@ -115,6 +115,11 @@ Last updated: 2026-09-14
 - [x] Daily briefing omits spray/weather guidance when weather inputs are missing
 - [x] ROI calculator requires user yield + protection assumptions (no silent defaults in math)
 - [x] Soften residual "locked in / keep 50%" beta marketing to contingent language
+- [x] Weather alerts use field GPS only (no Morehouse hardcode)
+- [x] Beta signup leaves new field coordinates null until farmer sets them
+- [x] Predictive-question AI prompt omits invented 0% health
+- [x] Daily briefing summary buckets require hasHealthScore
+- [x] analyze-crop prompts do not default location to Morehouse Parish
 
 ## Platform gates (external)
 

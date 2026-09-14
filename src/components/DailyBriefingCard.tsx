@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Sunrise, TrendingUp, AlertTriangle, CheckCircle2, Droplets, Thermometer, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { toHealthPercent } from '@/lib/health-score';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface BriefingData {
   date: string;
@@ -109,13 +109,15 @@ export function DailyBriefingCard() {
 
       // Calculate field summary
       const healthyCount = fieldAssessments.filter(f => 
-        f.latestAssessment && toHealthPercent(f.latestAssessment.health_score) >= 75
+        f.latestAssessment && hasHealthScore(f.latestAssessment.health_score) && toHealthPercent(f.latestAssessment.health_score) >= 75
       ).length;
       const needingAttentionCount = fieldAssessments.filter(f => 
-        f.latestAssessment && toHealthPercent(f.latestAssessment.health_score) >= 50 && toHealthPercent(f.latestAssessment.health_score) < 75
+        f.latestAssessment && hasHealthScore(f.latestAssessment.health_score)
+          && toHealthPercent(f.latestAssessment.health_score) >= 50
+          && toHealthPercent(f.latestAssessment.health_score) < 75
       ).length;
       const criticalCount = fieldAssessments.filter(f => 
-        f.latestAssessment && toHealthPercent(f.latestAssessment.health_score) < 50
+        f.latestAssessment && hasHealthScore(f.latestAssessment.health_score) && toHealthPercent(f.latestAssessment.health_score) < 50
       ).length;
 
       // Map AI priorities — require model-provided fields (no invented issue/action copy)

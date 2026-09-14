@@ -186,8 +186,9 @@ serve(async (req) => {
             name: formData.farm_name || 'Main Field',
             crop_type: cropType,
             acreage: formData.acreage,
-            location_lat: 32.73,
-            location_lng: -91.76,
+            // Leave coordinates unset — farmer must set real GPS (never invent parish center)
+            location_lat: null,
+            location_lng: null,
           });
 
         if (fieldError) {

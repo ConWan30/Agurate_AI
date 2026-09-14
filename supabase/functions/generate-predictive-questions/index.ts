@@ -52,14 +52,19 @@ serve(async (req) => {
     let contextPrompt = 'You are Delta Intelligence, an AI assistant for Louisiana Delta farmers.\n\n';
     
     if (fieldContext?.recentAssessment) {
-      const healthScore = toHealthPercent(fieldContext.healthScore);
       const cropType = fieldContext.cropType || 'crops';
-      const stressLevel = fieldContext.stressLevel || 'unknown';
       
       contextPrompt += `FIELD STATUS:\n`;
       contextPrompt += `- Crop Type: ${cropType}\n`;
-      contextPrompt += `- Health Score: ${healthScore.toFixed(0)}%\n`;
-      contextPrompt += `- Stress Level: ${stressLevel}\n`;
+      if (hasHealthScore(fieldContext.healthScore)) {
+        const healthScore = toHealthPercent(fieldContext.healthScore);
+        contextPrompt += `- Health Score: ${healthScore.toFixed(0)}%\n`;
+        if (fieldContext.stressLevel) {
+          contextPrompt += `- Stress Level: ${fieldContext.stressLevel}\n`;
+        }
+      } else {
+        contextPrompt += `- Health Score: not available — do not invent health, stress, or urgency\n`;
+      }
       
       if (fieldContext.symptoms && fieldContext.symptoms.length > 0) {
         contextPrompt += `- Symptoms: ${fieldContext.symptoms.join(', ')}\n`;

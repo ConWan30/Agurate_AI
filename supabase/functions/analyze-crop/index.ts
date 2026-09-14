@@ -411,7 +411,7 @@ Respond with JSON:
         messages: [
           {
             role: 'system',
-            content: `You are an LSU AgCenter-aligned agricultural advisor for Morehouse Parish, Louisiana.
+            content: `You are an LSU AgCenter-aligned agricultural advisor for Louisiana Delta farmers. Use the provided field location when present; if location is unknown, do not invent a parish.
 
 Generate actionable recommendations using LSU AgCenter best practices for Louisiana Delta farmers.
 
@@ -440,7 +440,7 @@ Respond ONLY in JSON format.`
           },
           {
             role: 'user',
-            content: `Generate recommendations for this ${cropType} field in ${location || 'Morehouse Parish, Louisiana'}:
+            content: `Generate recommendations for this ${cropType} field${location ? ` in ${location}` : ' (location unknown — do not invent a parish)'}:
 
 **FIELD ANALYSIS:**
 - Stress Score: ${imageAnalysis.stress_score.toFixed(2)}/1.0
