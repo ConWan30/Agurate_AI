@@ -162,17 +162,29 @@ export default function Fields() {
       };
 
       if (editingField) {
-        const { error } = await supabase
+        const { data: updated, error } = await supabase
           .from("fields")
           .update(fieldData)
-          .eq("id", editingField.id);
+          .eq("id", editingField.id)
+          .select("id")
+          .maybeSingle();
 
         if (error) throw error;
+        if (!updated) {
+          throw new Error("Field was not updated (no matching row or update not permitted)");
+        }
         toast({ title: "Field updated successfully" });
       } else {
-        const { error } = await supabase.from("fields").insert(fieldData);
+        const { data: inserted, error } = await supabase
+          .from("fields")
+          .insert(fieldData)
+          .select("id")
+          .maybeSingle();
 
         if (error) throw error;
+        if (!inserted) {
+          throw new Error("Field was not created (insert returned no row)");
+        }
         toast({ title: "Field added successfully" });
       }
 
@@ -195,9 +207,16 @@ export default function Fields() {
     if (!confirm("Are you sure you want to delete this field?")) return;
 
     try {
-      const { error } = await supabase.from("fields").delete().eq("id", id);
+      const { data: deleted, error } = await supabase
+        .from("fields")
+        .delete()
+        .eq("id", id)
+        .select("id");
 
       if (error) throw error;
+      if (!deleted?.length) {
+        throw new Error("Field was not deleted (no matching row or delete not permitted)");
+      }
       toast({ title: "Field deleted successfully" });
       fetchFields();
     } catch (error: unknown) {
@@ -471,11 +490,14 @@ export default function Fields() {
                       <span className="text-muted-foreground">Acreage:</span>
                       <span className="font-mono font-medium">{formatAcreage(field.acreage)}</span>
                     </div>
-                    {field.location_lat && field.location_lng && (
+                    {field.location_lat != null &&
+                      field.location_lng != null &&
+                      Number.isFinite(Number(field.location_lat)) &&
+                      Number.isFinite(Number(field.location_lng)) && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
                         <span className="font-mono font-medium text-xs">
-                          {field.location_lat != null && field.location_lng != null ? `${Number(field.location_lat).toFixed(4)}, ${Number(field.location_lng).toFixed(4)}` : 'Location not set'}
+                          {`${Number(field.location_lat).toFixed(4)}, ${Number(field.location_lng).toFixed(4)}`}
                         </span>
                       </div>
                     )}

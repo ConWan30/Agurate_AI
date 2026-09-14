@@ -1,3 +1,8 @@
+---
+note: Archived historical planning docs. Not live product truth. AgurateAI is not an official LSU partner; do not treat accuracy or partnership claims here as current.
+archived: 2026-09-14
+---
+
 # AgurateAI - Comprehensive UI/UX Audit Results
 ## Date: October 30, 2025
 ## Status: ✅ PRODUCTION READY FOR LSU AGCENTER PARTNERSHIP

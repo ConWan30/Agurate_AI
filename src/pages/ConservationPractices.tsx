@@ -121,14 +121,19 @@ export default function ConservationPractices() {
         ? `${priorNotes}\n\n${practicesBlock}`
         : practicesBlock;
 
-      const { error } = await supabase
+      const { data: updated, error } = await supabase
         .from('fields')
         .update({
           notes: mergedNotes,
         })
-        .eq('id', extractedData.field_id);
+        .eq('id', extractedData.field_id)
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!updated) {
+        throw new Error('Conservation notes were not saved (no matching field or update not permitted)');
+      }
 
       toast.success('Conservation practices appended to field notes (not a compliance filing).');
       setConversationalOpen(false);

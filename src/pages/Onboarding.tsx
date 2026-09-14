@@ -67,7 +67,7 @@ export default function Onboarding() {
       if (import.meta.env.DEV) console.log('🎯 Onboarding data extracted:', extractedData);
 
       // Update profile
-      const { error: profileError } = await supabase
+      const { data: updatedProfile, error: profileError } = await supabase
         .from('profiles')
         .update({
           farm_name: extractedData.farm_name,
@@ -80,9 +80,14 @@ export default function Onboarding() {
           onboarding_completed_at: new Date().toISOString(),
           // beta_farmer / lifetime_discount are set by beta-signup (service role), not the client
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select('id')
+        .maybeSingle();
 
       if (profileError) throw profileError;
+      if (!updatedProfile) {
+        throw new Error('Profile was not updated (no matching row or update not permitted)');
+      }
 
       // ✅ CREATE FIRST FIELD AUTOMATICALLY if field data was collected
       // Check if the conversational form extracted field information
@@ -116,9 +121,19 @@ export default function Onboarding() {
             : {}),
         };
 
-        // Add optional field data
-          if (extractedData.field_location_lat) fieldData.location_lat = parseFloat(String(extractedData.field_location_lat));
-        if (extractedData.field_location_lng) fieldData.location_lng = parseFloat(String(extractedData.field_location_lng));
+        // Add optional field data — preserve recorded 0 coords (do not treat as missing).
+        if (
+          extractedData.field_location_lat != null &&
+          Number.isFinite(Number(extractedData.field_location_lat))
+        ) {
+          fieldData.location_lat = Number(extractedData.field_location_lat);
+        }
+        if (
+          extractedData.field_location_lng != null &&
+          Number.isFinite(Number(extractedData.field_location_lng))
+        ) {
+          fieldData.location_lng = Number(extractedData.field_location_lng);
+        }
         if (extractedData.field_notes) fieldData.notes = String(extractedData.field_notes);
         
         // Add variety based on crop type
@@ -296,13 +311,20 @@ export default function Onboarding() {
               const { data: { user } } = await supabase.auth.getUser();
               if (!user) throw new Error('Not authenticated');
 
-              await supabase
+              const { data: updated, error } = await supabase
                 .from('profiles')
                 .update({
                   onboarding_completed: true,
                   onboarding_completed_at: new Date().toISOString()
                 })
-                .eq('id', user.id);
+                .eq('id', user.id)
+                .select('id')
+                .maybeSingle();
+
+              if (error) throw error;
+              if (!updated) {
+                throw new Error('Onboarding was not marked complete (no matching row or update not permitted)');
+              }
 
               toast.success('🎉 Welcome to AgurateAI!');
               setTimeout(() => navigate('/dashboard'), 1500);

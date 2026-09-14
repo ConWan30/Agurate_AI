@@ -265,7 +265,8 @@ export function CooperativeAlertsManager() {
           <CardContent className="space-y-3">
             <p className="text-sm leading-relaxed">{alert.message}</p>
             
-            {alert.affected_area_acres && (
+            {alert.affected_area_acres != null &&
+              Number.isFinite(Number(alert.affected_area_acres)) && (
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Affected: {alert.affected_area_acres} acres</span>

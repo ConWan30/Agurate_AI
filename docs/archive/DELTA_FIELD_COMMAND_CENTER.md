@@ -1,3 +1,8 @@
+---
+note: Archived historical design notes. Not live schema or RLS policy. Shared weather_events must not store farm GPS; AgurateAI is not an official LSU partner.
+archived: 2026-09-14
+---
+
 # Delta Field Command Center - Feature Implementation Guide
 
 **COPY THIS ENTIRE PROMPT INTO LOVABLE TO ADD TIER 1 FEATURES**

@@ -51,7 +51,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
           });
           return;
         }
-        const { error } = await supabase
+        const { data: saved, error } = await supabase
           .from('profiles')
           .update({
             farm_name: farmName,
@@ -59,13 +59,23 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
             total_acreage: acreageRaw,
             primary_crops: primaryCrops,
           })
-          .eq('id', user.id);
+          .eq('id', user.id)
+          .select('id')
+          .maybeSingle();
 
         if (error) {
           toast({
             variant: "destructive",
             title: "Error saving profile",
             description: error.message,
+          });
+          return;
+        }
+        if (!saved) {
+          toast({
+            variant: "destructive",
+            title: "Error saving profile",
+            description: "Profile was not updated (no matching row or update not permitted).",
           });
           return;
         }
@@ -82,20 +92,30 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   const completeOnboarding = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { error } = await supabase
+      const { data: completed, error } = await supabase
         .from('profiles')
         .update({
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
           // Entitlements (beta_farmer / lifetime_discount) are server-owned — set at beta-signup.
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select('id')
+        .maybeSingle();
 
       if (error) {
         toast({
           variant: "destructive",
           title: "Error completing onboarding",
           description: error.message,
+        });
+        return;
+      }
+      if (!completed) {
+        toast({
+          variant: "destructive",
+          title: "Error completing onboarding",
+          description: "Onboarding was not marked complete (no matching row or update not permitted).",
         });
         return;
       }
@@ -111,13 +131,23 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   const handleSkip = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      await supabase
+      const { data: skipped, error } = await supabase
         .from('profiles')
         .update({
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select('id')
+        .maybeSingle();
+      if (error || !skipped) {
+        toast({
+          variant: "destructive",
+          title: "Could not skip onboarding",
+          description: error?.message || "Profile was not updated.",
+        });
+        return;
+      }
     }
     onSkip();
   };

@@ -170,9 +170,13 @@ export default function Upload() {
       const field = fields.find((f) => f.id === selectedField);
       if (!field) throw new Error("Field not found");
       
-      const fieldLocation = field.location_lat && field.location_lng 
-        ? `${field.location_lat}, ${field.location_lng}`
-        : undefined;
+      const fieldLocation =
+        field.location_lat != null &&
+        field.location_lng != null &&
+        Number.isFinite(Number(field.location_lat)) &&
+        Number.isFinite(Number(field.location_lng))
+          ? `${field.location_lat}, ${field.location_lng}`
+          : undefined;
 
       // Track analytics
       const { analytics } = await import('@/lib/analytics');

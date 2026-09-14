@@ -54,7 +54,11 @@ export default function FieldMap() {
       .order('created_at', { ascending: false });
 
     const validFields = (fieldsData || []).filter(
-      f => f.location_lat && f.location_lng
+      (f) =>
+        f.location_lat != null &&
+        f.location_lng != null &&
+        Number.isFinite(Number(f.location_lat)) &&
+        Number.isFinite(Number(f.location_lng))
     );
 
     // Fetch latest assessment for each field
