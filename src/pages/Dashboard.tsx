@@ -280,7 +280,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Predictive Analytics</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    7-14 day comprehensive forecasts
+                    Optional 7–14 day planning outlooks when data exists — not guarantees
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>

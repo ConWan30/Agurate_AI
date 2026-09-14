@@ -276,7 +276,7 @@ export default function Insurance() {
                 <div className="p-3 bg-background rounded-lg">
                   <div className="font-semibold text-primary mb-1">2. Link AI Data</div>
                   <p className="text-muted-foreground">
-                    AI assessments from the same field are automatically available as evidence
+                    You can link field assessments from the same field as claim evidence
                   </p>
                 </div>
                 <div className="p-3 bg-background rounded-lg">

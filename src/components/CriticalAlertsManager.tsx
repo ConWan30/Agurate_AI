@@ -139,7 +139,7 @@ export function CriticalAlertsManager() {
             🚨 {criticalAlerts.length} Critical Alert{criticalAlerts.length > 1 ? 's' : ''} Requiring Immediate Action
           </AlertTitle>
           <AlertDescription>
-            These alerts have been escalated and may require SMS or voice call notification.
+            These alerts appear in-app. SMS/voice delivery is not enabled in this build.
           </AlertDescription>
         </Alert>
       )}

@@ -206,6 +206,12 @@ Return JSON with: current_impact, predicted_impact_1_year, predicted_impact_5_ye
       predictionData[field] = value;
     }
 
+    const confidenceScore = Number(predictionData.confidence_score);
+    if (!Number.isFinite(confidenceScore) || confidenceScore < 0 || confidenceScore > 1) {
+      throw new Error('Conservation prediction confidence_score must be a finite 0–1 value');
+    }
+    predictionData.confidence_score = confidenceScore;
+
     // Save to database (use regular client, RLS allows user to insert their own data)
     const { data, error } = await supabase
       .from('conservation_predictions')

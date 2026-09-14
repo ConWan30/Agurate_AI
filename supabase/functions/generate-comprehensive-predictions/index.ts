@@ -110,7 +110,7 @@ HONESTY RULES:
 
 Generate planning forecasts for next 30 days:
 1. yield_outlook: relative planning index 0–100 (not bushels)
-2. disease_risk: outbreak risk index 0–1
+2. disease_risk: outbreak risk index 0–100
 3. weather_impact: qualitative stress note or null
 4. recommendations: actionable monitoring/treatment questions (no invented $/acre rates)
 5. confidence_score: 0–1 based on data quality
@@ -165,6 +165,17 @@ Do NOT include economic_forecast, yield_prediction bushels, or currency fields.`
     }
     safePrediction.yield_outlook = yieldOutlook;
 
+    const diseaseRisk = Number(safePrediction.disease_risk);
+    if (!Number.isFinite(diseaseRisk) || diseaseRisk < 0 || diseaseRisk > 100) {
+      throw new Error('Comprehensive prediction disease_risk must be a 0–100 planning index');
+    }
+    safePrediction.disease_risk = diseaseRisk;
+
+    const confidenceScore = Number(predictionData.confidence_score);
+    if (!Number.isFinite(confidenceScore) || confidenceScore < 0 || confidenceScore > 1) {
+      throw new Error('Comprehensive prediction confidence_score must be a finite 0–1 value');
+    }
+
     // Save predictive model
     const { data, error } = await supabase
       .from('predictive_models')
@@ -172,7 +183,7 @@ Do NOT include economic_forecast, yield_prediction bushels, or currency fields.`
         model_type: 'comprehensive',
         field_id: fieldId,
         prediction_horizon: 30,
-        confidence_score: toHealthPercent(predictionData.confidence_score),
+        confidence_score: toHealthPercent(confidenceScore),
         prediction_data: safePrediction,
         lsu_validation: false,
       })

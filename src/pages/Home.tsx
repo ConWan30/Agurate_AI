@@ -428,7 +428,7 @@ export default function Home() {
                 <div className="flex items-center justify-center h-16 w-16 rounded-2xl gradient-harvest shadow-glow mx-auto mb-4">
                   <GraduationCap className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">LSU Research Integration</h3>
+                <h3 className="text-xl font-bold mb-2">LSU research framing</h3>
                 <p className="text-sm text-muted-foreground">
                   Recommendations are research-informed for Louisiana Delta conditions. We do not claim scientific validation or an official LSU partnership.
                 </p>

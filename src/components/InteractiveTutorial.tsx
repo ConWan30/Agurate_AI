@@ -220,7 +220,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
         <div className="space-y-4">
           <p className="text-muted-foreground leading-relaxed">
             James taps "Predictions." The AI combines his field history, current assessment, and 
-            weather forecasts to predict stress levels for the next 7 days.
+            weather forecasts to generate optional stress planning outlooks for the next 7 days when enough field history exists — not a guaranteed forecast.
           </p>
 
           <div className="space-y-2">
@@ -260,7 +260,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </Card>
 
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">🎯 LSU Research Integration:</p>
+            <p className="text-sm font-medium mb-2">🎯 LSU research framing:</p>
             <p className="text-sm text-muted-foreground">
               AI framed around public LSU research patterns: <span className="font-bold">Soybeans + potassium deficiency + 
               Louisiana heat = elevated yield-loss risk.</span> Farmers act before damage is visible.

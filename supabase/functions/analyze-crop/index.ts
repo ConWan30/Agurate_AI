@@ -181,7 +181,16 @@ ${assessmentHistory && assessmentHistory.length > 0
 
 🌱 ACTIVE CONSERVATION PRACTICES:
 ${conservationData && conservationData.length > 0 
-  ? conservationData.map((c: any) => `- ${c.practice_type}: Current Impact ${(c.current_impact * 100).toFixed(0)}%, Confidence ${(c.confidence_score * 100).toFixed(0)}%`).join('\n')
+  ? conservationData.map((c: any) => {
+      const impact = Number(c.current_impact);
+      const confidence = Number(c.confidence_score);
+      // current_impact is already a 0–100 planning index; confidence_score is 0–1
+      const impactLabel = Number.isFinite(impact) ? `${impact.toFixed(0)}/100 planning index` : 'not recorded';
+      const confidenceLabel = Number.isFinite(confidence)
+        ? `${(confidence <= 1 ? confidence * 100 : confidence).toFixed(0)}%`
+        : 'not recorded';
+      return `- ${c.practice_type}: Current Impact ${impactLabel}, Confidence ${confidenceLabel}`;
+    }).join('\n')
   : '- No conservation practices recorded'}
 
 🔬 VARIETY PERFORMANCE INTELLIGENCE:

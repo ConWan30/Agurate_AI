@@ -15,7 +15,7 @@ export const ComparisonSection = memo(function ComparisonSection() {
       feature: "Predictive Analytics",
       agurate: true,
       traditional: false,
-      description: "7-14 day forecasts vs. reactive response"
+      description: "Optional 7–14 day planning outlooks vs. reactive-only response"
     },
     {
       feature: "LSU Research Framing",
