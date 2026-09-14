@@ -34,8 +34,8 @@ const DemoDataContext = createContext<DemoDataContextType | undefined>(undefined
 const mockFields: DemoField[] = [
   {
     id: 'demo-field-1',
-    name: 'North Field',
-    crop_type: 'rice',
+    name: 'Morehouse North Soybeans',
+    crop_type: 'soybean',
     acreage: 150,
     location_lat: 32.6875,
     location_lng: -91.8292,
@@ -44,7 +44,7 @@ const mockFields: DemoField[] = [
   },
   {
     id: 'demo-field-2',
-    name: 'Delta South',
+    name: 'Morehouse South Soybeans',
     crop_type: 'soybean',
     acreage: 200,
     location_lat: 32.6800,
@@ -55,7 +55,7 @@ const mockFields: DemoField[] = [
   {
     id: 'demo-field-3',
     name: 'Cotton Ridge',
-    crop_type: 'cotton',
+    crop_type: 'soybean',
     acreage: 125,
     location_lat: 32.6950,
     location_lng: -91.8200,

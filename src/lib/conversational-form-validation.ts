@@ -137,14 +137,7 @@ export const onboardingSchema = z.object({
     .min(1, 'Parish is required')
     .max(50, 'Parish name must be less than 50 characters'),
   
-  primary_crops: z.array(z.union([
-    z.literal('rice'),
-    z.literal('soybean'),
-    z.literal('cotton'),
-    z.literal('corn')
-  ]))
-    .min(1, 'At least one crop must be selected')
-    .max(4, 'Maximum 4 crops allowed'),
+  primary_crops: z.array(z.literal('soybean')).min(1, 'Select soybean for the Morehouse Parish pilot').max(1, 'Morehouse Parish pilot is soybean-only'),
   
   total_acreage: z.number()
     .positive('Total acreage must be greater than 0')

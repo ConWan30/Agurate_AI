@@ -376,10 +376,7 @@ export default function BetaSignup() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="rice">🌾 Rice</SelectItem>
-                            <SelectItem value="soybean">🟢 Soybeans</SelectItem>
-                            <SelectItem value="cotton">⚪ Cotton</SelectItem>
-                            <SelectItem value="corn">🌽 Corn</SelectItem>
+                            <SelectItem value="soybean">🟢 Soybeans (Morehouse Parish pilot)</SelectItem>
                             <SelectItem value="multiple">Multiple crops</SelectItem>
                           </SelectContent>
                         </Select>

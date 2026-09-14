@@ -88,7 +88,7 @@ serve(async (req) => {
       email: 'demo@agurateai.com',
       farm_name: 'Demo Delta Farms',
       beta_farmer: true,
-      primary_crops: ['rice', 'soybean', 'cotton'],
+      primary_crops: ['soybean'],
     });
 
     // STEP 2: Create 3 DEMO fields (synthetic fixtures for screenshots — not real farm data).
@@ -96,12 +96,12 @@ serve(async (req) => {
     const fieldsData = [
       {
         user_id: demoUser.id,
-        name: '[DEMO] North Rice Field',
-        crop_type: 'rice',
+        name: '[DEMO] Morehouse Soybean North',
+        crop_type: 'soybean',
         acreage: 120,
         location_lat: 32.7340,
         location_lng: -91.7573,
-        rice_variety: 'CL153',
+        rice_variety: 'Asgrow AG48X9',
       },
       {
         user_id: demoUser.id,

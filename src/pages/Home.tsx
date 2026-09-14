@@ -91,7 +91,7 @@ export default function Home() {
     {
       icon: Microscope,
       title: "Variety Recommendations",
-      description: "AI-powered rice and soybean variety selection based on your soil type, planting conditions, and published LSU guidance.",
+      description: "Soybean variety context for Morehouse Parish conditions, framed with public LSU AgCenter guidance — not a prescription.",
       color: "gradient-harvest"
     },
     {
@@ -127,7 +127,7 @@ export default function Home() {
     "Insights informed by LSU AgCenter research framing",
     "Conservation practice tracking and ROI analysis",
     "Community intelligence and cooperative insights",
-    "Variety recommendations for rice and soybeans",
+    "Soybean variety context drawn from public LSU AgCenter materials",
     "GPS-tagged field mapping and health visualization",
     "Insurance claim documentation support (not automated settlement)",
     "Mobile-first design with installable PWA support"
@@ -193,7 +193,7 @@ export default function Home() {
             </h1>
             
             <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8 leading-relaxed">
-              Transform your farming with intelligent crop analysis for rice, soybean, cotton, and corn. 
+              Closed beta for Morehouse Parish soybean growers — photo-based crop observations as a research decision aid, not a diagnosis. 
               Research-informed for Louisiana Delta conditions.
             </p>
             

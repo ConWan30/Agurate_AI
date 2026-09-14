@@ -1,3 +1,4 @@
+import { PILOT_CROP, requirePilotCrop } from "@/lib/pilot-scope";
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -73,7 +74,7 @@ export default function Onboarding() {
           farm_name: extractedData.farm_name,
           full_name: extractedData.full_name,
           parish: extractedData.parish,
-          primary_crops: extractedData.primary_crops,
+          primary_crops: ['soybean'],
           total_acreage: extractedData.total_acreage,
           phone: extractedData.phone,
           onboarding_completed: true,
@@ -92,7 +93,7 @@ export default function Onboarding() {
       // ✅ CREATE FIRST FIELD AUTOMATICALLY if field data was collected
       // Check if the conversational form extracted field information
       if (extractedData.field_name && extractedData.field_crop_type) {
-        const normalizedCropType = extractedData.field_crop_type === 'soybeans' ? 'soybean' : extractedData.field_crop_type;
+        const normalizedCropType = requirePilotCrop(extractedData.field_crop_type === 'soybeans' ? 'soybean' : (extractedData.field_crop_type || PILOT_CROP));
         if (import.meta.env.DEV) console.log('🌾 Creating first field from onboarding data...');
         
         interface FieldData {

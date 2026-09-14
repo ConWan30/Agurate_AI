@@ -1,8 +1,11 @@
 # AgurateAI System Architecture
 
-**Version:** 1.0 (MVP)
-**Last Updated:** 2025-10-17
-**Status:** Initial Design
+**Version:** 0.1 (Morehouse soybean closed beta)
+**Last Updated:** 2026-09-14
+**Status:** Pilot wedge — fail-closed invent locks; live publish/migrate still operator-gated
+
+> Health / confidence scores are **0–100** (not 0.00–1.00). Missing scores must not invent `0`.
+> Pilot geography/crop: **Morehouse Parish × soybean**. Deferred modules render `PilotDeferred`.
 
 ---
 

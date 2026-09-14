@@ -538,10 +538,7 @@ export default function Cooperatives() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Crops</SelectItem>
-                    <SelectItem value="rice">Rice</SelectItem>
-                    <SelectItem value="soybean">Soybeans</SelectItem>
-                    <SelectItem value="cotton">Cotton</SelectItem>
-                    <SelectItem value="corn">Corn</SelectItem>
+                    <SelectItem value="soybean">Soybeans (Morehouse pilot)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

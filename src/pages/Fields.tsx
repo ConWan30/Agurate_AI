@@ -25,6 +25,7 @@ import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalF
 import { Sparkles } from "lucide-react";
 import { VarietyRecommendationCard } from "@/components/VarietyRecommendationCard";
 import { validateExtractedData } from "@/lib/conversational-form-validation";
+import { PILOT_CROP, requirePilotCrop } from "@/lib/pilot-scope";
 import { VarietyRecommendation } from "@/types/enhanced-features";
 import { useQuery } from "@tanstack/react-query";
 
@@ -96,7 +97,7 @@ export default function Fields() {
 
   const [formData, setFormData] = useState({
     name: "",
-    crop_type: "",
+    crop_type: PILOT_CROP,
     acreage: "",
     location_lat: "",
     location_lng: "",
@@ -154,7 +155,7 @@ export default function Fields() {
       const fieldData = {
         user_id: user.id,
         name: formData.name,
-        crop_type: formData.crop_type,
+        crop_type: requirePilotCrop(formData.crop_type || PILOT_CROP),
         acreage,
         location_lat:
           formData.location_lat.trim() !== '' && Number.isFinite(Number(formData.location_lat))
@@ -251,7 +252,7 @@ export default function Fields() {
   const resetForm = () => {
     setFormData({
       name: "",
-      crop_type: "",
+      crop_type: PILOT_CROP,
       acreage: "",
       location_lat: "",
       location_lng: "",
@@ -282,7 +283,7 @@ export default function Fields() {
 
       // Map the extracted data to field schema (DB CHECK expects singular soybean)
       const rawCrop = String(extractedData.crop_type || extractedData.cropType || '');
-      const cropType = rawCrop === 'soybeans' ? 'soybean' : rawCrop;
+      const cropType = requirePilotCrop(rawCrop === 'soybeans' ? 'soybean' : (rawCrop || PILOT_CROP));
       const acreage = Number(extractedData.acreage);
       const location_lat = extractedData.location_lat != null
         ? Number(extractedData.location_lat)
@@ -360,7 +361,7 @@ export default function Fields() {
         <div className="relative z-10 flex items-start justify-between">
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">My Fields</h1>
-            <p className="text-white/90 text-base md:text-lg">Manage your farm fields and crop types</p>
+            <p className="text-white/90 text-base md:text-lg">Morehouse Parish pilot · soybean fields only</p>
           </div>
           <Dialog
             open={conversationalDialogOpen}
