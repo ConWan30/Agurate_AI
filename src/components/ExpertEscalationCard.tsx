@@ -29,7 +29,7 @@ interface ExpertEscalationCardProps {
 export function ExpertEscalationCard({
   issueType,
   issueDescription,
-  confidenceScore = 0,
+  confidenceScore,
   fieldId,
   assessmentId,
   aiAnalysis,
@@ -42,7 +42,12 @@ export function ExpertEscalationCard({
   const [consultationCreated, setConsultationCreated] = useState(false);
 
   // Determine if escalation is recommended
-  const shouldEscalate = confidenceScore < 70 || issueType === 'unusual' || issueType === 'complex';
+  const hasConfidence =
+    confidenceScore != null && !Number.isNaN(Number(confidenceScore));
+  const shouldEscalate =
+    (hasConfidence && Number(confidenceScore) < 70) ||
+    issueType === 'unusual' ||
+    issueType === 'complex';
 
   // Load matching researcher when component mounts
   useEffect(() => {
@@ -113,7 +118,13 @@ export function ExpertEscalationCard({
           researcher_id: researcher.id,
           question: issueDescription,
           status: 'pending',
-          priority: confidenceScore < 50 ? 'urgent' : confidenceScore < 70 ? 'high' : 'medium',
+          priority: !hasConfidence
+            ? 'medium'
+            : Number(confidenceScore) < 50
+              ? 'urgent'
+              : Number(confidenceScore) < 70
+                ? 'high'
+                : 'medium',
         })
         .select()
         .single();
@@ -155,8 +166,8 @@ export function ExpertEscalationCard({
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Expert Review Recommended</AlertTitle>
             <AlertDescription>
-              {confidenceScore < 70
-                ? `AI confidence is ${confidenceScore}%. An expert review is recommended for the most accurate diagnosis.`
+              {hasConfidence && Number(confidenceScore) < 70
+                ? `AI confidence is ${confidenceScore}%. An expert review is recommended as a decision aid — not a validated diagnosis.`
                 : 'This case may benefit from expert consultation for specialized guidance.'}
             </AlertDescription>
           </Alert>

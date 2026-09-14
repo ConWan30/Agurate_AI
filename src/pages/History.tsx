@@ -27,7 +27,7 @@ import { ImageHistoryComparison } from "@/components/ImageHistoryComparison";
 import { ExpertEscalationCard } from "@/components/ExpertEscalationCard";
 import { PeerComparisonCard } from "@/components/PeerComparisonCard";
 import { AnnotatedImage, type ImageAnnotation } from "@/components/AnnotatedImage";
-import { toHealthPercent } from '@/lib/health-score';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface Assessment {
   id: string;
@@ -498,7 +498,7 @@ export default function History() {
                         selectedAssessment.detailed_visual_analysis ||
                         `Health score: ${toHealthPercent(selectedAssessment.health_score)}%, Stress: ${selectedAssessment.stress_level}`
                       }
-                      confidenceScore={toHealthPercent(selectedAssessment.confidence_score)}
+                      confidenceScore={hasHealthScore(selectedAssessment.confidence_score) ? toHealthPercent(selectedAssessment.confidence_score) : undefined}
                       fieldId={selectedAssessment.field.id}
                       assessmentId={selectedAssessment.id}
                       aiAnalysis={{

@@ -283,6 +283,25 @@ export default function Upload() {
     // ✅ UNIFIED AI: Enrich intelligence pool after analysis
     await enrichUnifiedContext(fieldId, aiResult);
 
+    
+  const toThreatObjects = (raw: unknown) => {
+    if (!Array.isArray(raw)) return [];
+    return raw.map((item) => {
+      if (typeof item === 'string') {
+        return { name: item, severity: 'moderate', confidence: 0 };
+      }
+      if (item && typeof item === 'object' && 'name' in item) {
+        const o = item as { name: string; severity?: string; confidence?: number };
+        return {
+          name: o.name,
+          severity: o.severity ?? 'moderate',
+          confidence: typeof o.confidence === 'number' ? o.confidence : 0,
+        };
+      }
+      return null;
+    }).filter(Boolean);
+  };
+
     // ✅ CRITICAL ALERTS: Check if assessment triggers critical alert
     try {
       const { data: fieldData } = await supabase
@@ -297,8 +316,8 @@ export default function Upload() {
           field_id: fieldId,
           health_score: toHealthPercent(aiResult.health_score),
           stress_level: aiResult.stress_level,
-          diseases: aiResult.disease_identified,
-          pests: aiResult.pest_identified,
+          diseases: toThreatObjects(aiResult.disease_identified),
+          pests: toThreatObjects(aiResult.pest_identified),
           estimated_yield_impact_percent: aiResult.estimated_yield_impact_percent,
           field_acreage: fieldData?.acreage,
           crop_type: fieldData?.crop_type || cropType,

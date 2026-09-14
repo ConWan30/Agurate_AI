@@ -541,7 +541,7 @@ export default function Home() {
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Button>
           </Link>
-          <p className="text-sm mt-6 opacity-75">Free Beta Access • No credit card required • Unlimited use during beta</p>
+          <p className="text-sm mt-6 opacity-75">Free closed-beta access • No credit card required • Limits may apply</p>
         </div>
       </section>
 

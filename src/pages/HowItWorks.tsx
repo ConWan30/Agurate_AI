@@ -119,7 +119,7 @@ export default function HowItWorks() {
     {
       icon: Cloud,
       title: 'Water Stress Intelligence',
-      description: 'Predictive irrigation alerts using soil moisture patterns, weather forecasts, and crop-specific water needs. Prevent stress before it starts',
+      description: 'Irrigation decision-aid alerts using soil moisture patterns, weather forecasts, and crop-specific water needs when those data sources are available',
       benefit: 'Stress prevention focus',
       color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20'
     },
@@ -133,14 +133,14 @@ export default function HowItWorks() {
     {
       icon: Network,
       title: 'Community Intelligence',
-      description: 'Anonymous farmer network shares disease outbreaks, treatment successes, and yield trends. Early warnings when pests hit neighboring farms',
+      description: 'Optional anonymous farmer network for sharing disease notes, treatment outcomes, and yield trends when enough peers participate',
       benefit: 'Neighbor early warnings',
       color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
     },
     {
       icon: Layers,
       title: 'Conservation Practice ROI',
-      description: 'Track cover crops, no-till, and precision fertilization impact on soil health, input costs, and yield. AI predicts long-term financial benefits',
+      description: 'Track cover crops, no-till, and precision fertilization notes on soil health, input costs, and yield. Financial figures are planning estimates, not guaranteed forecasts',
       benefit: 'Practice cost tracking',
       color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'
     },

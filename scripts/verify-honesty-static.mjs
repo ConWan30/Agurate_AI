@@ -76,6 +76,7 @@ const FORBIDDEN = [
   { name: 'published plan rate, for life', re: /published plan rate,? for life/i },
   { name: 'Claim Lifetime Discount CTA', re: /Claim Lifetime Discount/i },
   { name: 'Unlimited FREE Access During Beta', re: /Unlimited FREE Access During Beta/i },
+  { name: 'Unlimited use during beta', re: /Unlimited use during beta/i },
   { name: 'completely free during beta period', re: /completely free during beta/i },
   { name: 'Cutting-Edge Agricultural Technology', re: /Cutting-Edge Agricultural Technology/i },
   { name: 'Real-time Processing marketing', re: /Real-time Processing/i },

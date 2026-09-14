@@ -90,9 +90,19 @@ Last updated: 2026-09-14
 - [x] Field map does not invent health % / color when no assessment
 - [x] Community insights + compare-images fail closed on unparseable AI JSON
 
+
+- [x] ROI calculator refuses invented health scores
+- [x] Expert escalation ignores missing confidence (no fake 0% urgency)
+- [x] Scanner/analyze-crop fail closed on missing stress level
+- [x] Unified AI omits fabricated weather context
+- [x] Economic impact labeled as illustrative planning estimates
+- [x] Critical alerts do not invent acreage; normalize string disease/pest payloads
+- [x] Lock `subscription_status` from client self-writes (`20260914170000`)
+- [x] Soften Home unlimited-beta + tutorial “Diagnosis” framing
+
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (through `20260914160000` (includes entitlement clamps; researcher PII is `20260914100000`), plus prior RLS/RPC/storage)
+- [ ] Apply pending Supabase migrations (through `20260914170000` (includes entitlement clamps; researcher PII is `20260914100000`), plus prior RLS/RPC/storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

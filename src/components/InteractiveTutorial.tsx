@@ -149,7 +149,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                       {scanProgress > 60 && <CheckCircle2 className="h-3 w-3 inline ml-1" />}
                     </div>
                     <div className={scanProgress > 90 ? 'text-primary font-medium' : 'text-muted-foreground'}>
-                      Diagnosis
+                      Assessment
                       {scanProgress > 90 && <CheckCircle2 className="h-3 w-3 inline ml-1" />}
                     </div>
                   </div>
@@ -202,7 +202,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             <div>
               <p className="text-sm font-semibold mb-1">Why This Matters</p>
               <p className="text-xs text-muted-foreground">
-                Traditional diagnosis takes 3-7 days waiting for extension agent. 
+                Traditional field assessment takes 3-7 days waiting for extension agent. 
                 <span className="font-semibold text-foreground"> AgurateAI walks through an illustrative scan flow</span>, 
                 enabling immediate action before damage spreads.
               </p>
@@ -219,7 +219,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground leading-relaxed">
-            James taps "Predictions." The AI combines his field history, current diagnosis, and 
+            James taps "Predictions." The AI combines his field history, current assessment, and 
             weather forecasts to predict stress levels for the next 7 days.
           </p>
 

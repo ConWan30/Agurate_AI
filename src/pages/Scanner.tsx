@@ -229,6 +229,9 @@ export default function Scanner() {
 
       // Edge should also refuse missing scores; keep client fail-closed as defense in depth.
       requireHealthScore(aiResult.health_score);
+      if (!aiResult.stress_level) {
+        throw new Error('AI analysis did not return a stress_level');
+      }
 
       // Save assessment to database
       const { data: assessment, error: dbError } = await supabase
@@ -237,7 +240,7 @@ export default function Scanner() {
           field_id: selectedFieldId,
           image_url: imageUrl,
           health_score: toHealthPercent(aiResult.health_score),
-          stress_level: aiResult.stress_level || 'healthy',
+          stress_level: aiResult.stress_level,
           symptoms: aiResult.symptoms || [],
           confidence_score:
             aiResult.confidence_score == null

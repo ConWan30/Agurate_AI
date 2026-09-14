@@ -13,8 +13,8 @@ interface CriticalAlertInput {
   field_id: string;
   health_score: number;
   stress_level: string;
-  diseases?: Array<{ name: string; severity: string; confidence: number }>;
-  pests?: Array<{ name: string; severity: string; confidence: number }>;
+  diseases?: unknown;
+  pests?: unknown;
   estimated_yield_impact_percent?: number;
   field_acreage?: number;
   crop_type?: string;
@@ -28,6 +28,25 @@ interface UrgencyFactors {
   yieldImpact: number;
   fieldSize: number;
   cropValue: number;
+}
+
+
+function normalizeThreatList(raw: unknown): Array<{ name: string; severity: string; confidence: number }> {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item) => {
+    if (typeof item === 'string') {
+      return { name: item, severity: 'moderate', confidence: 0 };
+    }
+    if (item && typeof item === 'object') {
+      const o = item as Record<string, unknown>;
+      return {
+        name: String(o.name ?? o.disease ?? o.pest ?? 'unknown'),
+        severity: String(o.severity ?? 'moderate'),
+        confidence: typeof o.confidence === 'number' ? o.confidence : 0,
+      };
+    }
+    return { name: 'unknown', severity: 'moderate', confidence: 0 };
+  }).filter((d) => d.name && d.name !== 'unknown');
 }
 
 serve(async (req) => {
@@ -64,6 +83,9 @@ serve(async (req) => {
       crop_type,
     }: CriticalAlertInput = await req.json();
 
+    const normalizedDiseases = normalizeThreatList(diseases);
+    const normalizedPests = normalizeThreatList(pests);
+
     if (!field_id || !assessment_id) {
       return new Response(
         JSON.stringify({ error: 'field_id and assessment_id are required' }),
@@ -89,17 +111,17 @@ serve(async (req) => {
       healthScore: health_score,
       stressLevel: stress_level,
       diseaseSeverity:
-        diseases?.reduce((max, d) => {
+        normalizedDiseases.reduce((max, d) => {
           const severity = d.severity === 'severe' ? 3 : d.severity === 'moderate' ? 2 : 1;
           return Math.max(max, severity * d.confidence);
-        }, 0) || 0,
+        }, 0),
       pestSeverity:
-        pests?.reduce((max, p) => {
+        normalizedPests.reduce((max, p) => {
           const severity = p.severity === 'severe' ? 3 : p.severity === 'moderate' ? 2 : 1;
           return Math.max(max, severity * p.confidence);
-        }, 0) || 0,
+        }, 0),
       yieldImpact: estimated_yield_impact_percent || 0,
-      fieldSize: field_acreage || 100,
+      fieldSize: field_acreage ?? 0,
       cropValue: getCropValuePerAcre(crop_type || 'rice'),
     });
 
@@ -114,15 +136,15 @@ serve(async (req) => {
       );
     }
 
-    const alertType = determineAlertType(diseases, pests, stress_level);
+    const alertType = determineAlertType(normalizedDiseases, normalizedPests, stress_level);
     const { title, message, estimatedLoss } = generateAlertContent({
       alertType,
       fieldName: field.name || 'Field',
       cropType: crop_type || 'crop',
-      diseases,
-      pests,
+      diseases: normalizedDiseases,
+      pests: normalizedPests,
       yieldImpact: estimated_yield_impact_percent || 0,
-      acreage: field_acreage || 100,
+      acreage: field_acreage ?? 0,
       cropValue: getCropValuePerAcre(crop_type || 'rice'),
     });
 

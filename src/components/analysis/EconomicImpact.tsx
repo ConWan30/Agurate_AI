@@ -63,7 +63,7 @@ export function EconomicImpact({
           <>
             <div className="flex justify-between items-center p-4 bg-health-severe/10 rounded-lg border border-health-severe/20">
               <div>
-                <p className="text-sm font-medium">Potential Revenue Loss</p>
+                <p className="text-sm font-medium">Illustrative revenue-at-risk</p>
                 <p className="text-xs text-muted-foreground">
                   {acreage} acres × ${valuePerAcre}/acre × {Math.abs(yieldImpact)}%
                 </p>
@@ -84,9 +84,9 @@ export function EconomicImpact({
 
             <div className="flex justify-between items-center p-4 bg-health-good/10 rounded-lg border-2 border-health-good">
               <div>
-                <p className="text-sm font-medium">Potential Savings</p>
+                <p className="text-sm font-medium">Illustrative recovery estimate</p>
                 <p className="text-xs text-muted-foreground">
-                  With recommended treatment
+                  Assumes ~70% of modeled loss is recoverable — planning estimate only
                 </p>
               </div>
               <p className="text-3xl font-bold font-mono text-health-good">

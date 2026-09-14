@@ -118,14 +118,21 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
     insecticide: { cost: 30, yieldProtection: 0.18, name: 'Insecticide Treatment' },
   };
 
+  const hasAssessmentHealth =
+    assessmentData?.healthScore != null && !Number.isNaN(Number(assessmentData.healthScore));
+
   const calculateROI = () => {
+    if (!hasAssessmentHealth) {
+      setRoi(null);
+      return;
+    }
     const acreage = parseFloat(acres) || 100;
     const crop = cropPrices[cropType] || cropPrices.rice;
     const treatment = treatmentCosts[treatmentType] || treatmentCosts.fungicide;
 
-    // Estimate yield at risk based on health score
-    const healthScore = assessmentData?.healthScore || 65;
-    const yieldImpactPercent = assessmentData?.estimatedYieldImpact || (100 - healthScore) * 0.8;
+    // Require a real assessment health score — never invent one for ROI math
+    const healthScore = Number(assessmentData!.healthScore);
+    const yieldImpactPercent = assessmentData?.estimatedYieldImpact ?? (100 - healthScore) * 0.8;
     const yieldAtRisk = crop.avgYield * (yieldImpactPercent / 100);
 
     // Calculate potential loss without treatment
@@ -282,7 +289,12 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
               </div>
             </div>
 
-            <Button onClick={calculateROI} className="w-full">
+            {!hasAssessmentHealth && (
+              <p className="text-sm text-muted-foreground text-center">
+                Run a field assessment first — ROI estimates need a real health score, not a placeholder.
+              </p>
+            )}
+            <Button onClick={calculateROI} className="w-full" disabled={!hasAssessmentHealth}>
               <Calculator className="h-4 w-4 mr-2" />
               Calculate ROI
             </Button>

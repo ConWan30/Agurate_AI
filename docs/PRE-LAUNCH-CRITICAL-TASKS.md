@@ -10,9 +10,19 @@ actions (credentials required), not dashboard code edits.
 
 See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 
+
+- [x] ROI calculator refuses invented health scores
+- [x] Expert escalation ignores missing confidence (no fake 0% urgency)
+- [x] Scanner/analyze-crop fail closed on missing stress level
+- [x] Unified AI omits fabricated weather context
+- [x] Economic impact labeled as illustrative planning estimates
+- [x] Critical alerts do not invent acreage; normalize string disease/pest payloads
+- [x] Lock `subscription_status` from client self-writes (`20260914170000`)
+- [x] Soften Home unlimited-beta + tutorial “Diagnosis” framing
+
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations (through `20260914160000` researcher PII
+1. Apply pending Supabase migrations (through `20260914170000` researcher PII
    + soybean crop checks, plus view invoker, RLS lock-down, testimonials,
    critical_alerts, secure RPCs, coop auth, peer/expert/coop reconcile,
    crop-images storage)

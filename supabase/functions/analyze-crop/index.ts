@@ -473,7 +473,7 @@ Respond with JSON:
       if (normalized.includes('severe')) return 'severe';
       if (normalized.includes('mild') || normalized.includes('moderate')) return 'moderate';
       if (normalized.includes('healthy')) return 'healthy';
-      return 'moderate'; // default fallback
+      throw new Error(`Unrecognized stress condition from AI: ${condition}`);
     };
 
     // Combine both AI outputs — fail closed if health_score is missing (do not invent 0%)

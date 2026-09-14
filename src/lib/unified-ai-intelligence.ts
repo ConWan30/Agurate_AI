@@ -33,13 +33,8 @@ export async function gatherUnifiedContext(fieldId: string): Promise<UnifiedCont
       supabase.from('ai_intelligence_pool').select('*').eq('field_id', fieldId).order('snapshot_date', { ascending: false }).limit(1)
     ]);
 
-    // Get weather data (simulated for now)
-    const weatherData: WeatherData = {
-      current_temp: 85,
-      humidity: 75,
-      precipitation_forecast: [0.1, 0.2, 0, 0.3, 0.5, 0.1, 0],
-      days_since_rain: 3
-    };
+    // Weather integrations are not wired yet — omit fabricated readings from AI context.
+    const weatherData: WeatherData = {};
 
     const context: UnifiedContext = {
       fieldData: (fieldData as Field) || null,

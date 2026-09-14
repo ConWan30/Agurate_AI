@@ -55,6 +55,8 @@ describe('gatherUnifiedContext', () => {
     expect(context.fieldData).toEqual(mockField);
     expect(context.assessmentHistory).toEqual(mockAssessments);
     expect(context.weatherData).toBeDefined();
+    // Do not invent readings — empty object is honest until weather is wired
+    expect(context.weatherData).toEqual({});
     expect(from).toHaveBeenCalledWith('fields');
   });
 
