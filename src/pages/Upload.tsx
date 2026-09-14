@@ -305,13 +305,14 @@ export default function Upload() {
     if (!Array.isArray(raw)) return [];
     return raw.map((item) => {
       if (typeof item === 'string') {
-        return { name: item, severity: 'moderate', confidence: 0 };
+        // Name-only threat — do not invent severity
+        return { name: item, severity: 'unknown', confidence: 0 };
       }
       if (item && typeof item === 'object' && 'name' in item) {
         const o = item as { name: string; severity?: string; confidence?: number };
         return {
           name: o.name,
-          severity: o.severity ?? 'moderate',
+          severity: o.severity ?? 'unknown',
           confidence: typeof o.confidence === 'number' ? o.confidence : 0,
         };
       }

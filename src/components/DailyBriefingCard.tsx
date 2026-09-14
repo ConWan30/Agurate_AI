@@ -27,7 +27,7 @@ interface BriefingData {
     temperature: number;
     precipitation: number;
     recommendation: string | null;
-  };
+  } | null;
   achievements: string[];
 }
 
@@ -134,26 +134,36 @@ export function DailyBriefingCard() {
             issue: p.issue,
             urgency: (p.urgency === 'high' || p.urgency === 'low' || p.urgency === 'medium'
               ? p.urgency
-              : 'medium') as 'high' | 'medium' | 'low',
+              : null) as 'high' | 'medium' | 'low' | null,
             action: p.action,
           };
-        });
+        })
+        .filter((p): p is {
+          fieldName: string;
+          fieldId: string;
+          issue: string;
+          urgency: 'high' | 'medium' | 'low';
+          action: string;
+        } => p.urgency != null);
 
       if (priorities.length === 0) {
         throw new Error('Daily briefing priorities incomplete');
       }
 
-      // Weather insights from API — omit invented spray/recommendation text
-      const weatherInsights = {
-        temperature: data.weather?.highTemp || 0,
-        precipitation: data.weather?.precipitation || 0,
-        recommendation:
-          typeof data.weatherRecommendation === 'string' && data.weatherRecommendation.trim()
-            ? data.weatherRecommendation.trim()
-            : data.weather
-              ? `High: ${data.weather.highTemp}°F, Low: ${data.weather.lowTemp}°F`
-              : null,
-      };
+      // Weather insights from API — omit section when payload missing (never invent 0°F / 0")
+      const weatherInsights =
+        data.weather && data.weather.highTemp != null && data.weather.precipitation != null
+          ? {
+              temperature: data.weather.highTemp,
+              precipitation: data.weather.precipitation,
+              recommendation:
+                typeof data.weatherRecommendation === 'string' && data.weatherRecommendation.trim()
+                  ? data.weatherRecommendation.trim()
+                  : data.weather.lowTemp != null
+                    ? `High: ${data.weather.highTemp}°F, Low: ${data.weather.lowTemp}°F`
+                    : `High: ${data.weather.highTemp}°F`,
+            }
+          : null;
 
       setSprayWindow(
         typeof data.sprayWindow === 'string' && data.sprayWindow.trim()
@@ -283,26 +293,23 @@ export function DailyBriefingCard() {
           </div>
         )}
 
-        {/* Weather Insights */}
+        {/* Weather Insights — only when API provided real weather (not invented zeros) */}
+        {briefing.weatherInsights && (
         <div className="p-4 rounded-lg bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20">
           <h3 className="font-semibold text-sm text-muted-foreground mb-3 flex items-center gap-2">
             <Droplets className="h-4 w-4 text-secondary" />
             Today's Weather Impact
           </h3>
-          {briefing.weatherInsights.temperature > 0 && (
-            <div className="flex items-center gap-4 mb-2">
-              <div className="flex items-center gap-2">
-                <Thermometer className="h-4 w-4 text-health-moderate" />
-                <span className="text-sm font-medium">{briefing.weatherInsights.temperature}°F</span>
-              </div>
-              {briefing.weatherInsights.precipitation > 0 && (
-                <div className="flex items-center gap-2">
-                  <Droplets className="h-4 w-4 text-secondary" />
-                  <span className="text-sm font-medium">{briefing.weatherInsights.precipitation.toFixed(1)}mm rain</span>
-                </div>
-              )}
+          <div className="flex items-center gap-4 mb-2">
+            <div className="flex items-center gap-2">
+              <Thermometer className="h-4 w-4 text-health-moderate" />
+              <span className="text-sm font-medium">{briefing.weatherInsights.temperature}°F</span>
             </div>
-          )}
+            <div className="flex items-center gap-2">
+              <Droplets className="h-4 w-4 text-secondary" />
+              <span className="text-sm font-medium">{briefing.weatherInsights.precipitation.toFixed(1)}mm rain</span>
+            </div>
+          </div>
           {briefing.weatherInsights.recommendation && (
             <p className="text-sm text-muted-foreground">{briefing.weatherInsights.recommendation}</p>
           )}
@@ -312,6 +319,12 @@ export function DailyBriefingCard() {
             </p>
           )}
         </div>
+        )}
+        {!briefing.weatherInsights && sprayWindow && (
+          <p className="text-xs text-muted-foreground">
+            <strong>Spray Window:</strong> {sprayWindow}
+          </p>
+        )}
 
         {/* Achievements */}
         {briefing.achievements.length > 0 && (
