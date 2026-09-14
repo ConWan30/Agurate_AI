@@ -43,14 +43,37 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      const parsedSavings = estimatedSavings.trim()
+        ? Number(estimatedSavings)
+        : null;
+      const parsedAcres = acresProtected.trim()
+        ? Number(acresProtected)
+        : null;
+      if (parsedSavings != null && (!Number.isFinite(parsedSavings) || parsedSavings < 0)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid savings amount",
+          description: "Estimated savings must be a number greater than or equal to 0.",
+        });
+        return;
+      }
+      if (parsedAcres != null && (!Number.isFinite(parsedAcres) || parsedAcres < 0)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid acres protected",
+          description: "Acres protected must be a number greater than or equal to 0.",
+        });
+        return;
+      }
+
       const { error } = await supabase.from('success_stories').insert({
         user_id: user.id,
         assessment_id: assessmentId,
         problem_encountered: problemEncountered.trim(),
         action_taken: actionTaken.trim(),
         outcome: outcome.trim(),
-        estimated_savings: estimatedSavings ? parseFloat(estimatedSavings) : null,
-        acres_protected: acresProtected ? parseFloat(acresProtected) : null,
+        estimated_savings: parsedSavings,
+        acres_protected: parsedAcres,
         testimonial: testimonial.trim(),
         allow_public_use: allowPublicUse,
         allow_name: allowName,

@@ -16,11 +16,12 @@ import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import bgSoybeanResearch from "@/assets/bg-soybean-research.jpg";
 import { EnhancedPageHeader } from '@/components/EnhancedPageHeader';
 import TutorialTooltip from '@/components/TutorialTooltip';
+import { formatConfidencePercent, normalizeRiskLevel } from '@/lib/risk-confidence';
 
 interface Prediction {
   day: number;
   date: string;
-  risk_level: 'low' | 'medium' | 'high';
+  risk_level: 'low' | 'medium' | 'high' | string;
   predicted_stress: string;
   confidence: number;
   weather_factor: string;
@@ -143,18 +144,20 @@ export default function Predictions() {
   };
 
   const getRiskColor = (level: string) => {
-    switch (level) {
+    switch (normalizeRiskLevel(level)) {
       case 'high': return 'bg-destructive/10 text-destructive border-destructive/20';
       case 'medium': return 'bg-secondary/10 text-secondary-foreground border-secondary/20';
-      default: return 'bg-primary/10 text-primary border-primary/20';
+      case 'low': return 'bg-primary/10 text-primary border-primary/20';
+      default: return 'bg-muted text-muted-foreground border-muted-foreground/20';
     }
   };
 
   const getRiskIcon = (level: string) => {
-    switch (level) {
+    switch (normalizeRiskLevel(level)) {
       case 'high': return <AlertTriangle className="h-5 w-5 text-health-severe" aria-label="High risk" />;
       case 'medium': return <AlertTriangle className="h-5 w-5 text-health-moderate" aria-label="Medium risk" />;
-      default: return <TrendingUp className="h-5 w-5 text-health-good" aria-label="Low risk" />;
+      case 'low': return <TrendingUp className="h-5 w-5 text-health-good" aria-label="Low risk" />;
+      default: return <Cloud className="h-5 w-5 text-muted-foreground" aria-label="Risk not recorded" />;
     }
   };
 
@@ -311,21 +314,21 @@ export default function Predictions() {
                     <div className="flex items-center justify-between py-2">
                       <span className="text-sm font-semibold">Risk Level:</span>
                       <Badge variant="outline" className={getRiskColor(pred.risk_level)}>
-                        {pred.risk_level.toUpperCase()}
+                        {normalizeRiskLevel(pred.risk_level)
+                          ? normalizeRiskLevel(pred.risk_level).toUpperCase()
+                          : 'NOT RECORDED'}
                       </Badge>
                     </div>
                     
                     <div className="flex items-center justify-between py-2">
                       <span className="text-sm font-semibold">Predicted Stress:</span>
-                      <span className="text-sm font-medium">{pred.predicted_stress}</span>
+                      <span className="text-sm font-medium">{pred.predicted_stress || 'Not recorded'}</span>
                     </div>
 
                     <div className="flex items-center justify-between py-2">
                       <span className="text-sm font-semibold">Confidence:</span>
                       <span className="text-base font-bold font-mono">
-                        {pred.confidence != null && Number.isFinite(Number(pred.confidence))
-                          ? `${(Number(pred.confidence) * 100).toFixed(0)}%`
-                          : '—'}
+                        {formatConfidencePercent(pred.confidence)}
                       </span>
                     </div>
 

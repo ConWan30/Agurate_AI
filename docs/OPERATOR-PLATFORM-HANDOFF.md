@@ -4,7 +4,7 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| In-repo honesty, security, quality | **Complete (tip)** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`). Re-confirm with `npm run verify:local-gates` + tip CI after each push. Product-facing invent/security residuals are saturated in-repo; remaining work is platform-only. |
+| In-repo honesty, security, quality | **Complete for tip invent locks** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`). Re-confirm with `npm run verify:local-gates` + tip CI after each push. High-impact invent/security residuals continue to close in-repo; remaining production-complete blockers are platform-only. |
 | Apply Supabase migrations through tip | **Blocked** | Needs project DB credentials (`supabase db push` or Dashboard SQL) |
 | Auth Leaked Password Protection | **Blocked** | Needs Supabase Dashboard access |
 | Deploy edge functions | **Blocked** | Needs Supabase CLI linked project + secrets |
@@ -21,13 +21,13 @@ Verify local gates anytime:
 npm run verify:local-gates
 ```
 
-Latest migration in repo: `20260914290000_lock_yield_feedback_event_bug_acreage`
+Latest migration in repo: `20260914300000_lock_success_peer_cost_recommendation_update`
 
 ## 1. Apply Supabase migrations
 
 Apply **all** pending migrations through tip  
-`20260914290000_lock_yield_feedback_event_bug_acreage`  
-(includes yield/canopy CHECKs, feedback assessment RLS, insurance event_type allowlist, bug_report status freeze, fields.acreage CHECK, claim loss % CHECK, expert priority freeze, conversational completed@100%, field_uniformity CHECK, alert-ack + conversation_memory locks, delta/peer/expert invent locks, critical-alert UPDATE freeze + claim↔assessment field match, peer effectiveness CHECK, AI metric client-write locks, insurance claim status lock + invitation column freeze, entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
+`20260914300000_lock_success_peer_cost_recommendation_update`  
+(includes success-story / peer cost CHECKs + recommendation UPDATE freeze, yield/canopy CHECKs, feedback assessment RLS, insurance event_type allowlist, bug_report status freeze, fields.acreage CHECK, claim loss % CHECK, expert priority freeze, conversational completed@100%, field_uniformity CHECK, alert-ack + conversation_memory locks, delta/peer/expert invent locks, critical-alert UPDATE freeze + claim↔assessment field match, peer effectiveness CHECK, AI metric client-write locks, insurance claim status lock + invitation column freeze, entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
 
 ```bash
 # Linked project
@@ -36,7 +36,7 @@ supabase db push
 # Or via Dashboard → SQL → run each pending migration in timestamp order
 ```
 
-**Evidence receipt:** paste Supabase migration history showing tip `20260914290000_…` applied with no errors.
+**Evidence receipt:** paste Supabase migration history showing tip `20260914300000_…` applied with no errors.
 
 ## 2. Enable Auth Leaked Password Protection
 
@@ -121,7 +121,7 @@ This environment has **no** Supabase access token, DB password, service-role key
 ## Done means
 
 - [x] Local gates green (`npm run verify:local-gates` + CI) — tip of `cursor/launch-readiness-honesty-38b2`
-- [ ] Migrations applied through `20260914210000_…`
+- [ ] Migrations applied through tip (`20260914300000_…`)
 - [ ] Leaked password protection on
 - [ ] Edge functions deployed + demo secret policy set
 - [ ] App published

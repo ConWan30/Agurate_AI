@@ -127,6 +127,16 @@ const required = [
       'fields_acreage_check',
     ],
   },
+  {
+    id: '20260914300000_lock_success_peer_cost_recommendation_update',
+    needles: [
+      'success_stories_estimated_savings_check',
+      'success_stories_acres_protected_check',
+      'peer_treatment_outcomes_cost_usd_check',
+      'recommendations may only be created by trusted backends',
+      'NEW.recommendation_text := OLD.recommendation_text',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -147,11 +157,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091429') &&
-  tip < '20260914290000_lock_yield_feedback_event_bug_acreage'
+  !tip.startsWith('2026091430') &&
+  tip < '20260914300000_lock_success_peer_cost_recommendation_update'
 ) {
   fail(
-    `tip migration ${tip} should include yield/feedback/event/bug/acreage invent lock (20260914290000+)`
+    `tip migration ${tip} should include success/peer-cost/recommendation-update invent lock (20260914300000+)`
   );
 }
 

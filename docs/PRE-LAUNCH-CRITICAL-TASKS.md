@@ -32,10 +32,12 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] Alert acknowledgments + conversation_memory client INSERT lock (`20260914270000`); unknown stress no longer invents “severe” in Dashboard/FieldMap/WeatherTimeline/Scanner
 - [x] Claim loss % CHECK + expert priority freeze + form completed@100% + field_uniformity CHECK (`20260914280000`)
 - [x] Yield/canopy CHECKs + feedback assessment RLS + insurance event_type allowlist + bug_report status freeze + acreage CHECK (`20260914290000`)
+- [x] Success-story / peer cost CHECKs + recommendation UPDATE freeze (`20260914300000`); predict-stress fail-closed + Predictions unknown risk honesty; local gates include honesty e2e
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914290000` (yield/feedback/event/bug/acreage;
+1. Apply pending Supabase migrations through `20260914300000` (success/peer-cost/recommendation-update;
+   yield/feedback/event/bug/acreage `20260914290000`;
    claim loss / priority / form-complete `20260914280000`;
    alert-ack + conversation_memory invent lock `20260914270000`;
    delta/peer/expert invent `20260914260000`; critical-alert UPDATE freeze + claim

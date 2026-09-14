@@ -137,7 +137,7 @@ Last updated: 2026-09-14
 
 See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
-- [ ] Apply pending Supabase migrations (through `20260914290000` yield/feedback/event/bug/acreage; prior `20260914280000` claim loss / expert priority / form-complete / field_uniformity; `20260914270000` alert-ack; `20260914260000` delta/peer/expert; `20260914240000` critical-alert UPDATE freeze + claim↔assessment; `20260914230000` peer effectiveness CHECK; `20260914220000` AI metric invent lock; `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
+- [ ] Apply pending Supabase migrations (through `20260914300000` success/peer-cost/recommendation-update; prior `20260914290000` yield/feedback/event/bug/acreage; `20260914280000` claim loss / expert priority / form-complete / field_uniformity; `20260914270000` alert-ack; `20260914260000` delta/peer/expert; `20260914240000` critical-alert UPDATE freeze + claim↔assessment; `20260914230000` peer effectiveness CHECK; `20260914220000` AI metric invent lock; `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
@@ -146,9 +146,9 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
 ## Evidence expected before production-complete
 
-1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
-2. Migration applied confirmation in Supabase through `20260914290000_lock_yield_feedback_event_bug_acreage` — **pending credentials**
+1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build + honesty e2e) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
+2. Migration applied confirmation in Supabase through `20260914300000_lock_success_peer_cost_recommendation_update` — **pending credentials**
 3. Live production URL showing honest closed-beta copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
 
-In-repo honesty/security residuals closed on this tip batch (yield/canopy CHECKs, feedback assessment RLS, event_type allowlist, bug_report status freeze, acreage CHECK, claim loss CHECK, expert priority freeze, form completed@100%, field_uniformity scale honesty, alert-ack ownership lock, conversation_memory INSERT drop, unknown stress no longer invents severe, critical-alert UPDATE freeze, claim↔assessment field match, peer effectiveness CHECK, claim INSERT status lock, coop-alert member INSERT drop, claim UPDATE/invitation freeze, disease/pest empty≠unknown, nutrient null≠none, NaN loss guards, SMS badge removed, health.json tip-stamp CI/local assert). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).
+In-repo honesty/security residuals closed on this tip batch (success/peer cost CHECKs, recommendation UPDATE freeze, predict-stress fail-closed, Predictions unknown-risk honesty, local honesty e2e gate, yield/canopy CHECKs, feedback assessment RLS, event_type allowlist, bug_report status freeze, acreage CHECK, claim loss CHECK, expert priority freeze, form completed@100%, field_uniformity scale honesty, alert-ack ownership lock, conversation_memory INSERT drop, unknown stress no longer invents severe, critical-alert UPDATE freeze, claim↔assessment field match, peer effectiveness CHECK, claim INSERT status lock, coop-alert member INSERT drop, claim UPDATE/invitation freeze, disease/pest empty≠unknown, nutrient null≠none, NaN loss guards, SMS badge removed, health.json tip-stamp CI/local assert). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).

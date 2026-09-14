@@ -106,6 +106,15 @@ export function TreatmentOutcomeDialog({
         return;
       }
 
+      const parsedCost = costPerAcre.trim() ? Number(costPerAcre) : null;
+      if (parsedCost != null && (!Number.isFinite(parsedCost) || parsedCost < 0)) {
+        toast({
+          title: 'Cost per acre must be a number greater than or equal to 0',
+          variant: 'destructive'
+        });
+        return;
+      }
+
       const { success } = computeTreatmentSuccess({
         outcome,
         healthScoreBefore,
@@ -123,7 +132,7 @@ export function TreatmentOutcomeDialog({
           problem_addressed: symptoms.join(', ') || stressLevel || 'Unknown',
           outcome: outcome === 'success' ? 'successful' : outcome === 'partial' ? 'partially_successful' : 'unsuccessful',
           effectiveness_score: healthAfter,
-          cost_usd: costPerAcre ? parseFloat(costPerAcre) : null,
+          cost_usd: parsedCost,
           notes: notes || `Treatment: ${extractTreatmentName(recommendation.recommendation_text)}`,
           applied_at: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           evaluated_at: new Date().toISOString().split('T')[0],

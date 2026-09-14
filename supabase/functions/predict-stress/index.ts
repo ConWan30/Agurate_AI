@@ -216,14 +216,21 @@ Return JSON only with structured predictions.`
       throw new Error(`AI Gateway error: ${response.status}`);
     }
 
-    const aiData = await response.json();
-    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+    const aiPayload = await response.json();
+    const toolCall = aiPayload.choices?.[0]?.message?.tool_calls?.[0];
     
     if (!toolCall) {
-      throw new Error('No predictions generated');
+      throw new Error('No forecast generated');
     }
 
-    const predictions = JSON.parse(toolCall.function.arguments);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(toolCall.function.arguments);
+    } catch {
+      throw new Error('Forecast payload was not valid JSON');
+    }
+
+    const predictions = sanitizeForecastPayload(parsed, days);
 
     return new Response(JSON.stringify(predictions), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -234,3 +241,69 @@ Return JSON only with structured predictions.`
     return handleError(error, 'predict-stress', corsHeaders);
   }
 });
+
+const ALLOWED_RISK = new Set(['low', 'medium', 'high']);
+
+/** Fail-closed: drop invent rows; never invent low risk for unknown levels. */
+function sanitizeForecastPayload(raw: unknown, days: number) {
+  const empty = {
+    forecast: [] as Array<Record<string, unknown>>,
+    summary: 'Predictions unavailable — model returned incomplete risk data.',
+    high_risk_days: 0,
+  };
+
+  if (!raw || typeof raw !== 'object') return empty;
+  const obj = raw as Record<string, unknown>;
+  const rows = Array.isArray(obj.forecast) ? obj.forecast : [];
+  const forecast: Array<Record<string, unknown>> = [];
+
+  for (const item of rows) {
+    if (!item || typeof item !== 'object') continue;
+    const row = item as Record<string, unknown>;
+    const risk = String(row.risk_level ?? '').trim().toLowerCase();
+    if (!ALLOWED_RISK.has(risk)) continue;
+
+    const confidence = Number(row.confidence);
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) continue;
+
+    const day = Number(row.day);
+    if (!Number.isFinite(day) || day < 1) continue;
+
+    const date = typeof row.date === 'string' ? row.date : '';
+    if (!date) continue;
+
+    const predicted_stress =
+      typeof row.predicted_stress === 'string' && row.predicted_stress.trim()
+        ? row.predicted_stress.trim().slice(0, 120)
+        : null;
+    if (!predicted_stress) continue;
+
+    forecast.push({
+      day,
+      date,
+      risk_level: risk,
+      predicted_stress,
+      confidence,
+      weather_factor:
+        typeof row.weather_factor === 'string'
+          ? row.weather_factor.slice(0, 100)
+          : '',
+      recommendation:
+        typeof row.recommendation === 'string'
+          ? row.recommendation.slice(0, 200)
+          : '',
+    });
+
+    if (forecast.length >= days) break;
+  }
+
+  if (forecast.length === 0) return empty;
+
+  const high_risk_days = forecast.filter((f) => f.risk_level === 'high').length;
+  const summary =
+    typeof obj.summary === 'string' && obj.summary.trim()
+      ? obj.summary.trim().slice(0, 300)
+      : 'Stress outlook generated from available field history.';
+
+  return { forecast, summary, high_risk_days };
+}

@@ -23,6 +23,19 @@ const GATES = [
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example',
   } },
   { name: 'health stamp', cmd: 'npm', args: ['run', 'verify:health-stamp'] },
+  {
+    name: 'honesty e2e',
+    cmd: 'npm',
+    args: ['run', 'test:e2e:honesty'],
+    env: {
+      VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || 'https://example.supabase.co',
+      VITE_SUPABASE_PUBLISHABLE_KEY:
+        process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example',
+      // Allow reuse when a prior gate left :8080 occupied; CI installs a fresh server.
+      PLAYWRIGHT_REUSE_SERVER: '1',
+    },
+  },
 ];
 
 function latestMigrationId() {
