@@ -152,7 +152,7 @@ serve(async (req) => {
       throw new Error('User creation returned no user');
     }
 
-    const { error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .upsert({
         id: authData.user.id,
@@ -164,10 +164,36 @@ serve(async (req) => {
         beta_farmer: true,
         beta_signup_date: new Date().toISOString(),
         beta_feedback_provided: false,
-      });
+      })
+      .select('id')
+      .maybeSingle();
 
     if (profileError) {
       console.error('Error updating profile:', profileError);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'profile_failed',
+          message: 'Account was created but profile could not be saved. Please contact support or try signing in.',
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+    if (!profile) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'profile_failed',
+          message: 'Account was created but profile was not saved (no row returned). Please contact support.',
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     if (formData.location && formData.primary_crop) {
@@ -179,7 +205,7 @@ serve(async (req) => {
       };
       const cropType = normalizeCrop(formData.primary_crop);
       if (cropType) {
-        const { error: fieldError } = await supabase
+        const { data: field, error: fieldError } = await supabase
           .from('fields')
           .insert({
             user_id: authData.user.id,
@@ -189,10 +215,38 @@ serve(async (req) => {
             // Leave coordinates unset — farmer must set real GPS (never invent parish center)
             location_lat: null,
             location_lng: null,
-          });
+          })
+          .select('id')
+          .maybeSingle();
 
         if (fieldError) {
           console.error('Error creating field:', fieldError);
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'field_failed',
+              message:
+                'Account and profile were saved but the first field was not created. You can add a field after signing in.',
+            }),
+            {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+        if (!field) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'field_failed',
+              message:
+                'Account and profile were saved but the first field was not created (no row returned). You can add a field after signing in.',
+            }),
+            {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
         }
       } else {
         console.log('Skipping default field create for non-specific primary_crop:', formData.primary_crop);
@@ -206,10 +260,23 @@ serve(async (req) => {
 
     if (resetError) {
       console.error('Error sending password reset:', resetError);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'password_reset_failed',
+          message:
+            'Account was created but the password-setup email could not be sent. Please use Forgot Password on the sign-in page, or contact support.',
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const { data: newCountData } = await supabase.rpc('get_beta_farmer_count');
-    const betaNumber = newCountData || currentBetaCount + 1;
+    // Prefer the RPC count; if unavailable, report unknown rather than inventing +1.
+    const betaNumber = newCountData ?? null;
 
     return new Response(
       JSON.stringify({

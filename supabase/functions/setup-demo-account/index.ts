@@ -91,11 +91,12 @@ serve(async (req) => {
       primary_crops: ['rice', 'soybean', 'cotton'],
     });
 
-    // STEP 2: Create 3 fields (crop_type must match fields CHECK: rice|soybean|cotton|corn)
+    // STEP 2: Create 3 DEMO fields (synthetic fixtures for screenshots — not real farm data).
+    // Coordinates are labeled Morehouse Parish demo placeholders, not claimed field GPS.
     const fieldsData = [
       {
         user_id: demoUser.id,
-        name: 'North Rice Field',
+        name: '[DEMO] North Rice Field',
         crop_type: 'rice',
         acreage: 120,
         location_lat: 32.7340,
@@ -104,7 +105,7 @@ serve(async (req) => {
       },
       {
         user_id: demoUser.id,
-        name: 'South Soybean Field',
+        name: '[DEMO] South Soybean Field',
         crop_type: 'soybean',
         acreage: 180,
         location_lat: 32.7300,
@@ -113,7 +114,7 @@ serve(async (req) => {
       },
       {
         user_id: demoUser.id,
-        name: 'West Cotton Field',
+        name: '[DEMO] West Cotton Field',
         crop_type: 'cotton',
         acreage: 90,
         location_lat: 32.7380,
@@ -274,22 +275,34 @@ serve(async (req) => {
 
     const { data: assessments, error: assessError } = await supabase
       .from('assessments')
-      .upsert(assessmentsData)
+      .upsert(
+        assessmentsData.map((a) => ({
+          ...a,
+          detailed_visual_analysis:
+            'SYNTHETIC DEMO FIXTURE — not a real field assessment. Scores and symptoms are placeholders for UI screenshots only.',
+          symptoms: [
+            ...(Array.isArray(a.symptoms) ? a.symptoms : []),
+            '[DEMO FIXTURE]',
+          ],
+        })),
+      )
       .select();
 
     if (assessError) throw assessError;
-    console.log(`✅ Created ${assessments.length} assessments`);
+    console.log(`✅ Created ${assessments.length} synthetic DEMO assessments`);
 
-    // STEP 4: Create insurance claim for hail damage
+    // STEP 4: Create DEMO insurance claim fixture (synthetic — not a real claim)
     const { data: claim } = await supabase
       .from('insurance_claims')
       .insert({
         field_id: fields[0].id,
         event_type: 'hail',
         event_date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        description: 'Severe hail damage during storm on June 15, 2025. Extensive damage to rice crop at panicle initiation stage.',
-        estimated_damage_cost: 28500,
-        status: 'submitted'
+        description:
+          '[DEMO SYNTHETIC FIXTURE] Example hail-damage claim for UI screenshots only — not a real loss event.',
+        // Do not invent loss percentage — leave unset for honesty
+        estimated_loss_percentage: null,
+        status: 'draft',
       })
       .select()
       .single();
@@ -300,17 +313,17 @@ serve(async (req) => {
         claim_id: claim.id,
         assessment_id: assessments[1].id // The severe rice assessment
       });
-      console.log('✅ Created insurance claim with linked assessment');
+      console.log('✅ Created DEMO insurance claim fixture with linked assessment');
     }
 
-    // STEP 5: Create cooperative
+    // STEP 5: Create DEMO cooperative (membership count is real: 1 after insert below)
     const { data: coop } = await supabase
       .from('cooperatives')
       .insert({
         created_by: demoUser.id,
-        name: 'Delta Farmers Cooperative',
-        description: 'Northeast Louisiana farmer collaborative for shared insights and bulk purchasing',
-        member_count: 25
+        name: '[DEMO] Delta Farmers Cooperative',
+        description:
+          '[DEMO SYNTHETIC FIXTURE] Example cooperative for screenshots only — not a real organization.',
       })
       .select()
       .single();
@@ -320,17 +333,18 @@ serve(async (req) => {
         cooperative_id: coop.id,
         user_id: demoUser.id,
         role: 'member',
-        data_sharing_enabled: true
       });
-      console.log('✅ Created cooperative with demo user as member');
+      console.log('✅ Created DEMO cooperative with demo user as member');
     }
 
-    console.log('✅ Demo account setup complete!');
+    console.log('✅ Demo account setup complete (all seeded rows are synthetic fixtures)!');
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        message: 'Demo account fully populated',
+        message:
+          'Demo account populated with SYNTHETIC FIXTURES only (not real farm, assessment, claim, or cooperative data).',
+        synthetic: true,
         data: {
           user_id: demoUser.id,
           fields: fields.length,

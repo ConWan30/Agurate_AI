@@ -61,13 +61,13 @@ export function AnalysisExecutiveSummary({
       {showCriticalAlert && criticalIssue && (
         <Alert variant="destructive" className="border-2">
           <AlertTriangle className="h-5 w-5" />
-          <AlertTitle className="text-lg font-bold">🚨 Immediate Action Required</AlertTitle>
+          <AlertTitle className="text-lg font-bold">Immediate action may be needed</AlertTitle>
           <AlertDescription className="text-base">
-            {criticalIssue} detected. 
-            {yieldImpact != null && Number.isFinite(yieldImpact) && yieldImpact !== 0 && ` Estimated yield impact: ${Math.abs(yieldImpact)}%.`}
+            {criticalIssue} detected.
+            {yieldImpact != null && Number.isFinite(yieldImpact) && yieldImpact !== 0 && ` Estimated yield impact: ${Math.abs(yieldImpact)}% (model estimate — verify in field).`}
             {topRecommendation && (
               <span className="block mt-2 font-semibold">
-                Recommended action: {topRecommendation}
+                Suggested next step: {topRecommendation}
               </span>
             )}
           </AlertDescription>

@@ -33,20 +33,22 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
       });
       if (error) throw error;
 
-      window.open('https://delta-iat.water.msstate.edu/', '_blank');
-      
+      // Open only after the referral write succeeds — do not invent a recorded click.
+      window.open('https://delta-iat.water.msstate.edu/', '_blank', 'noopener,noreferrer');
+
       toast({
-        title: "DIRT Tool Opened",
-        description: "Opening MSU DIRT irrigation scheduling tool",
+        title: "DIRT referral recorded",
+        description: "Opening the public MSU DIRT irrigation scheduling tool (external site).",
       });
     } catch (error) {
       console.error('Error:', error);
       toast({
         title: "Could not record DIRT referral",
-        description: "The DIRT tool will still open, but this click was not saved.",
+        description: "Click was not saved. You can still open DIRT manually if needed.",
         variant: "destructive",
       });
-      window.open('https://delta-iat.water.msstate.edu/', '_blank');
+      // Still allow the farmer to reach the external tool, but do not claim the click was recorded.
+      window.open('https://delta-iat.water.msstate.edu/', '_blank', 'noopener,noreferrer');
     }
   };
 
