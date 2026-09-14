@@ -17,7 +17,7 @@ interface FieldData {
   name: string;
   crop_type: string;
   avgHealth: number | null;
-  trend: number;
+  trend: number | null;
   lastAssessment: string;
 }
 
@@ -64,17 +64,17 @@ export default function Analytics() {
             ? scored.reduce((sum: number, a: any) => sum + Number(a.health_score), 0) / scored.length
             : null;
           
-          const recentAssessments = assessments.slice(-2);
-          const trend = recentAssessments.length === 2
-            ? recentAssessments[1].health_score - recentAssessments[0].health_score
-            : 0;
+          const scoredRecent = scored.slice(-2);
+          const trend = scoredRecent.length === 2
+            ? Number(scoredRecent[1].health_score) - Number(scoredRecent[0].health_score)
+            : null;
 
           return {
             id: field.id,
             name: field.name,
             crop_type: field.crop_type,
             avgHealth: avgHealth == null ? null : Math.round(avgHealth),
-            trend: Math.round(trend),
+            trend: trend == null ? null : Math.round(trend),
             lastAssessment: assessments[assessments.length - 1]?.analyzed_at || "N/A"
           };
         });
@@ -276,10 +276,16 @@ export default function Analytics() {
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Trend</p>
                       <div className="flex items-center gap-2">
-                        <TrendingUp className={`h-5 w-5 ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`} aria-hidden="true" />
-                        <p className={`text-2xl font-mono font-bold ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`}>
-                          {field.trend >= 0 ? '+' : ''}{field.trend}%
-                        </p>
+                        {field.trend == null ? (
+                          <p className="text-2xl font-mono font-bold text-muted-foreground">N/A</p>
+                        ) : (
+                          <>
+                            <TrendingUp className={`h-5 w-5 ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`} aria-hidden="true" />
+                            <p className={`text-2xl font-mono font-bold ${field.trend >= 0 ? 'text-health-good' : 'text-health-severe'}`}>
+                              {field.trend >= 0 ? '+' : ''}{field.trend}%
+                            </p>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -138,3 +138,8 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 2. Migration applied confirmation in Supabase (including critical_alerts reconcile through tip)
 3. Live production URL showing honest closed-beta copy
 4. Auth + one authenticated scan path working on production
+- [x] Analytics trends require two scored assessments (null health not treated as 0)
+- [x] Weather timeline omits invented 0% when health score missing
+- [x] Cooperative avg health averages scored assessments only
+- [x] History weather card hidden when temp/precip not recorded
+- [x] Soften residual absolute "Lock in / Keep 50%" beta pricing copy

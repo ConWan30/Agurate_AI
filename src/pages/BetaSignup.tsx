@@ -166,7 +166,7 @@ export default function BetaSignup() {
             🌾 Join AgurateAI Beta Program
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground">
-            Closed beta for Louisiana Delta farmers — 50% off the published rate after launch
+            Closed beta for Louisiana Delta farmers — possible 50% off the published rate after launch
           </p>
           
           {/* Beta Status */}
@@ -221,7 +221,7 @@ export default function BetaSignup() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Keep 50% off the published plan rate when paid plans launch
+                  Possible 50% off the published plan rate when paid plans launch
                 </p>
               </CardContent>
             </Card>

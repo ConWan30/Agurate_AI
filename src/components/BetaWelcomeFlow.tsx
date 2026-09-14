@@ -125,9 +125,9 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             <div className="flex items-start gap-3">
               <TrendingDown className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <div>
-                <p className="font-semibold text-foreground">50% off published rate</p>
+                <p className="font-semibold text-foreground">Possible 50% off published rate</p>
                 <p className="text-sm text-muted-foreground">
-                  Keep 50% off the published plan rate when paid plans launch
+                  Possible 50% off the published plan rate when paid plans launch
                 </p>
               </div>
             </div>

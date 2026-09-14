@@ -36,8 +36,8 @@ interface Assessment {
   stress_level: string;
   symptoms: string[];
   confidence_score: number;
-  weather_temp_f: number;
-  weather_precipitation_mm: number;
+  weather_temp_f: number | null;
+  weather_precipitation_mm: number | null;
   image_url: string;
   created_at: string;
   growth_stage?: string;
@@ -553,24 +553,30 @@ export default function History() {
                     detailedVisualAnalysis={selectedAssessment.detailed_visual_analysis}
                   />
 
-                  {/* Weather Conditions */}
+                  {/* Weather Conditions — only when recorded values exist */}
+                  {(selectedAssessment.weather_temp_f != null || selectedAssessment.weather_precipitation_mm != null) && (
                   <Card className="bg-muted/50">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm">Weather Conditions at Analysis</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex gap-6">
+                        {selectedAssessment.weather_temp_f != null && (
                         <div>
                           <p className="text-2xl font-bold">{selectedAssessment.weather_temp_f}°F</p>
                           <p className="text-xs text-muted-foreground">Temperature</p>
                         </div>
+                        )}
+                        {selectedAssessment.weather_precipitation_mm != null && (
                         <div>
                           <p className="text-2xl font-bold">{selectedAssessment.weather_precipitation_mm} mm</p>
                           <p className="text-xs text-muted-foreground">Precipitation</p>
                         </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
+                  )}
 
                   {/* Symptoms */}
                   {selectedAssessment.symptoms && selectedAssessment.symptoms.length > 0 && (

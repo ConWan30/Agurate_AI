@@ -99,7 +99,7 @@ export function BetaConversionBanner() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                Keep 50% off the published plan rate before beta ends on{' '}
+                Possible 50% off the published plan rate before beta ends on{' '}
                 <span className="font-semibold text-foreground">
                   {betaEndDate?.toLocaleDateString('en-US', { 
                     month: 'long', 
@@ -114,8 +114,8 @@ export function BetaConversionBanner() {
               <div className="flex items-start gap-2 text-sm">
                 <DollarSign className="h-4 w-4 text-primary mt-0.5" />
                 <div>
-                  <p className="font-medium">50% off published rate</p>
-                  <p className="text-xs text-muted-foreground">50% off the published plan rate after paid plans launch</p>
+                  <p className="font-medium">Possible 50% off published rate</p>
+                  <p className="text-xs text-muted-foreground">Possible 50% off the published plan rate after paid plans launch</p>
                 </div>
               </div>
 

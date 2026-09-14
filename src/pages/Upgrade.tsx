@@ -71,7 +71,7 @@ export default function Upgrade() {
             🌟 Beta Farmer Exclusive Offer
           </Badge>
           <h2 className="text-3xl font-bold">
-            Lock in Your Beta Pricing Benefit
+            Your Beta Pricing Benefit
           </h2>
           <p className="text-lg text-muted-foreground">
             As a beta farmer, you've helped us build AgurateAI. Beta farmers may keep 50% off the published plan rate when paid plans launch. Billing checkout is not open yet.

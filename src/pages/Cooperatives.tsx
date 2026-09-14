@@ -136,15 +136,18 @@ export default function Cooperatives() {
             .limit(50);
 
           const totalAcreage = fields?.reduce((sum, f) => sum + (Number(f.acreage) || 0), 0) || 0;
-          const avgHealth = assessments?.length 
-            ? assessments.reduce((sum, a) => sum + (Number(a.health_score) || 0), 0) / assessments.length
-            : 0;
+          const scored = (assessments || []).filter(
+            (a) => a.health_score != null && !Number.isNaN(Number(a.health_score))
+          );
+          const avgHealth = scored.length
+            ? scored.reduce((sum, a) => sum + Number(a.health_score), 0) / scored.length
+            : null;
 
           return {
             cooperative_id: coop.id,
             total_acreage: totalAcreage,
             field_count: fields?.length || 0,
-            avg_health: Math.round(avgHealth)
+            avg_health: avgHealth == null ? null : Math.round(avgHealth)
           };
         })
       );
@@ -424,7 +427,7 @@ export default function Cooperatives() {
                             <div className="p-4 bg-muted/50 rounded-lg text-center">
                               <div className="flex items-center justify-center gap-2 mb-1">
                                 <TrendingUp className="h-4 w-4 text-primary" />
-                                <span className="text-2xl font-bold">{stats.avg_health}</span>
+                                <span className="text-2xl font-bold">{stats.avg_health == null ? "—" : stats.avg_health}</span>
                               </div>
                               <p className="text-xs text-muted-foreground">Avg Health</p>
                             </div>
