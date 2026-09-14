@@ -204,7 +204,7 @@ export function CriticalAlertsManager() {
               <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg">
                 <AlertTriangle className="h-4 w-4 text-destructive" />
                 <span className="text-sm font-semibold">
-                  Estimated Potential Loss: ${alert.estimated_loss_usd.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  Illustrative planning estimate: ${alert.estimated_loss_usd.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                 </span>
               </div>
             )}

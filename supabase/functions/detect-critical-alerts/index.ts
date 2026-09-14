@@ -137,13 +137,16 @@ serve(async (req) => {
     }
 
     const alertType = determineAlertType(normalizedDiseases, normalizedPests, stress_level);
+    const yieldImpact = Number.isFinite(Number(estimated_yield_impact_percent))
+      ? Number(estimated_yield_impact_percent)
+      : null;
     const { title, message, estimatedLoss } = generateAlertContent({
       alertType,
       fieldName: field.name || 'Field',
       cropType: crop_type || 'crop',
       diseases: normalizedDiseases,
       pests: normalizedPests,
-      yieldImpact: estimated_yield_impact_percent || 0,
+      yieldImpact,
       acreage: field_acreage ?? 0,
       cropValue: getCropValuePerAcre(crop_type || 'rice'),
     });
@@ -229,19 +232,24 @@ function generateAlertContent(params: {
   cropType: string;
   diseases?: Array<{ name: string; severity: string; confidence: number }>;
   pests?: Array<{ name: string; severity: string; confidence: number }>;
-  yieldImpact: number;
+  yieldImpact: number | null;
   acreage: number;
   cropValue: number;
-}): { title: string; message: string; estimatedLoss: number } {
+}): { title: string; message: string; estimatedLoss: number | null } {
   const { alertType, cropType, diseases, pests, yieldImpact, acreage, cropValue } = params;
-  const estimatedLoss = (yieldImpact / 100) * acreage * cropValue;
-  const lossText = estimatedLoss.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  const hasYieldImpact = yieldImpact != null && Number.isFinite(yieldImpact) && acreage > 0;
+  const estimatedLoss = hasYieldImpact
+    ? (Number(yieldImpact) / 100) * acreage * cropValue
+    : null;
+  const lossSuffix = estimatedLoss != null
+    ? ` Illustrative planning estimate if untreated (not a measured loss): $${estimatedLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })}.`
+    : '';
 
   if (alertType === 'disease' && diseases?.length) {
     const disease = diseases[0];
     return {
       title: `Critical: ${disease.name} Detected`,
-      message: `${disease.name} was flagged in your ${cropType} field. Review treatment options promptly. Illustrative loss estimate if untreated: $${lossText}.`,
+      message: `${disease.name} was flagged in your ${cropType} field. Review treatment options promptly.${lossSuffix}`,
       estimatedLoss,
     };
   }
@@ -249,20 +257,20 @@ function generateAlertContent(params: {
     const pest = pests[0];
     return {
       title: `Critical: ${pest.name} Pressure`,
-      message: `Elevated ${pest.name} pressure was flagged in your ${cropType} field. Confirm in-field and consider control measures. Illustrative loss estimate if untreated: $${lossText}.`,
+      message: `Elevated ${pest.name} pressure was flagged in your ${cropType} field. Confirm in-field and consider control measures.${lossSuffix}`,
       estimatedLoss,
     };
   }
   if (alertType === 'water_stress') {
     return {
       title: 'Critical: Severe Water Stress',
-      message: `Your ${cropType} field shows severe water-stress signals. Verify irrigation/soil moisture soon. Illustrative loss estimate if untreated: $${lossText}.`,
+      message: `Your ${cropType} field shows severe water-stress signals. Verify irrigation/soil moisture soon.${lossSuffix}`,
       estimatedLoss,
     };
   }
   return {
     title: 'Critical Alert: Field Health Issue',
-    message: `A high-urgency health signal was flagged for your ${cropType} field. Review the assessment details. Illustrative loss estimate if untreated: $${lossText}.`,
+    message: `A high-urgency health signal was flagged for your ${cropType} field. Review the assessment details.${lossSuffix}`,
     estimatedLoss,
   };
 }

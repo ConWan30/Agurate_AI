@@ -398,7 +398,7 @@ export default function History() {
                     healthScore={toHealthPercent(selectedAssessment.health_score)}
                     stressLevel={selectedAssessment.stress_level}
                     condition={selectedAssessment.stress_level}
-                    yieldImpact={selectedAssessment.estimated_yield_impact_percent ?? undefined}
+                    yieldImpact={selectedAssessment.estimated_yield_impact_percent != null && Number.isFinite(Number(selectedAssessment.estimated_yield_impact_percent)) ? Number(selectedAssessment.estimated_yield_impact_percent) : undefined}
                     diseaseCount={selectedAssessment.disease_identified?.length || 0}
                     diseasePressure={(selectedAssessment.severity_ratings?.disease_pressure as any) || "none"}
                     pestCount={selectedAssessment.pest_identified?.length || 0}
@@ -530,9 +530,10 @@ export default function History() {
                   />
 
                   {/* Economic Impact */}
-                  {selectedAssessment.estimated_yield_impact_percent !== undefined && (
+                  {selectedAssessment.estimated_yield_impact_percent != null
+                    && Number.isFinite(Number(selectedAssessment.estimated_yield_impact_percent)) && (
                     <EconomicImpact
-                      yieldImpact={selectedAssessment.estimated_yield_impact_percent}
+                      yieldImpact={Number(selectedAssessment.estimated_yield_impact_percent)}
                       cropType={selectedAssessment.field.crop_type}
                     />
                   )}

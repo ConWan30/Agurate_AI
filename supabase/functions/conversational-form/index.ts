@@ -262,7 +262,7 @@ Parish-Specific Personalization:
 
 Beta Program Communication:
 - Explain they're getting free access during closed beta
-- Mention 50% off the published plan rate after launch (confirm current pricing in-app)
+- Mention a possible 50% off the published plan rate after launch (confirm current pricing in-app; not guaranteed)
 - Explain they're helping build the future of Louisiana agriculture
 - Do not invent or quote specific dollar amounts for plan pricing
 
@@ -285,7 +285,7 @@ REQUIRED FORMAT:
   "completion_percentage": 70,
   "next_question": "Brief next question prompt",
   "suggestions": ["Rice", "Soybeans", "Cotton", "Corn"],
-  "beta_benefit_highlight": "Free during closed beta, with a 50% off the published plan rate after launch (confirm current pricing in-app)"
+  "beta_benefit_highlight": "Free during closed beta, with a possible 50% off the published plan rate after launch (confirm current pricing in-app; not guaranteed)"
 }`
 };
 
@@ -457,9 +457,8 @@ serve(async (req) => {
       
       // Beta Program
       betaProgram: profile?.beta_farmer ? {
-        lifetimeDiscount: 50,
         access: 'free during closed beta',
-        afterBeta: '50% off the published plan rate after launch (confirm current pricing in-app)'
+        afterBeta: 'possible 50% off the published plan rate after launch (confirm current pricing in-app; not guaranteed)'
       } : null
     };
 

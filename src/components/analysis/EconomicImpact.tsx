@@ -45,7 +45,7 @@ export function EconomicImpact({
         <div className="flex justify-between items-center p-4 bg-background rounded-lg border">
           <div>
             <p className="text-sm font-medium">Estimated Yield Impact</p>
-            <p className="text-xs text-muted-foreground">Based on current health score</p>
+            <p className="text-xs text-muted-foreground">Based on recorded yield-at-risk estimate (not inferred from health alone)</p>
           </div>
           <div className="text-right">
             <p className={cn(

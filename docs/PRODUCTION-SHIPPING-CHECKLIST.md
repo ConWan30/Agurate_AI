@@ -143,3 +143,7 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 - [x] Cooperative avg health averages scored assessments only
 - [x] History weather card hidden when temp/precip not recorded
 - [x] Soften residual absolute "Lock in / Keep 50%" beta pricing copy
+- [x] Upload omits invented "Louisiana Delta region" when field GPS missing
+- [x] History EconomicImpact requires finite yield-at-risk (null ≠ +0%)
+- [x] Conversational-form beta discount copy is contingent (not guaranteed)
+- [x] Critical alerts omit USD loss unless yield impact is recorded; UI labeled illustrative

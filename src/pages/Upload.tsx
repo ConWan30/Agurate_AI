@@ -172,7 +172,7 @@ export default function Upload() {
       
       const fieldLocation = field.location_lat && field.location_lng 
         ? `${field.location_lat}, ${field.location_lng}`
-        : "Louisiana Delta region";
+        : undefined;
 
       // Track analytics
       const { analytics } = await import('@/lib/analytics');
@@ -220,7 +220,7 @@ export default function Upload() {
     signedImageUrl: string,
     storagePath: string,
     cropType: string,
-    location: string,
+    location: string | undefined,
     fieldId: string,
     mediaType: 'image' | 'video'
   ) => {
