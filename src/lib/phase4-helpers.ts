@@ -3,7 +3,7 @@
  * Kept separate so Phase 4 behavior can be unit-tested without dialog UI.
  */
 
-import { toHealthPercent } from '@/lib/health-score';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 /** Map recommendation category → peer problem token. Never invent a product class (e.g. fungicide) from "pest". */
 export function getTreatmentType(category: string): string {
@@ -83,7 +83,17 @@ export function generateFallbackPredictiveQuestions(input: {
       'When should I schedule the next field check?',
     ];
   }
-  const healthScore = toHealthPercent(Number(input.healthScore));
+  const healthScore = hasHealthScore(input.healthScore)
+    ? toHealthPercent(Number(input.healthScore))
+    : null;
+  if (healthScore == null) {
+    return [
+      `What should I monitor in my ${cropType} this week?`,
+      'Any upcoming weather concerns?',
+      'Best practices for maintaining crop health?',
+      'When should I schedule the next field check?',
+    ];
+  }
   if (healthScore < 70) {
     return [
       `What's causing the stress in my ${cropType}?`,

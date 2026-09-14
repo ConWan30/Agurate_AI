@@ -86,7 +86,7 @@ export default function Scanner() {
       },
       (error) => {
         console.error('GPS error:', error);
-        toast.warning('Unable to get GPS location. Using field default.');
+        toast.warning('Unable to get device GPS. Photo will be saved without GPS metadata — field weather still uses the field’s recorded coordinates when available.');
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );

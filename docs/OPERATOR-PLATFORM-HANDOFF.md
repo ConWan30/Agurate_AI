@@ -4,7 +4,7 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| In-repo honesty, security, quality | **Complete for tip invent locks** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`). Re-confirm with `npm run verify:local-gates` + tip CI after each push. High-impact invent/security residuals continue to close in-repo; remaining production-complete blockers are platform-only. |
+| In-repo honesty, security, quality | **Complete for tip invent locks** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`). Re-confirm with `npm run verify:local-gates` + tip CI after each push. High-impact invent/security residuals continue to close in-repo (null health scores no longer invent 0%, tutorial Example labeling, fail-closed welcome/tutorial writes); remaining production-complete blockers are platform-only. |
 | Apply Supabase migrations through tip | **Blocked** | Needs project DB credentials (`supabase db push` or Dashboard SQL) |
 | Auth Leaked Password Protection | **Blocked** | Needs Supabase Dashboard access |
 | Deploy edge functions | **Blocked** | Needs Supabase CLI linked project + secrets |

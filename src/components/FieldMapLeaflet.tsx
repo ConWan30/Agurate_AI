@@ -27,8 +27,9 @@ export default function FieldMapLeaflet({ fields }: FieldMapLeafletProps) {
 
   const getHealthColor = (healthScore: number | null | undefined) => {
     if (!hasHealthScore(healthScore)) return '#94a3b8'; // slate — no assessment
-    if (toHealthPercent(healthScore) >= 75) return '#10b981';
-    if (toHealthPercent(healthScore) >= 50) return '#eab308';
+    const pct = toHealthPercent(healthScore);
+    if (pct >= 75) return '#10b981';
+    if (pct >= 50) return '#eab308';
     return '#ef4444';
   };
 

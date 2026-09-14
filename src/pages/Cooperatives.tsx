@@ -148,9 +148,9 @@ export default function Cooperatives() {
           const totalAcreage = recordedAcreages.length
             ? recordedAcreages.reduce((sum, n) => sum + n, 0)
             : null;
-          const scored = (assessments || [])
-            .filter((a) => hasHealthScore(a.health_score))
-            .map((a) => toHealthPercent(a.health_score));
+          const scored = (assessments || []).flatMap((a) =>
+            hasHealthScore(a.health_score) ? [toHealthPercent(a.health_score)] : []
+          );
           const avgHealth = scored.length
             ? scored.reduce((sum, n) => sum + n, 0) / scored.length
             : null;

@@ -20,11 +20,11 @@ describe('health-score helpers', () => {
     expect(toHealthPercent(91.5)).toBe(91.5);
   });
 
-  it('handles null, NaN, negatives, and >100', () => {
-    expect(toHealthPercent(null)).toBe(0);
-    expect(toHealthPercent(undefined)).toBe(0);
-    expect(toHealthPercent(Number.NaN)).toBe(0);
-    expect(toHealthPercent(-5)).toBe(0);
+  it('returns null for missing/invalid scores instead of inventing 0', () => {
+    expect(toHealthPercent(null)).toBeNull();
+    expect(toHealthPercent(undefined)).toBeNull();
+    expect(toHealthPercent(Number.NaN)).toBeNull();
+    expect(toHealthPercent(-5)).toBeNull();
     expect(toHealthPercent(150)).toBe(100);
   });
 
@@ -42,6 +42,7 @@ describe('health-score helpers', () => {
     expect(healthTone(0.2)).toBe('severe');
     expect(healthTone(null)).toBe('unknown');
     expect(toHealthFraction(80)).toBe(0.8);
+    expect(toHealthFraction(null)).toBeNull();
   });
 
   it('hasHealthScore / requireHealthScore fail closed on missing values', () => {

@@ -93,8 +93,9 @@ export default function FieldMap() {
 
   const getHealthColor = (healthScore: number | null | undefined) => {
     if (!hasHealthScore(healthScore)) return 'bg-muted-foreground/40';
-    if (toHealthPercent(healthScore) >= 75) return 'bg-health-good';
-    if (toHealthPercent(healthScore) >= 50) return 'bg-health-moderate';
+    const pct = toHealthPercent(healthScore);
+    if (pct >= 75) return 'bg-health-good';
+    if (pct >= 50) return 'bg-health-moderate';
     return 'bg-health-severe';
   };
 

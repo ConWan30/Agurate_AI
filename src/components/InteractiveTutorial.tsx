@@ -440,11 +440,15 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Every assessment James makes is <span className="font-bold">GPS-tagged automatically</span>, 
-            creating a living map of his 400-acre operation.
+            Every assessment James records can be <span className="font-bold">GPS-tagged</span>,
+            building a living map across his operation.
           </p>
           <Card className="border-primary/30 bg-gradient-to-br from-green-500/5 to-blue-500/5">
             <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-muted-foreground">Example map legend (illustrative)</p>
+                <Badge className="bg-warning text-warning-foreground">Example</Badge>
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <div className="text-center p-2 bg-green-500/10 rounded border border-green-500/30">
                   <MapPin className="h-5 w-5 text-green-600 mx-auto mb-1" />
@@ -459,7 +463,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                   <p className="text-xs font-medium">Severe: 5%</p>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">Heat map shows Section B needs immediate attention</p>
+              <p className="text-xs text-muted-foreground">Example only — not a real field heat map</p>
             </CardContent>
           </Card>
         </div>
@@ -473,21 +477,26 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            AgurateAI correlates <span className="font-bold">every assessment with weather patterns</span>, 
-            revealing cause-and-effect relationships James never saw before.
+            AgurateAI can correlate <span className="font-bold">recorded assessments with weather patterns</span>
+            when both are available — helping spot environmental context, not inventing causation.
           </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-muted-foreground">Example weather ↔ health timeline</p>
+            <Badge className="bg-warning text-warning-foreground">Example</Badge>
+          </div>
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2 p-2 bg-muted rounded">
               <span>June 8: Heat wave (98°F)</span>
               <ArrowRight className="h-4 w-4" />
-              <span className="text-destructive">Health dropped 32%</span>
+              <span className="text-destructive">Example: health down 32%</span>
             </div>
             <div className="flex items-center gap-2 p-2 bg-muted rounded">
               <span>June 15: Rainfall (2.3")</span>
               <ArrowRight className="h-4 w-4" />
-              <span className="text-primary">Health recovered 18%</span>
+              <span className="text-primary">Example: health up 18%</span>
             </div>
           </div>
+          <p className="text-xs text-muted-foreground">Illustrative only — not measured farm data.</p>
         </div>
       ),
       action: 'Next: Cooperatives'
@@ -499,17 +508,20 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            James joins <span className="font-bold">Delta Farmers Co-op</span> with 24 neighboring farms. 
-            Anonymous data sharing creates early warning systems.
+            James can join a <span className="font-bold">regional co-op</span> to share anonymized field signals
+            with neighbors — alerts only appear when real member reports exist.
           </p>
           <Card className="border-primary/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5">
-            <CardContent className="p-4">
-              <p className="font-semibold mb-2 text-sm">🚨 Early Outbreak Alert:</p>
+            <CardContent className="p-4 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-semibold text-sm">Example early outbreak alert</p>
+                <Badge className="bg-warning text-warning-foreground">Example</Badge>
+              </div>
               <p className="text-xs text-muted-foreground">
-                "3 farms within 10 miles reported possible <span className="font-bold text-destructive">rice blast</span> symptoms.
-                Check your fields soon. Public LSU AgCenter disease guides discuss preventative options — confirm with your parish agent before treating."
+                "Neighboring members reported possible <span className="font-bold text-destructive">rice blast</span> symptoms.
+                Check your fields soon. Public LSU AgCenter disease guides discuss options — confirm with your parish agent before treating."
               </p>
-              <Badge className="mt-2 text-xs">Helped James act before stress worsened</Badge>
+              <p className="text-xs text-muted-foreground">Illustrative placeholder — not a live outbreak or verified member count.</p>
             </CardContent>
           </Card>
         </div>

@@ -40,10 +40,17 @@ export function BetaWelcomeBanner() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase
+      const { data: updated, error } = await supabase
         .from('profiles')
         .update({ beta_welcome_dismissed: true })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select('id')
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!updated) {
+        throw new Error('Welcome banner was not dismissed (no matching row or update not permitted)');
+      }
 
       setIsDismissed(true);
     } catch (error) {
