@@ -376,11 +376,10 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </div>
 
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">🎯 Farmer ROI:</p>
+            <p className="text-sm font-medium mb-2">🎯 Documentation benefit:</p>
             <p className="text-sm text-muted-foreground">
-              James gets his insurance payout <span className="font-bold">3 weeks faster</span> due to 
-              AI-verified documentation. Stronger claims = better settlements. <span className="font-bold">$12,400 
-              saved</span> in this scenario.
+              James uses timestamped AI field notes to support his insurance claim. Clearer evidence can
+              help adjusters review cases — outcomes vary by carrier and are not guaranteed.
             </p>
           </div>
         </div>
@@ -524,49 +523,47 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            James tracks his <span className="font-bold">conservation practices</span> for USDA compliance 
-            while AgurateAI predicts cost savings over 5 years.
+            James logs his <span className="font-bold">conservation practices</span> for USDA documentation.
+            AgurateAI helps organize practice history — it does not promise dollar savings.
           </p>
           <div className="grid grid-cols-2 gap-3">
             <Card className="border-green-500/30 bg-green-500/5">
               <CardContent className="p-3 text-center">
                 <p className="text-xs text-muted-foreground mb-1">No-Till + Cover Crops</p>
-                <p className="text-2xl font-bold text-green-600">$38/acre</p>
-                <p className="text-xs text-muted-foreground">Year 1 savings</p>
+                <p className="text-sm font-bold text-green-600">Conservation practices</p>
+                <p className="text-xs text-muted-foreground">Track locally; savings vary</p>
               </CardContent>
             </Card>
             <Card className="border-green-500/30 bg-green-500/5">
               <CardContent className="p-3 text-center">
-                <p className="text-xs text-muted-foreground mb-1">5-Year Total</p>
-                <p className="text-2xl font-bold text-green-600">$15,200</p>
-                <p className="text-xs text-muted-foreground">Projected savings</p>
+                <p className="text-xs text-muted-foreground mb-1">Multi-year outlook</p>
+                <p className="text-sm font-bold text-green-600">Illustrative only</p>
+                <p className="text-xs text-muted-foreground">Not a guaranteed return</p>
               </CardContent>
             </Card>
           </div>
         </div>
       ),
-      action: 'Next: LSU Experts'
+      action: 'Next: LSU directory'
     },
     {
       icon: GraduationCap,
-      title: 'Core Feature #9: LSU AgCenter Access',
-      description: 'Direct line to Louisiana agricultural experts',
+      title: 'Core Feature #9: LSU AgCenter directory',
+      description: 'Public researcher profiles — contact via official LSU channels',
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            When AI isn't enough, James connects directly with <span className="font-bold">LSU AgCenter researchers</span> 
-            specializing in Delta crops.
+            When AI guidance is not enough, James can browse a <span className="font-bold">public LSU AgCenter researcher directory</span> and reach specialists through official LSU channels. AgurateAI does not broker introductions.
           </p>
           <Card className="border-primary/30 bg-gradient-to-br from-blue-500/5 to-purple-500/5">
             <CardContent className="p-4">
-              <p className="font-semibold mb-2 text-sm">🎓 Expert Available:</p>
+              <p className="font-semibold mb-2 text-sm">🎓 Example public profile:</p>
               <p className="text-sm font-medium mb-1">Dr. Sarah Martinez</p>
               <p className="text-xs text-muted-foreground">
-                Rice Pathology Specialist • 15 years Louisiana Delta research
+                Rice Pathology Specialist • Louisiana Delta research focus
               </p>
               <p className="text-xs text-muted-foreground mt-2 italic">
-                "I can review your field photos and provide customized treatment plans 
-                based on your specific soil conditions and planting date."
+                Contact through official LSU AgCenter channels. AgurateAI stores your consultation note locally and does not send cases to researchers.
               </p>
             </CardContent>
           </Card>

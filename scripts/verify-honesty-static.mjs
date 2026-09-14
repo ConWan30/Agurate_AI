@@ -20,6 +20,11 @@ const FORBIDDEN = [
   { name: '130+ years research claim', re: /Built on 130\+ years of research/i },
   { name: 'Expert help in <24hrs claim', re: /Expert help in <24hrs/i },
   { name: '85-95% accuracy band', re: /\b85-95%\b/ },
+  { name: '40% faster claims claim', re: /40%\s*faster/i },
+  { name: '15-25% more payouts claim', re: /15-25%\s*more/i },
+  { name: 'fabricated community savings total', re: /\$127K\+?\s*total savings/i },
+  { name: 'fabricated tutorial ROI dollars', re: /\$12,400|\$15,200/ },
+  { name: 'LSU AgCenter Access brokerage claim', re: /LSU AgCenter Access/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

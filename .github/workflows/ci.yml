@@ -24,6 +24,9 @@ jobs:
         continue-on-error: true
       - name: Unit tests
         run: npm run test:ci
+        env:
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
       - name: Honesty copy (static)
         run: npm run verify:honesty:static
       - name: Production build

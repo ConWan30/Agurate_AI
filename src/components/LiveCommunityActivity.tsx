@@ -68,7 +68,7 @@ export function LiveCommunityActivity() {
             <span className="inline-block h-2 w-2 rounded-full bg-green-400 animate-pulse" />
             {stats?.weeklyAssessments || 0} scans this week
           </p>
-          <p>💰 $127K+ total savings across Louisiana Delta</p>
+          <p>Closed beta for Louisiana Delta farms — savings claims not yet validated</p>
           <p>🌾 Protecting crops from Morehouse to East Carroll Parish</p>
         </div>
       </CardContent>

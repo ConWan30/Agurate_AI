@@ -20,11 +20,7 @@ export function BetaValueTracker() {
         .from('insurance_claims')
         .select('status');
 
-      // Calculate value:
-      // - Assessments × $25 (vs. extension service wait time)
-      // - Early disease detection (severe stress) × $1,000 (yield saved)
-      // - Insurance claims processed × $500 (faster processing)
-
+      // Illustrative planning weights only — not measured savings.
       const assessmentValue = (assessments?.length || 0) * 25;
       const diseaseValue = (assessments?.filter(a => a.stress_level === 'severe').length || 0) * 1000;
       const insuranceValue = (claims?.filter(c => c.status === 'approved').length || 0) * 500;
@@ -51,10 +47,10 @@ export function BetaValueTracker() {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <DollarSign className="h-5 w-5 text-primary" />
-          Your AgurateAI Value
+          Your AgurateAI Activity
         </CardTitle>
         <CardDescription>
-          Estimated savings & benefits during beta period
+          Illustrative planning estimate only — not validated dollar savings
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -63,7 +59,7 @@ export function BetaValueTracker() {
           <p className="text-5xl font-bold text-primary">
             ${valueData.totalValue.toLocaleString()}
           </p>
-          <p className="text-sm text-muted-foreground mt-2">Total Value This Month</p>
+          <p className="text-sm text-muted-foreground mt-2">Illustrative estimate this month</p>
         </div>
 
         {/* Value breakdown */}
@@ -71,7 +67,7 @@ export function BetaValueTracker() {
           <div className="flex items-center justify-between py-2 border-b">
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-primary" />
-              <span>Instant Assessments ({valueData.assessmentCount}×)</span>
+              <span>Assessments logged ({valueData.assessmentCount}×)</span>
             </div>
             <span className="font-semibold">${valueData.breakdown.assessmentValue}</span>
           </div>

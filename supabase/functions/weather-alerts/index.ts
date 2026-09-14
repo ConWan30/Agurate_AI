@@ -7,6 +7,23 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+/** Best-effort per-isolate rate limit to reduce authenticated write spam. */
+const recentCalls = new Map<string, number[]>();
+const RATE_WINDOW_MS = 15 * 60 * 1000;
+const RATE_MAX = 10;
+
+function allowUserCall(userId: string): boolean {
+  const now = Date.now();
+  const prior = (recentCalls.get(userId) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
+  if (prior.length >= RATE_MAX) {
+    recentCalls.set(userId, prior);
+    return false;
+  }
+  prior.push(now);
+  recentCalls.set(userId, prior);
+  return true;
+}
+
 // Input validation schema
 const weatherAlertsSchema = z.object({
   latitude: z.number().min(-90).max(90),
@@ -32,6 +49,21 @@ serve(async (req) => {
     const auth = await requireAuthenticatedUser(req, corsHeaders);
     if (auth instanceof Response) {
       return auth;
+    }
+    const { user } = auth;
+
+    if (!allowUserCall(user.id)) {
+      return new Response(
+        JSON.stringify({
+          error: "Too many weather alert requests. Please try again later.",
+          alerts: [],
+          count: 0,
+        }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     // Validate input
@@ -88,20 +120,20 @@ serve(async (req) => {
       alert.type === "excessive_rain"
     );
 
-    // Store alerts with service role only after the caller is authenticated
-    const supabase = getServiceClient();
-
-    // Store weather events for historical tracking
-    for (const alert of agAlerts) {
-      await supabase.from("weather_events").insert({
-        event_type: alert.type,
-        event_date: new Date(alert.start_time).toISOString().split("T")[0],
-        description: alert.description,
-        temperature_f: null,
-        precipitation_inches: null,
-        location_lat: latitude,
-        location_lng: longitude
-      });
+    // Store alerts with service role only after the caller is authenticated + rate-limited
+    if (agAlerts.length > 0) {
+      const supabase = getServiceClient();
+      for (const alert of agAlerts) {
+        await supabase.from("weather_events").insert({
+          event_type: alert.type,
+          event_date: new Date(alert.start_time).toISOString().split("T")[0],
+          description: alert.description,
+          temperature_f: null,
+          precipitation_inches: null,
+          location_lat: latitude,
+          location_lng: longitude
+        });
+      }
     }
 
     return new Response(

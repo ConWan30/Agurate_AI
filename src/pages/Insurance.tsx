@@ -286,10 +286,10 @@ export default function Insurance() {
             </div>
 
             <div className="p-4 bg-health-good/10 border border-health-good/20 rounded-lg">
-              <p className="text-sm font-medium text-health-good mb-1">💰 Estimated Value</p>
+              <p className="text-sm font-medium text-health-good mb-1">📋 Documentation support</p>
               <p className="text-sm text-muted-foreground">
-                Farmers with documented AI evidence settle claims <strong>40% faster</strong> and recover 
-                <strong> 15-25% more</strong> in payouts due to objective, timestamped crop health data.
+                Timestamped crop-health records can help support insurance conversations. Settlement
+                speed and payout amounts vary by carrier and are not guaranteed by AgurateAI.
               </p>
             </div>
           </CardContent>
