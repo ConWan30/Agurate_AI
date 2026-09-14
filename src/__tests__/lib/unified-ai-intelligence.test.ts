@@ -36,7 +36,7 @@ describe('gatherUnifiedContext', () => {
   });
 
   it('should gather context from all systems', async () => {
-    const mockField = { id: 'field-1', name: 'Test Field', crop_type: 'rice' };
+    const mockField = { id: 'field-1', name: 'Test Field', crop_type: 'soybean' };
     const mockAssessments = [{ id: 'assess-1', health_score: 85, analyzed_at: '2024-01-01', stress_level: 'low', symptoms: [] }];
 
     from.mockImplementation((table: string) => {
@@ -79,7 +79,7 @@ describe('formatContextForAI', () => {
         id: 'field-1',
         user_id: 'user-1',
         name: 'Test Field',
-        crop_type: 'rice',
+        crop_type: 'soybean',
         created_at: '2024-01-01T00:00:00Z',
       },
       assessmentHistory: [],
@@ -98,7 +98,7 @@ describe('formatContextForAI', () => {
 
     const formatted = formatContextForAI(context);
 
-    expect(formatted).toContain('rice');
+    expect(formatted).toContain('soybean');
     expect(formatted).toContain('85');
     expect(formatted).toContain('UNIFIED FIELD INTELLIGENCE CONTEXT');
   });

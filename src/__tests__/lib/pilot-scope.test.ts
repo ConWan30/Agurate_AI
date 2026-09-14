@@ -6,6 +6,7 @@ import {
   isPilotDeferredPath,
   normalizePilotCrop,
   requirePilotCrop,
+  pilotNavHref,
 } from '@/lib/pilot-scope';
 
 describe('pilot-scope', () => {
@@ -33,5 +34,10 @@ describe('pilot-scope', () => {
     expect(isPilotDeferredPath('/cooperatives/join/abc')).toBe(true);
     expect(isPilotDeferredPath('/scanner')).toBe(false);
     expect(isPilotDeferredPath('/fields')).toBe(false);
+  });
+
+  it('pilotNavHref sends deferred modules to the holding page', () => {
+    expect(pilotNavHref('/predictions')).toBe('/pilot-deferred');
+    expect(pilotNavHref('/scanner')).toBe('/scanner');
   });
 });

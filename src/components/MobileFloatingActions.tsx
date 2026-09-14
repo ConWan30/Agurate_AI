@@ -1,4 +1,4 @@
-import { Camera, TrendingUp, MapPin, History } from 'lucide-react';
+import { Camera, Cloud, MapPin, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -18,9 +18,9 @@ export default function MobileFloatingActions() {
       color: 'bg-primary text-primary-foreground hover:bg-primary/90',
     },
     {
-      icon: TrendingUp,
-      label: 'Predict',
-      path: '/predictions',
+      icon: Cloud,
+      label: 'Weather',
+      path: '/weather-timeline',
       color: 'bg-secondary text-secondary-foreground hover:bg-secondary/90',
     },
     {

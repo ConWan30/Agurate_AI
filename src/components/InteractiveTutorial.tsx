@@ -81,7 +81,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <TrendingUp className="h-8 w-8 text-secondary mb-2 group-hover:scale-110 transition-transform" />
-              <p className="text-sm font-semibold mb-1">Predictions</p>
+              <p className="text-sm font-semibold mb-1">Weather Timeline</p>
               <p className="text-xs text-muted-foreground">7-day stress forecasting</p>
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
@@ -210,17 +210,16 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </div>
         </div>
       ),
-      action: 'Next: Predictions →'
+      action: 'Next →'
     },
     {
       icon: TrendingUp,
-      title: 'Core Feature #2: Predictive Analytics',
+      title: 'Example (deferred): Planning outlooks',
       description: '6:40 AM - James checks the 7-day forecast',
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground leading-relaxed">
-            James taps "Predictions." The AI combines his field history, current assessment, and 
-            weather forecasts to generate optional stress planning outlooks for the next 7 days when enough field history exists — not a guaranteed forecast.
+            Example only for this closed beta: planning outlooks stay deferred until the Morehouse soybean wedge is field-validated. Live pilot tools are scan, fields, weather timeline, history, and Delta chat as a research aid.
           </p>
 
           <div className="space-y-2">
@@ -286,7 +285,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <div className="bg-card/50 p-3 rounded-lg">
                 <p className="text-sm font-medium mb-1">James asks:</p>
                 <p className="text-sm text-muted-foreground italic">
-                  "Best potassium treatment for soybeans in Louisiana before a heat wave?"
+                  "Best potassium notes for soybeans in Louisiana before a heat wave?"
                 </p>
               </div>
 

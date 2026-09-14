@@ -50,6 +50,8 @@ export const PILOT_CORE_PATHS = [
   '/delta',
   '/delta-intelligence',
   '/pilot-deferred',
+  '/beta-signup',
+  '/auth',
 ] as const;
 
 /** Modules parked for post-validation — too many invent surfaces for a one-crop pilot. */
@@ -97,4 +99,9 @@ export function isPilotCorePath(pathname: string): boolean {
   return (PILOT_CORE_PATHS as readonly string[]).some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   );
+}
+
+/** Farmer links to deferred modules should land on the honest holding page. */
+export function pilotNavHref(pathname: string): string {
+  return isPilotDeferredPath(pathname) ? '/pilot-deferred' : pathname;
 }

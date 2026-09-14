@@ -126,21 +126,21 @@ export default function HowItWorks() {
     {
       icon: TrendingUp,
       title: 'Variety Performance Tracking',
-      description: 'Compare rice, soybean, cotton, and corn varieties against published LSU guidance. Match soil type and climate to researched cultivars',
+      description: 'Soybean variety context for Morehouse Parish, framed against published LSU guidance — research aid, not a cultivar prescription',
       benefit: 'Research-informed picks',
       color: 'bg-orange-500/10 text-orange-700 border-orange-500/20'
     },
     {
       icon: Network,
       title: 'Community Intelligence',
-      description: 'Optional anonymous farmer network for sharing disease notes, treatment outcomes, and yield trends when enough peers participate',
+      description: 'Peer comparison modules are deferred for this pilot; focus stays on your own Morehouse soybean records',
       benefit: 'Neighbor early warnings',
       color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
     },
     {
       icon: Layers,
       title: 'Conservation Practice ROI',
-      description: 'Track cover crops, no-till, and precision fertilization notes on soil health, input costs, and yield. Financial figures are planning estimates, not guaranteed forecasts',
+      description: 'Conservation ROI modules are deferred until the soybean wedge is validated — no invented dollar savings in the pilot UI',
       benefit: 'Practice cost tracking',
       color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'
     },
@@ -228,7 +228,7 @@ export default function HowItWorks() {
                   { icon: Cloud, label: 'Weather Correlation Patterns', desc: 'Symptom triggers from climate data' },
                   { icon: Layers, label: 'Conservation Practice Impact', desc: 'Soil health improvement tracking' },
                   { icon: Network, label: 'Community Success Patterns', desc: 'Peer-shared treatment notes when available' },
-                  { icon: Brain, label: 'Predictive Analytics Feed', desc: 'Planning outlooks when enough history exists' }
+                  { icon: Brain, label: 'Weather + History Context', desc: 'Parish weather beside your soybean scans when data exists' }
                 ].map((item, idx) => (
                   <div key={idx} className="text-center p-4 bg-background/50 rounded-lg border">
                     <item.icon className="h-8 w-8 mx-auto mb-3 text-primary" aria-hidden="true" />

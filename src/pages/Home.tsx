@@ -66,26 +66,26 @@ export default function Home() {
     },
     {
       icon: TrendingUp,
-      title: "Predictive Analytics",
-      description: "Optional 7-14 day stress outlooks when weather and field history are available — decision support, not a guarantee.",
+      title: "Weather Timeline",
+      description: "Morehouse Parish weather context next to your soybean field history — context for decisions, not a forecast guarantee.",
       color: "gradient-sky"
     },
     {
       icon: Brain,
       title: "Delta Intelligence Chat",
-      description: "On-demand AI advisor framed around LSU AgCenter research. Field-aware conversations with image analysis and treatment recommendations.",
+      description: "On-demand AI advisor framed around LSU AgCenter research. Field-aware conversations framed as research questions — not prescriptions.",
       color: "gradient-harvest"
     },
     {
       icon: Droplets,
-      title: "Water Stress Intelligence",
-      description: "Water stress signals with a deep-link to the public MSU DIRT irrigation scheduling tool (opens in a new tab — not an embedded integration).",
+      title: "Field History",
+      description: "Keep Morehouse soybean scan history, notes, and photos in one place so you can compare weeks — not invent outcomes.",
       color: "gradient-delta"
     },
     {
       icon: Leaf,
-      title: "Conservation Tracking",
-      description: "Track sustainable practices with planning indexes and your recorded costs. Monitor cover crops, no-till, and precision fertilization notes.",
+      title: "Pilot Scope",
+      description: "Closed beta is soybean + Morehouse Parish only. Extra suite modules stay parked until this wedge is field-validated.",
       color: "gradient-sky"
     },
     {
@@ -96,7 +96,7 @@ export default function Home() {
     },
     {
       icon: GraduationCap,
-      title: "LSU Researcher Directory",
+      title: "Public LSU AgCenter Links",
       description: "Browse public LSU AgCenter researcher profiles and use official LSU channels to contact specialists.",
       color: "gradient-delta"
     },
@@ -392,7 +392,7 @@ export default function Home() {
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
               Our proprietary AI synergy system connects all features for context-aware insights. 
-              Every data point strengthens predictions across the entire platform.
+              Each Morehouse soybean scan adds to your field history — not a claim of platform-wide validated predictions.
             </p>
           </div>
 
@@ -558,7 +558,7 @@ export default function Home() {
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                AI-powered precision agriculture for Louisiana Delta farmers
+                Morehouse Parish soybean closed beta — research decision aid, not a diagnosis
               </p>
               <div className="flex items-center gap-2 text-sm">
                 <Shield className="h-4 w-4 text-success" />
@@ -581,13 +581,13 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/predictions" className="text-muted-foreground hover:text-primary transition-colors">
-                    Predictions
+                  <Link to="/fields" className="text-muted-foreground hover:text-primary transition-colors">
+                    My Fields
                   </Link>
                 </li>
                 <li>
-                  <Link to="/insurance" className="text-muted-foreground hover:text-primary transition-colors">
-                    Insurance Claims
+                  <Link to="/pilot-deferred" className="text-muted-foreground hover:text-primary transition-colors">
+                    Pilot scope
                   </Link>
                 </li>
               </ul>
@@ -603,8 +603,8 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/cooperatives" className="text-muted-foreground hover:text-primary transition-colors">
-                    Cooperatives & Community
+                  <Link to="/weather-timeline" className="text-muted-foreground hover:text-primary transition-colors">
+                    Weather Timeline
                   </Link>
                 </li>
                 <li>

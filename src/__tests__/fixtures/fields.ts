@@ -9,7 +9,7 @@ export const mockField: Field = {
   id: 'field-1',
   user_id: 'user-1',
   name: 'North Rice Field',
-  crop_type: 'rice',
+  crop_type: 'soybean',
   acreage: 40.5,
   location_lat: 32.73,
   location_lng: -91.76,
