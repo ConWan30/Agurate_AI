@@ -1,8 +1,8 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-import { handleError, handleAuthError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
+import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { handleError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
@@ -121,6 +121,11 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const supabaseClient = getAnonClient(authHeader);
+
     // Validate input
     const rawBody = await req.json();
     const validation = deltaChatSchema.safeParse(rawBody);
@@ -139,20 +144,6 @@ serve(async (req) => {
     }
 
     const { messages, conversationId, simplifiedLanguage = false } = validation.data;
-    
-    const authHeader = req.headers.get('authorization');
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader! } } }
-    );
-
-    // Get user context - their fields and recent assessments
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    
-    if (!user) {
-      return handleAuthError(corsHeaders);
-    }
 
     // Rate limiting: Check request frequency (10 requests per minute)
     const { data: recentRequests } = await supabaseClient

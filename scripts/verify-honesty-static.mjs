@@ -31,6 +31,15 @@ const FORBIDDEN = [
   { name: 'LSU researcher access plan claim', re: /LSU researcher access/i },
   { name: 'instant health assessment claim', re: /instant health assessment/i },
   { name: 'fabricated 94% confidence claim', re: /\b94%\b/ },
+  { name: 'fabricated $15K savings placeholder', re: /\$15K/i },
+  { name: 'unsourced $20-50 per acre claim', re: /\$20-50\s*per\s*acre/i },
+  { name: '80% faster than traditional claim', re: /80%\s*faster\s*than\s*traditional/i },
+  { name: 'hardcoded beta $39.50 price', re: /\$39\.50/ },
+  { name: 'hardcoded beta $49/mo price', re: /\$49\/mo/ },
+  { name: 'hardcoded $790/year plan price', re: /\$790\/year/i },
+  { name: 'hardcoded $158/year plan price', re: /\$158\/year/i },
+  { name: '80% lifetime discount claim', re: /80%\s*lifetime\s*discount/i },
+  { name: 'presented fictional James as real farmer', re: /a real Louisiana Delta farmer/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

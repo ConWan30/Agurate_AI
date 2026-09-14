@@ -1,8 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-import { handleError, handleAuthError, handleForbiddenError, handleNotFoundError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
+import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -36,6 +35,11 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const supabaseAuth = getAnonClient(authHeader);
+
     // Validate input
     const rawBody = await req.json();
     const validation = analyzeCropSchema.safeParse(rawBody);
@@ -69,25 +73,6 @@ serve(async (req) => {
     }
     
     console.log('🌾 Analyzing crop media with unified context:', { imageUrl, cropType, fieldId, location, mediaType });
-
-    // Authenticate user
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      return handleAuthError(corsHeaders);
-    }
-
-    const supabaseAuth = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token);
-    
-    if (userError || !user) {
-      console.error('[analyze-crop] Authentication failed');
-      return handleAuthError(corsHeaders);
-    }
 
     // Verify field ownership if fieldId provided
     if (fieldId) {
@@ -147,10 +132,7 @@ serve(async (req) => {
     // STEP 0: Gather unified context if fieldId provided (use service role after auth check)
     let unifiedContext = '';
     if (fieldId) {
-      const supabase = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-      );
+      const supabase = getServiceClient();
 
       const [
         { data: fieldData },

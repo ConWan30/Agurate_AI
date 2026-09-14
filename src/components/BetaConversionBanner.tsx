@@ -116,7 +116,7 @@ export function BetaConversionBanner() {
                 <DollarSign className="h-4 w-4 text-primary mt-0.5" />
                 <div>
                   <p className="font-medium">Lifetime 50% Discount</p>
-                  <p className="text-xs text-muted-foreground">$49/mo instead of $99/mo forever</p>
+                  <p className="text-xs text-muted-foreground">50% off the published plan rate, for life</p>
                 </div>
               </div>
 

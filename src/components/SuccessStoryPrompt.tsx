@@ -161,7 +161,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
             <Label htmlFor="testimonial">Your testimonial (in your own words) *</Label>
             <Textarea
               id="testimonial"
-              placeholder="e.g., AgurateAI caught this disease days before I would have noticed it. Saved me at least $15K this season..."
+              placeholder="e.g., AgurateAI helped me spot stress earlier than I would have on my own. Here's what changed for my fields..."
               value={testimonial}
               onChange={(e) => setTestimonial(e.target.value)}
               rows={4}

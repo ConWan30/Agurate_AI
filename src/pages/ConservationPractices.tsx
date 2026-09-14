@@ -153,7 +153,7 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
               <DollarSign className="h-8 w-8 text-primary mb-2" aria-hidden="true" />
               <CardTitle className="font-heading">Cost Savings</CardTitle>
               <CardDescription>
-                Save $20-50 per acre annually through reduced tillage and cover crops
+                Reduced tillage and cover crops can lower input costs and protect soil — results vary by farm and season
               </CardDescription>
             </CardHeader>
           </AnimatedCard>

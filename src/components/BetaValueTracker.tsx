@@ -91,7 +91,7 @@ export function BetaValueTracker() {
         <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-sm space-y-1">
           <p className="font-semibold text-primary">💡 Beta Lifetime Discount</p>
           <p className="text-xs text-muted-foreground">
-            Lock in 50% off ($39.50/month instead of $99) when you convert after beta ends
+            Lock in 50% off the published plan rate when you convert after beta ends
           </p>
         </div>
       </CardContent>

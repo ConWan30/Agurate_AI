@@ -131,7 +131,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
               <div>
                 <p className="font-semibold text-foreground">Lifetime 50% Discount</p>
                 <p className="text-sm text-muted-foreground">
-                  Lock in $39.50/month forever (regular $79/month)
+                  Lock in 50% off the published plan rate for life after beta
                 </p>
               </div>
             </div>

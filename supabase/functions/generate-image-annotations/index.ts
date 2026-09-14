@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.178.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.1';
-import { corsHeaders, handleAuthError, handleError } from '../_shared/errorHandler.ts';
+import { requireAuthenticatedUser } from '../_shared/auth.ts';
+import { corsHeaders, handleError } from '../_shared/errorHandler.ts';
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
@@ -33,21 +33,9 @@ serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      return handleAuthError(corsHeaders);
-    }
-
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      return handleAuthError(corsHeaders);
-    }
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
 
     const { image_url, analysis_context }: AnnotationRequest = await req.json();
 

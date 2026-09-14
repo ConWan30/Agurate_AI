@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { handleError, handleAuthError, handleForbiddenError, handleRateLimitError } from '../_shared/errorHandler.ts';
+import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { handleError, handleRateLimitError } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +18,11 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const supabaseClient = getAnonClient(authHeader);
+
     const rawBody = await req.json();
     const validation = predictStressSchema.safeParse(rawBody);
     
@@ -29,28 +34,6 @@ serve(async (req) => {
     }
 
     const { days } = validation.data;
-    
-    // Get auth token from request header
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      console.error('[predict-stress] No authorization header');
-      return handleAuthError(corsHeaders);
-    }
-
-    // Create Supabase client with auth token
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
-
-    // Get user from JWT token in authorization header
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
-    
-    if (userError || !user) {
-      console.error('[predict-stress] Failed to get user');
-      return handleAuthError(corsHeaders);
-    }
     
     console.log('[predict-stress] User authenticated:', user.id);
 

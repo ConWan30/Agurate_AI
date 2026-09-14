@@ -28,10 +28,14 @@ Last updated: 2026-09-14
 - [x] CSP allows lovable.cloud + supabase hosts
 - [x] detect-critical-alerts ownership + rate-limit fixed
 - [x] setup-demo-account avoids listUsers; verify_jwt=false for secret gate
+- [x] Open RLS "System can INSERT/UPDATE true" policies replaced with ownership-scoped writes
+- [x] Remaining edge functions use shared `requireAuthenticatedUser` (no bare npm supabase import)
+- [x] CI Deno `check:edge` for `supabase/functions/*/index.ts`
+- [x] Remaining honesty gaps: beta dollar inconsistency, $15K placeholder, unsourced $/acre, 80% faster
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (including view security invoker)
+- [ ] Apply pending Supabase migrations (including view security invoker + RLS lock-down + testimonial unapprove)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

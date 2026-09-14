@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.1";
-import { handleError, handleAuthError, handleRateLimitError } from '../_shared/errorHandler.ts';
+import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { handleError, handleRateLimitError } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -264,9 +264,10 @@ Parish-Specific Personalization:
 - Connect them with local LSU extension agents (future)
 
 Beta Program Communication:
-- Explain they're getting FREE access during beta (normally $790/year)
-- Mention 80% lifetime discount after beta ($158/year forever)
+- Explain they're getting free access during closed beta
+- Mention lifetime 50% discount after beta at the published plan rate (confirm current pricing in-app)
 - Explain they're helping build the future of Louisiana agriculture
+- Do not invent or quote specific dollar amounts for plan pricing
 
 CRITICAL JSON FORMAT REQUIREMENTS:
 1. Return ONLY a raw JSON object. NO text before or after. NO markdown code blocks.
@@ -287,7 +288,7 @@ REQUIRED FORMAT:
   "completion_percentage": 70,
   "next_question": "Brief next question prompt",
   "suggestions": ["Rice", "Soybeans", "Cotton", "Corn"],
-  "beta_benefit_highlight": "You're saving $790/year during beta!"
+  "beta_benefit_highlight": "Free during closed beta, with a lifetime 50% discount after beta at the published plan rate (confirm current pricing in-app)"
 }`
 };
 
@@ -297,6 +298,11 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) return auth;
+    const { user, authHeader } = auth;
+    const supabaseClient = getAnonClient(authHeader);
+
     const rawBody = await req.json();
     const { sessionId, message, formType } = rawBody;
     
@@ -309,25 +315,6 @@ serve(async (req) => {
     }
     
     const sanitizedMessage = sanitizeInput(message);
-
-    if (!sessionId || !message || !formType) {
-      throw new Error('Missing required parameters');
-    }
-
-    // Create Supabase client with user's auth
-    const authHeader = req.headers.get('Authorization');
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader! } } }
-    );
-
-    // Get user
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      console.error('[conversational-form] Authentication failed');
-      return handleAuthError(corsHeaders);
-    }
 
     // Rate limiting: Check request frequency (20 requests per minute for forms)
     const { data: recentRequests } = await supabaseClient
@@ -483,8 +470,9 @@ serve(async (req) => {
       
       // Beta Program
       betaProgram: profile?.beta_farmer ? {
-        lifetimeDiscount: 80,
-        savingsPerYear: 632
+        lifetimeDiscount: 50,
+        access: 'free during closed beta',
+        afterBeta: 'lifetime 50% discount at the published plan rate (confirm current pricing in-app)'
       } : null
     };
 

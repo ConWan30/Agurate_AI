@@ -29,6 +29,12 @@ jobs:
           VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
       - name: Honesty copy (static)
         run: npm run verify:honesty:static
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Edge functions typecheck
+        run: npm run check:edge
       - name: Production build
         run: npm run build
         env:

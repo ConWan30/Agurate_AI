@@ -92,14 +92,14 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <FileText className="h-8 w-8 text-success mb-2 group-hover:scale-110 transition-transform" />
               <p className="text-sm font-semibold mb-1">Insurance</p>
-              <p className="text-xs text-muted-foreground">Automated claim docs</p>
+              <p className="text-xs text-muted-foreground">Field notes for claims</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 p-4 rounded-lg bg-primary/5 border border-primary/20">
             <Target className="h-5 w-5 text-primary shrink-0" />
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Follow James's journey</span> – a real Louisiana Delta farmer using AI to transform his 400-acre operation
+              <span className="font-semibold text-foreground">Follow James's journey</span> – an illustrative Louisiana Delta scenario showing how a grower might use AI on a multi-field operation
             </p>
           </div>
         </div>
@@ -362,15 +362,15 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           <div className="grid grid-cols-2 gap-3">
             <Card className="border-health-severe/20 bg-health-severe/5">
               <CardContent className="p-4 text-center">
-                <p className="text-sm text-muted-foreground mb-2">Average Response Time Before</p>
-                <p className="text-2xl font-bold text-health-severe">21 days</p>
+                <p className="text-sm text-muted-foreground mb-2">Waiting on paper trails</p>
+                <p className="text-2xl font-bold text-health-severe">Slow</p>
               </CardContent>
             </Card>
             
             <Card className="border-health-good/20 bg-health-good/5">
               <CardContent className="p-4 text-center">
-                <p className="text-sm text-muted-foreground mb-2">Average Response Time Now</p>
-                <p className="text-2xl font-bold text-health-good">8 minutes</p>
+                <p className="text-sm text-muted-foreground mb-2">With timestamped field notes</p>
+                <p className="text-2xl font-bold text-health-good">Ready sooner</p>
               </CardContent>
             </Card>
           </div>

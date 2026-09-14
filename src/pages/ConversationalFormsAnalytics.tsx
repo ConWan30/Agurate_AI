@@ -132,7 +132,7 @@ export default function ConversationalFormsAnalytics() {
                   Object.keys(sessionStats).length
                 ) : 0}s
               </div>
-              <p className="text-xs text-muted-foreground">80% faster than traditional</p>
+              <p className="text-xs text-muted-foreground">Average time across tracked sessions</p>
             </CardContent>
           </Card>
         </div>

@@ -20,7 +20,8 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "verify:honesty": "node scripts/verify-honesty-copy.mjs",
-    "verify:honesty:static": "node scripts/verify-honesty-static.mjs"
+    "verify:honesty:static": "node scripts/verify-honesty-static.mjs",
+    "check:edge": "bash scripts/check-edge-functions.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
