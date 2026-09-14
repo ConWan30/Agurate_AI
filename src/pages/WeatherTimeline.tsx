@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import TutorialTooltip from '@/components/TutorialTooltip';
 import bgWeatherStation from "@/assets/bg-weather-station.jpg";
 import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
 
 interface Assessment {
   id: string;
@@ -301,12 +302,13 @@ export default function WeatherTimeline() {
                           </p>
                         )}
                       </div>
-                      <AgriculturalBadge type={
-                        assessment.stress_level === 'healthy' ? 'healthy' :
-                        assessment.stress_level === 'moderate' ? 'moderate' : 'severe'
-                      }>
-                        {assessment.stress_level}
-                      </AgriculturalBadge>
+                      {normalizeStressLevel(assessment.stress_level) ? (
+                        <AgriculturalBadge type={stressBadgeType(assessment.stress_level)}>
+                          {formatStressLabel(assessment.stress_level)}
+                        </AgriculturalBadge>
+                      ) : (
+                        <Badge variant="outline">Stress not recorded</Badge>
+                      )}
                     </div>
                   </div>
                 ))}

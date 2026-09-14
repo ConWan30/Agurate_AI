@@ -97,6 +97,15 @@ const required = [
       "role = 'user'",
     ],
   },
+  {
+    id: '20260914270000_lock_alert_ack_and_conversation_memory',
+    needles: [
+      'Users can create acknowledgments',
+      'reject_client_insert_alert_acknowledgments_trg',
+      'Users can create own conversation memory',
+      'reject_client_insert_conversation_memory_trg',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -116,8 +125,13 @@ for (const req of required) {
 
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
-if (!tip.startsWith('2026091426') && tip < '20260914260000_lock_delta_peer_expert_invent') {
-  fail(`tip migration ${tip} should include delta/peer/expert invent lock (20260914260000+)`);
+if (
+  !tip.startsWith('2026091427') &&
+  tip < '20260914270000_lock_alert_ack_and_conversation_memory'
+) {
+  fail(
+    `tip migration ${tip} should include alert-ack / conversation_memory invent lock (20260914270000+)`
+  );
 }
 
 if (process.exitCode) {

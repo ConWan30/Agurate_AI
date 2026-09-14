@@ -11,6 +11,7 @@ import FieldMapLeaflet from '@/components/FieldMapLeaflet';
 import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
 import TutorialTooltip from '@/components/TutorialTooltip';
 import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
 
 interface Field {
   id: string;
@@ -90,15 +91,6 @@ export default function FieldMap() {
     if (toHealthPercent(healthScore) >= 75) return 'bg-health-good';
     if (toHealthPercent(healthScore) >= 50) return 'bg-health-moderate';
     return 'bg-health-severe';
-  };
-
-  const getStressBadgeVariant = (stressLevel: string) => {
-    switch (stressLevel?.toLowerCase()) {
-      case 'healthy': return 'default';
-      case 'moderate': return 'secondary';
-      case 'severe': return 'destructive';
-      default: return 'outline';
-    }
   };
 
   const tutorialSteps = [
@@ -225,12 +217,13 @@ export default function FieldMap() {
                           Health: {toHealthPercent(healthScore).toFixed(0)}%
                         </span>
                       </div>
-                      <AgriculturalBadge type={
-                        assessment.stress_level?.toLowerCase() === 'healthy' ? 'healthy' :
-                        assessment.stress_level?.toLowerCase() === 'moderate' ? 'moderate' : 'severe'
-                      }>
-                        {assessment.stress_level}
-                      </AgriculturalBadge>
+                      {normalizeStressLevel(assessment.stress_level) ? (
+                        <AgriculturalBadge type={stressBadgeType(assessment.stress_level)}>
+                          {formatStressLabel(assessment.stress_level)}
+                        </AgriculturalBadge>
+                      ) : (
+                        <Badge variant="outline">Stress not recorded</Badge>
+                      )}
                       <p className="text-xs text-muted-foreground">
                         Last analyzed: <time dateTime={assessment.analyzed_at}>{new Date(assessment.analyzed_at).toLocaleDateString()}</time>
                       </p>

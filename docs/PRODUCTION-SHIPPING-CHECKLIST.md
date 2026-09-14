@@ -137,7 +137,7 @@ Last updated: 2026-09-14
 
 See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
-- [ ] Apply pending Supabase migrations (through `20260914260000` critical-alert UPDATE freeze + claim↔assessment field match; prior `20260914230000` peer effectiveness CHECK; `20260914220000` AI metric invent lock; `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
+- [ ] Apply pending Supabase migrations (through `20260914270000` alert-ack + conversation_memory invent lock; prior `20260914260000` delta/peer/expert; `20260914240000` critical-alert UPDATE freeze + claim↔assessment; `20260914230000` peer effectiveness CHECK; `20260914220000` AI metric invent lock; `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
@@ -147,8 +147,8 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 ## Evidence expected before production-complete
 
 1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
-2. Migration applied confirmation in Supabase through `20260914260000_lock_delta_peer_expert_invent` — **pending credentials**
+2. Migration applied confirmation in Supabase through `20260914270000_lock_alert_ack_and_conversation_memory` — **pending credentials**
 3. Live production URL showing honest closed-beta copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
 
-In-repo honesty/security residuals closed on this tip batch (critical-alert UPDATE freeze, claim↔assessment field match, peer effectiveness CHECK, claim INSERT status lock, coop-alert member INSERT drop, claim UPDATE/invitation freeze, disease/pest empty≠unknown, nutrient null≠none, NaN loss guards, SMS badge removed, health.json tip-stamp CI/local assert). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).
+In-repo honesty/security residuals closed on this tip batch (alert-ack ownership lock, conversation_memory INSERT drop, unknown stress no longer invents severe, critical-alert UPDATE freeze, claim↔assessment field match, peer effectiveness CHECK, claim INSERT status lock, coop-alert member INSERT drop, claim UPDATE/invitation freeze, disease/pest empty≠unknown, nutrient null≠none, NaN loss guards, SMS badge removed, health.json tip-stamp CI/local assert). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).

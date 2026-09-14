@@ -14,7 +14,8 @@ import TutorialTooltip from '@/components/TutorialTooltip';
 import { useHaptics } from '@/hooks/use-haptics';
 import { useGlobalKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
-import { requireHealthScore, toHealthPercent } from '@/lib/health-score';
+import { hasHealthScore, formatHealthPercent, requireHealthScore, toHealthPercent } from '@/lib/health-score';
+import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
 
 interface Field {
   id: string;
@@ -390,7 +391,7 @@ export default function Scanner() {
                       <div className="absolute top-4 right-4 bg-card/90 backdrop-blur-sm border text-card-foreground px-4 py-2 rounded-lg shadow-md">
                         <div className="text-xs text-muted-foreground">Health Score</div>
                         <div className="text-2xl font-bold text-foreground">
-                          {toHealthPercent(aiOverlay.health_score).toFixed(0)}%
+                          {formatHealthPercent(aiOverlay.health_score)}
                         </div>
                       </div>
 
@@ -398,18 +399,22 @@ export default function Scanner() {
                       <div className="absolute bottom-4 left-4 right-4 bg-card/90 backdrop-blur-sm border text-card-foreground px-4 py-3 rounded-lg shadow-md space-y-1">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-semibold text-foreground">
-                            {aiOverlay.stress_level === 'healthy' && '✓ Healthy'}
-                            {aiOverlay.stress_level === 'moderate_stress' && '⚠ Moderate Stress'}
-                            {aiOverlay.stress_level === 'severe_stress' && '⚠️ Severe Stress'}
+                            {normalizeStressLevel(aiOverlay.stress_level)
+                              ? formatStressLabel(aiOverlay.stress_level)
+                              : 'Stress not recorded'}
                           </span>
                           <span className={`text-xs px-2 py-1 rounded ${
-                            aiOverlay.stress_level === 'healthy' 
+                            stressBadgeType(aiOverlay.stress_level) === 'healthy'
                               ? 'bg-primary/20 text-primary'
-                              : aiOverlay.stress_level === 'moderate_stress'
+                              : stressBadgeType(aiOverlay.stress_level) === 'moderate'
                               ? 'bg-secondary/20 text-secondary-foreground'
-                              : 'bg-destructive/20 text-destructive'
+                              : stressBadgeType(aiOverlay.stress_level) === 'severe'
+                              ? 'bg-destructive/20 text-destructive'
+                              : 'bg-muted text-muted-foreground'
                           }`}>
-                            {aiOverlay.confidence_score && `${toHealthPercent(aiOverlay.confidence_score).toFixed(0)}% conf.`}
+                            {hasHealthScore(aiOverlay.confidence_score)
+                              ? `${toHealthPercent(aiOverlay.confidence_score).toFixed(0)}% conf.`
+                              : 'Confidence not recorded'}
                           </span>
                         </div>
                         {aiOverlay.visual_cues && (

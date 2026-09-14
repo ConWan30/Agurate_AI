@@ -9,7 +9,45 @@ export function normalizeStressLevel(
 ): NormalizedStressLevel {
   const raw = (stressLevel || '').trim().toLowerCase();
   if (raw === 'healthy' || raw === 'none' || raw === 'low') return 'healthy';
-  if (raw === 'moderate' || raw === 'medium' || raw === 'mild') return 'moderate';
-  if (raw === 'severe' || raw === 'critical' || raw === 'high') return 'severe';
+  if (
+    raw === 'moderate' ||
+    raw === 'medium' ||
+    raw === 'mild' ||
+    raw === 'moderate_stress'
+  ) {
+    return 'moderate';
+  }
+  if (
+    raw === 'severe' ||
+    raw === 'critical' ||
+    raw === 'high' ||
+    raw === 'severe_stress'
+  ) {
+    return 'severe';
+  }
   return '';
+}
+
+/** Badge type for UI — unknown stress must not invent "severe". */
+export function stressBadgeType(
+  stressLevel: string | null | undefined
+): 'healthy' | 'moderate' | 'severe' | 'unknown' {
+  const normalized = normalizeStressLevel(stressLevel);
+  return normalized || 'unknown';
+}
+
+/** Short display label; empty when stress was not recorded. */
+export function formatStressLabel(
+  stressLevel: string | null | undefined
+): string {
+  switch (normalizeStressLevel(stressLevel)) {
+    case 'healthy':
+      return 'Healthy';
+    case 'moderate':
+      return 'Moderate';
+    case 'severe':
+      return 'Severe';
+    default:
+      return '';
+  }
 }

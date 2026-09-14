@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeStressLevel } from '@/lib/stress-level';
+import {
+  formatStressLabel,
+  normalizeStressLevel,
+  stressBadgeType,
+} from '@/lib/stress-level';
 import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 describe('normalizeStressLevel', () => {
@@ -9,6 +13,8 @@ describe('normalizeStressLevel', () => {
     expect(normalizeStressLevel('severe')).toBe('severe');
     expect(normalizeStressLevel('mild')).toBe('moderate');
     expect(normalizeStressLevel('critical')).toBe('severe');
+    expect(normalizeStressLevel('moderate_stress')).toBe('moderate');
+    expect(normalizeStressLevel('severe_stress')).toBe('severe');
   });
 
   it('does not invent severity for missing/unknown values', () => {
@@ -17,6 +23,13 @@ describe('normalizeStressLevel', () => {
     expect(normalizeStressLevel('')).toBe('');
     expect(normalizeStressLevel('unknown')).toBe('');
     expect(normalizeStressLevel('kinda bad')).toBe('');
+  });
+
+  it('maps unknown stress to unknown badge type, not severe', () => {
+    expect(stressBadgeType(null)).toBe('unknown');
+    expect(stressBadgeType('weird')).toBe('unknown');
+    expect(formatStressLabel(null)).toBe('');
+    expect(formatStressLabel('moderate_stress')).toBe('Moderate');
   });
 });
 

@@ -34,6 +34,7 @@ import { PullToRefresh } from "@/components/PullToRefresh";
 import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { EmptyState } from "@/components/ui/empty-state";
 import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
 
 interface Field {
   id: string;
@@ -129,8 +130,7 @@ export default function Dashboard() {
   };
 
   const getStressIcon = (stressLevel: string) => {
-    const normalized = stressLevel?.toLowerCase();
-    switch (normalized) {
+    switch (normalizeStressLevel(stressLevel)) {
       case "healthy":
         return <CheckCircle2 className="h-5 w-5 text-health-good" />;
       case "moderate":
@@ -138,35 +138,7 @@ export default function Dashboard() {
       case "severe":
         return <AlertCircle className="h-5 w-5 text-health-severe" />;
       default:
-        return <CheckCircle2 className="h-5 w-5 text-muted-foreground" />;
-    }
-  };
-
-  const getStressBadgeVariant = (stressLevel: string): "default" | "secondary" | "destructive" | "outline" => {
-    const normalized = stressLevel?.toLowerCase();
-    switch (normalized) {
-      case "healthy":
-        return "default";
-      case "moderate":
-        return "outline";
-      case "severe":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStressBadgeClass = (stressLevel: string) => {
-    const normalized = stressLevel?.toLowerCase();
-    switch (normalized) {
-      case "healthy":
-        return "status-healthy";
-      case "moderate":
-        return "status-moderate";
-      case "severe":
-        return "status-severe";
-      default:
-        return "";
+        return null;
     }
   };
 
@@ -642,12 +614,12 @@ export default function Dashboard() {
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">Health Score</p>
                         </div>
-                        {assessment.stress_level ? (
+                        {normalizeStressLevel(assessment.stress_level) ? (
                           <AgriculturalBadge
-                            type={assessment.stress_level?.toLowerCase() === 'healthy' ? 'healthy' : assessment.stress_level?.toLowerCase() === 'moderate' ? 'moderate' : 'severe'}
+                            type={stressBadgeType(assessment.stress_level)}
                             className="text-base px-4 py-2 font-semibold"
                           >
-                            {assessment.stress_level.charAt(0).toUpperCase() + assessment.stress_level.slice(1)}
+                            {formatStressLabel(assessment.stress_level)}
                           </AgriculturalBadge>
                         ) : (
                           <Badge variant="outline" className="text-base px-4 py-2 font-semibold">

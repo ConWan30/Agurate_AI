@@ -29,10 +29,12 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] Peer effectiveness_score CHECK 0–100 (`20260914230000`); critical-alert UPDATE freeze + claim↔assessment field match (`20260914240000`)
 - [x] Conversational-form metrics/messages + request_logs invent lock (`20260914250000`)
 - [x] Delta assistant invent lock + peer field ownership + expert/LSU response freeze (`20260914260000`)
+- [x] Alert acknowledgments + conversation_memory client INSERT lock (`20260914270000`); unknown stress no longer invents “severe” in Dashboard/FieldMap/WeatherTimeline/Scanner
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914260000` (critical-alert UPDATE freeze + claim
+1. Apply pending Supabase migrations through `20260914270000` (alert-ack + conversation_memory invent lock;
+   delta/peer/expert invent `20260914260000`; critical-alert UPDATE freeze + claim
    assessment field match; peer effectiveness CHECK `20260914230000`; AI metric client-write lock
    `20260914220000` + assessment AI-score service-role persist `20260914210000`; claim INSERT status
    lock + coop-alert member INSERT drop `20260914200000`; claim UPDATE/
