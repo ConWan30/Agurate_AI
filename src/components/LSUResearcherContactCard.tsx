@@ -26,13 +26,16 @@ export function LSUResearcherContactCard({ researcher, onContact }: LSUResearche
         return;
       }
 
-      const { error } = await supabase.from('farmer_researcher_interactions').insert({
+      const { data: interaction, error } = await supabase.from('farmer_researcher_interactions').insert({
         farmer_id: user.id,
         researcher_id: researcher.id,
         interaction_type: 'question',
         status: 'pending',
-      });
+      }).select('id').maybeSingle();
       if (error) throw error;
+      if (!interaction) {
+        throw new Error('Contact request was not recorded (insert returned no row or not permitted)');
+      }
 
       toast({
         title: "Request recorded (no email sent)",

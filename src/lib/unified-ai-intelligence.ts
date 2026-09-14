@@ -178,8 +178,8 @@ WATER STRESS HISTORY:
 ${waterStressData.length > 0 ? waterStressData.map(w => `- ${new Date(w.created_at).toLocaleDateString()}: Stress Score ${w.stress_score}, Severity: ${w.severity}`).join('\n') : '- No water stress events recorded'}
 
 AI INTELLIGENCE POOL INSIGHTS:
-- Historical Pattern Confidence: ${intelligencePool.confidence_scores?.vision_analysis || 'N/A'}
-- Community Pattern Alignment: ${intelligencePool.confidence_scores?.community_alignment || 'N/A'}
+- Historical Pattern Confidence: ${intelligencePool.confidence_scores?.vision_analysis ?? 'N/A'}
+- Community Pattern Alignment: ${intelligencePool.confidence_scores?.community_alignment ?? 'N/A'}
 ${intelligencePool.image_analysis_patterns?.symptom_progression ? `- Symptom Progression Detected: ${JSON.stringify(intelligencePool.image_analysis_patterns.symptom_progression)}` : ''}
 
 CRITICAL: Use all above context to enhance analysis accuracy. Cross-reference current observations with historical patterns, variety-specific traits, conservation impacts, and weather correlations.

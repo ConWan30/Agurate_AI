@@ -85,16 +85,21 @@ export default function Auth() {
 
       if (data.user) {
         // Create profile
-        const { error: profileError } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .insert({
             id: data.user.id,
             email: signUpData.email,
             full_name: signUpData.fullName,
             farm_name: signUpData.farmName || null,
-          });
+          })
+          .select("id")
+          .maybeSingle();
 
         if (profileError) throw profileError;
+        if (!profile) {
+          throw new Error("Account was created but profile was not saved (insert returned no row or not permitted)");
+        }
 
       toast({
         title: "Account created!",

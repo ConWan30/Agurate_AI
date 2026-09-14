@@ -89,16 +89,19 @@ export function BugReportDialog({ open, onClose }: BugReportDialogProps) {
       }
 
       // Insert bug report
-      const { error } = await supabase.from('bug_reports').insert({
+      const { data: report, error } = await supabase.from('bug_reports').insert({
         user_id: user.id,
         description: description.trim(),
         screenshot_url: screenshotPath,
         user_agent: navigator.userAgent,
         page_url: window.location.href,
         status: 'open',
-      });
+      }).select('id').maybeSingle();
 
       if (error) throw error;
+      if (!report) {
+        throw new Error('Bug report was not saved (insert returned no row or not permitted)');
+      }
 
       toast({
         title: "🐛 Bug report submitted",

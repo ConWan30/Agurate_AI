@@ -45,7 +45,12 @@ export function WeatherAlerts() {
       if (fieldsError) throw fieldsError;
 
       const field = fields?.[0];
-      if (!field?.location_lat || !field?.location_lng) {
+      if (
+        field?.location_lat == null ||
+        field?.location_lng == null ||
+        !Number.isFinite(Number(field.location_lat)) ||
+        !Number.isFinite(Number(field.location_lng))
+      ) {
         setAlerts([]);
         setLocationReady(false);
         setLastChecked(new Date());

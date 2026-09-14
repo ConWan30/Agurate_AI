@@ -23,7 +23,7 @@ export function EconomicImpact({
   treatmentCost,
   potentialSavings
 }: EconomicImpactProps) {
-  const hasAcreage = acreage != null && Number.isFinite(acreage) && acreage > 0;
+  const hasAcreage = acreage != null && Number.isFinite(acreage) && acreage >= 0;
   const hasValuePerAcre = valuePerAcre != null && Number.isFinite(valuePerAcre) && valuePerAcre > 0;
   const calculatedLoss =
     estimatedLoss != null && Number.isFinite(estimatedLoss)
