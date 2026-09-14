@@ -463,7 +463,7 @@ export default function Fields() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
                         <span className="font-mono font-medium text-xs">
-                          {field.location_lat.toFixed(4)}, {field.location_lng.toFixed(4)}
+                          {field.location_lat != null && field.location_lng != null ? `${Number(field.location_lat).toFixed(4)}, ${Number(field.location_lng).toFixed(4)}` : 'Location not set'}
                         </span>
                       </div>
                     )}

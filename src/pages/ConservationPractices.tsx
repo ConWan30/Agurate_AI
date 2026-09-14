@@ -20,7 +20,7 @@ export default function ConservationPractices() {
   const [conversationalOpen, setConversationalOpen] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
 
-  // Fetch conservation predictions
+  // Fetch conservation predictions for the user's fields (table has field_id, not user_id)
   const { data: predictions } = useQuery({
     queryKey: ['conservation-predictions'],
     queryFn: async () => {
@@ -28,18 +28,31 @@ export default function ConservationPractices() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return [];
 
-        const response = await (supabase as any)
-          .from('conservation_predictions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('predicted_date', { ascending: false })
-          .limit(3);
+        const { data: ownedFields, error: fieldsError } = await supabase
+          .from('fields')
+          .select('id')
+          .eq('user_id', user.id);
 
-        if (response.error) {
-          console.error('Error fetching predictions:', response.error);
+        if (fieldsError) {
+          console.error('Error fetching fields for predictions:', fieldsError);
           return [];
         }
-        return response.data as ConservationPrediction[];
+
+        const fieldIds = (ownedFields ?? []).map((f) => f.id);
+        if (fieldIds.length === 0) return [];
+
+        const { data, error } = await supabase
+          .from('conservation_predictions')
+          .select('*')
+          .in('field_id', fieldIds)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) {
+          console.error('Error fetching predictions:', error);
+          return [];
+        }
+        return (data ?? []) as ConservationPrediction[];
       } catch (err) {
         console.error(err);
         return [];

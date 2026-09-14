@@ -145,7 +145,10 @@ export default function Analytics() {
           <p className="font-semibold text-foreground mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value.toFixed(1)}
+              {entry.name}:{' '}
+              {entry.value != null && Number.isFinite(Number(entry.value))
+                ? Number(entry.value).toFixed(1)
+                : '—'}
             </p>
           ))}
         </div>

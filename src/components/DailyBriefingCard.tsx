@@ -303,11 +303,19 @@ export function DailyBriefingCard() {
           <div className="flex items-center gap-4 mb-2">
             <div className="flex items-center gap-2">
               <Thermometer className="h-4 w-4 text-health-moderate" />
-              <span className="text-sm font-medium">{briefing.weatherInsights.temperature}°F</span>
+              <span className="text-sm font-medium">
+                {Number.isFinite(Number(briefing.weatherInsights.temperature))
+                  ? `${Number(briefing.weatherInsights.temperature)}°F`
+                  : 'Temp not recorded'}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Droplets className="h-4 w-4 text-secondary" />
-              <span className="text-sm font-medium">{briefing.weatherInsights.precipitation.toFixed(1)}mm rain</span>
+              <span className="text-sm font-medium">
+                {Number.isFinite(Number(briefing.weatherInsights.precipitation))
+                  ? `${Number(briefing.weatherInsights.precipitation).toFixed(1)}mm rain`
+                  : 'Rainfall not recorded'}
+              </span>
             </div>
           </div>
           {briefing.weatherInsights.recommendation && (

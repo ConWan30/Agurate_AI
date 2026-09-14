@@ -241,7 +241,7 @@ export default function FieldMap() {
 
                   <div className="pt-2 border-t">
                     <p className="text-xs text-muted-foreground">
-                      📍 {field.location_lat.toFixed(4)}, {field.location_lng.toFixed(4)}
+                      📍 {field.location_lat != null && field.location_lng != null ? `${Number(field.location_lat).toFixed(4)}, ${Number(field.location_lng).toFixed(4)}` : 'Location not set'}
                     </p>
                   </div>
                 </CardContent>

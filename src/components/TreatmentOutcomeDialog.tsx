@@ -98,6 +98,14 @@ export function TreatmentOutcomeDialog({
         return;
       }
 
+      if (!Number.isFinite(Number(healthAfter)) || Number(healthAfter) < 0 || Number(healthAfter) > 100) {
+        toast({
+          title: 'Enter a valid after-treatment health score (0-100)',
+          variant: 'destructive'
+        });
+        return;
+      }
+
       const { success } = computeTreatmentSuccess({
         outcome,
         healthScoreBefore,

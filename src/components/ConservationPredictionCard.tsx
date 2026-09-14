@@ -10,7 +10,7 @@ interface ConservationPredictionCardProps {
 
 function formatIndex(value: number): string {
   if (!Number.isFinite(value)) return "—";
-  return value.toFixed(0);
+  return Number.isFinite(Number(value)) ? Number(value).toFixed(0) : 'n/a';
 }
 
 function relativeChangeLabel(current: number, future: number): string {

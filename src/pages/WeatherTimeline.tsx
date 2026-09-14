@@ -192,13 +192,15 @@ export default function WeatherTimeline() {
                   />
                   {/* Precipitation reference lines */}
                   {timelineData.map((point, idx) => 
-                    point.precipitation && point.precipitation > 0.5 ? (
+                    point.precipitation != null
+                      && Number.isFinite(Number(point.precipitation))
+                      && Number(point.precipitation) > 0.5 ? (
                       <ReferenceLine 
                         key={`precip-${idx}`}
                         x={point.date}
                         stroke="#3B82F6"
                         strokeDasharray="3 3"
-                        label={{ value: `${point.precipitation.toFixed(1)}"`, position: 'top' }}
+                        label={{ value: `${Number(point.precipitation).toFixed(1)}"`, position: 'top' }}
                       />
                     ) : null
                   )}
