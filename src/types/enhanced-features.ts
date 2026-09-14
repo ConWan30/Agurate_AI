@@ -55,10 +55,10 @@ export interface ConservationPrediction {
 export interface ConservationAdoptionMetric {
   id: string;
   practice_type: string;
-  total_adopters: number;
-  total_acres: number;
-  average_savings: number;
-  lsu_validation_score: number;
+  total_adopters: number | null;
+  total_acres: number | null;
+  average_savings: number | null;
+  lsu_validation_score: number | null;
   last_updated: string;
 }
 
@@ -67,15 +67,15 @@ export interface WaterStressEvent {
   id: string;
   field_id: string;
   assessment_id: string;
-  stress_score: number;
-  severity: 'mild' | 'moderate' | 'severe';
-  confidence: number;
+  stress_score: number | null;
+  severity: 'none' | 'mild' | 'moderate' | 'severe' | 'critical' | 'unknown';
+  confidence: number | null;
   weather_context: Record<string, any>;
   symptoms_detected: string[];
   dirt_recommendation: boolean;
   dirt_clicked: boolean;
   irrigation_applied: boolean;
-  outcome_improvement?: number;
+  outcome_improvement?: number | null;
   created_at: string;
 }
 
@@ -135,9 +135,9 @@ export interface BestPractice {
   practice_name: string;
   description: string;
   lsu_research_basis: string[];
-  adoption_count: number;
-  success_rate: number;
-  average_savings: number;
+  adoption_count: number | null;
+  success_rate: number | null;
+  average_savings: number | null;
   lsu_researcher_id?: string;
   created_at: string;
 }

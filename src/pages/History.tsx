@@ -342,7 +342,6 @@ export default function History() {
                                     'Authorization': `Bearer ${session?.access_token}`,
                                   },
                                   body: JSON.stringify({
-                                    image_url: selectedAssessment.image_url,
                                     assessment_id: selectedAssessment.id,
                                   }),
                                 });

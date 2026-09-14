@@ -37,7 +37,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Quick AR analysis for real-time overlay
+    // Quick AR analysis for real-time overlay — fail closed on invent/uncertain scores.
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -49,21 +49,22 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a crop health AR analyzer. Provide a brief visual assessment in JSON format only.'
+            content:
+              'You are a crop health AR analyzer. Return brief visual assessment JSON only. Do not invent scores: if the image is unclear or not a crop, still return best-effort bounded scores with low confidence and honest visual_cues stating uncertainty.',
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: 'Analyze this crop image and return JSON with: health_score (0-1), stress_level ("healthy"|"moderate_stress"|"severe_stress"), visual_cues (brief description of what you see), confidence_score (0-1). Keep visual_cues under 60 characters.'
+                text: 'Analyze this crop image and return JSON with: health_score (finite 0-1), stress_level ("healthy"|"moderate_stress"|"severe_stress"), visual_cues (non-empty, under 60 chars, describe what is visible — say "unclear image" if uncertain), confidence_score (finite 0-1). Never invent disease names or dollar impacts.',
               },
               {
                 type: 'image_url',
-                image_url: { url: imageData }
-              }
-            ]
-          }
+                image_url: { url: imageData },
+              },
+            ],
+          },
         ],
         tools: [
           {
@@ -75,17 +76,20 @@ serve(async (req) => {
                 type: 'object',
                 properties: {
                   health_score: { type: 'number', minimum: 0, maximum: 1 },
-                  stress_level: { type: 'string', enum: ['healthy', 'moderate_stress', 'severe_stress'] },
-                  visual_cues: { type: 'string', maxLength: 60 },
-                  confidence_score: { type: 'number', minimum: 0, maximum: 1 }
+                  stress_level: {
+                    type: 'string',
+                    enum: ['healthy', 'moderate_stress', 'severe_stress'],
+                  },
+                  visual_cues: { type: 'string', minLength: 1, maxLength: 60 },
+                  confidence_score: { type: 'number', minimum: 0, maximum: 1 },
                 },
                 required: ['health_score', 'stress_level', 'visual_cues', 'confidence_score'],
-                additionalProperties: false
-              }
-            }
-          }
+                additionalProperties: false,
+              },
+            },
+          },
         ],
-        tool_choice: { type: 'function', function: { name: 'ar_overlay_data' } }
+        tool_choice: { type: 'function', function: { name: 'ar_overlay_data' } },
       }),
     });
 
@@ -95,14 +99,15 @@ serve(async (req) => {
 
     const aiData = await response.json();
     const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-    
+
     if (!toolCall) {
       throw new Error('No tool call in AI response');
     }
 
     const result = JSON.parse(toolCall.function.arguments);
-    if (result.health_score == null || Number.isNaN(Number(result.health_score))) {
-      throw new Error('AR analysis omitted health_score');
+    const healthScore = Number(result.health_score);
+    if (!Number.isFinite(healthScore) || healthScore < 0 || healthScore > 1) {
+      throw new Error('AR analysis omitted or out-of-range health_score (require finite 0–1)');
     }
     const confidence = Number(result.confidence_score);
     if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
@@ -112,7 +117,13 @@ serve(async (req) => {
     if (!allowedStress.has(String(result.stress_level))) {
       throw new Error('AR analysis omitted or invented stress_level');
     }
+    const visualCues = typeof result.visual_cues === 'string' ? result.visual_cues.trim() : '';
+    if (!visualCues) {
+      throw new Error('AR analysis omitted visual_cues — refusing empty invent overlay');
+    }
+    result.health_score = healthScore;
     result.confidence_score = confidence;
+    result.visual_cues = visualCues.slice(0, 60);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

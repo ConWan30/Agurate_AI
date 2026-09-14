@@ -7,8 +7,9 @@ import { corsHeaders, handleError } from '../_shared/errorHandler.ts';
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
 interface AnnotationRequest {
-  image_url: string;
   assessment_id: string;
+  /** @deprecated Ignored — image is loaded from the owned assessment.image_url. */
+  image_url?: string;
   /** @deprecated Ignored — context is loaded from the owned assessment. */
   analysis_context?: unknown;
 }
@@ -50,14 +51,7 @@ serve(async (req) => {
       });
     }
 
-    const { image_url, assessment_id }: AnnotationRequest = await req.json();
-
-    if (!image_url) {
-      return new Response(
-        JSON.stringify({ error: 'Image URL is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const { assessment_id }: AnnotationRequest = await req.json();
 
     if (!assessment_id) {
       return new Response(
@@ -66,9 +60,10 @@ serve(async (req) => {
       );
     }
 
+    // Bind image from owned assessment — never trust client image_url invent.
     const { data: assessment, error: assessmentError } = await rateLimitClient
       .from('assessments')
-      .select('id, field_id, health_score, stress_level, symptoms, disease_identified, pest_identified')
+      .select('id, field_id, image_url, health_score, stress_level, symptoms, disease_identified, pest_identified')
       .eq('id', assessment_id)
       .maybeSingle();
 
@@ -94,6 +89,17 @@ serve(async (req) => {
       );
     }
 
+    const imageUrl =
+      typeof assessment.image_url === 'string' && assessment.image_url.trim()
+        ? assessment.image_url.trim()
+        : null;
+    if (!imageUrl) {
+      return new Response(
+        JSON.stringify({ error: 'Assessment has no recorded image_url to annotate' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const healthScore =
       assessment.health_score != null && Number.isFinite(Number(assessment.health_score))
         ? Number(assessment.health_score)
@@ -101,9 +107,12 @@ serve(async (req) => {
     const symptoms = Array.isArray(assessment.symptoms) ? assessment.symptoms : [];
     const diseases = Array.isArray(assessment.disease_identified) ? assessment.disease_identified : [];
     const pests = Array.isArray(assessment.pest_identified) ? assessment.pest_identified : [];
+    const allowHealthyMarkers =
+      healthScore != null &&
+      (healthScore > 1 ? healthScore >= 75 : healthScore >= 0.75);
 
     // Use Gemini Vision to analyze image and generate annotation coordinates
-    const annotationPrompt = `You are analyzing a crop health image. Identify specific areas that need attention and provide annotation coordinates.
+    const annotationPrompt = `You are analyzing a crop health image. Mark only visually supportable findings with annotation coordinates.
 
 CONTEXT (from persisted assessment only — do not invent missing findings):
 - Health Score: ${healthScore != null ? `${healthScore}%` : 'not recorded'}
@@ -112,26 +121,21 @@ CONTEXT (from persisted assessment only — do not invent missing findings):
 - Diseases: ${diseases.length ? diseases.join(', ') : 'not recorded'}
 - Pests: ${pests.length ? pests.join(', ') : 'not recorded'}
 
-Analyze this image and return a JSON array of annotations. Each annotation should have:
-- type: "circle", "arrow", "rectangle", or "text"
-- x: percentage (0-100) from left
-- y: percentage (0-100) from top
-- radius: percentage for circles (optional)
-- width/height: percentage for rectangles (optional)
-- label: descriptive text
-- severity: "critical", "warning", "info", or "success"
+HONESTY:
+- If nothing is visually supportable, return an empty JSON array [].
+- Do NOT invent disease names, pest names, or "Healthy area" markers without visual evidence.
+- severity "success" (healthy reference) is ${allowHealthyMarkers ? 'allowed only for clearly healthy tissue' : 'NOT allowed for this assessment — health is not recorded as high'}.
+- Prefer empty [] over speculative labels.
 
-Focus on:
-1. Disease/pest locations (use circles, mark as critical or warning)
-2. Healthy reference areas (use circles, mark as success)
-3. Areas needing attention (use arrows or rectangles)
-4. Key findings (use text annotations)
+Each annotation object:
+- type: "circle" | "arrow" | "rectangle" | "text"
+- x, y: 0–100 percentages
+- radius / width / height: optional percentages
+- label: short descriptive text grounded in the image
+- severity: "critical" | "warning" | "info"${allowHealthyMarkers ? ' | "success"' : ''}
 
-Return ONLY valid JSON array, no markdown, no code blocks. Example format:
-[
-  {"type": "circle", "x": 25, "y": 30, "radius": 5, "label": "Rice blast lesion", "severity": "critical"},
-  {"type": "circle", "x": 75, "y": 50, "radius": 4, "label": "Healthy area", "severity": "success"}
-]`;
+Return ONLY a JSON array (no markdown). Schema example (do not copy these labels):
+[{"type":"circle","x":0,"y":0,"radius":1,"label":"string","severity":"warning"}]`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -151,7 +155,7 @@ Return ONLY valid JSON array, no markdown, no code blocks. Example format:
               },
               {
                 type: 'image_url',
-                image_url: { url: image_url },
+                image_url: { url: imageUrl },
               },
             ],
           },
@@ -182,23 +186,34 @@ Return ONLY valid JSON array, no markdown, no code blocks. Example format:
       }
     }
 
-    // Validate and clean annotations
+    // Validate and clean annotations — strip invent healthy/success when health is not high.
+    const allowedSeverities = allowHealthyMarkers
+      ? new Set(['critical', 'warning', 'info', 'success'])
+      : new Set(['critical', 'warning', 'info']);
     const validAnnotations = annotations
       .filter((ann: any) => ann.type && ann.x !== undefined && ann.y !== undefined && ann.label)
-      .map((ann: any) => ({
-        type: ann.type as Annotation['type'],
-        x: Math.max(0, Math.min(100, ann.x)),
-        y: Math.max(0, Math.min(100, ann.y)),
-        radius: ann.radius ? Math.max(1, Math.min(20, ann.radius)) : undefined,
-        width: ann.width ? Math.max(1, Math.min(50, ann.width)) : undefined,
-        height: ann.height ? Math.max(1, Math.min(50, ann.height)) : undefined,
-        label: ann.label,
-        color: ann.color,
-        ...(typeof ann.severity === 'string' &&
-        ['critical', 'warning', 'info', 'success'].includes(ann.severity)
-          ? { severity: ann.severity as Annotation['severity'] }
-          : {}),
-      }));
+      .map((ann: any) => {
+        const rawSeverity =
+          typeof ann.severity === 'string' && allowedSeverities.has(ann.severity)
+            ? (ann.severity as Annotation['severity'])
+            : undefined;
+        // Drop success-labeled "healthy" invent when not allowed.
+        if (!allowHealthyMarkers && /healthy/i.test(String(ann.label ?? ''))) {
+          return null;
+        }
+        return {
+          type: ann.type as Annotation['type'],
+          x: Math.max(0, Math.min(100, Number(ann.x))),
+          y: Math.max(0, Math.min(100, Number(ann.y))),
+          radius: ann.radius ? Math.max(1, Math.min(20, Number(ann.radius))) : undefined,
+          width: ann.width ? Math.max(1, Math.min(50, Number(ann.width))) : undefined,
+          height: ann.height ? Math.max(1, Math.min(50, Number(ann.height))) : undefined,
+          label: String(ann.label).slice(0, 120),
+          color: ann.color,
+          ...(rawSeverity ? { severity: rawSeverity } : {}),
+        };
+      })
+      .filter((ann): ann is NonNullable<typeof ann> => ann != null);
 
     return new Response(
       JSON.stringify({ annotations: validAnnotations }),

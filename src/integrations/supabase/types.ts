@@ -1778,6 +1778,27 @@ export type Database = {
         }
         Relationships: []
       }
+      edge_ip_rate_limits: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: number
+          ip_hash: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: number
+          ip_hash?: string
+        }
+        Relationships: []
+      }
       success_stories: {
         Row: {
           acres_protected: number | null
