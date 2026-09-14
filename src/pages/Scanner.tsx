@@ -269,7 +269,7 @@ export default function Scanner() {
     {
       id: 'welcome',
       title: 'Welcome to Field Scanner! 📸',
-      content: 'Capture crop photos and get instant AI health analysis with GPS tagging.',
+      content: 'Capture crop photos and get AI health analysis with GPS tagging.',
       position: 'top' as const,
     },
     {

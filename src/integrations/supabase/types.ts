@@ -806,13 +806,17 @@ export type Database = {
           assessment_id: string | null
           created_at: string | null
           estimated_loss_usd: number | null
+          expires_at: string | null
           field_id: string | null
           id: string
+          in_app_notification_sent: boolean | null
           message: string
+          metadata: Json | null
           severity: string
           sms_sent: boolean | null
           title: string
           urgency_score: number
+          user_id: string | null
           voice_call_attempted: boolean | null
         }
         Insert: {
@@ -822,13 +826,17 @@ export type Database = {
           assessment_id?: string | null
           created_at?: string | null
           estimated_loss_usd?: number | null
+          expires_at?: string | null
           field_id?: string | null
           id?: string
+          in_app_notification_sent?: boolean | null
           message: string
+          metadata?: Json | null
           severity?: string
           sms_sent?: boolean | null
           title: string
           urgency_score: number
+          user_id?: string | null
           voice_call_attempted?: boolean | null
         }
         Update: {
@@ -838,13 +846,17 @@ export type Database = {
           assessment_id?: string | null
           created_at?: string | null
           estimated_loss_usd?: number | null
+          expires_at?: string | null
           field_id?: string | null
           id?: string
+          in_app_notification_sent?: boolean | null
           message?: string
+          metadata?: Json | null
           severity?: string
           sms_sent?: boolean | null
           title?: string
           urgency_score?: number
+          user_id?: string | null
           voice_call_attempted?: boolean | null
         }
         Relationships: [
@@ -2213,14 +2225,18 @@ export type Database = {
           created_at: string | null
           crop_type: string | null
           estimated_loss_usd: number | null
+          expires_at: string | null
           field_id: string | null
           field_name: string | null
           id: string | null
+          in_app_notification_sent: boolean | null
           message: string | null
+          metadata: Json | null
           severity: string | null
           sms_sent: boolean | null
           title: string | null
           urgency_score: number | null
+          user_id: string | null
           voice_call_attempted: boolean | null
         }
         Relationships: [

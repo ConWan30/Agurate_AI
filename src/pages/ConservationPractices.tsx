@@ -252,25 +252,25 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
         {/* Educational Section */}
         <Card className="mt-8 bg-muted/30">
           <CardHeader>
-            <CardTitle>Conservation Practice Benefits (LSU AgCenter Research)</CardTitle>
+            <CardTitle>Conservation Practice Benefits</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <h4 className="font-semibold mb-2">No-Till / Reduced-Till</h4>
               <p className="text-sm text-muted-foreground">
-                • Fuel savings: $8-12/acre • Soil moisture retention: +15-20% • Erosion reduction: 70-90%
+                Can reduce fuel use and improve moisture retention and erosion control — outcomes vary by soil, crop, and season. See LSU AgCenter / NRCS guidance for local estimates.
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-2">Cover Crops</h4>
               <p className="text-sm text-muted-foreground">
-                • Nitrogen credit: $15-30/acre • Weed suppression: 50-70% • Soil organic matter: +0.1-0.3% annually
+                Often used for nitrogen contribution, weed suppression, and soil organic matter — results depend on species, timing, and management. Confirm with local extension resources.
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-2">Precision Fertilization</h4>
               <p className="text-sm text-muted-foreground">
-                • Input cost savings: 10-20% • Environmental impact: -30% nitrogen runoff • Yield improvement: 5-10%
+                May lower input costs and nutrient runoff versus blanket rates when calibrated to soil tests and field conditions — not a guaranteed yield lift.
               </p>
             </div>
           </CardContent>

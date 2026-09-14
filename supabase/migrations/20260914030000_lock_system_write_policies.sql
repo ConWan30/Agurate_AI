@@ -40,13 +40,13 @@ CREATE POLICY "Users can insert own request logs"
   TO authenticated
   WITH CHECK (auth.uid() = user_id);
 
+-- Field-ownership only here: user_id column is reconciled in a later migration.
 CREATE POLICY "Users can insert critical alerts for own fields"
   ON public.critical_alerts
   FOR INSERT
   TO authenticated
   WITH CHECK (
-    auth.uid() = user_id
-    AND EXISTS (
+    EXISTS (
       SELECT 1 FROM public.fields f
       WHERE f.id = critical_alerts.field_id
         AND f.user_id = auth.uid()

@@ -31,11 +31,13 @@ Last updated: 2026-09-14
 - [x] Open RLS "System can INSERT/UPDATE true" policies replaced with ownership-scoped writes
 - [x] Remaining edge functions use shared `requireAuthenticatedUser` (no bare npm supabase import)
 - [x] CI Deno `check:edge` for `supabase/functions/*/index.ts`
-- [x] Remaining honesty gaps: beta dollar inconsistency, $15K placeholder, unsourced $/acre, 80% faster
+- [x] Beta pricing shown as discount-off-published-rate (no hardcoded $39.50 / $49)
+- [x] critical_alerts Jan/Nov schema reconcile migration + owned acknowledge RPC
+- [x] weather_events insert types mapped to CHECK-allowed values
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (including view security invoker + RLS lock-down + testimonial unapprove)
+- [ ] Apply pending Supabase migrations (view security invoker + RLS lock-down + testimonial unapprove + critical_alerts reconcile)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
@@ -44,7 +46,7 @@ Last updated: 2026-09-14
 
 ## Evidence expected before production-complete
 
-1. Green CI/local typecheck + unit tests + honesty static + build
-2. Migration applied confirmation in Supabase
+1. Green CI/local typecheck + unit tests + honesty static + edge check + build
+2. Migration applied confirmation in Supabase (including critical_alerts reconcile)
 3. Live production URL showing honest closed-beta copy
 4. Auth + one authenticated scan path working on production

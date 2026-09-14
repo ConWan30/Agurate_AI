@@ -301,7 +301,7 @@ export default function DeltaIntelligence() {
       target: 'predictive-questions',
       id: 'questions',
       title: 'Step 2: Quick Questions',
-      content: 'Click any suggested question for instant field-specific advice based on your data.',
+      content: 'Click any suggested question for field-specific advice based on your data.',
       position: 'top' as const,
     },
     {

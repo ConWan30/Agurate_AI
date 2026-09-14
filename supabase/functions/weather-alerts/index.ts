@@ -31,7 +31,7 @@ const weatherAlertsSchema = z.object({
 });
 
 interface WeatherAlert {
-  type: "frost" | "drought" | "severe_weather" | "excessive_rain";
+  type: "frost" | "drought" | "high_wind" | "heavy_rain" | "heat_wave";
   severity: "warning" | "watch" | "advisory";
   title: string;
   description: string;
@@ -91,7 +91,7 @@ serve(async (req) => {
     const processedAlerts: WeatherAlert[] = features.map((feature: any) => {
       const props = feature.properties;
       
-      let type: WeatherAlert["type"] = "severe_weather";
+      let type: WeatherAlert["type"] = "high_wind";
       const event = props.event?.toLowerCase() || "";
       
       if (event.includes("frost") || event.includes("freeze")) {
@@ -99,7 +99,9 @@ serve(async (req) => {
       } else if (event.includes("drought")) {
         type = "drought";
       } else if (event.includes("flood") || event.includes("rain")) {
-        type = "excessive_rain";
+        type = "heavy_rain";
+      } else if (event.includes("heat") || event.includes("excessive heat")) {
+        type = "heat_wave";
       }
 
       return {
@@ -114,10 +116,11 @@ serve(async (req) => {
     });
 
     // Filter for agriculture-relevant alerts
-    const agAlerts = processedAlerts.filter(alert => 
-      alert.type === "frost" || 
-      alert.type === "drought" || 
-      alert.type === "excessive_rain"
+    const agAlerts = processedAlerts.filter(alert =>
+      alert.type === "frost" ||
+      alert.type === "drought" ||
+      alert.type === "heavy_rain" ||
+      alert.type === "heat_wave"
     );
 
     // Store alerts with service role only after the caller is authenticated + rate-limited

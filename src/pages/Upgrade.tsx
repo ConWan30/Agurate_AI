@@ -11,7 +11,6 @@ export default function Upgrade() {
   const plans = [
     {
       name: "Starter",
-      price: 49,
       description: "Perfect for small operations",
       features: [
         "1 farmer, 5 fields",
@@ -25,9 +24,7 @@ export default function Upgrade() {
     },
     {
       name: "Professional",
-      price: 99,
-      originalPrice: 99,
-      betaPrice: 39.50,
+      betaPriceLabel: "50% off published rate",
       description: "Most popular for Louisiana farmers",
       features: [
         "Unlimited fields & assessments",
@@ -45,7 +42,6 @@ export default function Upgrade() {
     },
     {
       name: "Cooperative",
-      price: 499,
       description: "For farming cooperatives",
       features: [
         "25+ farmers",
@@ -107,26 +103,26 @@ export default function Upgrade() {
                 <CardDescription>{plan.description}</CardDescription>
 
                 <div className="pt-4">
-                  {plan.betaPrice ? (
+                  {plan.betaPriceLabel ? (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-center gap-3">
-                        <p className="text-3xl font-bold line-through text-muted-foreground">
-                          ${plan.originalPrice}
-                        </p>
-                        <p className="text-5xl font-bold text-primary">
-                          ${plan.betaPrice}
-                        </p>
-                      </div>
+                      <p className="text-5xl font-bold text-primary">
+                        Beta rate
+                      </p>
                       <Badge className="bg-primary/10 text-primary border-primary/30">
                         {plan.betaDiscount}
                       </Badge>
+                      <p className="text-sm text-muted-foreground">
+                        {plan.betaPriceLabel} after conversion — confirm current published pricing in-app at signup.
+                      </p>
                     </div>
                   ) : (
                     <p className="text-4xl font-bold">
-                      ${plan.price}
+                      Custom
                     </p>
                   )}
-                  <p className="text-sm text-muted-foreground mt-2">/month</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {plan.betaPriceLabel ? "lifetime beta discount" : "contact for pricing"}
+                  </p>
                 </div>
               </CardHeader>
 

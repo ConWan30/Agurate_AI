@@ -40,6 +40,12 @@ const FORBIDDEN = [
   { name: 'hardcoded $158/year plan price', re: /\$158\/year/i },
   { name: '80% lifetime discount claim', re: /80%\s*lifetime\s*discount/i },
   { name: 'presented fictional James as real farmer', re: /a real Louisiana Delta farmer/i },
+  { name: 'hardcoded betaPrice 39.50', re: /betaPrice\s*:\s*39\.5/ },
+  { name: 'hardcoded plan price 49', re: /\bprice\s*:\s*49\b/ },
+  { name: 'unsourced $8-12/acre claim', re: /\$8-12\/acre/i },
+  { name: 'unsourced $15-30/acre claim', re: /\$15-30\/acre/i },
+  { name: 'instant AI health analysis claim', re: /instant AI health analysis/i },
+  { name: 'instant field-specific advice claim', re: /instant field-specific advice/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */
