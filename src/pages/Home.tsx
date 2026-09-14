@@ -22,7 +22,6 @@ import {
   Cloud,
   Award,
   Zap,
-  Quote,
   Droplets,
   Leaf,
   GraduationCap,
@@ -62,7 +61,7 @@ export default function Home() {
     {
       icon: Scan,
       title: "AI Crop Scanner",
-      description: "Instant crop health analysis from any smartphone camera. Detect stress, disease, and nutrient deficiencies in seconds with 95%+ accuracy.",
+      description: "Instant crop health analysis from any smartphone camera. Detect stress, disease, and nutrient deficiency signals from a phone photo in seconds.",
       color: "gradient-delta"
     },
     {
@@ -74,7 +73,7 @@ export default function Home() {
     {
       icon: Brain,
       title: "Delta Intelligence Chat",
-      description: "24/7 AI advisor trained on LSU AgCenter research. Field-aware conversations with image analysis and treatment recommendations.",
+      description: "24/7 AI advisor framed around LSU AgCenter research. Field-aware conversations with image analysis and treatment recommendations.",
       color: "gradient-harvest"
     },
     {
@@ -92,13 +91,13 @@ export default function Home() {
     {
       icon: Microscope,
       title: "Variety Recommendations",
-      description: "AI-powered rice and soybean variety selection based on your soil type, planting conditions, and LSU research data.",
+      description: "AI-powered rice and soybean variety selection based on your soil type, planting conditions, and published LSU guidance.",
       color: "gradient-harvest"
     },
     {
       icon: GraduationCap,
-      title: "LSU Researcher Access",
-      description: "Connect directly with LSU AgCenter experts. Get specialized support for complex crop issues and participate in research.",
+      title: "LSU Researcher Directory",
+      description: "Browse public LSU AgCenter researcher profiles and use official LSU channels to contact specialists.",
       color: "gradient-delta"
     },
     {
@@ -122,10 +121,10 @@ export default function Home() {
   ];
 
   const benefits = [
-    "Real-time crop health assessment with 95%+ accuracy",
+    "Phone-camera crop health reads for Delta crops",
     "7-14 day predictive analytics for proactive decisions",
     "Water stress monitoring with DIRT integration",
-    "LSU AgCenter-validated insights and researcher access",
+    "Insights informed by LSU AgCenter research framing",
     "Conservation practice tracking and ROI analysis",
     "Community intelligence and cooperative insights",
     "Variety recommendations for rice and soybeans",
@@ -135,31 +134,10 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: 95, label: "AI Accuracy Rate", suffix: "+%", prefix: "" },
-    { value: 14, label: "Day Predictions", suffix: "", prefix: "" },
-    { value: 10, label: "Integrated Features", suffix: "+", prefix: "" },
+    { value: 7, label: "Day Stress Forecasts", suffix: "+", prefix: "" },
+    { value: 4, label: "Delta Crops Supported", suffix: "", prefix: "" },
+    { value: 100, label: "Beta Partner Spots", suffix: "", prefix: "" },
     { value: 24, label: "AI Advisor Available", suffix: "/7", prefix: "" }
-  ];
-
-  const testimonials = [
-    {
-      quote: "AgurateAI helped us detect cotton stress early and saved 15% of our yield. Game changer for Morehouse Parish farmers.",
-      author: "James Mitchell",
-      role: "Cotton Farmer, Morehouse Parish",
-      stat: "15% yield saved"
-    },
-    {
-      quote: "The mobile scanner is incredibly accurate. We caught rice blast before it spread across the whole field.",
-      author: "Sarah Thompson",
-      role: "Rice Producer, Louisiana Delta",
-      stat: "Early detection"
-    },
-    {
-      quote: "Insurance claims are now backed by AI verification. No more disputes, just fast payouts.",
-      author: "Robert Davis",
-      role: "Soybean Farmer, 450 acres",
-      stat: "Faster claims"
-    }
   ];
 
   return (
@@ -216,7 +194,7 @@ export default function Home() {
             
             <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8 leading-relaxed">
               Transform your farming with intelligent crop analysis for rice, soybean, cotton, and corn. 
-              Built on LSU AgCenter research.
+              Research-informed for Louisiana Delta conditions.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
@@ -289,7 +267,7 @@ export default function Home() {
           <div className={`text-center mb-16 transition-all duration-1000 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
               <Zap className="h-3 w-3 mr-1" />
-              Built on LSU AgCenter Research
+              Research-informed for the Delta
             </Badge>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-4">
               Everything You Need to Monitor Your Crops
@@ -336,14 +314,13 @@ export default function Home() {
           <div className={`transition-all duration-1000 ${benefitsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
                 <Award className="h-3 w-3 mr-1" aria-hidden="true" />
-                130+ Years of LSU AgCenter Research
+                Research-informed
               </Badge>
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
                 Built for Louisiana Delta Farmers
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Our AI is specifically trained on LSU AgCenter research data and Morehouse Parish conditions, 
-                ensuring accurate, relevant recommendations for your crops.
+                Guidance is framed around publicly available LSU AgCenter research and Morehouse Parish conditions. It is a decision aid, not a validated diagnosis.
               </p>
               
               <div className="space-y-3">
@@ -373,8 +350,8 @@ export default function Home() {
             <div className={`grid grid-cols-2 gap-6 transition-all duration-1000 ${benefitsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
               <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group focus-ring" tabIndex={0}>
                 <Shield className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">LSU Research-Based</h3>
-                <p className="text-sm text-muted-foreground">Built on 130+ years of research</p>
+                <h3 className="font-bold font-heading text-lg mb-2 group-hover:text-primary transition-colors">Research-informed</h3>
+                <p className="text-sm text-muted-foreground">Framed for Louisiana Delta crops</p>
               </Card>
               
               <Card className="border-2 p-6 hover:shadow-field transition-all hover-lift group mt-8 focus-ring" tabIndex={0}>
@@ -453,8 +430,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold mb-2">LSU Research Integration</h3>
                 <p className="text-sm text-muted-foreground">
-                  Every AI decision is backed by 130+ years of LSU AgCenter research. 
-                  Scientifically validated recommendations for Louisiana Delta conditions.
+                  Recommendations are research-informed for Louisiana Delta conditions. We do not claim scientific validation or an official LSU partnership.
                 </p>
               </CardContent>
             </Card>
@@ -483,13 +459,13 @@ export default function Home() {
           <div className={`text-center mb-16 transition-all duration-1000 ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
               <Users className="h-3 w-3 mr-1" />
-              Trusted by Louisiana Farmers
+              Early Louisiana Delta beta
             </Badge>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
-              Real Results from Morehouse Parish
+              Built with Morehouse Parish growers in mind
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              See how AgurateAI is helping local farmers increase yields and reduce losses
+              We are recruiting the first 100 Louisiana Delta farmers. Real pilot stories will land here as they approve them.
             </p>
           </div>
 
@@ -505,27 +481,15 @@ export default function Home() {
                 </div>
               ))
             ) : (
-              testimonials.map((testimonial, index) => (
-                <Card 
-                  key={index}
-                  className={`border-2 hover:border-primary transition-all duration-500 hover-lift ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
-                >
-                  <CardContent className="p-8">
-                    <Quote className="h-10 w-10 text-primary mb-4 opacity-50" aria-hidden="true" />
-                    <p className="text-muted-foreground mb-6 leading-relaxed italic">"{testimonial.quote}"</p>
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <div>
-                        <p className="font-bold">{testimonial.author}</p>
-                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                      </div>
-                      <Badge variant="outline" className="text-success border-success">
-                        {testimonial.stat}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+              <Card className={`md:col-start-2 border-2 transition-all duration-500 ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <CardContent className="p-8 text-center">
+                  <h3 className="text-xl font-bold mb-3">Be one of the first voices</h3>
+                  <p className="text-muted-foreground mb-6 leading-relaxed">No fabricated reviews here. Join the free closed beta, run a scan in your field, and if it helps, we will ask to feature your story with your approval.</p>
+                  <Link to="/beta-signup">
+                    <Button className="gap-2">Join Free Beta<ArrowRight className="h-4 w-4" /></Button>
+                  </Link>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>
@@ -536,7 +500,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
-              Trusted by Louisiana Delta Farmers
+              Why Delta farmers are joining early
             </h2>
           </div>
           <TrustIndicators variant="full" className="max-w-6xl mx-auto" />
@@ -598,7 +562,7 @@ export default function Home() {
               </p>
               <div className="flex items-center gap-2 text-sm">
                 <Shield className="h-4 w-4 text-success" />
-                <span className="text-muted-foreground">LSU Research-Based</span>
+                <span className="text-muted-foreground">Informed by LSU AgCenter research</span>
               </div>
             </div>
 
@@ -686,7 +650,7 @@ export default function Home() {
               </Badge>
               <Badge variant="outline" className="text-xs">
                 <Award className="h-3 w-3 mr-1" />
-                LSU AgCenter Validated
+                Informed by LSU AgCenter research
               </Badge>
             </div>
           </div>
