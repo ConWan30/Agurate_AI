@@ -258,7 +258,7 @@ export default function Analytics() {
                 <CardHeader>
                   <CardTitle className="font-heading flex items-center justify-between">
                     {field.name}
-                    <AgriculturalBadge type={field.avgHealth == null ? "moderate" : field.avgHealth > 80 ? "healthy" : field.avgHealth > 60 ? "moderate" : "severe"}>
+                    <AgriculturalBadge type={field.avgHealth == null ? "unknown" : field.avgHealth > 80 ? "healthy" : field.avgHealth > 60 ? "moderate" : "severe"}>
                       {field.avgHealth == null ? "No score" : `${field.avgHealth}% Health`}
                     </AgriculturalBadge>
                   </CardTitle>

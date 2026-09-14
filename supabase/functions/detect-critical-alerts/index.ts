@@ -47,7 +47,7 @@ function normalizeThreatList(raw: unknown): Array<{ name: string; severity: stri
         confidence: typeof o.confidence === 'number' ? o.confidence : 0,
       };
     }
-    return { name: 'unknown', severity: 'moderate', confidence: 0 };
+    return { name: 'unknown', severity: 'unknown', confidence: 0 };
   }).filter((d) => d.name && d.name !== 'unknown');
 }
 

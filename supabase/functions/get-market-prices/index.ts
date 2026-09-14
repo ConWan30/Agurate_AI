@@ -4,54 +4,11 @@ import { getCorsHeaders } from '../_shared/cors.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
-// Market price data structure
-interface MarketPrice {
-  commodity: string;
-  price_per_bushel: number;
-  price_per_pound?: number;
-  unit: string;
-  source: string;
-  last_updated: string;
-  disclaimer: string;
-}
-
-// Placeholder estimates only — not a live USDA/CBOT feed.
-const ESTIMATED_MARKET_PRICES: Record<string, MarketPrice> = {
-  rice: {
-    commodity: 'Rice',
-    price_per_bushel: 14.50,
-    unit: 'bushel',
-    source: 'Estimated placeholder (not live USDA)',
-    last_updated: new Date().toISOString(),
-    disclaimer: 'Illustrative estimate for closed-beta planning only. Not an official market quote.',
-  },
-  soybeans: {
-    commodity: 'Soybeans',
-    price_per_bushel: 12.80,
-    unit: 'bushel',
-    source: 'Estimated placeholder (not live USDA)',
-    last_updated: new Date().toISOString(),
-    disclaimer: 'Illustrative estimate for closed-beta planning only. Not an official market quote.',
-  },
-  cotton: {
-    commodity: 'Cotton',
-    price_per_pound: 0.75,
-    price_per_bushel: 0,
-    unit: 'pound',
-    source: 'Estimated placeholder (not live USDA)',
-    last_updated: new Date().toISOString(),
-    disclaimer: 'Illustrative estimate for closed-beta planning only. Not an official market quote.',
-  },
-  corn: {
-    commodity: 'Corn',
-    price_per_bushel: 5.20,
-    unit: 'bushel',
-    source: 'Estimated placeholder (not live USDA)',
-    last_updated: new Date().toISOString(),
-    disclaimer: 'Illustrative estimate for closed-beta planning only. Not an official market quote.',
-  },
-};
-
+/**
+ * Live USDA/CBOT market quotes are not wired in closed beta.
+ * Fail closed — never return invented placeholder commodity prices.
+ * ROI and planning UIs must require farmer-entered prices.
+ */
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -89,31 +46,15 @@ serve(async (req) => {
       );
     }
 
-    const cropToCommodity: Record<string, string> = {
-      rice: 'rice',
-      soybean: 'soybeans',
-      soybeans: 'soybeans',
-      cotton: 'cotton',
-      corn: 'corn',
-    };
-
-    const commodity = cropToCommodity[cropType] || cropType;
-    const price = ESTIMATED_MARKET_PRICES[commodity];
-
-    if (!price) {
-      return new Response(
-        JSON.stringify({
-          error: `No market price estimate available for ${cropType}`,
-          available_crops: Object.keys(ESTIMATED_MARKET_PRICES),
-        }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     return new Response(
-      JSON.stringify(price),
+      JSON.stringify({
+        error: 'Live market price feed is not configured',
+        crop_type: cropType,
+        disclaimer:
+          'No placeholder commodity prices are returned. Enter your own price for planning ROI.',
+      }),
       {
-        status: 200,
+        status: 503,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );

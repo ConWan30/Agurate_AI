@@ -241,7 +241,11 @@ export function TreatmentOutcomeDialog({
               step="0.01"
               value={costPerAcre}
               onChange={(e) => setCostPerAcre(e.target.value)}
-              placeholder={`e.g., ${recommendation.estimated_cost?.toFixed(2) || '30.00'}`}
+              placeholder={
+                recommendation.estimated_cost != null && Number.isFinite(recommendation.estimated_cost)
+                  ? `Optional — your actual $/acre`
+                  : 'Enter cost if known'
+              }
             />
           </div>
 

@@ -149,7 +149,7 @@ export function AnalysisExecutiveSummary({
           }
           severity={
             yieldImpact == null || Number.isNaN(Number(yieldImpact))
-              ? 'none'
+              ? 'unknown'
               : yieldImpact > 20
                 ? 'severe'
                 : yieldImpact > 10

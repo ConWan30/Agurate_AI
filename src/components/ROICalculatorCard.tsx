@@ -38,12 +38,13 @@ interface ROICalculatorCardProps {
   className?: string;
 }
 
-const TREATMENT_COSTS: Record<string, { cost: number; name: string }> = {
-  fungicide: { cost: 28, name: 'Fungicide Application' },
-  fertilizer: { cost: 45, name: 'Corrective Fertilizer' },
-  herbicide: { cost: 22, name: 'Herbicide Application' },
-  irrigation: { cost: 35, name: 'Supplemental Irrigation' },
-  insecticide: { cost: 30, name: 'Insecticide Treatment' },
+/** Labels only — never invent $/acre treatment defaults. */
+const TREATMENT_TYPES: Record<string, string> = {
+  fungicide: 'Fungicide Application',
+  fertilizer: 'Corrective Fertilizer',
+  herbicide: 'Herbicide Application',
+  irrigation: 'Supplemental Irrigation',
+  insecticide: 'Insecticide Treatment',
 };
 
 /** Unit hints for placeholders only — never used as silent price/yield defaults. */
@@ -58,8 +59,9 @@ const UNIT_HINTS: Record<string, string> = {
 export function ROICalculatorCard({ assessmentData, fieldData, className }: ROICalculatorCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [acres, setAcres] = useState(fieldData?.acreage != null ? String(fieldData.acreage) : '');
-  const [cropType, setCropType] = useState(fieldData?.cropType || 'rice');
+  const [cropType, setCropType] = useState(fieldData?.cropType || '');
   const [treatmentType, setTreatmentType] = useState('fungicide');
+  const [treatmentCostPerAcre, setTreatmentCostPerAcre] = useState('');
   const [roi, setRoi] = useState<ROICalculation | null>(null);
   const [marketPrice, setMarketPrice] = useState<{
     price: number;
@@ -76,7 +78,11 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
   const [manualPriceInput, setManualPriceInput] = useState('');
 
   useEffect(() => {
-    void fetchMarketPrice(cropType);
+    if (cropType) {
+      void fetchMarketPrice(cropType);
+    } else {
+      setMarketPrice(null);
+    }
   }, [cropType]);
 
   useEffect(() => {
@@ -147,18 +153,32 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
     Number.isFinite(Number(yieldProtectionPercent)) &&
     Number(yieldProtectionPercent) >= 0;
   const hasAcres = acres !== '' && Number.isFinite(Number(acres)) && Number(acres) > 0;
+  const hasTreatmentCost =
+    treatmentCostPerAcre !== '' &&
+    Number.isFinite(Number(treatmentCostPerAcre)) &&
+    Number(treatmentCostPerAcre) >= 0;
+  const hasCrop = cropType !== '';
   const currentPrice = getCurrentPrice();
   const hasPrice = currentPrice != null;
 
   const calculateROI = () => {
-    if (!hasAssessmentHealth || !hasYieldAtRisk || !hasAvgYield || !hasProtection || !hasAcres || !hasPrice) {
+    if (
+      !hasAssessmentHealth ||
+      !hasYieldAtRisk ||
+      !hasAvgYield ||
+      !hasProtection ||
+      !hasAcres ||
+      !hasPrice ||
+      !hasTreatmentCost ||
+      !hasCrop
+    ) {
       setRoi(null);
       return;
     }
 
     const acreage = Number(acres);
     const crop = currentPrice;
-    const treatment = TREATMENT_COSTS[treatmentType] || TREATMENT_COSTS.fungicide;
+    const costPerAcre = Number(treatmentCostPerAcre);
     const avgYield = Number(avgYieldInput);
     const yieldImpactPercent = Number(yieldAtRiskPercent);
     const protectionFraction = Number(yieldProtectionPercent) / 100;
@@ -170,7 +190,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
 
     const yieldAtRisk = avgYield * (yieldImpactPercent / 100);
     const totalPotentialLoss = yieldAtRisk * crop.price * acreage;
-    const totalTreatmentCost = treatment.cost * acreage;
+    const totalTreatmentCost = costPerAcre * acreage;
     const revenueProtected = yieldAtRisk * protectionFraction * crop.price * acreage;
     const netBenefit = revenueProtected - totalTreatmentCost;
     const roiPercentage = totalTreatmentCost > 0 ? (netBenefit / totalTreatmentCost) * 100 : 0;
@@ -191,7 +211,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
         yieldAtRisk,
         pricePerUnit: crop.price,
         priceUnit: crop.unit,
-        costPerAcre: treatment.cost,
+        costPerAcre,
         acres: acreage,
       },
     });
@@ -233,6 +253,16 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
         };
     }
   };
+
+  const canCalculate =
+    hasAssessmentHealth &&
+    hasYieldAtRisk &&
+    hasAvgYield &&
+    hasProtection &&
+    hasAcres &&
+    hasPrice &&
+    hasTreatmentCost &&
+    hasCrop;
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className={className}>
@@ -280,9 +310,9 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
 
               <div className="space-y-2">
                 <Label htmlFor="crop">Crop Type</Label>
-                <Select value={cropType} onValueChange={setCropType}>
+                <Select value={cropType || undefined} onValueChange={setCropType}>
                   <SelectTrigger id="crop">
-                    <SelectValue />
+                    <SelectValue placeholder="Select crop" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="rice">Rice</SelectItem>
@@ -291,6 +321,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                     <SelectItem value="corn">Corn</SelectItem>
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">Required — no default crop assumed.</p>
               </div>
 
               <div className="space-y-2">
@@ -358,7 +389,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                   }}
                   placeholder={
                     loadingPrice
-                      ? 'Loading market price…'
+                      ? 'Checking market feed…'
                       : `Enter $/${UNIT_HINTS[cropType] || 'unit'}`
                   }
                   disabled={loadingPrice}
@@ -366,45 +397,50 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                 <p className="text-xs text-muted-foreground">
                   {marketPrice
                     ? `Using ${marketPrice.source} quote — edit to override.`
-                    : 'Required. Market quote unavailable — enter your price; no silent commodity default.'}
+                    : 'Required. Enter your price — live market quotes are not invented.'}
                 </p>
               </div>
 
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="treatment">Treatment Type</Label>
                 <Select value={treatmentType} onValueChange={setTreatmentType}>
                   <SelectTrigger id="treatment">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(TREATMENT_COSTS).map(([key, value]) => (
+                    {Object.entries(TREATMENT_TYPES).map(([key, name]) => (
                       <SelectItem key={key} value={key}>
-                        {value.name} (${value.cost}/acre)
+                        {name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="treatment-cost">Treatment cost ($/acre)</Label>
+                <Input
+                  id="treatment-cost"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={treatmentCostPerAcre}
+                  onChange={(e) => setTreatmentCostPerAcre(e.target.value)}
+                  placeholder="Enter your $/acre cost"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Required. Your recorded cost — no Louisiana average defaults.
+                </p>
+              </div>
             </div>
 
-            {(!hasAssessmentHealth || !hasYieldAtRisk || !hasPrice) && (
+            {!canCalculate && (
               <p className="text-sm text-muted-foreground text-center">
-                ROI needs a real assessment health score, an explicit yield-at-risk %, and a crop price
-                (market or entered).
+                ROI needs assessment health, crop, acres, yield-at-risk %, typical yield, protection %,
+                crop price, and your treatment $/acre.
               </p>
             )}
-            <Button
-              onClick={calculateROI}
-              className="w-full"
-              disabled={
-                !hasAssessmentHealth ||
-                !hasYieldAtRisk ||
-                !hasAvgYield ||
-                !hasProtection ||
-                !hasAcres ||
-                !hasPrice
-              }
-            >
+            <Button onClick={calculateROI} className="w-full" disabled={!canCalculate}>
               <Calculator className="h-4 w-4 mr-2" />
               Calculate ROI
             </Button>
@@ -487,9 +523,9 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
 
                 <div className="text-xs text-muted-foreground text-center space-y-1">
                   <p>
-                    * Illustrative planning estimate using your inputs
-                    {marketPrice ? ` and ${marketPrice.source} market prices` : ''}. Treatment $/acre uses
-                    Louisiana Delta planning averages.
+                    * Illustrative planning estimate using only the inputs you entered
+                    {marketPrice ? ` and ${marketPrice.source} market prices` : ''}. Treatment $/acre is
+                    your recorded cost — not a regional average.
                   </p>
                   {marketPrice && (
                     <p className="flex items-center justify-center gap-1">
@@ -500,7 +536,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                         size="sm"
                         className="h-4 px-2 text-xs"
                         onClick={() => void fetchMarketPrice(cropType)}
-                        disabled={loadingPrice}
+                        disabled={loadingPrice || !cropType}
                       >
                         {loadingPrice ? 'Updating...' : 'Refresh'}
                       </Button>

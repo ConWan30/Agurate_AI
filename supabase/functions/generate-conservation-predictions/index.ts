@@ -93,11 +93,21 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Calculate field health trend
-    const healthTrend = fieldAssessments.length >= 5
-      ? (fieldAssessments.slice(0, 5).reduce((sum, a) => sum + a.health_score, 0) / 5) - 
-        (fieldAssessments.slice(-5).reduce((sum, a) => sum + a.health_score, 0) / 5)
-      : 0;
+    // Health trend only when enough scored assessments exist — never invent 0% trend
+    const scoredAssessments = fieldAssessments.filter(
+      (a) => a.health_score != null && Number.isFinite(Number(a.health_score))
+    );
+    const healthTrend =
+      scoredAssessments.length >= 5
+        ? scoredAssessments.slice(0, 5).reduce((sum, a) => sum + Number(a.health_score), 0) / 5 -
+          scoredAssessments.slice(-5).reduce((sum, a) => sum + Number(a.health_score), 0) / 5
+        : null;
+    const healthTrendLabel =
+      healthTrend == null
+        ? 'unknown (insufficient scored assessments)'
+        : healthTrend > 0
+          ? `+${healthTrend.toFixed(1)} pts`
+          : `${healthTrend.toFixed(1)} pts`;
 
     const aiPrompt = `You are AgurateAI's conservation prediction engine for Louisiana Delta farming.
 
@@ -107,31 +117,34 @@ Field Profile:
 - Crop: ${fieldData.crop_type}
 - Acreage: ${fieldData.acreage}
 - Soil Type: ${fieldData.soil_type}
-- Health Trend: ${healthTrend > 0 ? `+${healthTrend.toFixed(1)}%` : `${healthTrend.toFixed(1)}%`}
+- Health Trend: ${healthTrendLabel}
 
 Conservation Practice: ${practiceType}
 
-Historical Field Performance (30 assessments):
-Average Health: ${fieldAssessments.length > 0 ? (fieldAssessments.reduce((sum, a) => sum + a.health_score, 0) / fieldAssessments.length).toFixed(1) : 'N/A'}
+Historical Field Performance:
+Average Health: ${scoredAssessments.length > 0 ? (scoredAssessments.reduce((sum, a) => sum + Number(a.health_score), 0) / scoredAssessments.length).toFixed(1) : 'N/A'}
 
 Community Adoption Data (${practiceType}):
-${communityPractices.map(p => `- ${p.total_adopters} farmers: Avg savings $${p.average_annual_savings}, Success: ${(p.success_rate * 100).toFixed(0)}%`).join('\n')}
+${communityPractices.map(p => `- ${p.total_adopters} farmers: reported community avg savings $${p.average_annual_savings} (community-reported, not this farm's measured savings), Success: ${(p.success_rate * 100).toFixed(0)}%`).join('\n')}
 
 Weather Context (Recent Events):
 ${weatherData.slice(0, 5).map(w => `- ${w.event_type}: ${w.event_date}`).join('\n')}
 
-LSU AgCenter Research:
-- No-till: illustrative low double-digit $/acre fuel savings, +15-20% soil moisture
-- Cover crops: illustrative mid double-digit $/acre nitrogen credit
-- Precision fertilization: 10-20% input savings
+LSU AgCenter Research (public guidance framing only — not measured farm savings):
+- No-till / cover crops / precision fert: cite directional soil/input effects; do NOT invent farm-specific $/year
+
+CRITICAL HONESTY RULES:
+- Do NOT invent dollar savings ($/year or $/acre) for this farm.
+- current_impact / predicted_impact_* MUST be relative planning INDEX scores from 0–100 (not dollars).
+- If cost inputs were not provided (they were not), never convert indexes into currency.
 
 TASK: Generate predictive conservation impact analysis:
-1. Calculate REALISTIC current annual savings ($/year) based on acreage and practice
-2. Predict 1-year impact (account for initial soil improvement)
-3. Predict 5-year impact (compounding benefits, full soil health restoration)
-4. Climate benefit factor (0-1 scale, carbon sequestration potential)
-5. Soil health improvement trajectory (0-1 scale)
-6. Confidence score based on community data quality (0-1 scale)
+1. current_impact: relative planning index 0–100 for near-term practice benefit
+2. predicted_impact_1_year: relative planning index 0–100 at 1 year
+3. predicted_impact_5_year: relative planning index 0–100 at 5 years
+4. climate_factor (0-1)
+5. soil_health_improvement (0-1)
+6. confidence_score (0-1) based on community data quality / sample size
 
 Return JSON with: current_impact, predicted_impact_1_year, predicted_impact_5_year, climate_factor, soil_health_improvement, confidence_score.`;
 
@@ -169,6 +182,19 @@ Return JSON with: current_impact, predicted_impact_1_year, predicted_impact_5_ye
     }
     if (predictionData.confidence_score == null || Number.isNaN(Number(predictionData.confidence_score))) {
       throw new Error('Conservation prediction omitted confidence_score');
+    }
+
+    const indexFields = [
+      'current_impact',
+      'predicted_impact_1_year',
+      'predicted_impact_5_year',
+    ] as const;
+    for (const field of indexFields) {
+      const value = Number(predictionData[field]);
+      if (!Number.isFinite(value) || value < 0 || value > 100) {
+        throw new Error(`Conservation prediction ${field} must be a 0–100 planning index`);
+      }
+      predictionData[field] = value;
     }
 
     // Save to database (use regular client, RLS allows user to insert their own data)

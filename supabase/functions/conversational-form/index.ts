@@ -521,19 +521,18 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
     // Strip markdown code blocks if present (```json ... ```)
     aiMessage = aiMessage.replace(/```json\s*/g, '').replace(/```\s*/g, '');
 
-    // Parse AI response (expect JSON)
+    // Parse AI response (expect JSON) — fail closed; never invent a success-shaped payload
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(aiMessage);
     } catch (parseError) {
       console.error('Failed to parse AI response:', aiMessage, parseError);
-      // If AI didn't return JSON, wrap it
-      parsedResponse = {
-        message: aiMessage,
-        extracted_data: {},
-        completion_percentage: 0,
-        next_question: null
-      };
+      return new Response(
+        JSON.stringify({
+          error: 'Form assistant returned unparseable JSON — refusing to invent extracted fields',
+        }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Update extracted data

@@ -360,7 +360,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">LSU Directory</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Direct AgCenter support access
+                    Public LSU AgCenter directory
                   </p>
                   <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>

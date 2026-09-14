@@ -93,7 +93,10 @@ export default function Insurance() {
         field: {
           name: claim.field?.name || 'Unknown Field',
           crop_type: claim.field?.crop_type || 'unknown',
-          acreage: claim.field?.acreage || 0,
+          acreage:
+            claim.field?.acreage != null && Number.isFinite(Number(claim.field.acreage))
+              ? Number(claim.field.acreage)
+              : null,
         },
         assessment: claim.assessment ? {
           health_score: claim.assessment.health_score,

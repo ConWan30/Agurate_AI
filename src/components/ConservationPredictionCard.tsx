@@ -1,11 +1,26 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { TrendingUp, DollarSign, Sprout, CloudSun } from "lucide-react";
+import { TrendingUp, Gauge, Sprout, CloudSun } from "lucide-react";
 import { ConservationPrediction } from "@/types/enhanced-features";
 
 interface ConservationPredictionCardProps {
   prediction: ConservationPrediction;
+}
+
+function formatIndex(value: number): string {
+  if (!Number.isFinite(value)) return "—";
+  return value.toFixed(0);
+}
+
+function relativeChangeLabel(current: number, future: number): string {
+  if (!Number.isFinite(current) || !Number.isFinite(future) || current <= 0) {
+    return "Planning index (not measured $)";
+  }
+  const pct = ((future / current - 1) * 100);
+  if (!Number.isFinite(pct)) return "Planning index (not measured $)";
+  const sign = pct >= 0 ? "+" : "";
+  return `${sign}${pct.toFixed(0)}% vs current index`;
 }
 
 export function ConservationPredictionCard({ prediction }: ConservationPredictionCardProps) {
@@ -28,13 +43,14 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <DollarSign className="h-4 w-4" />
+              <Gauge className="h-4 w-4" />
               <span>Current Impact</span>
             </div>
             <div className="text-2xl font-bold text-primary">
-              ${prediction.current_impact.toLocaleString()}
+              {formatIndex(prediction.current_impact)}
+              <span className="text-sm font-normal text-muted-foreground"> /100</span>
             </div>
-            <p className="text-xs text-muted-foreground">Annual savings</p>
+            <p className="text-xs text-muted-foreground">Relative planning index — not $/year</p>
           </div>
 
           <div className="space-y-2">
@@ -43,10 +59,11 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
               <span>1-Year Forecast</span>
             </div>
             <div className="text-2xl font-bold text-accent">
-              ${prediction.predicted_impact_1_year.toLocaleString()}
+              {formatIndex(prediction.predicted_impact_1_year)}
+              <span className="text-sm font-normal text-muted-foreground"> /100</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              +{((prediction.predicted_impact_1_year / prediction.current_impact - 1) * 100).toFixed(0)}% increase
+              {relativeChangeLabel(prediction.current_impact, prediction.predicted_impact_1_year)}
             </p>
           </div>
 
@@ -56,10 +73,11 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
               <span>5-Year Forecast</span>
             </div>
             <div className="text-2xl font-bold text-secondary">
-              ${prediction.predicted_impact_5_year.toLocaleString()}
+              {formatIndex(prediction.predicted_impact_5_year)}
+              <span className="text-sm font-normal text-muted-foreground"> /100</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              +{((prediction.predicted_impact_5_year / prediction.current_impact - 1) * 100).toFixed(0)}% increase
+              {relativeChangeLabel(prediction.current_impact, prediction.predicted_impact_5_year)}
             </p>
           </div>
         </div>
@@ -90,7 +108,7 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
 
         <div className="pt-4 border-t">
           <p className="text-xs text-muted-foreground">
-            * Predictions based on historical data, weather forecasts, and LSU AgCenter research
+            * Relative planning indexes only — not measured farm savings. Dollar outcomes require your recorded cost inputs.
           </p>
         </div>
       </CardContent>

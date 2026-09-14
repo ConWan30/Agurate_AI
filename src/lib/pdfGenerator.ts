@@ -12,7 +12,7 @@ export interface ClaimData {
   field: {
     name: string;
     crop_type: string;
-    acreage: number;
+    acreage?: number | null;
     location?: string;
   };
   assessment?: {
@@ -101,10 +101,14 @@ export const generateInsurancePDF = (claim: ClaimData): jsPDF => {
   doc.text('Field Information', 15, yPos);
   
   yPos += 10;
+  const acreageLabel =
+    claim.field.acreage != null && Number.isFinite(Number(claim.field.acreage))
+      ? `${claim.field.acreage} acres`
+      : 'Not recorded';
   const fieldInfo = [
     ['Field Name', claim.field.name],
     ['Crop Type', claim.field.crop_type.charAt(0).toUpperCase() + claim.field.crop_type.slice(1)],
-    ['Acreage', `${claim.field.acreage} acres`],
+    ['Acreage', acreageLabel],
     ...(claim.field.location ? [['Location', claim.field.location]] : []),
   ];
 
