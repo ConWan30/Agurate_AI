@@ -41,11 +41,15 @@ export default function LSUResearchers() {
     }
   };
 
-  const filteredResearchers = researchers.filter(r =>
-    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.expertise.some(e => e.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    r.department.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredResearchers = researchers.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    const expertise = Array.isArray(r.expertise) ? r.expertise : [];
+    return (
+      (r.name || '').toLowerCase().includes(q) ||
+      expertise.some((e) => String(e).toLowerCase().includes(q)) ||
+      (r.department || '').toLowerCase().includes(q)
+    );
+  });
 
   if (loading) {
     return (
@@ -143,7 +147,7 @@ export default function LSUResearchers() {
           </div>
           <div>
             <h2 className="text-2xl font-heading font-bold">Recent LSU Publications</h2>
-            <p className="text-sm text-muted-foreground">Research backing our AI recommendations</p>
+            <p className="text-sm text-muted-foreground">Public LSU studies for Louisiana crops — not an AgurateAI partnership endorsement</p>
           </div>
         </div>
         <div className="space-y-4">
@@ -154,22 +158,24 @@ export default function LSUResearchers() {
                   <div className="flex-1">
                     <CardTitle className="text-lg font-heading">{pub.title}</CardTitle>
                     <CardDescription className="mt-2">
-                      By {pub.authors.join(', ')} • {pub.year}
+                      By {(Array.isArray(pub.authors) ? pub.authors : []).join(', ') || 'Authors not listed'} • {pub.year ?? 'Year n/a'}
                     </CardDescription>
                   </div>
-                  <AgriculturalBadge type="growing">{pub.crops[0]}</AgriculturalBadge>
+                  {Array.isArray(pub.crops) && pub.crops[0] ? (
+                    <AgriculturalBadge type="growing">{pub.crops[0]}</AgriculturalBadge>
+                  ) : null}
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex flex-wrap gap-2">
-                    {pub.topics.slice(0, 3).map((topic: string) => (
+                    {(Array.isArray(pub.topics) ? pub.topics : []).slice(0, 3).map((topic: string) => (
                       <Badge key={topic} variant="secondary" className="text-xs">
                         {topic}
                       </Badge>
                     ))}
                   </div>
-                  {pub.key_findings && pub.key_findings.length > 0 && (
+                  {Array.isArray(pub.key_findings) && pub.key_findings.length > 0 && (
                     <div className="text-sm text-muted-foreground">
                       <strong>Key Findings:</strong>
                       <ul className="list-disc list-inside mt-1 space-y-1">

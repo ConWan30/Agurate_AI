@@ -26,12 +26,11 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
   const hasConfidence = hasHealthScore(latestPrediction.confidence_score);
   const yieldOutlook = Number(predictionData.yield_outlook);
   const hasYieldOutlook = Number.isFinite(yieldOutlook) && yieldOutlook >= 0 && yieldOutlook <= 100;
-  // Edge stores disease_risk as a 0–100 planning index (not 0–1)
-  const diseaseRiskRaw = Number(predictionData.disease_risk);
-  const diseaseRiskPercent = Number.isFinite(diseaseRiskRaw)
-    ? (diseaseRiskRaw <= 1 ? diseaseRiskRaw * 100 : diseaseRiskRaw)
+  // disease_risk may arrive as 0–1 or 0–100; toHealthPercent normalizes both
+  const diseaseRiskPercent = hasHealthScore(predictionData.disease_risk)
+    ? toHealthPercent(Number(predictionData.disease_risk))
     : NaN;
-  const hasDiseaseRisk = Number.isFinite(diseaseRiskPercent) && diseaseRiskPercent >= 0 && diseaseRiskPercent <= 100;
+  const hasDiseaseRisk = Number.isFinite(diseaseRiskPercent);
   const weatherImpact =
     typeof predictionData.weather_impact === 'string' && predictionData.weather_impact.trim()
       ? predictionData.weather_impact

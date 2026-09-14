@@ -28,6 +28,7 @@ import { ExpertEscalationCard } from "@/components/ExpertEscalationCard";
 import { PeerComparisonCard } from "@/components/PeerComparisonCard";
 import { AnnotatedImage, type ImageAnnotation } from "@/components/AnnotatedImage";
 import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
+import { normalizeStressLevel } from '@/lib/stress-level';
 import { resolveCropImageUrls } from '@/lib/crop-image';
 
 interface Assessment {
@@ -137,14 +138,6 @@ export default function History() {
         variant: "destructive",
       });
     }
-  };
-
-  const normalizeStressLevel = (stressLevel: string | null | undefined) => {
-    const raw = (stressLevel || '').trim().toLowerCase();
-    if (raw === 'healthy' || raw === 'none' || raw === 'low') return 'healthy';
-    if (raw === 'moderate' || raw === 'medium' || raw === 'mild') return 'moderate';
-    if (raw === 'severe' || raw === 'critical' || raw === 'high') return 'severe';
-    return '';
   };
 
   const getStressIcon = (stressLevel: string) => {
