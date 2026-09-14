@@ -151,7 +151,7 @@ export function PeerComparisonCard({
 
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
-              <p className="text-xs text-muted-foreground">Avg. Effectiveness</p>
+              <p className="text-xs text-muted-foreground">Avg. effectiveness (when recorded)</p>
               <p className="text-lg font-bold text-success">
                 {formatPeerMetric(topTreatment.avg_effectiveness, '/100')}
               </p>

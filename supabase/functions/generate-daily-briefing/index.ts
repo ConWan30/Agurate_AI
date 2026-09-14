@@ -113,7 +113,7 @@ serve(async (req) => {
       contextPrompt += `WEATHER TODAY:\n`;
       contextPrompt += `- High: ${weather.highTemp}°F\n`;
       contextPrompt += `- Low: ${weather.lowTemp}°F\n`;
-      contextPrompt += `- Precipitation: ${weather.precipitation}mm\n\n`;
+      contextPrompt += `- Precipitation: ${weather.precipitation} in\n\n`;
     }
 
     contextPrompt += `FIELD STATUS:\n`;

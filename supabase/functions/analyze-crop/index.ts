@@ -235,22 +235,22 @@ serve(async (req) => {
 
       unifiedContext = `
 ═══════════════════════════════════════════════════════════════
-🧠 UNIFIED FIELD INTELLIGENCE (Historical Context Integration)
+UNIFIED FIELD INTELLIGENCE (recorded history only — do not invent missing values)
 ═══════════════════════════════════════════════════════════════
 
-📊 FIELD PROFILE:
+FIELD PROFILE:
 - Variety: ${fieldData?.rice_variety || fieldData?.soybean_variety || fieldData?.cotton_variety || fieldData?.corn_hybrid || 'Unknown'}
 - Acreage: ${fieldData?.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? fieldData.acreage : 'not recorded'} acres
 - Soil Type: ${fieldData?.soil_type || 'Not specified'}
 
-📈 HISTORICAL HEALTH TREND (Last 5 Assessments):
+HISTORICAL HEALTH TREND (Last 5 Assessments):
 ${assessmentHistory && assessmentHistory.length > 0 
   ? assessmentHistory.map((a: any, i: number) => 
       `${i + 1}. ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${formatHealthForPrompt(a.health_score)}, Stress: ${a.stress_level ?? 'not recorded'}${a.symptoms?.length > 0 ? `, Symptoms: ${a.symptoms.join(', ')}` : ''}`
     ).join('\n') 
   : '- No historical data available (first assessment)'}
 
-🌱 ACTIVE CONSERVATION PRACTICES:
+ACTIVE CONSERVATION PRACTICES:
 ${conservationData && conservationData.length > 0 
   ? conservationData.map((c: any) => {
       const impact = Number(c.current_impact);
@@ -264,7 +264,7 @@ ${conservationData && conservationData.length > 0
     }).join('\n')
   : '- No conservation practices recorded'}
 
-🔬 VARIETY PERFORMANCE INTELLIGENCE:
+VARIETY PERFORMANCE (recorded metrics only):
 ${varietyData && varietyData.length > 0
   ? varietyData.map((v: any) => {
       const perf = v.performance_score != null && Number.isFinite(Number(v.performance_score))
@@ -277,7 +277,7 @@ ${varietyData && varietyData.length > 0
     }).join('\n')
   : '- No variety performance data available'}
 
-💧 RECENT WATER STRESS EVENTS (Last 30 days):
+RECENT WATER STRESS EVENTS (Last 30 days):
 ${waterStressData && waterStressData.length > 0
   ? waterStressData.map((w: any) => {
       const stress = w.stress_score != null && Number.isFinite(Number(w.stress_score))
@@ -287,17 +287,17 @@ ${waterStressData && waterStressData.length > 0
     }).join('\n')
   : '- No water stress events recorded'}
 
-🎯 CRITICAL ANALYSIS DIRECTIVE:
-Use ALL historical context above to:
-1. Compare current symptoms with historical progression patterns
-2. Identify if issues are worsening, stable, or improving
-3. Cross-reference variety-specific vulnerabilities
-4. Consider conservation practice impacts on current health
-5. Provide context-aware recommendations that account for field history
+ANALYSIS DIRECTIVE:
+Prefer the current media as ground truth. Use recorded history only when it clearly supports a visible finding:
+1. Note progression only when prior assessments exist and symptoms visibly align
+2. Do not invent worsening/improving trends from missing history
+3. Mention variety vulnerabilities only when listed above and visually relevant
+4. Do not invent conservation or water-stress effects that are not recorded
+5. Keep recommendations tied to visible evidence and cited public guidance
 
 ═══════════════════════════════════════════════════════════════
 `;
-      console.log('✅ Unified context gathered for field:', fieldId);
+      console.log('Unified context gathered for field:', fieldId);
     }
 
     // STEP 1: Fetch weather only for real field/photo coordinates — never invent parish defaults
@@ -360,7 +360,7 @@ CONTEXT:
 - Soils: Alluvial/claypan soils typical of Mississippi Delta
 - Climate: Warm, humid with high rainfall
 
-${unifiedContext ? '🧠 YOU HAVE ACCESS TO UNIFIED FIELD INTELLIGENCE - Use historical context to enhance diagnosis accuracy!' : ''}
+${unifiedContext ? 'You have unified field intelligence history. Use it only as supporting context — never invent scores, diseases, or yield impact not visible in the current media.' : ''}
 
 ${mediaType === 'video' 
   ? 'Analyze drone video footage of crop fields, examining patterns across multiple frames for comprehensive field assessment.'
@@ -412,10 +412,11 @@ ${cropType.toLowerCase().includes('corn') ? `**CORN:** Look for:
 - Rectangular lesions (gray leaf spot)
 - Rust pustules or stalk rot` : ''}
 
-**STRESS SCORING:**
-- 0.0-0.3 = Severe stress (immediate action needed)
-- 0.3-0.6 = Moderate stress (monitor closely)
-- 0.6-1.0 = Healthy (routine management)
+**STRESS SCORING (estimate from visible evidence only — use null/omit fields you cannot support):**
+- 0.0-0.3 = Severe stress when clear visual evidence warrants it
+- 0.3-0.6 = Moderate stress when symptoms are present but limited
+- 0.6-1.0 = Healthy when the crop appears vigorous with no clear stress cues
+- If the image is unclear or not a crop, keep confidence low and say so in visual_cues — do not invent disease names or yield %
 
 Respond with JSON:
 {

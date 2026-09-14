@@ -313,7 +313,7 @@ export function DailyBriefingCard() {
               <Droplets className="h-4 w-4 text-secondary" />
               <span className="text-sm font-medium">
                 {Number.isFinite(Number(briefing.weatherInsights.precipitation))
-                  ? `${Number(briefing.weatherInsights.precipitation).toFixed(1)}mm rain`
+                  ? `${Number(briefing.weatherInsights.precipitation).toFixed(1)} in rain`
                   : 'Rainfall not recorded'}
               </span>
             </div>
