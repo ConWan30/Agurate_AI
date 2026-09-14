@@ -118,13 +118,7 @@ Return your analysis as a JSON object with:
       const jsonStr = jsonMatch ? jsonMatch[1] : aiAnalysis;
       parsedAnalysis = JSON.parse(jsonStr);
     } catch {
-      // Fallback: create structured response from text
-      parsedAnalysis = {
-        visual_changes: [aiAnalysis],
-        symptom_progression: [],
-        treatment_effectiveness: null,
-        projected_recovery: null,
-      };
+      throw new Error('Image comparison AI returned unparseable JSON — refusing to invent structured analysis');
     }
 
     const result = {

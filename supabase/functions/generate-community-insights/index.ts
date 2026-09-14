@@ -108,11 +108,7 @@ Return JSON with community insights and best practices.`;
     try {
       analysisData = JSON.parse(aiResponse);
     } catch {
-      analysisData = {
-        insights: 'Community data aggregated',
-        recommendations: ['Continue monitoring practices'],
-        average_savings: insights?.reduce((sum, i) => sum + (i.savings_achieved || 0), 0) / (insights?.length || 1),
-      };
+      throw new Error('Community insights AI returned unparseable JSON — refusing to invent insights');
     }
 
     return new Response(

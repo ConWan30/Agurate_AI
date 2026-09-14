@@ -87,6 +87,8 @@ Last updated: 2026-09-14
 - [x] AR analyze + prediction edges fail closed (no invented scores)
 - [x] unified-ai enrichment stubs mark unavailable (no invented confidence)
 - [x] predict-water-stress fail closed on unparseable AI JSON
+- [x] Field map does not invent health % / color when no assessment
+- [x] Community insights + compare-images fail closed on unparseable AI JSON
 
 ## Platform gates (external)
 

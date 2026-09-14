@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import FieldMapLeaflet from '@/components/FieldMapLeaflet';
 import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
 import TutorialTooltip from '@/components/TutorialTooltip';
-import { toHealthPercent } from '@/lib/health-score';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -85,7 +85,8 @@ export default function FieldMap() {
     setIsLoading(false);
   };
 
-  const getHealthColor = (healthScore: number) => {
+  const getHealthColor = (healthScore: number | null | undefined) => {
+    if (!hasHealthScore(healthScore)) return 'bg-muted-foreground/40';
     if (toHealthPercent(healthScore) >= 75) return 'bg-health-good';
     if (toHealthPercent(healthScore) >= 50) return 'bg-health-moderate';
     return 'bg-health-severe';
@@ -171,6 +172,10 @@ export default function FieldMap() {
               <div className="w-4 h-4 rounded-full bg-health-severe border-2 border-white shadow-md" />
               <span className="text-sm">Severe (0-49%)</span>
             </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-muted-foreground/40 border-2 border-white shadow-md" />
+              <span className="text-sm">No assessment yet</span>
+            </div>
           </CardContent>
         </AnimatedCard>
 
@@ -189,7 +194,8 @@ export default function FieldMap() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {fields.map((field, idx) => {
             const assessment = assessments.find(a => a.field_id === field.id);
-            const healthScore = assessment?.health_score ?? 50;
+            const healthScore = assessment?.health_score;
+            const hasScore = hasHealthScore(healthScore);
 
             return (
               <AnimatedCard key={field.id} delay={idx * 50} hover>
@@ -201,10 +207,17 @@ export default function FieldMap() {
                         {field.crop_type} • {field.acreage || 'N/A'} acres
                       </p>
                     </div>
-                    <div className={`w-6 h-6 rounded-full ${getHealthColor(healthScore)} border-2 border-white shadow-md`} aria-label={`Health indicator: ${toHealthPercent(healthScore).toFixed(0)}%`} />
+                    <div
+                      className={`w-6 h-6 rounded-full ${getHealthColor(healthScore)} border-2 border-white shadow-md`}
+                      aria-label={
+                        hasScore
+                          ? `Health indicator: ${toHealthPercent(healthScore).toFixed(0)}%`
+                          : 'Health indicator: no assessment yet'
+                      }
+                    />
                   </div>
 
-                  {assessment && (
+                  {assessment && hasScore ? (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Activity className="h-4 w-4" aria-hidden="true" />
@@ -222,6 +235,8 @@ export default function FieldMap() {
                         Last analyzed: <time dateTime={assessment.analyzed_at}>{new Date(assessment.analyzed_at).toLocaleDateString()}</time>
                       </p>
                     </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No assessment yet</p>
                   )}
 
                   <div className="pt-2 border-t">
