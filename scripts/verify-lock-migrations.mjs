@@ -259,6 +259,15 @@ const required = [
       'app.allow_dirt_referral_insert',
     ],
   },
+  {
+    id: '20260914410000_lock_peer_crop_bind_cost_strip',
+    needles: [
+      'NEW.crop_type := field_crop',
+      'NEW.cost_usd := NULL',
+      'NEW.crop_type := OLD.crop_type',
+      'peer_treatment_outcomes.recommendation_id is required',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -279,11 +288,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091440') &&
-  tip < '20260914400000_lock_peer_insert_beta_metrics_coop_dirt'
+  !tip.startsWith('2026091441') &&
+  tip < '20260914410000_lock_peer_crop_bind_cost_strip'
 ) {
   fail(
-    `tip migration ${tip} should include peer-insert/beta-metrics/coop/dirt invent lock (20260914400000+)`
+    `tip migration ${tip} should include peer crop-bind/cost-strip invent lock (20260914410000+)`
   );
 }
 

@@ -120,18 +120,8 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
         body: JSON.stringify({
           image1_url: image1Url,
           image2_url: image2Url,
-          assessment1_data: {
-            health_score: assessment1.health_score,
-            stress_level: assessment1.stress_level,
-            symptoms: assessment1.symptoms,
-            analyzed_at: assessment1.analyzed_at,
-          },
-          assessment2_data: {
-            health_score: assessment2.health_score,
-            stress_level: assessment2.stress_level,
-            symptoms: assessment2.symptoms,
-            analyzed_at: assessment2.analyzed_at,
-          },
+          assessment1_id: assessment1.id,
+          assessment2_id: assessment2.id,
         }),
       });
 

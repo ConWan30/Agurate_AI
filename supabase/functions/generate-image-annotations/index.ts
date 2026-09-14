@@ -8,13 +8,9 @@ const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
 interface AnnotationRequest {
   image_url: string;
-  analysis_context?: {
-    health_score?: number;
-    stress_level?: string;
-    symptoms?: string[];
-    diseases?: string[];
-    pests?: string[];
-  };
+  assessment_id: string;
+  /** @deprecated Ignored — context is loaded from the owned assessment. */
+  analysis_context?: unknown;
 }
 
 interface Annotation {
@@ -54,7 +50,7 @@ serve(async (req) => {
       });
     }
 
-    const { image_url, analysis_context }: AnnotationRequest = await req.json();
+    const { image_url, assessment_id }: AnnotationRequest = await req.json();
 
     if (!image_url) {
       return new Response(
@@ -63,17 +59,44 @@ serve(async (req) => {
       );
     }
 
+    if (!assessment_id) {
+      return new Response(
+        JSON.stringify({ error: 'assessment_id is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { data: assessment, error: assessmentError } = await rateLimitClient
+      .from('assessments')
+      .select('id, health_score, stress_level, symptoms, disease_identified, pest_identified, fields!inner(user_id)')
+      .eq('id', assessment_id)
+      .maybeSingle();
+
+    if (assessmentError) throw assessmentError;
+    if (!assessment || (assessment as { fields?: { user_id?: string } }).fields?.user_id !== user.id) {
+      return new Response(
+        JSON.stringify({ error: 'Assessment not found for authenticated user' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const healthScore =
+      assessment.health_score != null && Number.isFinite(Number(assessment.health_score))
+        ? Number(assessment.health_score)
+        : null;
+    const symptoms = Array.isArray(assessment.symptoms) ? assessment.symptoms : [];
+    const diseases = Array.isArray(assessment.disease_identified) ? assessment.disease_identified : [];
+    const pests = Array.isArray(assessment.pest_identified) ? assessment.pest_identified : [];
+
     // Use Gemini Vision to analyze image and generate annotation coordinates
     const annotationPrompt = `You are analyzing a crop health image. Identify specific areas that need attention and provide annotation coordinates.
 
-${analysis_context ? `
-CONTEXT:
-- Health Score: ${analysis_context.health_score != null && Number.isFinite(Number(analysis_context.health_score)) ? `${analysis_context.health_score}%` : 'not recorded'}
-- Stress Level: ${analysis_context.stress_level || 'Unknown'}
-- Symptoms: ${(analysis_context.symptoms || []).join(', ') || 'None'}
-- Diseases: ${(analysis_context.diseases || []).join(', ') || 'None'}
-- Pests: ${(analysis_context.pests || []).join(', ') || 'None'}
-` : ''}
+CONTEXT (from persisted assessment only — do not invent missing findings):
+- Health Score: ${healthScore != null ? `${healthScore}%` : 'not recorded'}
+- Stress Level: ${assessment.stress_level ?? 'not recorded'}
+- Symptoms: ${symptoms.length ? symptoms.join(', ') : 'not recorded'}
+- Diseases: ${diseases.length ? diseases.join(', ') : 'not recorded'}
+- Pests: ${pests.length ? pests.join(', ') : 'not recorded'}
 
 Analyze this image and return a JSON array of annotations. Each annotation should have:
 - type: "circle", "arrow", "rectangle", or "text"

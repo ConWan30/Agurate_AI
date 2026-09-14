@@ -103,13 +103,15 @@ export default function DeltaIntelligence() {
       if (fields) {
         const { data: assessment } = await supabase
           .from('assessments')
-          .select('health_score, stress_level, analyzed_at')
+          .select('id, health_score, stress_level, analyzed_at')
           .eq('field_id', fields.id)
           .order('analyzed_at', { ascending: false })
           .limit(1)
           .single();
 
         setFieldContext({
+          fieldId: fields.id,
+          assessmentId: assessment?.id ?? null,
           recentAssessment: assessment,
           cropType: fields.crop_type,
           healthScore: assessment?.health_score,

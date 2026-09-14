@@ -34,7 +34,7 @@ export const PredictiveQuestions = memo(function PredictiveQuestions({
   // Fetch AI-generated predictive questions
   useEffect(() => {
     const fetchPredictiveQuestions = async () => {
-      if (!fieldContext?.recentAssessment) {
+      if (!fieldContext?.recentAssessment || !fieldContext?.fieldId || !(fieldContext.assessmentId ?? fieldContext.recentAssessment?.id)) {
         // Use fallback for non-field context
         return;
       }
@@ -56,7 +56,8 @@ export const PredictiveQuestions = memo(function PredictiveQuestions({
               'Authorization': `Bearer ${session.access_token}`,
             },
             body: JSON.stringify({
-              fieldContext,
+              fieldId: fieldContext.fieldId,
+              assessmentId: fieldContext.assessmentId ?? fieldContext.recentAssessment?.id,
               conversationHistory: conversationHistory.slice(-5), // Last 5 messages
               maxQuestions: 4,
             }),

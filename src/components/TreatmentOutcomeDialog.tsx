@@ -121,6 +121,11 @@ export function TreatmentOutcomeDialog({
         healthScoreAfter: healthAfter,
       });
 
+      const costNote =
+        parsedCost != null
+          ? `Self-reported cost/acre: $${parsedCost}`
+          : null;
+      const baseNotes = notes || `Treatment: ${extractTreatmentName(recommendation.recommendation_text)}`;
       const { error } = await supabase
         .from('peer_treatment_outcomes')
         .insert({
@@ -132,8 +137,8 @@ export function TreatmentOutcomeDialog({
           problem_addressed: symptoms.join(', ') || stressLevel || 'Unknown',
           outcome: outcome === 'success' ? 'successful' : outcome === 'partial' ? 'partially_successful' : 'unsuccessful',
           effectiveness_score: healthAfter,
-          cost_usd: parsedCost,
-          notes: notes || `Treatment: ${extractTreatmentName(recommendation.recommendation_text)}`,
+          // cost_usd is stripped server-side — keep self-reported cost in notes only
+          notes: [baseNotes, costNote].filter(Boolean).join(' | '),
           applied_at: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           evaluated_at: new Date().toISOString().split('T')[0],
         });
@@ -249,7 +254,7 @@ export function TreatmentOutcomeDialog({
 
           {/* Cost Per Acre */}
           <div className="space-y-2">
-            <Label htmlFor="costPerAcre">Cost Per Acre (Optional)</Label>
+            <Label htmlFor="costPerAcre">Cost Per Acre (optional notes only — not used in peer averages)</Label>
             <Input
               id="costPerAcre"
               type="number"

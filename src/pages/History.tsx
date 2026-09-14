@@ -343,15 +343,7 @@ export default function History() {
                                   },
                                   body: JSON.stringify({
                                     image_url: selectedAssessment.image_url,
-                                    analysis_context: {
-                                      health_score: hasHealthScore(selectedAssessment.health_score)
-                                        ? toHealthPercent(selectedAssessment.health_score)
-                                        : null,
-                                      stress_level: selectedAssessment.stress_level,
-                                      symptoms: selectedAssessment.symptoms,
-                                      diseases: selectedAssessment.disease_identified,
-                                      pests: selectedAssessment.pest_identified,
-                                    },
+                                    assessment_id: selectedAssessment.id,
                                   }),
                                 });
 

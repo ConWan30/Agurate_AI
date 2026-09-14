@@ -40,43 +40,77 @@ serve(async (req) => {
       });
     }
 
-    // Parse request body
+    // Parse request body — IDs only; hydrate owned field/assessment server-side.
     const body = await req.json();
     const {
-      fieldContext,
+      fieldId,
+      assessmentId,
       conversationHistory = [],
       maxQuestions = 3,
     } = body;
 
-    // Build context prompt for AI
+    if (!fieldId || !assessmentId) {
+      return new Response(
+        JSON.stringify({ error: 'fieldId and assessmentId are required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const { data: field, error: fieldError } = await rateLimitClient
+      .from('fields')
+      .select('id, crop_type, user_id')
+      .eq('id', fieldId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (fieldError) throw fieldError;
+    if (!field) {
+      return new Response(
+        JSON.stringify({ error: 'Field not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const { data: assessment, error: assessmentError } = await rateLimitClient
+      .from('assessments')
+      .select('id, field_id, health_score, stress_level, symptoms, disease_identified, pest_identified')
+      .eq('id', assessmentId)
+      .eq('field_id', fieldId)
+      .maybeSingle();
+    if (assessmentError) throw assessmentError;
+    if (!assessment) {
+      return new Response(
+        JSON.stringify({ error: 'Assessment not found for field' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // Build context prompt for AI from persisted rows only
     let contextPrompt = 'You are Delta Intelligence, an AI assistant for Louisiana Delta farmers.\n\n';
-    
-    if (fieldContext?.recentAssessment) {
-      const cropType = fieldContext.cropType || 'crops';
-      
-      contextPrompt += `FIELD STATUS:\n`;
-      contextPrompt += `- Crop Type: ${cropType}\n`;
-      if (hasHealthScore(fieldContext.healthScore)) {
-        const healthScore = toHealthPercent(fieldContext.healthScore);
-        contextPrompt += `- Health Score: ${healthScore.toFixed(0)}%\n`;
-        if (fieldContext.stressLevel) {
-          contextPrompt += `- Stress Level: ${fieldContext.stressLevel}\n`;
-        }
-      } else {
-        contextPrompt += `- Health Score: not available — do not invent health, stress, or urgency\n`;
+
+    const cropType = field.crop_type || 'crops';
+    contextPrompt += `FIELD STATUS:\n`;
+    contextPrompt += `- Crop Type: ${cropType}\n`;
+    if (hasHealthScore(assessment.health_score)) {
+      const healthScore = toHealthPercent(assessment.health_score);
+      contextPrompt += `- Health Score: ${healthScore.toFixed(0)}%\n`;
+      if (assessment.stress_level) {
+        contextPrompt += `- Stress Level: ${assessment.stress_level}\n`;
       }
-      
-      if (fieldContext.symptoms && fieldContext.symptoms.length > 0) {
-        contextPrompt += `- Symptoms: ${fieldContext.symptoms.join(', ')}\n`;
-      }
-      
-      if (fieldContext.diseases && fieldContext.diseases.length > 0) {
-        contextPrompt += `- Diseases Detected: ${fieldContext.diseases.join(', ')}\n`;
-      }
-      
-      if (fieldContext.pests && fieldContext.pests.length > 0) {
-        contextPrompt += `- Pests Detected: ${fieldContext.pests.join(', ')}\n`;
-      }
+    } else {
+      contextPrompt += `- Health Score: not available — do not invent health, stress, or urgency\n`;
+    }
+
+    const symptoms = Array.isArray(assessment.symptoms) ? assessment.symptoms : [];
+    const diseases = Array.isArray(assessment.disease_identified) ? assessment.disease_identified : [];
+    const pests = Array.isArray(assessment.pest_identified) ? assessment.pest_identified : [];
+    if (symptoms.length > 0) {
+      contextPrompt += `- Symptoms: ${symptoms.join(', ')}\n`;
+    }
+    if (diseases.length > 0) {
+      contextPrompt += `- Diseases Detected: ${diseases.join(', ')}\n`;
+    }
+    if (pests.length > 0) {
+      contextPrompt += `- Pests Detected: ${pests.join(', ')}\n`;
     }
 
     if (conversationHistory.length > 0) {
@@ -142,7 +176,6 @@ serve(async (req) => {
 
     // Generic fallbacks only — never invent stress narratives from health bands
     if (questions.length === 0) {
-      const cropType = fieldContext?.cropType || 'crops';
       questions = [
         `What should I check in my ${cropType} this week?`,
         'Any weather concerns I should plan around?',

@@ -240,7 +240,7 @@ export default function WeatherTimeline() {
                     </div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <AgriculturalBadge type={event.event_type === 'heat_wave' ? 'severe' : event.event_type === 'heavy_rain' ? 'moderate' : 'healthy'}>
+                        <AgriculturalBadge type={event.event_type === 'heat_wave' ? 'severe' : event.event_type === 'heavy_rain' ? 'moderate' : 'unknown'}>
                           {event.event_type.replace('_', ' ')}
                         </AgriculturalBadge>
                         <time className="text-sm text-muted-foreground" dateTime={event.event_date}>
