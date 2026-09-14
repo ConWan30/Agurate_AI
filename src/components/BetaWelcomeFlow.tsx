@@ -118,7 +118,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
               <div>
                 <p className="font-semibold text-foreground">Closed-beta free access</p>
                 <p className="text-sm text-muted-foreground">
-                  All 17 features completely free during beta (6-12 months)
+                  Core features available at no charge while closed beta is open
                 </p>
               </div>
             </div>
@@ -127,7 +127,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
               <div>
                 <p className="font-semibold text-foreground">50% off published rate</p>
                 <p className="text-sm text-muted-foreground">
-                  Lock in 50% off the published plan rate for life after beta
+                  Keep 50% off the published plan rate when paid plans launch
                 </p>
               </div>
             </div>

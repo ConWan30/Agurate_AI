@@ -61,7 +61,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
 
       toast({
         title: "🏆 Success story saved!",
-        description: "Thank you for sharing your experience. This helps other farmers and improves the closed beta.",
+        description: "Thanks for sharing. Public display requires moderation approval before it appears publicly.",
       });
       onClose();
     } catch (error: unknown) {

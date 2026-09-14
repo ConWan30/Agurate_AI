@@ -64,7 +64,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <Sprout className="h-16 w-16 mx-auto text-primary animate-bounce delta-wave" />
               <h3 className="text-2xl font-bold text-gradient-delta">AgurateAI Platform</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Where Louisiana farming tradition meets cutting-edge AI technology
+                Where Louisiana farming tradition meets AI-assisted field tools
               </p>
             </div>
             {/* Floating elements */}

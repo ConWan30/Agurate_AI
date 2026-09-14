@@ -78,8 +78,7 @@ export default function Onboarding() {
           phone: extractedData.phone,
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
-          beta_farmer: true,
-          beta_signup_date: new Date().toISOString()
+          // beta_farmer / lifetime_discount are set by beta-signup (service role), not the client
         })
         .eq('id', user.id);
 

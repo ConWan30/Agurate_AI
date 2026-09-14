@@ -385,7 +385,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <Badge className="mb-4 text-sm px-4 py-2 shadow-card">
               <Sparkles className="h-3 w-3 mr-1" />
-              Cutting-Edge Agricultural Technology
+              Agricultural Technology for the Delta
             </Badge>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-4">
               Unified AI Intelligence System
@@ -527,7 +527,7 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center relative z-10">
           <Badge className="mb-6 text-sm px-4 py-2 bg-primary-foreground/20 border-primary-foreground/40 text-primary-foreground backdrop-blur-md">
             <Zap className="h-3 w-3 mr-1" />
-            Start Free Today
+            Join Closed Beta
           </Badge>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
             Ready to Join the Beta?

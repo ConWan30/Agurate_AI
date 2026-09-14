@@ -78,9 +78,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
         .update({
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
-          beta_farmer: true,
-          beta_signup_date: new Date().toISOString(),
-          lifetime_discount: 0.50, // 50% lifetime discount
+          // Entitlements (beta_farmer / lifetime_discount) are server-owned — set at beta-signup.
         })
         .eq('id', user.id);
 
@@ -308,8 +306,8 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
               </div>
               <div className="space-y-3 text-sm">
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <p className="font-medium mb-1">✅ Unlimited FREE Access During Beta</p>
-                  <p className="text-muted-foreground">All features, no limits, no credit card required</p>
+                  <p className="font-medium mb-1">✅ Closed-beta access at no charge</p>
+                  <p className="text-muted-foreground">Core features available during beta without a paid plan</p>
                 </div>
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                   <p className="font-medium mb-1">💰 Beta pricing: 50% off published rate</p>

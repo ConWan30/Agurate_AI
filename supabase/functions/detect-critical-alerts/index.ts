@@ -4,6 +4,7 @@ import {
   handleError,
   handleRateLimitError,
 } from '../_shared/errorHandler.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
@@ -30,6 +31,8 @@ interface UrgencyFactors {
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

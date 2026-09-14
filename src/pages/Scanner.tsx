@@ -223,16 +223,23 @@ export default function Scanner() {
 
       if (aiError) throw aiError;
 
+      if (aiResult.health_score == null || Number.isNaN(Number(aiResult.health_score))) {
+        throw new Error('AI analysis did not return a health score');
+      }
+
       // Save assessment to database
       const { data: assessment, error: dbError } = await supabase
         .from('assessments')
         .insert({
           field_id: selectedFieldId,
           image_url: imageUrl,
-          health_score: toHealthPercent(aiResult.health_score ?? 0.75),
+          health_score: toHealthPercent(aiResult.health_score),
           stress_level: aiResult.stress_level || 'healthy',
           symptoms: aiResult.symptoms || [],
-          confidence_score: toHealthPercent(aiResult.confidence_score ?? 0.85),
+          confidence_score:
+            aiResult.confidence_score == null
+              ? null
+              : toHealthPercent(aiResult.confidence_score),
           photo_location_lat: gpsCoords?.lat || selectedField.location_lat,
           photo_location_lng: gpsCoords?.lng || selectedField.location_lng,
           gps_accuracy_meters: gpsCoords?.accuracy,

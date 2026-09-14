@@ -18,6 +18,19 @@ describe('health-score helpers', () => {
     expect(toHealthPercent(91.5)).toBe(91.5);
   });
 
+  it('handles null, NaN, negatives, and >100', () => {
+    expect(toHealthPercent(null)).toBe(0);
+    expect(toHealthPercent(undefined)).toBe(0);
+    expect(toHealthPercent(Number.NaN)).toBe(0);
+    expect(toHealthPercent(-5)).toBe(0);
+    expect(toHealthPercent(150)).toBe(100);
+  });
+
+  it('distinguishes fraction boundary 1 from percent scale values', () => {
+    expect(toHealthPercent(1)).toBe(100);
+    expect(toHealthPercent(2)).toBe(2);
+  });
+
   it('formats and classifies tones', () => {
     expect(formatHealthPercent(0.8)).toBe('80%');
     expect(healthTone(0.9)).toBe('good');

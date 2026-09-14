@@ -71,6 +71,15 @@ const FORBIDDEN = [
   { name: '24/7 crop monitoring claim', re: /24\/7 crop monitoring/i },
   { name: 'first 100 louisiana delta farmers claim', re: /Limited to First 100 Louisiana Delta Farmers/i },
   { name: 'direct DIRT integration claim', re: /direct integration to MSU DIRT/i },
+  { name: '50% OFF LIFETIME badge', re: /50%\s*OFF\s*LIFETIME/i },
+  { name: 'for life after beta claim', re: /for life after beta/i },
+  { name: 'published plan rate, for life', re: /published plan rate,? for life/i },
+  { name: 'Claim Lifetime Discount CTA', re: /Claim Lifetime Discount/i },
+  { name: 'Unlimited FREE Access During Beta', re: /Unlimited FREE Access During Beta/i },
+  { name: 'completely free during beta period', re: /completely free during beta/i },
+  { name: 'Cutting-Edge Agricultural Technology', re: /Cutting-Edge Agricultural Technology/i },
+  { name: 'Real-time Processing marketing', re: /Real-time Processing/i },
+  { name: 'master all 17 features claim', re: /master all 17/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

@@ -7,8 +7,9 @@
 export function toHealthPercent(score: number | null | undefined): number {
   if (score == null || Number.isNaN(Number(score))) return 0;
   const n = Number(score);
+  if (n < 0) return 0;
   if (n <= 1) return Math.round(n * 1000) / 10;
-  return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
+  return Math.min(100, Math.round(n * 10) / 10);
 }
 
 /** 0–1 fraction for math that expects a ratio. */

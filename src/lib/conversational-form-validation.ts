@@ -200,5 +200,6 @@ export function sanitizeInput(input: string): string {
   return input
     .trim()
     .replace(/[<>]/g, '') // Remove potential HTML tags
-    .replace(/[\x00-\x1F\x7F]/g, ''); // Remove control characters
+    // eslint-disable-next-line no-control-regex -- intentional control-char strip
+    .replace(/[\u0000-\u001F\u007F]/g, '');
 }

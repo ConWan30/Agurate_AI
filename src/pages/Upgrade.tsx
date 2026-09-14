@@ -35,10 +35,10 @@ export default function Upgrade() {
         "Priority support",
         "Early access to new features"
       ],
-      buttonText: "Claim Beta Discount",
+      buttonText: "Notify Me When Billing Opens",
       buttonVariant: "default" as const,
       isFeatured: true,
-      betaDiscount: "50% OFF LIFETIME"
+      betaDiscount: "50% OFF PUBLISHED RATE"
     },
     {
       name: "Cooperative",
@@ -74,7 +74,7 @@ export default function Upgrade() {
             Lock in Your Beta Pricing Benefit
           </h2>
           <p className="text-lg text-muted-foreground">
-            As a beta farmer, you've helped us build AgurateAI. Secure your lifetime discount before the beta program ends.
+            As a beta farmer, you've helped us build AgurateAI. Beta farmers may keep 50% off the published plan rate when paid plans launch. Billing checkout is not open yet.
           </p>
         </div>
 
@@ -121,7 +121,7 @@ export default function Upgrade() {
                     </p>
                   )}
                   <p className="text-sm text-muted-foreground mt-2">
-                    {plan.betaPriceLabel ? "lifetime beta discount" : "contact for pricing"}
+                    {plan.betaPriceLabel ? "beta pricing benefit when billing launches" : "contact for pricing"}
                   </p>
                 </div>
               </CardHeader>
@@ -147,8 +147,7 @@ export default function Upgrade() {
                     if (plan.name === "Cooperative") {
                       window.location.href = "mailto:support@agurateai.com?subject=Cooperative%20Plan%20Inquiry";
                     } else {
-                      // Future: Stripe integration
-                      navigate("/dashboard");
+                      window.location.href = "mailto:support@agurateai.com?subject=Beta%20Pricing%20Waitlist";
                     }
                   }}
                 >
@@ -192,7 +191,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  We accept all major credit cards (Visa, Mastercard, American Express, Discover) and bank transfers for annual subscriptions.
+                  Paid checkout is not live yet. Email support@agurateai.com to join the billing waitlist when plans launch.
                 </p>
               </CardContent>
             </Card>

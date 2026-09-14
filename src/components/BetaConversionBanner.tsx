@@ -53,11 +53,10 @@ export function BetaConversionBanner() {
   };
 
   const handleClaimDiscount = () => {
-    toast.success("Redirecting to checkout...");
-    // Navigate to profile/subscription page
-    setTimeout(() => {
-      navigate('/profile?action=subscribe');
-    }, 500);
+    toast.message("Billing checkout is not open yet", {
+      description: "Email support@agurateai.com to join the paid-plan waitlist.",
+    });
+    window.location.href = "mailto:support@agurateai.com?subject=Beta%20Pricing%20Waitlist";
   };
 
   const handleLearnMore = () => {
@@ -116,7 +115,7 @@ export function BetaConversionBanner() {
                 <DollarSign className="h-4 w-4 text-primary mt-0.5" />
                 <div>
                   <p className="font-medium">50% off published rate</p>
-                  <p className="text-xs text-muted-foreground">50% off the published plan rate, for life</p>
+                  <p className="text-xs text-muted-foreground">50% off the published plan rate after paid plans launch</p>
                 </div>
               </div>
 
@@ -135,7 +134,7 @@ export function BetaConversionBanner() {
                 className={`gap-2 ${isUrgent ? 'bg-destructive hover:bg-destructive/90' : ''}`}
               >
                 <Sparkles className="h-4 w-4" />
-                Claim Lifetime Discount
+                Join pricing waitlist
               </Button>
               <Button variant="outline" onClick={handleLearnMore}>
                 Learn More

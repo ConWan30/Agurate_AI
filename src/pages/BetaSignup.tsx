@@ -70,15 +70,13 @@ export default function BetaSignup() {
   const onSubmit = async (data: BetaSignupForm) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/beta-signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const { data: result, error: invokeError } = await supabase.functions.invoke('beta-signup', {
+        body: data,
       });
 
-      const result = await response.json();
+      if (invokeError) {
+        throw invokeError;
+      }
 
       if (!result.success) {
         if (result.error === 'beta_full') {
@@ -211,7 +209,7 @@ export default function BetaSignup() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Use all 17 features completely free during beta period
+                  Use core closed-beta features at no charge while the program is open
                 </p>
               </CardContent>
             </Card>

@@ -4,7 +4,7 @@ import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 import { useNavigate, Link } from 'react-router-dom';
-import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { PipelineStepCard, FeatureRevealCard, UseCaseRevealCard } from '@/components/HowItWorksRevealCards';
 import bgDeltaRice from "@/assets/bg-delta-rice.jpg";
 
 export default function HowItWorks() {
@@ -257,56 +257,14 @@ export default function HowItWorks() {
           {/* Clean Pipeline Flow */}
           <div className="relative max-w-4xl mx-auto">
             <div className="space-y-4">
-              {aiPipeline.map((step, idx) => {
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
-                const isLast = idx === aiPipeline.length - 1;
-                
-                return (
-                  <div 
-                    key={idx} 
-                    ref={ref}
-                    className={`${hasIntersected ? 'animate-fade-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
-                  >
-                    <div className="relative">
-                      <Card className="field-card hover-lift border-2 transition-all group">
-                        <CardContent className="p-6">
-                          <div className="flex items-start gap-6">
-                            {/* Step Number & Icon */}
-                            <div className="flex-shrink-0">
-                              <div className="relative">
-                                <div className={`h-16 w-16 rounded-2xl ${step.color} flex flex-col items-center justify-center shadow-field group-hover:scale-110 transition-transform`}>
-                                  <step.icon className="h-7 w-7 mb-1" aria-hidden="true" />
-                                  <span className="text-xs font-bold">{idx + 1}</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-xl font-heading font-bold mb-2">{step.title}</h3>
-                              <p className="text-muted-foreground leading-relaxed mb-3">
-                                {step.description}
-                              </p>
-                              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg border text-xs font-mono">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
-                                {step.tech}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Connecting Arrow */}
-                      {!isLast && (
-                        <div className="flex justify-center py-2">
-                          <ArrowRight className="h-6 w-6 text-primary/40 rotate-90" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              {aiPipeline.map((step, idx) => (
+              <PipelineStepCard
+                key={idx}
+                step={step}
+                index={idx}
+                isLast={idx === aiPipeline.length - 1}
+              />
+            ))}
             </div>
           </div>
         </section>
@@ -349,7 +307,7 @@ export default function HowItWorks() {
         <section className="space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-display font-bold">AI Model Details</h2>
-            <p className="text-muted-foreground">Built on cutting-edge AI technology</p>
+            <p className="text-muted-foreground">Built with modern AI models as a research-framed decision aid</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -398,7 +356,7 @@ export default function HowItWorks() {
             <Card className="field-card border-primary/20">
               <CardHeader>
                 <CardTitle>AR Analysis</CardTitle>
-                <CardDescription>Real-time Processing</CardDescription>
+                <CardDescription>Fast Field Processing</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between text-sm">
@@ -432,35 +390,9 @@ export default function HowItWorks() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {enhancedFeatures.map((feature, idx) => {
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
-              
-              return (
-                <Card 
-                  key={idx} 
-                  ref={ref}
-                  className={`field-card hover-lift border-2 ${hasIntersected ? 'animate-fade-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
-                >
-                  <CardHeader>
-                    <div className={`inline-flex h-12 w-12 rounded-xl ${feature.color} items-center justify-center mb-3`}>
-                      <feature.icon className="h-6 w-6" />
-                    </div>
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {feature.description}
-                    </p>
-                    <div className="pt-2 border-t">
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
-                        ✨ {feature.benefit}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {enhancedFeatures.map((feature, idx) => (
+              <FeatureRevealCard key={idx} feature={feature} index={idx} />
+            ))}
           </div>
         </section>
 
@@ -472,39 +404,9 @@ export default function HowItWorks() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {useCases.map((useCase, idx) => {
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const { ref, hasIntersected } = useIntersectionObserver({ freezeOnceVisible: true });
-              return (
-                <div 
-                  key={idx}
-                  ref={ref}
-                  className={`${hasIntersected ? 'animate-scale-in opacity-100' : 'opacity-0'} stagger-${Math.min(idx + 1, 5)}`}
-                >
-                  <Card className="field-card hover-lift glass-strong">
-                    <CardHeader>
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="h-12 w-12 rounded-xl gradient-delta shadow-glow flex items-center justify-center animate-glow-pulse">
-                          <useCase.icon className="h-6 w-6 text-white" />
-                        </div>
-                        <CardTitle className="text-xl">{useCase.title}</CardTitle>
-                      </div>
-                      <CardDescription className="text-base">{useCase.scenario}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="p-3 bg-muted/50 rounded-lg border">
-                        <p className="text-sm font-medium mb-1">Impact:</p>
-                        <p className="text-sm text-muted-foreground">{useCase.impact}</p>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-health-good/10 border border-health-good/20 rounded-lg">
-                        <span className="text-sm font-medium text-health-good">Estimated Savings:</span>
-                        <span className="text-lg font-bold text-health-good">{useCase.savings}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            })}
+            {useCases.map((useCase, idx) => (
+              <UseCaseRevealCard key={idx} useCase={useCase} index={idx} />
+            ))}
           </div>
         </section>
 

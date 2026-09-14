@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.178.0/http/server.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 import { corsHeaders, handleError } from '../_shared/errorHandler.ts';
 
@@ -29,6 +30,8 @@ interface Annotation {
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
