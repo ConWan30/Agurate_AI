@@ -263,7 +263,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">AI Crop Scanner</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Instant 95%+ accurate health analysis
+                    Phone-camera crop health reads in seconds
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>

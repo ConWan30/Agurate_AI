@@ -530,7 +530,7 @@ export default function Cooperatives() {
               </div>
               <div>
                 <h2 className="text-2xl font-display font-bold">Proven Best Practices</h2>
-                <p className="text-sm text-muted-foreground">LSU-validated techniques with real farmer results</p>
+                <p className="text-sm text-muted-foreground">Community techniques informed by LSU AgCenter research framing</p>
               </div>
             </div>
 

@@ -421,13 +421,13 @@ export default function Predictions() {
                   <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-secondary/10">
                     <Zap className="h-5 w-5 text-secondary" aria-hidden="true" />
                   </div>
-                  <CardTitle className="text-lg font-heading">LSU-Validated</CardTitle>
+                  <CardTitle className="text-lg font-heading">Research-informed</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  All predictions and recommendations are cross-referenced with LSU AgCenter research data 
-                  and validated against proven agricultural practices for Louisiana Delta conditions.
+                  Predictions and recommendations are framed around publicly available LSU AgCenter research
+                  for Louisiana Delta conditions. This is a decision aid — not scientific validation or an official LSU partnership.
                 </CardDescription>
               </CardContent>
             </Card>

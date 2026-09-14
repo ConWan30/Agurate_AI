@@ -368,8 +368,8 @@ export default function HowItWorks() {
                   <span className="font-semibold">Image + Video</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Avg Confidence:</span>
-                  <span className="font-semibold">85-95%</span>
+                  <span className="text-muted-foreground">Output style:</span>
+                  <span className="font-semibold">Confidence-aware</span>
                 </div>
               </CardContent>
             </Card>
@@ -389,8 +389,8 @@ export default function HowItWorks() {
                   <span className="font-semibold">Field + Weather</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Accuracy:</span>
-                  <span className="font-semibold">80-90%</span>
+                  <span className="text-muted-foreground">Status:</span>
+                  <span className="font-semibold">Closed beta</span>
                 </div>
               </CardContent>
             </Card>

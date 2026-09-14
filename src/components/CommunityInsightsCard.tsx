@@ -22,7 +22,7 @@ export function CommunityInsightsCard({ practice }: CommunityInsightsCardProps) 
           {practice.lsu_researcher_id && (
             <Badge variant="default">
               <CheckCircle2 className="mr-1 h-3 w-3" />
-              LSU Validated
+              LSU research-linked
             </Badge>
           )}
         </div>

@@ -571,7 +571,7 @@ export default function DeltaIntelligence() {
               </div>
               <div className="flex items-start gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
-                <p className="text-sm text-muted-foreground">Louisiana-proven crop varieties & soil management</p>
+                <p className="text-sm text-muted-foreground">Louisiana crop varieties & soil management guidance</p>
               </div>
               <div className="flex items-start gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />

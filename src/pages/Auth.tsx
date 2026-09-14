@@ -233,8 +233,8 @@ export default function Auth() {
                 <Shield className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
-                <p className="font-semibold">LSU Research-Based</p>
-                <p className="text-sm opacity-75">Built on 130+ years of research</p>
+                <p className="font-semibold">Research-informed</p>
+                <p className="text-sm opacity-75">Framed around public LSU AgCenter research</p>
               </div>
             </div>
             

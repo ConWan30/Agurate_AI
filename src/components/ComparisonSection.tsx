@@ -18,10 +18,10 @@ export const ComparisonSection = memo(function ComparisonSection() {
       description: "7-14 day forecasts vs. reactive response"
     },
     {
-      feature: "LSU Research Integration",
+      feature: "LSU Research Framing",
       agurate: true,
       traditional: "Limited",
-      description: "Direct AI access to 130+ years of research"
+      description: "Guidance framed around public LSU AgCenter research (not an official partnership)"
     },
     {
       feature: "24/7 AI Advisor",

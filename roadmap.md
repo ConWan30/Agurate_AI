@@ -1,4 +1,4 @@
-- [ ] Finish launch-readiness fixes and verify critical pages
-- [ ] Apply honest closed-beta copy and metadata corrections
-- [ ] Remove fabricated testimonials, ratings, accuracy, validation, partnership, and user-count claims
+- [x] Finish launch-readiness fixes and verify critical pages
+- [x] Apply honest closed-beta copy and metadata corrections
+- [x] Remove fabricated testimonials, ratings, accuracy, validation, partnership, and user-count claims
 - [ ] Verify preview, security, and publish updated app

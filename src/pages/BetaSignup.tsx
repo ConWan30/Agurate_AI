@@ -268,7 +268,7 @@ export default function BetaSignup() {
               "Community Intelligence Network (anonymous benchmarking)",
               "Interactive Field Map with GPS tagging",
               "Weather-Correlated Health Timeline",
-              "LSU AgCenter Validated Recommendations",
+              "Recommendations framed around LSU AgCenter research",
               "Conservation Practice Tracking",
               "Variety Performance Analytics",
               "ROI Calculator for treatments",
@@ -480,23 +480,23 @@ export default function BetaSignup() {
       {/* Trust Indicators */}
       <section className="container mx-auto px-4 py-12 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h2 className="text-2xl font-heading font-bold">Trusted by Louisiana Farmers</h2>
+          <h2 className="text-2xl font-heading font-bold">Closed beta for Louisiana Delta farmers</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <p className="text-3xl font-bold text-primary">95%</p>
-              <p className="text-muted-foreground">AI Accuracy</p>
+              <p className="text-3xl font-bold text-primary">100</p>
+              <p className="text-muted-foreground">Beta partner spots</p>
             </div>
             <div className="space-y-2">
               <p className="text-3xl font-bold text-primary">LSU AgCenter</p>
-              <p className="text-muted-foreground">Validated</p>
+              <p className="text-muted-foreground">Research framing only</p>
             </div>
             <div className="space-y-2">
-              <p className="text-3xl font-bold text-primary">100%</p>
-              <p className="text-muted-foreground">Data Privacy</p>
+              <p className="text-3xl font-bold text-primary">Yours</p>
+              <p className="text-muted-foreground">Farm data stays yours</p>
             </div>
           </div>
           <p className="text-sm text-muted-foreground pt-4">
-            🔒 Your data stays private - you own your farm data
+            Not scientifically validated. Decision aid for early pilot partners — not a certified diagnosis.
           </p>
         </div>
       </section>
@@ -530,7 +530,7 @@ export default function BetaSignup() {
             <AccordionItem value="item-4">
               <AccordionTrigger>Is my data secure?</AccordionTrigger>
               <AccordionContent>
-                Absolutely. You own your farm data. We use bank-level encryption and never share individual data.
+                You own your farm data. We do not sell individual farm data. Access is protected with authenticated accounts and database row-level security.
               </AccordionContent>
             </AccordionItem>
 

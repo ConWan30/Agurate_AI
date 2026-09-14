@@ -276,7 +276,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
               <div className="space-y-3 text-sm">
                 <div className="p-4 border rounded-lg">
                   <p className="font-medium mb-1">🔬 AI Crop Analysis</p>
-                  <p className="text-muted-foreground">Instant disease detection in &lt;2 seconds with 95%+ accuracy</p>
+                  <p className="text-muted-foreground">Fast phone-camera crop health reads — a decision aid, not a certified diagnosis</p>
                 </div>
                 <div className="p-4 border rounded-lg">
                   <p className="font-medium mb-1">📊 7-Day Stress Predictions</p>

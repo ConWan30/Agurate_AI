@@ -200,14 +200,13 @@ export default function LSUResearchers() {
               <GraduationCap className="h-6 w-6 text-accent" />
             </div>
             <div>
-              <h3 className="font-bold mb-2">Pre-Partnership Notice</h3>
+              <h3 className="font-bold mb-2">Directory notice</h3>
               <p className="text-sm text-muted-foreground mb-3">
-                We're currently in discussions with LSU AgCenter for an official partnership. 
-                All researcher contact requests are currently routed through the LSU AgCenter general office at agcenter@lsu.edu.
+                AgurateAI is not an official LSU AgCenter partner. This page lists publicly available researcher profiles for convenience.
+                Contact researchers through official LSU channels — we do not broker introductions or claim a partnership.
               </p>
               <p className="text-sm text-muted-foreground">
-                Once the partnership is finalized, you'll have direct access to researcher contact information 
-                and personalized expert guidance for your specific crop challenges.
+                For general LSU AgCenter inquiries, use official LSU contact channels such as the AgCenter website.
               </p>
             </div>
           </div>

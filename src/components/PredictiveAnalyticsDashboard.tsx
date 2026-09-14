@@ -119,8 +119,8 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
 
           {latestPrediction.lsu_validation && (
             <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
-              <Badge variant="default" className="text-sm">LSU Validated</Badge>
-              <span className="text-sm text-muted-foreground">This prediction has been validated by LSU AgCenter researchers</span>
+              <Badge variant="default" className="text-sm">Research-informed</Badge>
+              <span className="text-sm text-muted-foreground">Framed around publicly available LSU AgCenter research — not an official validation</span>
             </div>
           )}
 

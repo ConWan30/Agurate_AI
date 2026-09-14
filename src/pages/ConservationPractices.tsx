@@ -130,7 +130,7 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
         <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col justify-center text-white">
           <h1 className="text-5xl font-heading font-bold mb-4">Conservation Practices</h1>
           <p className="text-xl text-white/90 max-w-2xl mb-6">
-            Document your sustainable farming practices for USDA compliance and discover cost savings through LSU AgCenter-validated conservation methods.
+            Document your sustainable farming practices for USDA compliance and explore conservation methods framed around publicly available LSU AgCenter research.
           </p>
           <Button
             size="lg"
