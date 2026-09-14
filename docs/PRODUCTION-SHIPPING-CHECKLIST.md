@@ -100,10 +100,11 @@ Last updated: 2026-09-14
 - [x] Lock `subscription_status` from client self-writes (`20260914170000`)
 - [x] Soften Home unlimited-beta + tutorial “Diagnosis” framing
 - [x] Analytics/phase4/unified-AI omit invented weather & score defaults; soften forecast marketing copy
+- [x] ROI requires explicit yield-at-risk % (no invent from health); executive summary shows “Not estimated”; beta_metrics counts only approved stories (`20260914180000`)
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (through `20260914170000` (includes entitlement clamps; researcher PII is `20260914100000`), plus prior RLS/RPC/storage)
+- [ ] Apply pending Supabase migrations (through `20260914180000` (includes entitlement clamps; researcher PII is `20260914100000`), plus prior RLS/RPC/storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

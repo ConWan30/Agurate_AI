@@ -45,6 +45,12 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
   const [roi, setRoi] = useState<ROICalculation | null>(null);
   const [marketPrice, setMarketPrice] = useState<{ price: number; unit: string; source: string; last_updated: string } | null>(null);
   const [loadingPrice, setLoadingPrice] = useState(false);
+  const [yieldAtRiskPercent, setYieldAtRiskPercent] = useState(
+    assessmentData?.estimatedYieldImpact != null
+      ? String(assessmentData.estimatedYieldImpact)
+      : ''
+  );
+
 
   // Fallback prices (used if market price API fails)
   const fallbackPrices: Record<string, { price: number; unit: string; avgYield: number }> = {
@@ -59,6 +65,13 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
   useEffect(() => {
     fetchMarketPrice(cropType);
   }, [cropType]);
+
+  useEffect(() => {
+    if (assessmentData?.estimatedYieldImpact != null) {
+      setYieldAtRiskPercent(String(assessmentData.estimatedYieldImpact));
+    }
+  }, [assessmentData?.estimatedYieldImpact]);
+
 
   const fetchMarketPrice = async (crop: string) => {
     setLoadingPrice(true);
@@ -120,9 +133,11 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
 
   const hasAssessmentHealth =
     assessmentData?.healthScore != null && !Number.isNaN(Number(assessmentData.healthScore));
+  const hasYieldAtRisk =
+    yieldAtRiskPercent !== '' && Number.isFinite(Number(yieldAtRiskPercent)) && Number(yieldAtRiskPercent) >= 0;
 
   const calculateROI = () => {
-    if (!hasAssessmentHealth) {
+    if (!hasAssessmentHealth || !hasYieldAtRisk) {
       setRoi(null);
       return;
     }
@@ -130,9 +145,12 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
     const crop = cropPrices[cropType] || cropPrices.rice;
     const treatment = treatmentCosts[treatmentType] || treatmentCosts.fungicide;
 
-    // Require a real assessment health score — never invent one for ROI math
-    const healthScore = Number(assessmentData!.healthScore);
-    const yieldImpactPercent = assessmentData?.estimatedYieldImpact ?? (100 - healthScore) * 0.8;
+    // Yield-at-risk must be explicit (assessment or user) — never invented from health score
+    const yieldImpactPercent = Number(yieldAtRiskPercent);
+    if (!Number.isFinite(yieldImpactPercent) || yieldImpactPercent < 0) {
+      setRoi(null);
+      return;
+    }
     const yieldAtRisk = crop.avgYield * (yieldImpactPercent / 100);
 
     // Calculate potential loss without treatment
@@ -272,6 +290,23 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                 </Select>
               </div>
 
+
+              <div className="space-y-2">
+                <Label htmlFor="yield-at-risk">Yield at risk (%)</Label>
+                <Input
+                  id="yield-at-risk"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={yieldAtRiskPercent}
+                  onChange={(e) => setYieldAtRiskPercent(e.target.value)}
+                  placeholder="From assessment or enter estimate"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Required. Prefills from assessment when available — never invented from health score alone.
+                </p>
+              </div>
+
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="treatment">Treatment Type</Label>
                 <Select value={treatmentType} onValueChange={setTreatmentType}>
@@ -289,12 +324,12 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
               </div>
             </div>
 
-            {!hasAssessmentHealth && (
+            {(!hasAssessmentHealth || !hasYieldAtRisk) && (
               <p className="text-sm text-muted-foreground text-center">
-                Run a field assessment first — ROI estimates need a real health score, not a placeholder.
+                ROI needs a real assessment health score and an explicit yield-at-risk % (from the assessment or entered below).
               </p>
             )}
-            <Button onClick={calculateROI} className="w-full" disabled={!hasAssessmentHealth}>
+            <Button onClick={calculateROI} className="w-full" disabled={!hasAssessmentHealth || !hasYieldAtRisk}>
               <Calculator className="h-4 w-4 mr-2" />
               Calculate ROI
             </Button>

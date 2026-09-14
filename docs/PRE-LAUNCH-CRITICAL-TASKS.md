@@ -20,13 +20,13 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 - [x] Lock `subscription_status` from client self-writes (`20260914170000`)
 - [x] Soften Home unlimited-beta + tutorial “Diagnosis” framing
 - [x] Analytics/phase4/unified-AI omit invented weather & score defaults; soften forecast marketing copy
+- [x] ROI requires explicit yield-at-risk % (no invent from health); executive summary shows “Not estimated”; beta_metrics counts only approved stories (`20260914180000`)
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations (through `20260914170000` researcher PII
-   + soybean crop checks, plus view invoker, RLS lock-down, testimonials,
-   critical_alerts, secure RPCs, coop auth, peer/expert/coop reconcile,
-   crop-images storage)
+1. Apply pending Supabase migrations through `20260914180000` (researcher PII is
+   `20260914100000`; `subscription_status` lock is `20260914170000`; beta_metrics
+   approved-story sync is `20260914180000`; plus prior RLS/RPC/storage/soybean checks)
 2. Enable Auth **Leaked Password Protection**
 3. Deploy updated edge functions
 4. Set `DEMO_SETUP_SECRET` (or leave unset to keep demo setup disabled)

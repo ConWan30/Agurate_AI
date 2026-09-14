@@ -27,7 +27,7 @@ export function AnalysisExecutiveSummary({
   healthScore,
   stressLevel,
   condition,
-  yieldImpact = 0,
+  yieldImpact,
   diseaseCount,
   diseasePressure,
   pestCount,
@@ -130,9 +130,25 @@ export function AnalysisExecutiveSummary({
         <QuickInsightCard
           icon={Droplets}
           label="Yield Impact"
-          value={yieldImpact > 0 ? `-${Math.abs(yieldImpact)}%` : `+${Math.abs(yieldImpact)}%`}
-          severity={yieldImpact > 20 ? "severe" : yieldImpact > 10 ? "moderate" : yieldImpact > 0 ? "mild" : "none"}
-          urgent={yieldImpact > 20}
+          value={
+            yieldImpact == null || Number.isNaN(Number(yieldImpact))
+              ? 'Not estimated'
+              : yieldImpact > 0
+                ? `-${Math.abs(yieldImpact)}%`
+                : `${Math.abs(yieldImpact)}%`
+          }
+          severity={
+            yieldImpact == null || Number.isNaN(Number(yieldImpact))
+              ? 'none'
+              : yieldImpact > 20
+                ? 'severe'
+                : yieldImpact > 10
+                  ? 'moderate'
+                  : yieldImpact > 0
+                    ? 'mild'
+                    : 'none'
+          }
+          urgent={yieldImpact != null && yieldImpact > 20}
         />
       </div>
     </div>

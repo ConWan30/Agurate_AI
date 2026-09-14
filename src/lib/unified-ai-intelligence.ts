@@ -85,7 +85,7 @@ export async function enrichUnifiedContext(fieldId: string, analysisData: Analys
         performance_patterns: analysisData.variety?.performance || {}
       },
       conservation_effectiveness: {
-        soil_health_trend: analysisData.conservation?.soil_health_indicator || 0,
+        soil_health_trend: analysisData.conservation?.soil_health_indicator ?? null,
         practice_impacts: analysisData.conservation?.practice_impacts || {},
         visual_improvements: analysisData.conservation?.improvements || []
       },
