@@ -546,13 +546,18 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
       'avgSavings',
       'average_savings',
       'averageSavings',
+      'cost_savings_estimate',
+      'costSavingsEstimate',
       'roi',
       'cost_usd',
       'costUsd',
     ]);
+    const isMoneyInventKey = (key: string) =>
+      MONEY_INVENT_KEYS.has(key) ||
+      /(saving|savings|roi|cost|dollar|loss|revenue|profit)/i.test(key);
     const incomingExtracted = { ...(parsedResponse.extracted_data || {}) };
     for (const key of Object.keys(incomingExtracted)) {
-      if (MONEY_INVENT_KEYS.has(key) || /^(estimated_?).*(loss|saving|roi|cost|dollar)/i.test(key)) {
+      if (isMoneyInventKey(key)) {
         delete incomingExtracted[key];
       }
     }
@@ -562,7 +567,7 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
     };
     // Also clear any previously invented money keys left in session.
     for (const key of Object.keys(updatedData)) {
-      if (MONEY_INVENT_KEYS.has(key) || /^(estimated_?).*(loss|saving|roi|cost|dollar)/i.test(key)) {
+      if (isMoneyInventKey(key)) {
         delete updatedData[key];
       }
     }
@@ -591,7 +596,10 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
         session_id: sessionId,
         role: 'assistant',
         content: parsedResponse.message || parsedResponse.next_question || aiMessage,
-        field_mapping: parsedResponse.extracted_data ? JSON.stringify(parsedResponse.extracted_data) : null
+        // Persist stripped mapping only — never store raw AI money invent keys.
+        field_mapping: Object.keys(incomingExtracted).length > 0
+          ? JSON.stringify(incomingExtracted)
+          : null
       });
 
     return new Response(

@@ -241,18 +241,9 @@ Return JSON with: recommended_variety, expected_improvement (decimal 0-1 or null
       throw new Error('Variety recommendation omitted recommended_variety');
     }
 
-    const rawImprovement = recommendationData.expected_improvement;
-    const hasCitedBasis =
-      Array.isArray(recommendationData.lsu_research_basis) &&
-      recommendationData.lsu_research_basis.length > 0;
-    const expectedImprovement =
-      hasCitedBasis &&
-      rawImprovement != null &&
-      Number.isFinite(Number(rawImprovement)) &&
-      Number(rawImprovement) >= 0 &&
-      Number(rawImprovement) <= 1
-        ? Number(rawImprovement)
-        : null;
+    // Always null — model-cited LSU strings are not a verified allowlist, so any
+    // expected_improvement % would be inventable. Keep qualitative rec only.
+    const expectedImprovement = null;
 
     const rawRisk = String(recommendationData.risk_assessment ?? '')
       .trim()

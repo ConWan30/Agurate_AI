@@ -129,13 +129,15 @@ Average Health: ${scoredAssessments.length > 0 ? (scoredAssessments.reduce((sum,
 
 Community Adoption Data (${practiceType}):
 ${communityPractices.map(p => {
-  const savings = p.average_annual_savings != null && Number.isFinite(Number(p.average_annual_savings))
-    ? `$${p.average_annual_savings}`
+  // Use real conservation_adoption_metrics columns only (average_savings).
+  // No success_rate on this table — never invent one.
+  const savings = p.average_savings != null && Number.isFinite(Number(p.average_savings))
+    ? `$${p.average_savings}`
     : 'not recorded';
-  const success = p.success_rate != null && Number.isFinite(Number(p.success_rate))
-    ? `${(Number(p.success_rate) * 100).toFixed(0)}%`
+  const adopters = p.total_adopters != null && Number.isFinite(Number(p.total_adopters))
+    ? p.total_adopters
     : 'not recorded';
-  return `- ${p.total_adopters} farmers: reported community avg savings ${savings} (community-reported, not this farm's measured savings), Success: ${success}`;
+  return `- ${adopters} farmers: reported community avg savings ${savings} (community-reported, not this farm's measured savings)`;
 }).join('\n')}
 
 Weather Context (Recent Events):

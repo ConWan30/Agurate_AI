@@ -125,9 +125,19 @@ serve(async (req) => {
     if (rawBody?.action === 'persist_assistant') {
       const conversationId = rawBody.conversationId;
       const content = typeof rawBody.content === 'string' ? rawBody.content.trim() : '';
-      const contextSnapshot = rawBody.contextSnapshot && typeof rawBody.contextSnapshot === 'object'
-        ? rawBody.contextSnapshot
+      const rawSnapshot = rawBody.contextSnapshot && typeof rawBody.contextSnapshot === 'object'
+        ? rawBody.contextSnapshot as Record<string, unknown>
         : {};
+      // Strip client metric invent — persist IDs only.
+      const contextSnapshot: Record<string, unknown> = {
+        timestamp: new Date().toISOString(),
+      };
+      if (typeof rawSnapshot.field_id === 'string') {
+        contextSnapshot.field_id = rawSnapshot.field_id;
+      }
+      if (typeof rawSnapshot.assessment_id === 'string') {
+        contextSnapshot.assessment_id = rawSnapshot.assessment_id;
+      }
       if (!conversationId || !content) {
         return new Response(JSON.stringify({ error: 'conversationId and content required' }), {
           status: 400,
@@ -250,8 +260,10 @@ serve(async (req) => {
             contextPrompt += `### ${group.title}\n`;
             // Reverse messages to chronological order
             group.messages.reverse().forEach((msg: any) => {
-              const contextInfo = msg.context_snapshot && Object.keys(msg.context_snapshot).length > 0
-                ? ` [Context: ${msg.context_snapshot.field_name || 'general'}, ${msg.context_snapshot.crop_type || ''}${msg.context_snapshot.health_score ? `, ${msg.context_snapshot.health_score}% health` : ''}]`
+              // IDs only — never replay client-claimed health/crop invent as fact.
+              const snap = msg.context_snapshot;
+              const contextInfo = snap?.field_id
+                ? ` [Context: field ${String(snap.field_id).slice(0, 8)}…]`
                 : '';
               contextPrompt += `${msg.role === 'user' ? '👤' : '🤖'}: ${msg.content}${contextInfo}\n`;
             });
