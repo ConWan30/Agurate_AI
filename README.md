@@ -19,6 +19,8 @@
   ·
   <a href="docs/PRE-LAUNCH-CRITICAL-TASKS.md">Pre-Launch Tasks</a>
   ·
+  <a href="docs/OPERATOR-PLATFORM-HANDOFF.md">Operator Handoff</a>
+  ·
   <a href="mailto:support@agurateai.com">support@agurateai.com</a>
 </p>
 
@@ -144,11 +146,13 @@ App defaults to **http://localhost:8080**.
 | `npm run typecheck` | TypeScript (`tsc --noEmit`) |
 | `npm run test:ci` | Unit tests (Vitest) |
 | `npm run verify:honesty:static` | Static banned-claim scan (`src` + edge functions) |
+| `npm run verify:public-routes` | App ↔ robots.txt ↔ sitemap public route alignment |
 | `npm run check:edge` | Deno check for Supabase Edge Functions |
 | `npm run test:e2e:honesty` | Playwright public-copy honesty smoke |
-| `npm run build` | Production build |
+| `npm run verify:local-gates` | All in-repo production gates in one command |
+| `npm run build` | Production build (stamps `/health.json` with git SHA) |
 
-CI runs these gates on pull requests (see `.github/workflows/ci.yml`).
+CI runs these gates on pull requests (see `.github/workflows/ci.yml`). For migrate/deploy/publish steps that need credentials, see [docs/OPERATOR-PLATFORM-HANDOFF.md](docs/OPERATOR-PLATFORM-HANDOFF.md).
 
 ---
 
@@ -160,6 +164,7 @@ CI runs these gates on pull requests (see `.github/workflows/ci.yml`).
 | Lovable editor / project | https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f |
 | Production shipping checklist | [docs/PRODUCTION-SHIPPING-CHECKLIST.md](docs/PRODUCTION-SHIPPING-CHECKLIST.md) |
 | Pre-launch critical tasks | [docs/PRE-LAUNCH-CRITICAL-TASKS.md](docs/PRE-LAUNCH-CRITICAL-TASKS.md) |
+| Operator platform handoff | [docs/OPERATOR-PLATFORM-HANDOFF.md](docs/OPERATOR-PLATFORM-HANDOFF.md) |
 | Environment template | [.env.example](.env.example) |
 | Support | [support@agurateai.com](mailto:support@agurateai.com) |
 | Product site (referenced in-app) | https://agurateai.com |
