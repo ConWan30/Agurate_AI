@@ -68,12 +68,26 @@ serve(async (req) => {
 
     const { data: assessment, error: assessmentError } = await rateLimitClient
       .from('assessments')
-      .select('id, health_score, stress_level, symptoms, disease_identified, pest_identified, fields!inner(user_id)')
+      .select('id, field_id, health_score, stress_level, symptoms, disease_identified, pest_identified')
       .eq('id', assessment_id)
       .maybeSingle();
 
     if (assessmentError) throw assessmentError;
-    if (!assessment || (assessment as { fields?: { user_id?: string } }).fields?.user_id !== user.id) {
+    if (!assessment) {
+      return new Response(
+        JSON.stringify({ error: 'Assessment not found for authenticated user' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { data: ownedField, error: fieldError } = await rateLimitClient
+      .from('fields')
+      .select('id')
+      .eq('id', assessment.field_id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (fieldError) throw fieldError;
+    if (!ownedField) {
       return new Response(
         JSON.stringify({ error: 'Assessment not found for authenticated user' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

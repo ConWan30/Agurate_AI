@@ -53,18 +53,32 @@ serve(async (req) => {
 
     const { data: assessments, error: assessmentError } = await supabase
       .from('assessments')
-      .select('id, field_id, health_score, stress_level, symptoms, analyzed_at, fields!inner(user_id)')
+      .select('id, field_id, health_score, stress_level, symptoms, analyzed_at')
       .in('id', [assessment1Id, assessment2Id]);
 
     if (assessmentError) throw assessmentError;
 
-    const owned = (assessments ?? []).filter(
-      (a: { fields?: { user_id?: string } }) => a.fields?.user_id === user.id,
-    );
-    const assessment1 = owned.find((a: { id: string }) => a.id === assessment1Id);
-    const assessment2 = owned.find((a: { id: string }) => a.id === assessment2Id);
+    const assessment1 = (assessments ?? []).find((a: { id: string }) => a.id === assessment1Id);
+    const assessment2 = (assessments ?? []).find((a: { id: string }) => a.id === assessment2Id);
 
     if (!assessment1 || !assessment2) {
+      return new Response(
+        JSON.stringify({ error: 'Assessments not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const fieldIds = [...new Set([assessment1.field_id, assessment2.field_id])];
+    const { data: ownedFields, error: fieldError } = await supabase
+      .from('fields')
+      .select('id')
+      .in('id', fieldIds)
+      .eq('user_id', user.id);
+
+    if (fieldError) throw fieldError;
+
+    const ownedFieldIds = new Set((ownedFields ?? []).map((f: { id: string }) => f.id));
+    if (!ownedFieldIds.has(assessment1.field_id) || !ownedFieldIds.has(assessment2.field_id)) {
       return new Response(
         JSON.stringify({ error: 'Assessments not found for authenticated user' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
