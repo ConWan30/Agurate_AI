@@ -122,14 +122,19 @@ export default function History() {
 
   const handleFeedback = async (assessmentId: string, wasHelpful: boolean) => {
     try {
-      const { error } = await supabase
+      const { data: saved, error } = await supabase
         .from("feedback")
         .insert({
           assessment_id: assessmentId,
           was_helpful: wasHelpful,
-        });
+        })
+        .select("id")
+        .maybeSingle();
 
       if (error) throw error;
+      if (!saved) {
+        throw new Error("Feedback was not saved (insert returned no row or not permitted)");
+      }
       toast({ title: "Thank you for your feedback!" });
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to submit feedback';

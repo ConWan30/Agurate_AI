@@ -70,7 +70,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
       ].filter(Boolean);
       const testimonialBody = [testimonial.trim(), ...moneyNotes].join('\n\n');
 
-      const { error } = await supabase.from('success_stories').insert({
+      const { data: saved, error } = await supabase.from('success_stories').insert({
         user_id: user.id,
         assessment_id: assessmentId,
         problem_encountered: problemEncountered.trim(),
@@ -80,9 +80,12 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
         allow_public_use: allowPublicUse,
         allow_name: allowName,
         allow_farm_name: allowFarmName,
-      });
+      }).select('id').maybeSingle();
 
       if (error) throw error;
+      if (!saved) {
+        throw new Error('Success story was not saved (insert returned no row or not permitted)');
+      }
 
       toast({
         title: "🏆 Success story saved!",

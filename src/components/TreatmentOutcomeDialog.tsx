@@ -127,7 +127,7 @@ export function TreatmentOutcomeDialog({
           ? `Self-reported cost/acre: $${parsedCost}`
           : null;
       const baseNotes = notes || `Treatment: ${extractTreatmentName(recommendation.recommendation_text)}`;
-      const { error } = await supabase
+      const { data: logged, error } = await supabase
         .from('peer_treatment_outcomes')
         .insert({
           farmer_id: user.id,
@@ -141,9 +141,14 @@ export function TreatmentOutcomeDialog({
           notes: [baseNotes, healthNote, costNote].filter(Boolean).join(' | '),
           applied_at: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           evaluated_at: new Date().toISOString().split('T')[0],
-        });
+        })
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!logged) {
+        throw new Error('Treatment outcome was not saved (insert returned no row or not permitted)');
+      }
 
       toast({
         title: 'Treatment outcome logged successfully!',

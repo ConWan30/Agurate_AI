@@ -156,8 +156,14 @@ export default function Fields() {
         name: formData.name,
         crop_type: formData.crop_type,
         acreage,
-        location_lat: formData.location_lat ? parseFloat(formData.location_lat) : null,
-        location_lng: formData.location_lng ? parseFloat(formData.location_lng) : null,
+        location_lat:
+          formData.location_lat.trim() !== '' && Number.isFinite(Number(formData.location_lat))
+            ? Number(formData.location_lat)
+            : null,
+        location_lng:
+          formData.location_lng.trim() !== '' && Number.isFinite(Number(formData.location_lng))
+            ? Number(formData.location_lng)
+            : null,
         notes: formData.notes || null,
       };
 

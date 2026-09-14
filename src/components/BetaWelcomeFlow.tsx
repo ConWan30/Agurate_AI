@@ -56,12 +56,17 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
 
   const handleGetStarted = async () => {
     try {
-      const { error } = await supabase
+      const { data: updated, error } = await supabase
         .from('profiles')
         .update({ beta_welcome_shown: true })
-        .eq('id', userId);
+        .eq('id', userId)
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!updated) {
+        throw new Error('Welcome flag was not saved (no matching row or update not permitted)');
+      }
 
       setIsOpen(false);
       toast.success('Welcome to AgurateAI! 🎉');

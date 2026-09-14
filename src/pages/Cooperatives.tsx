@@ -98,15 +98,20 @@ export default function Cooperatives() {
       
       if (coopError) throw coopError;
 
-      const { error: memberError } = await supabase
+      const { data: member, error: memberError } = await supabase
         .from('cooperative_members')
         .insert([{
           cooperative_id: coop.id,
           user_id: user?.id || '',
           role: 'admin'
-        }]);
+        }])
+        .select('id')
+        .maybeSingle();
       
       if (memberError) throw memberError;
+      if (!member) {
+        throw new Error('Admin membership was not created (insert returned no row or not permitted)');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cooperatives'] });

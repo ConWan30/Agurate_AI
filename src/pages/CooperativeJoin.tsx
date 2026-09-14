@@ -62,26 +62,36 @@ export default function CooperativeJoin() {
       }
 
       // Add user to cooperative
-      const { error: memberError } = await supabase
+      const { data: member, error: memberError } = await supabase
         .from('cooperative_members')
         .insert({
           cooperative_id: invitation.cooperative_id,
           user_id: user.id,
           role: 'member'
-        });
+        })
+        .select('id')
+        .maybeSingle();
       
       if (memberError) throw memberError;
+      if (!member) {
+        throw new Error('Membership was not created (insert returned no row or not permitted)');
+      }
 
       // Update invitation status
-      const { error: updateError } = await supabase
+      const { data: updatedInvite, error: updateError } = await supabase
         .from('cooperative_invitations')
         .update({
           status: 'accepted',
           accepted_at: new Date().toISOString()
         })
-        .eq('id', invitation.id);
+        .eq('id', invitation.id)
+        .select('id')
+        .maybeSingle();
       
       if (updateError) throw updateError;
+      if (!updatedInvite) {
+        throw new Error('Invitation was not accepted (no matching row or update not permitted)');
+      }
     },
     onSuccess: () => {
       toast.success('Successfully joined cooperative!');

@@ -133,12 +133,16 @@ export function useDeltaConversations() {
 
   const deleteConversation = async (conversationId: string) => {
     try {
-      const { error } = await supabase
+      const { data: deleted, error } = await supabase
         .from('delta_conversations')
         .delete()
-        .eq('id', conversationId);
+        .eq('id', conversationId)
+        .select('id');
 
       if (error) throw error;
+      if (!deleted?.length) {
+        throw new Error('Conversation was not deleted (no matching row or delete not permitted)');
+      }
 
       if (currentConversationId === conversationId) {
         setCurrentConversationId(null);
@@ -159,10 +163,17 @@ export function useDeltaConversations() {
 
   const updateConversationTitle = async (conversationId: string, title: string) => {
     try {
-      const { error } = await supabase
+      const { data: updated, error } = await supabase
         .from('delta_conversations')
         .update({ title })
-        .eq('id', conversationId);
+        .eq('id', conversationId)
+        .select('id')
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!updated) {
+        throw new Error('Conversation title was not updated (no matching row or update not permitted)');
+      }
 
       if (error) throw error;
       await loadConversations();

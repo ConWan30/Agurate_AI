@@ -75,15 +75,18 @@ export default function Insurance() {
         description: formData.get('description') || 'Claim filed via form',
         estimated_loss_percentage: estimated_loss_percentage ?? undefined,
       });
-      const { error } = await supabase.from('insurance_claims').insert([{
+      const { data: created, error } = await supabase.from('insurance_claims').insert([{
         field_id: validated.field_id,
         event_type: validated.event_type,
         event_date: validated.event_date,
         estimated_loss_percentage: validated.estimated_loss_percentage ?? null,
         description: validated.description,
         status: 'draft'
-      }]);
+      }]).select('id').maybeSingle();
       if (error) throw error;
+      if (!created) {
+        throw new Error('Claim was not created (insert returned no row or not permitted)');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
@@ -161,15 +164,18 @@ export default function Insurance() {
         description: extractedData.description,
         estimated_loss_percentage: estimated_loss_percentage ?? undefined,
       });
-      const { error } = await supabase.from('insurance_claims').insert([{
+      const { data: created, error } = await supabase.from('insurance_claims').insert([{
         field_id: validated.field_id,
         event_type: validated.event_type,
         event_date: validated.event_date,
         estimated_loss_percentage: validated.estimated_loss_percentage ?? null,
         description: validated.description,
         status: 'draft'
-      }]);
+      }]).select('id').maybeSingle();
       if (error) throw error;
+      if (!created) {
+        throw new Error('Claim was not created (insert returned no row or not permitted)');
+      }
       
       queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
       toast.success('🎉 Insurance claim created successfully!', {

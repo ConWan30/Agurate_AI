@@ -114,9 +114,10 @@ export default function Onboarding() {
           name: extractedData.field_name!,
           crop_type: normalizedCropType!,
           // Only use explicit field acreage — never invent from farm-total acreage.
+          // Preserve recorded 0 acres (do not treat as missing).
           ...(extractedData.field_acreage != null &&
           Number.isFinite(Number(extractedData.field_acreage)) &&
-          Number(extractedData.field_acreage) > 0
+          Number(extractedData.field_acreage) >= 0
             ? { acreage: Number(extractedData.field_acreage) }
             : {}),
         };
@@ -155,10 +156,18 @@ export default function Onboarding() {
 
         if (fieldError) {
           console.error('❌ Error creating field:', fieldError);
-        } else {
-          if (import.meta.env.DEV) console.log('✅ First field created successfully:', newField);
-          toast.success(`🌾 ${fieldData.name} field created!`);
+          throw new Error(
+            fieldError.message ||
+              'Profile was saved but the first field was not created. Please add the field from Fields.'
+          );
         }
+        if (!newField) {
+          throw new Error(
+            'Profile was saved but the first field was not created (insert returned no row). Please add the field from Fields.'
+          );
+        }
+        if (import.meta.env.DEV) console.log('✅ First field created successfully:', newField);
+        toast.success(`🌾 ${fieldData.name} field created!`);
       }
 
       toast.success('🎉 Welcome to AgurateAI! Your profile is all set.');
