@@ -93,26 +93,42 @@ export function WeatherAlerts() {
     }
   };
 
-  const getSeverityVariant = (severity: string): "default" | "destructive" | "outline" => {
-    switch (severity) {
+  const normalizeSeverity = (severity: string): "warning" | "watch" | "advisory" | "unknown" => {
+    const s = (severity || "").toLowerCase();
+    if (s === "warning" || s === "watch" || s === "advisory") return s;
+    return "unknown";
+  };
+
+  const getSeverityVariant = (severity: string): "default" | "destructive" | "outline" | "secondary" => {
+    switch (normalizeSeverity(severity)) {
       case "warning":
         return "destructive";
       case "watch":
         return "default";
-      default:
+      case "advisory":
         return "outline";
+      default:
+        // Fail closed — unknown is not an advisory
+        return "secondary";
     }
   };
 
   const getSeverityColor = (severity: string) => {
-    switch (severity) {
+    switch (normalizeSeverity(severity)) {
       case "warning":
         return "text-destructive";
       case "watch":
         return "text-warning";
+      case "advisory":
+        return "text-muted-foreground";
       default:
         return "text-muted-foreground";
     }
+  };
+
+  const getSeverityLabel = (severity: string) => {
+    const n = normalizeSeverity(severity);
+    return n === "unknown" ? "severity not recorded" : n;
   };
 
   if (alerts.length === 0 && !loading) {
@@ -183,7 +199,7 @@ export function WeatherAlerts() {
                 <div>
                   <h4 className="font-semibold">{alert.title}</h4>
                   <Badge variant={getSeverityVariant(alert.severity)} className="mt-1 text-xs capitalize">
-                    {alert.severity}
+                    {getSeverityLabel(alert.severity)}
                   </Badge>
                 </div>
               </div>

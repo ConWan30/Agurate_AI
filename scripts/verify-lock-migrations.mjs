@@ -192,6 +192,18 @@ const required = [
       'farmer_testimonials_roi_achieved_check',
     ],
   },
+  {
+    id: '20260914360000_lock_coop_member_update_field_coop_predictive_outcomes',
+    needles: [
+      'protect_cooperative_member_update',
+      'NEW.user_id := OLD.user_id',
+      'fields.cooperative_id requires membership in that cooperative',
+      'predictive_models_confidence_score_check',
+      'NEW.prediction_data := OLD.prediction_data',
+      'reject_client_insert_prediction_outcomes_trg',
+      'NEW.accuracy_achieved := OLD.accuracy_achieved',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -212,11 +224,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091435') &&
-  tip < '20260914350000_lock_coop_alert_field_expert_link_money_metrics'
+  !tip.startsWith('2026091436') &&
+  tip < '20260914360000_lock_coop_member_update_field_coop_predictive_outcomes'
 ) {
   fail(
-    `tip migration ${tip} should include coop-alert/expert-link/money-metrics invent lock (20260914350000+)`
+    `tip migration ${tip} should include coop-member-update/field-coop/predictive-outcomes invent lock (20260914360000+)`
   );
 }
 

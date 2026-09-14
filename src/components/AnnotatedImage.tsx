@@ -65,7 +65,7 @@ export function AnnotatedImage({
         const x = (annotation.x / 100) * canvas.width;
         const y = (annotation.y / 100) * canvas.height;
 
-        // Determine color based on severity
+        // Determine color based on severity — unknown fails closed to muted gray
         const color =
           annotation.color ||
           (annotation.severity === 'critical'
@@ -74,7 +74,9 @@ export function AnnotatedImage({
             ? '#f59e0b'
             : annotation.severity === 'success'
             ? '#10b981'
-            : '#3b82f6');
+            : annotation.severity === 'info'
+            ? '#64748b'
+            : '#94a3b8');
 
         ctx.strokeStyle = color;
         ctx.fillStyle = color;

@@ -33,7 +33,8 @@ export function DiseasePestDetection({ diseases, pests }: DiseasePestDetectionPr
       case "mild":
         return "secondary";
       default:
-        return "secondary";
+        // Fail closed — unknown is not mild
+        return "outline";
     }
   };
 

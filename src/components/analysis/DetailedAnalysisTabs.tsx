@@ -190,9 +190,14 @@ export function DetailedAnalysisTabs({
                         <p className="font-semibold capitalize">{nutrient} Deficiency</p>
                         <Badge variant={
                           deficiency.severity === "severe" ? "destructive" :
-                          deficiency.severity === "moderate" ? "outline" : "secondary"
+                          deficiency.severity === "moderate" ? "outline" :
+                          deficiency.severity === "mild" ? "secondary" : "outline"
                         }>
-                          {deficiency.severity}
+                          {deficiency.severity === "severe" ||
+                          deficiency.severity === "moderate" ||
+                          deficiency.severity === "mild"
+                            ? deficiency.severity
+                            : "severity unknown"}
                         </Badge>
                       </div>
                       {deficiency.description && (
