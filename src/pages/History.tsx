@@ -139,13 +139,21 @@ export default function History() {
     }
   };
 
+  const normalizeStressLevel = (stressLevel: string | null | undefined) => {
+    const raw = (stressLevel || '').trim().toLowerCase();
+    if (raw === 'healthy' || raw === 'none' || raw === 'low') return 'healthy';
+    if (raw === 'moderate' || raw === 'medium' || raw === 'mild') return 'moderate';
+    if (raw === 'severe' || raw === 'critical' || raw === 'high') return 'severe';
+    return '';
+  };
+
   const getStressIcon = (stressLevel: string) => {
-    switch (stressLevel) {
-      case "Healthy":
+    switch (normalizeStressLevel(stressLevel)) {
+      case "healthy":
         return <CheckCircle2 className="h-5 w-5 text-health-good" aria-label="Healthy crop status" />;
-      case "Moderate":
+      case "moderate":
         return <AlertTriangle className="h-5 w-5 text-health-moderate" aria-label="Moderate stress detected" />;
-      case "Severe":
+      case "severe":
         return <AlertCircle className="h-5 w-5 text-health-severe" aria-label="Severe stress detected" />;
       default:
         return null;
@@ -250,10 +258,7 @@ export default function History() {
                       <div className="flex items-center justify-between gap-4">
                         <AgriculturalBadge 
                           type={
-                            assessment.stress_level === "Healthy" ? "healthy"
-                              : assessment.stress_level === "Moderate" ? "moderate"
-                              : assessment.stress_level === "Severe" ? "severe"
-                              : "moderate"
+                            normalizeStressLevel(assessment.stress_level) || "unknown"
                           }
                         >
                           {assessment.stress_level || "Stress not recorded"}

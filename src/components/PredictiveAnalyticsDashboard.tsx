@@ -26,8 +26,12 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
   const hasConfidence = hasHealthScore(latestPrediction.confidence_score);
   const yieldOutlook = Number(predictionData.yield_outlook);
   const hasYieldOutlook = Number.isFinite(yieldOutlook) && yieldOutlook >= 0 && yieldOutlook <= 100;
-  const diseaseRisk = Number(predictionData.disease_risk);
-  const hasDiseaseRisk = Number.isFinite(diseaseRisk) && diseaseRisk >= 0 && diseaseRisk <= 1;
+  // Edge stores disease_risk as a 0–100 planning index (not 0–1)
+  const diseaseRiskRaw = Number(predictionData.disease_risk);
+  const diseaseRiskPercent = Number.isFinite(diseaseRiskRaw)
+    ? (diseaseRiskRaw <= 1 ? diseaseRiskRaw * 100 : diseaseRiskRaw)
+    : NaN;
+  const hasDiseaseRisk = Number.isFinite(diseaseRiskPercent) && diseaseRiskPercent >= 0 && diseaseRiskPercent <= 100;
   const weatherImpact =
     typeof predictionData.weather_impact === 'string' && predictionData.weather_impact.trim()
       ? predictionData.weather_impact
@@ -82,7 +86,7 @@ export function PredictiveAnalyticsDashboard({ predictions }: PredictiveAnalytic
                   <span className="text-sm font-semibold">Disease Risk Index</span>
                 </div>
                 <div className="text-3xl font-bold text-accent mb-2">
-                  {(diseaseRisk * 100).toFixed(0)}%
+                  {diseaseRiskPercent.toFixed(0)}%
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Planning risk index — not a measured outbreak rate

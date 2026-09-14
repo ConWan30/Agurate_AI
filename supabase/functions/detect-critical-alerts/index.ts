@@ -5,7 +5,7 @@ import {
   handleRateLimitError,
 } from '../_shared/errorHandler.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
-import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 interface CriticalAlertInput {
@@ -79,6 +79,7 @@ serve(async (req) => {
     if (auth instanceof Response) return auth;
     const { user, authHeader } = auth;
     const supabaseClient = getAnonClient(authHeader);
+    const admin = getServiceClient();
 
     const rateLimit = await enforceRateLimit(supabaseClient, user.id, {
       functionName: 'detect-critical-alerts',
@@ -197,7 +198,7 @@ serve(async (req) => {
       cropValue: resolveCropValuePerAcre(crop_value_per_acre),
     });
 
-    const { data: alert, error: alertError } = await supabaseClient
+    const { data: alert, error: alertError } = await admin
       .from('critical_alerts')
       .insert({
         user_id: user.id,

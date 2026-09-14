@@ -1,0 +1,92 @@
+#!/usr/bin/env node
+/**
+ * Static assertions that tip SQL lock migrations still contain protect triggers /
+ * policy drops. Catches accidental deletion of invent-path locks without a DB.
+ */
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import path from 'node:path';
+
+const ROOT = process.cwd();
+const MIGRATIONS = path.join(ROOT, 'supabase', 'migrations');
+
+function fail(msg) {
+  console.error(`FAIL  ${msg}`);
+  process.exitCode = 1;
+}
+
+function pass(msg) {
+  console.log(`PASS  ${msg}`);
+}
+
+if (!existsSync(MIGRATIONS)) {
+  fail('supabase/migrations missing');
+  process.exit(1);
+}
+
+const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith('.sql')).sort();
+const byId = Object.fromEntries(files.map((f) => [f.replace(/\.sql$/, ''), f]));
+
+const required = [
+  {
+    id: '20260914190000_protect_claim_status_and_invitation_columns',
+    needles: [
+      'protect_insurance_claim_status',
+      'protect_cooperative_invitation_columns',
+    ],
+  },
+  {
+    id: '20260914200000_claim_insert_status_and_coop_alert_insert',
+    needles: [
+      'protect_insurance_claim_status',
+      'Members can create cooperative alerts',
+    ],
+  },
+  {
+    id: '20260914210000_protect_assessment_ai_scores',
+    needles: [
+      'protect_assessment_ai_scores',
+      'Users can insert own assessments',
+      'Users can insert own recommendations',
+      'protect_recommendation_inserts',
+    ],
+  },
+  {
+    id: '20260914220000_lock_ai_metric_client_writes',
+    needles: [
+      'reject_client_ai_metric_insert',
+      'mark_water_stress_dirt_clicked',
+      'protect_water_stress_ai_columns',
+      'Users can insert water stress events for own fields',
+      'Users can insert predictive models for own fields',
+      'System can create community insights',
+    ],
+  },
+];
+
+for (const req of required) {
+  const file = byId[req.id];
+  if (!file) {
+    fail(`missing required lock migration ${req.id}`);
+    continue;
+  }
+  const sql = readFileSync(path.join(MIGRATIONS, file), 'utf8');
+  const missing = req.needles.filter((n) => !sql.includes(n));
+  if (missing.length) {
+    fail(`${req.id} missing markers: ${missing.join(', ')}`);
+  } else {
+    pass(`${req.id} lock markers present`);
+  }
+}
+
+const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
+pass(`tip migration ${tip}`);
+if (!tip.startsWith('2026091422') && tip < '20260914220000_lock_ai_metric_client_writes') {
+  fail(`tip migration ${tip} should include AI metric client-write lock (20260914220000+)`);
+}
+
+if (process.exitCode) {
+  console.error('\nLock migration static verification failed.');
+  process.exit(process.exitCode);
+}
+
+console.log('\nAll lock-migration static checks passed.');

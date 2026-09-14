@@ -111,11 +111,7 @@ export async function enrichUnifiedContext(fieldId: string, analysisData: Analys
         community_alignment: analysisData.community?.confidence ?? null
       }
     };
-
-    await supabase.from('ai_intelligence_pool').insert({
-      field_id: fieldId,
-      ...patterns
-    });
+    // Pool writes are service-role only (unified-ai-analysis edge). Client invent removed.
 
     return true;
   } catch (error) {

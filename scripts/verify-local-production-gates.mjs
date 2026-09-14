@@ -14,6 +14,7 @@ const GATES = [
   { name: 'typecheck', cmd: 'npm', args: ['run', 'typecheck'] },
   { name: 'unit tests', cmd: 'npm', args: ['run', 'test:ci'] },
   { name: 'honesty static', cmd: 'npm', args: ['run', 'verify:honesty:static'] },
+  { name: 'lock migrations', cmd: 'npm', args: ['run', 'verify:lock-migrations'] },
   { name: 'edge typecheck', cmd: 'npm', args: ['run', 'check:edge'] },
   { name: 'production build', cmd: 'npm', args: ['run', 'build'], env: {
     VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || 'https://example.supabase.co',

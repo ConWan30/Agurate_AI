@@ -27,16 +27,11 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
 
   const handleDIRTClick = async () => {
     try {
-      await supabase
-        .from('water_stress_events')
-        .update({ dirt_clicked: true })
-        .eq('id', waterStress.id);
-
-      await supabase.from('dirt_referral_metrics').insert({
-        field_id: waterStress.field_id,
-        water_stress_score: waterStress.stress_score,
-        dirt_clicked: true,
+      // Service-locked metrics: only flip dirt_clicked (+ referral row) via RPC
+      const { error } = await supabase.rpc('mark_water_stress_dirt_clicked', {
+        event_id: waterStress.id,
       });
+      if (error) throw error;
 
       window.open('https://delta-iat.water.msstate.edu/', '_blank');
       
@@ -46,6 +41,12 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
       });
     } catch (error) {
       console.error('Error:', error);
+      toast({
+        title: "Could not record DIRT referral",
+        description: "The DIRT tool will still open, but this click was not saved.",
+        variant: "destructive",
+      });
+      window.open('https://delta-iat.water.msstate.edu/', '_blank');
     }
   };
 
@@ -53,7 +54,9 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
     <Alert className={`${config.bg} border-2`}>
       <Icon className={`h-5 w-5 ${config.color}`} />
       <AlertTitle className="flex items-center gap-2 mb-2">
-        <span className={config.color}>Water Stress Detected - {waterStress.severity.toUpperCase()}</span>
+        <span className={config.color}>
+          Water Stress Detected - {(waterStress.severity || 'unknown').toUpperCase()}
+        </span>
         <Badge variant="outline" className="text-xs">
           {waterStress.stress_score != null && Number.isFinite(Number(waterStress.stress_score))
             ? `${(Number(waterStress.stress_score) * 100).toFixed(0)}% severity`
@@ -64,11 +67,19 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
         <div className="space-y-1">
           <p className="font-medium">Symptoms Detected:</p>
           <div className="flex flex-wrap gap-2">
-            {waterStress.symptoms_detected.map((symptom, idx) => (
-              <Badge key={idx} variant="secondary" className="text-xs">
-                {symptom}
-              </Badge>
-            ))}
+            {(() => {
+              const symptoms = Array.isArray(waterStress.symptoms_detected)
+                ? waterStress.symptoms_detected
+                : [];
+              if (symptoms.length === 0) {
+                return <span className="text-sm text-muted-foreground">No symptoms recorded</span>;
+              }
+              return symptoms.map((symptom, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs">
+                  {symptom}
+                </Badge>
+              ));
+            })()}
           </div>
         </div>
 

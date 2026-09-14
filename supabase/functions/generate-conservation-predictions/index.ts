@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
@@ -23,6 +23,7 @@ serve(async (req) => {
     if (auth instanceof Response) return auth;
     const { user, authHeader } = auth;
     const supabase = getAnonClient(authHeader);
+    const admin = getServiceClient();
 
     const rateLimit = await enforceRateLimit(supabase, user.id, {
       functionName: 'generate-conservation-predictions',
@@ -220,8 +221,8 @@ Return JSON with: current_impact, predicted_impact_1_year, predicted_impact_5_ye
     }
     predictionData.confidence_score = confidenceScore;
 
-    // Save to database (use regular client, RLS allows user to insert their own data)
-    const { data, error } = await supabase
+    // Save to database (service role — clients can no longer insert AI metric rows)
+    const { data, error } = await admin
       .from('conservation_predictions')
       .insert({
         field_id: fieldId,

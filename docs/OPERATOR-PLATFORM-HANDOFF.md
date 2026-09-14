@@ -21,12 +21,12 @@ Verify local gates anytime:
 npm run verify:local-gates
 ```
 
-Latest migration in repo: `20260914210000_protect_assessment_ai_scores`
+Latest migration in repo: `20260914220000_lock_ai_metric_client_writes`
 
 ## 1. Apply Supabase migrations
 
 Apply **all** pending migrations through tip  
-`20260914210000_protect_assessment_ai_scores`  
+`20260914220000_lock_ai_metric_client_writes`  
 (includes insurance claim status lock + invitation column freeze, entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
 
 ```bash
