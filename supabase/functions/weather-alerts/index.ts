@@ -23,8 +23,11 @@ function allowUserCall(userId: string): boolean {
 
 // Input validation schema
 const weatherAlertsSchema = z.object({
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  field_id: z.string().uuid(),
+  /** @deprecated Ignored — coordinates are loaded from the owned field. */
+  latitude: z.number().min(-90).max(90).optional(),
+  /** @deprecated Ignored — coordinates are loaded from the owned field. */
+  longitude: z.number().min(-180).max(180).optional(),
 });
 
 interface WeatherAlert {
@@ -78,9 +81,33 @@ serve(async (req) => {
       );
     }
 
-    // Validate input
+    // Validate input — bind coords from owned field (ignore client lat/lng invent).
     const body = weatherAlertsSchema.parse(await req.json());
-    const { latitude, longitude } = body;
+    const { data: ownedField, error: fieldError } = await rateLimitClient
+      .from('fields')
+      .select('id, location_lat, location_lng')
+      .eq('id', body.field_id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (fieldError) throw fieldError;
+    if (
+      !ownedField ||
+      ownedField.location_lat == null ||
+      ownedField.location_lng == null ||
+      !Number.isFinite(Number(ownedField.location_lat)) ||
+      !Number.isFinite(Number(ownedField.location_lng))
+    ) {
+      return new Response(
+        JSON.stringify({
+          error: 'Owned field with recorded coordinates is required',
+          alerts: [],
+          count: 0,
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+    const latitude = Number(ownedField.location_lat);
+    const longitude = Number(ownedField.location_lng);
 
     // NOAA API - National Weather Service alerts
     const alertsUrl = `https://api.weather.gov/alerts/active?point=${latitude},${longitude}`;

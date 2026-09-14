@@ -196,7 +196,7 @@ export default function FieldMap() {
                     <div className="space-y-1">
                       <h3 className="font-heading font-bold text-lg">{field.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {field.crop_type} • {field.acreage || 'N/A'} acres
+                        {field.crop_type} • {field.acreage != null && Number.isFinite(Number(field.acreage)) ? field.acreage : 'not recorded'} acres
                       </p>
                     </div>
                     <div

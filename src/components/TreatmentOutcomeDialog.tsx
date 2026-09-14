@@ -121,6 +121,7 @@ export function TreatmentOutcomeDialog({
         healthScoreAfter: healthAfter,
       });
 
+      const healthNote = `Self-reported after-treatment health: ${healthAfter}`;
       const costNote =
         parsedCost != null
           ? `Self-reported cost/acre: $${parsedCost}`
@@ -136,9 +137,8 @@ export function TreatmentOutcomeDialog({
           crop_type: cropType,
           problem_addressed: symptoms.join(', ') || stressLevel || 'Unknown',
           outcome: outcome === 'success' ? 'successful' : outcome === 'partial' ? 'partially_successful' : 'unsuccessful',
-          effectiveness_score: healthAfter,
-          // cost_usd is stripped server-side — keep self-reported cost in notes only
-          notes: [baseNotes, costNote].filter(Boolean).join(' | '),
+          // effectiveness_score is stripped server-side — keep after-health in notes only
+          notes: [baseNotes, healthNote, costNote].filter(Boolean).join(' | '),
           applied_at: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           evaluated_at: new Date().toISOString().split('T')[0],
         });

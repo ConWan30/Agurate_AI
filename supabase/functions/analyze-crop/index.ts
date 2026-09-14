@@ -240,7 +240,7 @@ serve(async (req) => {
 
 📊 FIELD PROFILE:
 - Variety: ${fieldData?.rice_variety || fieldData?.soybean_variety || fieldData?.cotton_variety || fieldData?.corn_hybrid || 'Unknown'}
-- Acreage: ${fieldData?.acreage || 'Unknown'} acres
+- Acreage: ${fieldData?.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? fieldData.acreage : 'not recorded'} acres
 - Soil Type: ${fieldData?.soil_type || 'Not specified'}
 
 📈 HISTORICAL HEALTH TREND (Last 5 Assessments):
@@ -519,7 +519,7 @@ Generate actionable recommendations informed by publicly available LSU AgCenter 
 
 **PUBLIC LSU AGCENTER RESEARCH REFERENCES (cite published ranges when applicable; not farm-specific guarantees or an official partnership):**
 - Fertilizer: LSU AgCenter Publication Pub. 2945, "Fertilizer Recommendations for Field Crops in Louisiana: N-P-K-S" (2024)
-  - Rice: published N ranges often cited around 120-150 lbs N/acre in split applications — confirm against the publication and field conditions
+  - Rice: cite Pub. 2945 published N guidance only — do not invent farm-specific lbs N/acre; ask for farmer-recorded rates before asserting any rate
   - Soybeans: Minimal N (legume fixation), focus on K and P
 - Rice Disease: LSU AgCenter Rice Research Station, "Rice Varieties and Management Tips 2025" (2024)
   - Blast-resistant varieties may reduce fungicide needs in published trial contexts — do not assert a farm-specific % without visible evidence
@@ -530,11 +530,11 @@ Generate actionable recommendations informed by publicly available LSU AgCenter 
   - Frogeye-resistant varieties are often described as cost-effective control options in published guidance
 
 **DECISION RULES (planning aid — cite pub ranges; do not invent farm-specific rates):**
-1. If stress_score < 0.3 → Flag for urgent farmer review within 24-48 hours
+1. If stress_score indicates elevated stress → Flag for urgent farmer review within 24-48 hours
 2. Disease symptoms → Suggest treatment categories + cite LSU research framing
-3. Nitrogen deficiency → Reference Pub. 2945 ranges for rice; ask for farmer-recorded rates before asserting lbs/acre
-4. Precipitation < 0.5" AND temp > 90°F → Flag irrigation review (cite LSU water management)
-5. Precipitation > 2" in 7 days → Flag fertilizer timing/runoff risk per LSU guidelines
+3. Nitrogen deficiency → Reference Pub. 2945 qualitatively; ask for farmer-recorded rates before asserting lbs/acre
+4. Hot/dry conditions without recorded precip → Flag irrigation review (cite LSU water management)
+5. Heavy recent precip → Flag fertilizer timing/runoff risk per LSU guidelines
 
 Use clear, farmer-friendly language. Cite specific public LSU AgCenter publications when applicable. Never claim an official LSU partnership or validation. Never invent farm-specific yield %, dollar savings, or prescription rates without visible evidence or farmer inputs.
 

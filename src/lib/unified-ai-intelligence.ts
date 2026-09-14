@@ -140,11 +140,11 @@ UNIFIED FIELD INTELLIGENCE CONTEXT:
 FIELD INFORMATION:
 - Crop Type: ${fieldData?.crop_type || 'Unknown'}
 - Variety: ${fieldData?.rice_variety || fieldData?.soybean_variety || fieldData?.cotton_variety || fieldData?.corn_hybrid || 'Not specified'}
-- Acreage: ${fieldData?.acreage || 'Unknown'} acres
-- Location: ${fieldData?.location_lat || 'N/A'}, ${fieldData?.location_lng || 'N/A'}
+- Acreage: ${fieldData?.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? fieldData.acreage : 'not recorded'} acres
+- Location: ${fieldData?.location_lat != null ? fieldData.location_lat : 'not recorded'}, ${fieldData?.location_lng != null ? fieldData.location_lng : 'not recorded'}
 
 HISTORICAL ASSESSMENT TRENDS (Last 10):
-${assessmentHistory.map(a => `- ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${a.health_score != null && Number.isFinite(Number(a.health_score)) ? `${a.health_score}%` : 'not recorded'}, Stress Level: ${a.stress_level ?? 'not recorded'}, Symptoms: ${a.symptoms?.join(', ') || 'None'}`).join('\n') || '- No historical data'}
+${assessmentHistory.map(a => `- ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${a.health_score != null && Number.isFinite(Number(a.health_score)) ? `${a.health_score}%` : 'not recorded'}, Stress Level: ${a.stress_level ?? 'not recorded'}, Symptoms: ${a.symptoms?.length ? a.symptoms.join(', ') : 'not recorded'}`).join('\n') || '- No historical data'}
 
 CONSERVATION PRACTICES:
 ${conservationData.length > 0 ? conservationData.map(c => `- ${c.practice_type}: Current Impact ${c.current_impact}, Confidence ${c.confidence_score}`).join('\n') : '- No conservation data available'}

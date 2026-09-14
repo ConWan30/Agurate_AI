@@ -37,7 +37,7 @@ export function WeatherAlerts() {
       // Use a field with real coordinates — never invent parish defaults
       const { data: fields, error: fieldsError } = await supabase
         .from("fields")
-        .select("location_lat, location_lng")
+        .select("id, location_lat, location_lng")
         .not("location_lat", "is", null)
         .not("location_lng", "is", null)
         .limit(1);
@@ -53,11 +53,8 @@ export function WeatherAlerts() {
       }
 
       setLocationReady(true);
-      const latitude = Number(field.location_lat);
-      const longitude = Number(field.location_lng);
-
       const { data, error } = await supabase.functions.invoke("weather-alerts", {
-        body: { latitude, longitude }
+        body: { field_id: field.id }
       });
 
       if (error) throw error;

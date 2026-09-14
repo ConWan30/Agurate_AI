@@ -277,40 +277,48 @@ const required = [
       'cooperative_alerts.field_id must be owned by the authenticated user',
     ],
   },
-  {
-    id: '20260914430000_drop_legacy_peer_comparison_data_view',
-    needles: [
-      'DROP VIEW IF EXISTS public.peer_comparison_data',
-      'REVOKE ALL ON TABLE public.peer_comparison_data',
-    ],
-  },
-];
+    {
+      id: '20260914430000_drop_legacy_peer_comparison_data_view',
+      needles: [
+        'DROP VIEW IF EXISTS public.peer_comparison_data',
+        'REVOKE ALL ON TABLE public.peer_comparison_data',
+      ],
+    },
+    {
+      id: '20260914440000_lock_peer_effectiveness_strip',
+      needles: [
+        'NEW.effectiveness_score := NULL',
+        'NEW.cost_usd := NULL',
+        'protect_peer_treatment_outcome_metrics',
+      ],
+    },
+  ];
 
-for (const req of required) {
-  const file = byId[req.id];
-  if (!file) {
-    fail(`missing required lock migration ${req.id}`);
-    continue;
+  for (const req of required) {
+    const file = byId[req.id];
+    if (!file) {
+      fail(`missing required lock migration ${req.id}`);
+      continue;
+    }
+    const sql = readFileSync(path.join(MIGRATIONS, file), 'utf8');
+    const missing = req.needles.filter((n) => !sql.includes(n));
+    if (missing.length) {
+      fail(`${req.id} missing markers: ${missing.join(', ')}`);
+    } else {
+      pass(`${req.id} lock markers present`);
+    }
   }
-  const sql = readFileSync(path.join(MIGRATIONS, file), 'utf8');
-  const missing = req.needles.filter((n) => !sql.includes(n));
-  if (missing.length) {
-    fail(`${req.id} missing markers: ${missing.join(', ')}`);
-  } else {
-    pass(`${req.id} lock markers present`);
-  }
-}
 
-const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
-pass(`tip migration ${tip}`);
-if (
-  !tip.startsWith('2026091443') &&
-  tip < '20260914430000_drop_legacy_peer_comparison_data_view'
-) {
-  fail(
-    `tip migration ${tip} should include legacy peer_comparison_data view drop (20260914430000+)`
-  );
-}
+  const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
+  pass(`tip migration ${tip}`);
+  if (
+    !tip.startsWith('2026091444') &&
+    tip < '20260914440000_lock_peer_effectiveness_strip'
+  ) {
+    fail(
+      `tip migration ${tip} should include peer effectiveness strip (20260914440000+)`
+    );
+  }
 
 if (process.exitCode) {
   console.error('\nLock migration static verification failed.');

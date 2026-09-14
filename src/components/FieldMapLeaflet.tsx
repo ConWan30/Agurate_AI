@@ -87,7 +87,7 @@ export default function FieldMapLeaflet({ fields }: FieldMapLeafletProps) {
             <strong>Crop:</strong> ${field.crop_type}
           </p>
           <p style="margin: 4px 0; font-size: 14px; color: #666;">
-            <strong>Acreage:</strong> ${field.acreage || 'N/A'} acres
+            <strong>Acreage:</strong> ${field.acreage != null && Number.isFinite(Number(field.acreage)) ? field.acreage : 'not recorded'} acres
           </p>
           <p style="margin: 4px 0; font-size: 14px; color: #666;">
             <strong>Health:</strong> ${healthLabel}
