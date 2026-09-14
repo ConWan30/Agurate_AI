@@ -4,7 +4,7 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| In-repo honesty, security, quality | **Complete (tip)** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`); includes residual invent closures (conservation $, community savings, Home 24/7 split, variety %, null→0 health prompts, unknown alert severity, crop $/acre defaults). Re-confirm with `npm run verify:local-gates` + tip CI after each push. |
+| In-repo honesty, security, quality | **Complete (tip)** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`). Re-confirm with `npm run verify:local-gates` + tip CI after each push. Product-facing invent/security residuals are saturated in-repo; remaining work is platform-only. |
 | Apply Supabase migrations through tip | **Blocked** | Needs project DB credentials (`supabase db push` or Dashboard SQL) |
 | Auth Leaked Password Protection | **Blocked** | Needs Supabase Dashboard access |
 | Deploy edge functions | **Blocked** | Needs Supabase CLI linked project + secrets |
@@ -79,9 +79,12 @@ Evidence: production HTML/JS matches tip commit; `/health.json` loads with that 
 # After publish — confirm the live build identity matches the tip SHA you intended
 curl -sS https://YOUR_PRODUCTION_HOST/health.json
 # Expect: "status":"ok", "stage":"closed-beta", "commit":"<tip sha>"
+
+# Or run the automated public-route + health tip match check:
+PRODUCTION_URL=https://YOUR_PRODUCTION_HOST EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke
 ```
 
-**Evidence receipt:** `curl` JSON with `commit` equal to published tip SHA.
+**Evidence receipt:** `curl` JSON with `commit` equal to published tip SHA, or `npm run verify:production-smoke` PASS output.
 
 ## 6. Production smoke
 
@@ -95,10 +98,20 @@ On the live URL, confirm:
 | `/how-it-works` | Honest capability copy |
 | `/health.json` | `status=ok`, `stage=closed-beta`, `commit` equals published tip SHA |
 
+Automated helper (public routes + tip match only):
+
+```bash
+PRODUCTION_URL=https://YOUR_PRODUCTION_HOST EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke
+```
+
 Also: one authenticated scan/upload path returns a real health score or a clear
 error — never a silent invented score.
 
-**Evidence receipt:** checklist of routes OK + note of authenticated scan result.
+**Evidence receipt:** checklist of routes OK + note of authenticated scan result (+ optional `verify:production-smoke` PASS).
+
+## Credentials required (why the coding agent stops here)
+
+This environment has **no** Supabase access token, DB password, service-role key, or Lovable publish credentials. Platform rows cannot be evidenced until an operator with those credentials runs the steps above and pastes receipts.
 
 ## Done means
 
@@ -107,4 +120,4 @@ error — never a silent invented score.
 - [ ] Leaked password protection on
 - [ ] Edge functions deployed + demo secret policy set
 - [ ] App published
-- [ ] Live smoke passed
+- [ ] Live smoke passed (`verify:production-smoke` + authenticated scan)
