@@ -215,7 +215,7 @@ export default function Scanner() {
       // ✅ UNIFIED AI: Gather context before analysis
       const unifiedContext = await gatherUnifiedContext(selectedFieldId);
 
-      // Call analyze-crop edge function with unified context
+      // Call analyze-crop; edge persists scored assessment (clients cannot write health_score)
       const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
         body: {
           imageUrl: signedImageUrl,
@@ -223,7 +223,12 @@ export default function Scanner() {
           fieldId: selectedFieldId,
           latitude: gpsCoords?.lat ?? selectedField.location_lat ?? undefined,
           longitude: gpsCoords?.lng ?? selectedField.location_lng ?? undefined,
-          unifiedContext // Include intelligence pool data
+          storagePath: fileName,
+          photoLocationLat: gpsCoords?.lat ?? selectedField.location_lat ?? undefined,
+          photoLocationLng: gpsCoords?.lng ?? selectedField.location_lng ?? undefined,
+          gpsAccuracyMeters: gpsCoords?.accuracy,
+          capturedOffline: !isOnline,
+          unifiedContext,
         }
       });
 
@@ -234,31 +239,9 @@ export default function Scanner() {
       if (!aiResult.stress_level) {
         throw new Error('AI analysis did not return a stress_level');
       }
-
-      // Durable storage path — never persist the ephemeral signed URL
-      const { data: assessment, error: dbError } = await supabase
-        .from('assessments')
-        .insert({
-          field_id: selectedFieldId,
-          image_url: fileName,
-          health_score: toHealthPercent(aiResult.health_score),
-          stress_level: aiResult.stress_level,
-          symptoms: aiResult.symptoms || [],
-          confidence_score:
-            aiResult.confidence_score == null
-              ? null
-              : toHealthPercent(aiResult.confidence_score),
-          photo_location_lat: gpsCoords?.lat || selectedField.location_lat,
-          photo_location_lng: gpsCoords?.lng || selectedField.location_lng,
-          gps_accuracy_meters: gpsCoords?.accuracy,
-          captured_offline: !isOnline,
-          weather_temp_f: aiResult.weather_temp_f,
-          weather_precipitation_mm: aiResult.weather_precipitation_mm
-        })
-        .select()
-        .single();
-
-      if (dbError) throw dbError;
+      if (!aiResult.assessment_id) {
+        throw new Error('Analysis did not persist an assessment');
+      }
 
       // ✅ UNIFIED AI: Enrich intelligence pool after analysis
       await enrichUnifiedContext(selectedFieldId, aiResult);

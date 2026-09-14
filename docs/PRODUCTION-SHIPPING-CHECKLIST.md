@@ -137,7 +137,7 @@ Last updated: 2026-09-14
 
 See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
-- [ ] Apply pending Supabase migrations (through `20260914200000` claim INSERT + coop-alert INSERT locks; prior `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
+- [ ] Apply pending Supabase migrations (through `20260914210000` claim INSERT + coop-alert INSERT locks; prior `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
@@ -147,7 +147,7 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 ## Evidence expected before production-complete
 
 1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
-2. Migration applied confirmation in Supabase through `20260914200000_claim_insert_status_and_coop_alert_insert` — **pending credentials**
+2. Migration applied confirmation in Supabase through `20260914210000_protect_assessment_ai_scores` — **pending credentials**
 3. Live production URL showing honest closed-beta copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
 

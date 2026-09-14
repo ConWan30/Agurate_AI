@@ -24,11 +24,13 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] Public route alignment gate (`verify:public-routes`) keeps App ↔ robots ↔ sitemap in sync
 - [x] `npm run verify:local-gates` + `docs/OPERATOR-PLATFORM-HANDOFF.md` for credentialed shipping steps
 - [x] `/health.json` build stamp includes git commit for post-publish verification
+- [x] Assessment health/AI scores persisted only via analyze-crop service role (`20260914210000`)
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914200000` (claim INSERT status
-   lock + coop-alert member INSERT drop; prior tip `20260914190000` claim UPDATE/
+1. Apply pending Supabase migrations through `20260914210000` (assessment AI-score
+   write lock + service-role persist; prior `20260914200000` claim INSERT status
+   lock + coop-alert member INSERT drop; `20260914190000` claim UPDATE/
    invitation freeze; researcher PII is `20260914100000`; `subscription_status`
    lock is `20260914170000`; beta_metrics approved-story sync is `20260914180000`;
    plus prior RLS/RPC/storage/soybean checks)

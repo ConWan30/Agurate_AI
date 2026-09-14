@@ -6,15 +6,37 @@ import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 // Input validation schema
-const analyzeCropSchema = z.object({
-  imageUrl: z.string().url().max(2048),
-  cropType: z.enum(['rice', 'soybean', 'cotton', 'corn']),
-  fieldId: z.string().uuid().optional(),
-  location: z.string().max(200).optional(),
-  mediaType: z.enum(['image', 'video']).default('image'),
-  latitude: z.number().min(-90).max(90).optional(),
-  longitude: z.number().min(-180).max(180).optional(),
-});
+const analyzeCropSchema = z
+  .object({
+    imageUrl: z.string().url().max(2048),
+    cropType: z.enum(['rice', 'soybean', 'cotton', 'corn']),
+    fieldId: z.string().uuid().optional(),
+    location: z.string().max(200).optional(),
+    mediaType: z.enum(['image', 'video']).default('image'),
+    latitude: z.number().min(-90).max(90).optional(),
+    longitude: z.number().min(-180).max(180).optional(),
+    /** Durable storage object path (not a signed URL). When set with fieldId, edge persists the assessment. */
+    storagePath: z
+      .string()
+      .min(1)
+      .max(1024)
+      .regex(/^[a-zA-Z0-9/_.\-]+$/)
+      .refine((p) => !p.includes('://'), { message: 'storagePath must be a storage object path' })
+      .optional(),
+    photoLocationLat: z.number().min(-90).max(90).optional(),
+    photoLocationLng: z.number().min(-180).max(180).optional(),
+    gpsAccuracyMeters: z.number().min(0).max(100_000).optional(),
+    capturedOffline: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.storagePath && !data.fieldId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'fieldId is required when storagePath is provided',
+        path: ['fieldId'],
+      });
+    }
+  });
 
 // Validate image URL has proper file extension
 function validateImageUrl(url: string, mediaType: string): boolean {
@@ -84,7 +106,20 @@ serve(async (req) => {
       );
     }
 
-    const { imageUrl, cropType, fieldId, location, mediaType, latitude, longitude } = validation.data;
+    const {
+      imageUrl,
+      cropType,
+      fieldId,
+      location,
+      mediaType,
+      latitude,
+      longitude,
+      storagePath,
+      photoLocationLat,
+      photoLocationLng,
+      gpsAccuracyMeters,
+      capturedOffline,
+    } = validation.data;
     
     // Validate image/video file format
     if (!validateImageUrl(imageUrl, mediaType)) {
@@ -526,17 +561,25 @@ Respond with JSON:
     };
 
     // Combine both AI outputs — fail closed if health_score is missing (do not invent 0%)
-    const finalResult = {
+    const healthScore = requireHealthScore(imageAnalysis.health_score);
+    const stressLevel = normalizeStressLevel(imageAnalysis.condition);
+    const confidenceScore =
+      imageAnalysis.confidence_score == null || Number.isNaN(Number(imageAnalysis.confidence_score))
+        ? null
+        : toHealthPercent(imageAnalysis.confidence_score);
+    const symptoms = Array.isArray(imageAnalysis.symptoms) ? imageAnalysis.symptoms : [];
+    const recommendationList = Array.isArray(recommendations.recommendations)
+      ? recommendations.recommendations
+      : [];
+
+    const finalResult: Record<string, unknown> = {
       // From image analysis
-      health_score: requireHealthScore(imageAnalysis.health_score),
-      stress_level: normalizeStressLevel(imageAnalysis.condition),
+      health_score: healthScore,
+      stress_level: stressLevel,
       stress_score: imageAnalysis.stress_score,
-      symptoms: imageAnalysis.symptoms,
+      symptoms,
       visual_cues: imageAnalysis.visual_cues,
-      confidence_score:
-        imageAnalysis.confidence_score == null || Number.isNaN(Number(imageAnalysis.confidence_score))
-          ? null
-          : toHealthPercent(imageAnalysis.confidence_score),
+      confidence_score: confidenceScore,
       
       // Enhanced analytical fields
       growth_stage: imageAnalysis.growth_stage,
@@ -552,13 +595,86 @@ Respond with JSON:
       detailed_visual_analysis: imageAnalysis.detailed_visual_analysis,
       
       // From recommendations
-      recommendations: recommendations.recommendations,
+      recommendations: recommendationList,
       analysis_summary: recommendations.analysis_summary,
       weather_note: recommendations.weather_note,
       
       // Weather data
       weather_data: weatherData
     };
+
+    // Persist scored assessment server-side (clients cannot write health_score via RLS)
+    if (fieldId && storagePath) {
+      const admin = getServiceClient();
+      const weatherTemp =
+        weatherData?.temp_f != null && Number.isFinite(Number(weatherData.temp_f))
+          ? Number(weatherData.temp_f)
+          : null;
+      const weatherPrecipMm =
+        weatherData?.precipitation_7day != null && Number.isFinite(Number(weatherData.precipitation_7day))
+          ? Number(weatherData.precipitation_7day) * 25.4
+          : null;
+
+      const { data: assessment, error: assessmentError } = await admin
+        .from('assessments')
+        .insert({
+          field_id: fieldId,
+          image_url: storagePath,
+          health_score: healthScore,
+          stress_level: stressLevel,
+          symptoms,
+          confidence_score: confidenceScore,
+          weather_temp_f: weatherTemp,
+          weather_precipitation_mm: weatherPrecipMm,
+          growth_stage: imageAnalysis.growth_stage ?? null,
+          disease_identified: imageAnalysis.disease_identified ?? null,
+          pest_identified: imageAnalysis.pest_identified ?? null,
+          nutrient_deficiencies: imageAnalysis.nutrient_deficiencies ?? null,
+          severity_ratings: imageAnalysis.severity_ratings ?? null,
+          field_uniformity_score: imageAnalysis.field_uniformity_score ?? null,
+          estimated_yield_impact_percent: imageAnalysis.estimated_yield_impact_percent ?? null,
+          canopy_coverage_percent: imageAnalysis.canopy_coverage_percent ?? null,
+          plant_density_assessment: imageAnalysis.plant_density_assessment ?? null,
+          root_health_indicators: imageAnalysis.root_health_indicators ?? null,
+          detailed_visual_analysis: imageAnalysis.detailed_visual_analysis ?? null,
+          photo_location_lat: photoLocationLat ?? latitude ?? null,
+          photo_location_lng: photoLocationLng ?? longitude ?? null,
+          gps_accuracy_meters: gpsAccuracyMeters ?? null,
+          captured_offline: capturedOffline ?? false,
+        })
+        .select('id')
+        .single();
+
+      if (assessmentError || !assessment?.id) {
+        console.error('Failed to persist assessment:', assessmentError);
+        throw new Error('Failed to save assessment');
+      }
+
+      if (recommendationList.length > 0) {
+        const rows = recommendationList
+          .filter((rec: { text?: unknown }) => typeof rec?.text === 'string' && rec.text.trim().length > 0)
+          .map((rec: { text: string; priority?: string; category?: string }) => ({
+            assessment_id: assessment.id,
+            recommendation_text: rec.text,
+            priority: ['urgent', 'normal', 'low'].includes(rec.priority ?? '') ? rec.priority : 'normal',
+            category: ['irrigation', 'fertilization', 'pest_management', 'weather_alert', 'general'].includes(
+              rec.category ?? ''
+            )
+              ? rec.category
+              : 'general',
+          }));
+
+        if (rows.length > 0) {
+          const { error: recError } = await admin.from('recommendations').insert(rows);
+          if (recError) {
+            console.error('Failed to persist recommendations:', recError);
+            throw new Error('Failed to save recommendations');
+          }
+        }
+      }
+
+      finalResult.assessment_id = assessment.id;
+    }
 
     return new Response(
       JSON.stringify(finalResult),

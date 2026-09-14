@@ -11,10 +11,13 @@ import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 interface CriticalAlertInput {
   assessment_id: string;
   field_id: string;
-  health_score: number;
-  stress_level: string;
+  /** @deprecated Ignored — scores are loaded from the persisted assessment. */
+  health_score?: number;
+  /** @deprecated Ignored — scores are loaded from the persisted assessment. */
+  stress_level?: string;
   diseases?: unknown;
   pests?: unknown;
+  /** @deprecated Ignored — yield impact is loaded from the persisted assessment. */
   estimated_yield_impact_percent?: number;
   field_acreage?: number;
   crop_type?: string;
@@ -89,18 +92,12 @@ serve(async (req) => {
     const {
       assessment_id,
       field_id,
-      health_score,
-      stress_level,
       diseases,
       pests,
-      estimated_yield_impact_percent,
       field_acreage,
       crop_type,
       crop_value_per_acre,
     }: CriticalAlertInput = await req.json();
-
-    const normalizedDiseases = normalizeThreatList(diseases);
-    const normalizedPests = normalizeThreatList(pests);
 
     if (!field_id || !assessment_id) {
       return new Response(
@@ -111,7 +108,7 @@ serve(async (req) => {
 
     const { data: field, error: fieldError } = await supabaseClient
       .from('fields')
-      .select('id, name, user_id')
+      .select('id, name, user_id, acreage, crop_type')
       .eq('id', field_id)
       .eq('user_id', user.id)
       .maybeSingle();
@@ -123,6 +120,34 @@ serve(async (req) => {
       });
     }
 
+    // Trust persisted assessment scores only — never client-supplied health_score / stress_level
+    const { data: assessment, error: assessmentError } = await supabaseClient
+      .from('assessments')
+      .select(
+        'id, field_id, health_score, stress_level, estimated_yield_impact_percent, disease_identified, pest_identified'
+      )
+      .eq('id', assessment_id)
+      .eq('field_id', field_id)
+      .maybeSingle();
+
+    if (assessmentError || !assessment) {
+      return new Response(JSON.stringify({ error: 'Assessment not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const health_score = assessment.health_score;
+    const stress_level = assessment.stress_level ?? 'unknown';
+    const estimated_yield_impact_percent = assessment.estimated_yield_impact_percent;
+
+    const normalizedDiseases = normalizeThreatList(
+      Array.isArray(diseases) && diseases.length > 0 ? diseases : assessment.disease_identified
+    );
+    const normalizedPests = normalizeThreatList(
+      Array.isArray(pests) && pests.length > 0 ? pests : assessment.pest_identified
+    );
+
     const finiteHealth =
       typeof health_score === 'number' && Number.isFinite(health_score) ? health_score : null;
     const finiteYield =
@@ -130,7 +155,12 @@ serve(async (req) => {
         ? Number(estimated_yield_impact_percent)
         : null;
     const finiteAcreage =
-      field_acreage != null && Number.isFinite(Number(field_acreage)) ? Number(field_acreage) : null;
+      field_acreage != null && Number.isFinite(Number(field_acreage))
+        ? Number(field_acreage)
+        : field.acreage != null && Number.isFinite(Number(field.acreage))
+          ? Number(field.acreage)
+          : null;
+    const resolvedCropType = crop_type || field.crop_type || 'crop';
 
     const urgencyScore = calculateUrgencyScore({
       healthScore: finiteHealth,
@@ -159,7 +189,7 @@ serve(async (req) => {
     const { title, message, estimatedLoss } = generateAlertContent({
       alertType,
       fieldName: field.name || 'Field',
-      cropType: crop_type || 'crop',
+      cropType: resolvedCropType,
       diseases: normalizedDiseases,
       pests: normalizedPests,
       yieldImpact: finiteYield,

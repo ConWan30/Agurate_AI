@@ -21,12 +21,12 @@ Verify local gates anytime:
 npm run verify:local-gates
 ```
 
-Latest migration in repo: `20260914200000_claim_insert_status_and_coop_alert_insert`
+Latest migration in repo: `20260914210000_protect_assessment_ai_scores`
 
 ## 1. Apply Supabase migrations
 
 Apply **all** pending migrations through tip  
-`20260914200000_claim_insert_status_and_coop_alert_insert`  
+`20260914210000_protect_assessment_ai_scores`  
 (includes insurance claim status lock + invitation column freeze, entitlement locks `20260914140000`–`20260914170000`, researcher PII revoke `20260914100000`, prior RLS/RPC/storage).
 
 ```bash
@@ -36,7 +36,7 @@ supabase db push
 # Or via Dashboard → SQL → run each pending migration in timestamp order
 ```
 
-**Evidence receipt:** paste Supabase migration history showing tip `20260914200000_…` applied with no errors.
+**Evidence receipt:** paste Supabase migration history showing tip `20260914210000_…` applied with no errors.
 
 ## 2. Enable Auth Leaked Password Protection
 
@@ -121,7 +121,7 @@ This environment has **no** Supabase access token, DB password, service-role key
 ## Done means
 
 - [x] Local gates green (`npm run verify:local-gates` + CI) — tip of `cursor/launch-readiness-honesty-38b2`
-- [ ] Migrations applied through `20260914200000_…`
+- [ ] Migrations applied through `20260914210000_…`
 - [ ] Leaked password protection on
 - [ ] Edge functions deployed + demo secret policy set
 - [ ] App published
