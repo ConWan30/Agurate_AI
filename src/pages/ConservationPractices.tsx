@@ -92,29 +92,45 @@ export default function ConservationPractices() {
 
   const handleConversationalComplete = async (extractedData: ConservationPracticesData) => {
     try {
-      // Conservation practices would typically be stored in a conservation_practices table
-      // or as JSONB on the fields table. For now, we'll update the field's notes.
-      
-      const practicesText = `
-Conservation Practices:
-- Tillage: ${extractedData.tillage_type}
-- Cover Crops: ${extractedData.cover_crops ? 'Yes' : 'No'}
-- Crop Rotation: ${extractedData.crop_rotation ? 'Yes' : 'No'}
-- Buffer Strips: ${extractedData.buffer_strips ? 'Yes' : 'No'}
-- Precision Fertilization: ${extractedData.precision_fertilization ? 'Yes' : 'No'}
-${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
-      `.trim();
+      // No dedicated conservation_practices table yet — append a dated block to field notes
+      // instead of overwriting existing notes (which destroyed prior field records).
+      const practicesBlock = [
+        `Conservation Practices (${new Date().toISOString().slice(0, 10)}):`,
+        `- Tillage: ${extractedData.tillage_type ?? 'not recorded'}`,
+        `- Cover Crops: ${extractedData.cover_crops ? 'Yes' : 'No'}`,
+        `- Crop Rotation: ${extractedData.crop_rotation ? 'Yes' : 'No'}`,
+        `- Buffer Strips: ${extractedData.buffer_strips ? 'Yes' : 'No'}`,
+        `- Precision Fertilization: ${extractedData.precision_fertilization ? 'Yes' : 'No'}`,
+        extractedData.notes ? `- Notes: ${extractedData.notes}` : null,
+      ]
+        .filter(Boolean)
+        .join('\n');
+
+      const { data: existingField, error: loadError } = await supabase
+        .from('fields')
+        .select('notes')
+        .eq('id', extractedData.field_id)
+        .maybeSingle();
+      if (loadError) throw loadError;
+
+      const priorNotes =
+        typeof existingField?.notes === 'string' && existingField.notes.trim().length > 0
+          ? existingField.notes.trim()
+          : '';
+      const mergedNotes = priorNotes
+        ? `${priorNotes}\n\n${practicesBlock}`
+        : practicesBlock;
 
       const { error } = await supabase
         .from('fields')
         .update({
-          notes: practicesText
+          notes: mergedNotes,
         })
         .eq('id', extractedData.field_id);
 
       if (error) throw error;
 
-      toast.success('🌱 Conservation practices documented successfully!');
+      toast.success('Conservation practices appended to field notes (not a compliance filing).');
       setConversationalOpen(false);
       setSelectedFieldId(null);
 

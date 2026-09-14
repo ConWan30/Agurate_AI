@@ -35,12 +35,13 @@ export function TutorialFeedbackDialog({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      await supabase.from('tutorial_feedback').insert({
+      const { error } = await supabase.from('tutorial_feedback').insert({
         tutorial_id: tutorialId,
         rating,
         comment: comment.trim() || null,
         user_id: user.id
       });
+      if (error) throw error;
 
       toast.success('Thanks for your feedback! It helps us improve AgurateAI.');
       onClose();

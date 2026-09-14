@@ -71,4 +71,34 @@ describe('PeerComparisonCard', () => {
     });
     expect(rpc).not.toHaveBeenCalled();
   });
+
+  it('shows em dash for null avg_effectiveness (never invents 0/100)', async () => {
+    rpc.mockResolvedValue({
+      data: [
+        {
+          treatment_type: 'pest_management',
+          success_rate: 70,
+          avg_effectiveness: null,
+          sample_size: 9,
+          farmer_count: 3,
+        },
+      ],
+      error: null,
+    });
+
+    render(
+      <PeerComparisonCard
+        fieldId="11111111-1111-1111-1111-111111111111"
+        treatmentType="pest_management"
+        cropType="soybean"
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Highest self-reported success rate/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/0\/100/)).not.toBeInTheDocument();
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+  });
+
 });

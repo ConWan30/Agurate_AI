@@ -319,11 +319,7 @@ const required = [
 
   const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
   pass(`tip migration ${tip}`);
-  if (
-    !tip.startsWith('2026091445') &&
-    !tip.startsWith('2026091444') &&
-    tip < '20260914450000_scrub_peer_effectiveness_history'
-  ) {
+  if (!tip.startsWith('2026091445')) {
     fail(
       `tip migration ${tip} should include peer effectiveness history scrub (20260914450000+)`
     );

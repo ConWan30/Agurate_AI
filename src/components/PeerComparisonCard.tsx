@@ -23,6 +23,8 @@ interface PeerComparisonCardProps {
 }
 
 function formatPeerMetric(value: unknown, suffix = ''): string {
+  // Number(null) === 0 — must reject null/undefined before coercing (post-scrub AVG is null).
+  if (value == null || value === '') return '—';
   const n = Number(value);
   if (!Number.isFinite(n)) return '—';
   return `${Math.round(n)}${suffix}`;
@@ -111,12 +113,14 @@ export function PeerComparisonCard({
   }
 
   const topTreatment = comparisonData[0];
-  const sampleSize = Number.isFinite(Number(topTreatment.sample_size))
-    ? Number(topTreatment.sample_size)
-    : null;
-  const farmerCount = Number.isFinite(Number(topTreatment.farmer_count))
-    ? Number(topTreatment.farmer_count)
-    : null;
+  const sampleSize =
+    topTreatment.sample_size == null || !Number.isFinite(Number(topTreatment.sample_size))
+      ? null
+      : Number(topTreatment.sample_size);
+  const farmerCount =
+    topTreatment.farmer_count == null || !Number.isFinite(Number(topTreatment.farmer_count))
+      ? null
+      : Number(topTreatment.farmer_count);
 
   return (
     <Card className={className}>

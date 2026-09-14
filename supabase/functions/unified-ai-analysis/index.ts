@@ -122,6 +122,21 @@ serve(async (req) => {
 
     console.log('✅ Unified AI analysis complete');
 
+    // Only claim sources that gatherUnifiedContext actually loaded — weather is not wired.
+    const context_sources = [
+      'vision',
+      Array.isArray(context?.assessmentHistory) && context.assessmentHistory.length > 0
+        ? 'historical'
+        : null,
+      Array.isArray(context?.conservationData) && context.conservationData.length > 0
+        ? 'conservation'
+        : null,
+      Array.isArray(context?.varietyData) && context.varietyData.length > 0 ? 'variety' : null,
+      Array.isArray(context?.waterStressData) && context.waterStressData.length > 0
+        ? 'water_stress'
+        : null,
+    ].filter(Boolean);
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -132,7 +147,7 @@ serve(async (req) => {
         community,
         predictions,
         recommendations,
-        context_sources: ['vision', 'historical', 'conservation', 'variety', 'weather', 'community']
+        context_sources,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

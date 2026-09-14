@@ -38,14 +38,20 @@ const failures = [];
 const LIVE_FORBIDDEN = [
   { name: '95%+ accuracy claim', re: /95%\+?\s*(accuracy|accurate)/i },
   { name: 'LSU AgCenter Validated badge', re: /LSU AgCenter Validated/i },
+  { name: 'LSU-Validated badge', re: /\bLSU[- ]Validated\b/i },
   { name: 'Trusted by 100+ Farmers', re: /Trusted by 100\+?\s*Farmers/i },
+  { name: 'Trusted by Louisiana Farmers', re: /Trusted by Louisiana Farmers/i },
   { name: 'Free unlimited access claim', re: /Free unlimited access/i },
   { name: '24/7 AI advisor claim', re: /24\/7 AI advisor/i },
   { name: 'fabricated James Mitchell testimonial', re: /James Mitchell/i },
   { name: 'fabricated Sarah Thompson testimonial', re: /Sarah Thompson/i },
   { name: 'fabricated Robert Davis testimonial', re: /Robert Davis/i },
+  { name: 'fabricated James Collins testimonial', re: /James Collins/i },
   { name: '130+ years research claim', re: /130\+\s*Years of (?:LSU )?Research/i },
+  { name: 'Built on 130+ years claim', re: /Built on 130\+ years of research/i },
   { name: 'Connect directly with LSU experts claim', re: /Connect directly with LSU AgCenter experts/i },
+  { name: 'fabricated community savings total', re: /\$127K\+?\s*total savings/i },
+  { name: 'fabricated $127K savings', re: /\$127,?000|\$127K/i },
 ];
 
 async function check(path, assertFn) {
