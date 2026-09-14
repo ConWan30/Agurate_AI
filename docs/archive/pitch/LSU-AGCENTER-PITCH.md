@@ -230,7 +230,7 @@ flowchart TD
 ### Why Gemini 2.5 Flash?
 - ✅ **Multimodal**: Analyzes images + text + structured data
 - ✅ **Fast**: Sub-2-second response times for farmer usability
-- ✅ **Accurate**: 95%+ accuracy on crop disease identification (pilot data)
+- ✅ **Accurate**: Pilot disease-ID accuracy is provisional and not a published validated rate
 - ✅ **Cost-effective**: $0.10 per 1000 requests vs. $1.20 for competitors
 - ✅ **Scalable**: Handles 10,000+ concurrent farmers without degradation
 
@@ -360,7 +360,7 @@ Your knowledge is based on:
 ### Model 1: White-Label Licensing (Recommended)
 **Structure**:
 - LSU AgCenter licenses AgurateAI as **"LSU Precision Ag Platform"**
-- Branded as official LSU AgCenter tool
+- Could be co-branded only with explicit LSU AgCenter agreement — currently independent
 - AgurateAI handles technology, LSU provides research/credibility
 
 **Revenue**:
@@ -614,7 +614,7 @@ Your knowledge is based on:
 | Feature | AgurateAI + LSU | John Deere Operations Center | Climate FieldView |
 |---------|-----------------|------------------------------|-------------------|
 | **AI Crop Analysis** | ✅ Yes (Gemini 2.5 Flash) | ❌ No (manual logging) | ⚠️ Limited (NDVI only) |
-| **LSU-Validated Recommendations** | ✅ Yes | ❌ No (generic) | ❌ No |
+| **LSU-research-framed recommendations (not official validation)** | ✅ Public research framing | ❌ No (generic) | ❌ No |
 | **Insurance Claim Automation** | ✅ Yes | ❌ No | ❌ No |
 | **Cooperative Intelligence** | ✅ Yes | ❌ No | ⚠️ Limited |
 | **Cost for Farmers** | ✅ $20-50/month | ❌ $1,500+/year | ❌ $800+/year |

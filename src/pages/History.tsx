@@ -469,7 +469,9 @@ export default function History() {
                       <ActionCenter
                         recommendations={selectedAssessment.recommendations.map(rec => ({
                           ...rec,
-                          reasoning: rec.category ? `${rec.category.replace(/_/g, " ")} recommendation based on field analysis` : undefined
+                          reasoning: typeof rec.reasoning === 'string' && rec.reasoning.trim()
+                            ? rec.reasoning
+                            : undefined
                         }))}
                         fieldId={selectedAssessment.field.id}
                         fieldName={selectedAssessment.field.name}

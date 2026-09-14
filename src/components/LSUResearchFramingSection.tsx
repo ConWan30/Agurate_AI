@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { GraduationCap, BookOpen, Users, ExternalLink, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export function LSUPartnershipSection() {
+export function LSUResearchFramingSection() {
   return (
     <section className="py-24 bg-gradient-to-br from-primary/5 via-background to-primary/10 relative overflow-hidden">
       {/* Decorative elements */}
@@ -28,7 +28,7 @@ export function LSUPartnershipSection() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-12">
-          {/* Main Partnership Card */}
+          {/* Main research-framing card */}
           <Card className="border-2 hover:border-primary transition-all hover-lift md:col-span-2">
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-center">

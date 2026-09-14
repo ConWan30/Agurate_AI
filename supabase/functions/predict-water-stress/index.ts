@@ -120,18 +120,34 @@ Return JSON with daily predictions and DIRT recommendation.`;
       throw new Error('Water-stress prediction omitted stress_score');
     }
 
+    const stressScore = Number(predictionData.stress_score);
+    if (!Number.isFinite(stressScore) || stressScore < 0 || stressScore > 1) {
+      throw new Error('Water-stress prediction stress_score must be a finite 0–1 value');
+    }
+    const confidence = Number(predictionData.confidence);
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+      throw new Error('Water-stress prediction confidence must be a finite 0–1 value');
+    }
+    const allowedSeverities = new Set(['none', 'mild', 'moderate', 'severe', 'critical', 'unknown']);
+    const severity = String(predictionData.severity ?? 'unknown');
+    if (!allowedSeverities.has(severity)) {
+      throw new Error('Water-stress prediction severity is invalid — refusing to invent severity');
+    }
+
     // Save to database (use regular client, RLS allows user to insert their own data)
     const { data, error } = await supabase
       .from('water_stress_events')
       .insert({
         field_id: fieldId,
         assessment_id: assessmentId,
-        stress_score: predictionData.stress_score,
-        severity: predictionData.severity,
-        confidence: predictionData.confidence,
+        stress_score: stressScore,
+        severity,
+        confidence,
         weather_context: weatherData,
-        symptoms_detected: predictionData.symptoms_detected,
-        dirt_recommendation: predictionData.dirt_recommendation,
+        symptoms_detected: Array.isArray(predictionData.symptoms_detected)
+          ? predictionData.symptoms_detected
+          : [],
+        dirt_recommendation: predictionData.dirt_recommendation ?? null,
       })
       .select()
       .single();

@@ -196,7 +196,7 @@ export default function Insurance() {
                 Insurance Claims
               </h1>
               <p className="text-white/90 text-base md:text-lg">
-                Document crop damage for insurance providers with AI-verified evidence
+                Document crop damage for insurance providers with AI-assisted, timestamped field notes — not insurer verification
               </p>
             </div>
             <Dialog open={conversationalOpen} onOpenChange={setConversationalOpen}>

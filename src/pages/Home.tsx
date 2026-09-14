@@ -35,7 +35,7 @@ import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { TrustIndicators } from "@/components/TrustIndicators";
-import { LSUPartnershipSection } from "@/components/LSUPartnershipSection";
+import { LSUResearchFramingSection } from "@/components/LSUResearchFramingSection";
 import { ComparisonSection } from "@/components/ComparisonSection";
 
 export default function Home() {
@@ -508,7 +508,7 @@ export default function Home() {
       </section>
 
       {/* LSU Partnership Section */}
-      <LSUPartnershipSection />
+      <LSUResearchFramingSection />
 
       {/* Comparison Section */}
       <ComparisonSection />

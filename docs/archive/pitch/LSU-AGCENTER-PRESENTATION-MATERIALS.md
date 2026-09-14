@@ -936,7 +936,7 @@ Research validation partnership to test AgurateAI platform with 50 Morehouse Par
 
 **Pilot Success Criteria:**
 - **Activation:** 80%+ farmer activation (signup → first assessment within 7 days)
-- **Accuracy:** 95%+ AI accuracy (validated against pathologist diagnoses)
+- **Accuracy:** Pilot accuracy is provisional — not a published pathologist-validated rate
 - **Satisfaction:** 60%+ farmer satisfaction (4+ stars in feedback survey)
 - **Adoption:** 70%+ feature adoption (core features used by majority)
 - **Engagement:** 50%+ farmers upload 3+ assessments during pilot

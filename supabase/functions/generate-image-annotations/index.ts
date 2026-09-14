@@ -157,7 +157,10 @@ Return ONLY valid JSON array, no markdown, no code blocks. Example format:
         height: ann.height ? Math.max(1, Math.min(50, ann.height)) : undefined,
         label: ann.label,
         color: ann.color,
-        severity: ann.severity || 'info',
+        ...(typeof ann.severity === 'string' &&
+        ['critical', 'warning', 'info', 'success'].includes(ann.severity)
+          ? { severity: ann.severity as Annotation['severity'] }
+          : {}),
       }));
 
     return new Response(

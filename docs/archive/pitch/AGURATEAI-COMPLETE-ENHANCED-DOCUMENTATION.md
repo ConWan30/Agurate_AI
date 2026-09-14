@@ -3246,7 +3246,7 @@ Deno.serve(async (req) => {
 ### **Platform Performance Metrics:**
 
 #### **AI Analysis Accuracy:**
-- **Target:** 95%+ (validated against LSU plant pathologists)
+- **Target:** Improve pilot accuracy with expert review — not a published LSU-validated rate
 - **Measurement:** Comparison of AI diagnoses vs. expert diagnoses
 - **Collection:** Validation studies with LSU pathologists
 - **Reporting:** Quarterly accuracy audits

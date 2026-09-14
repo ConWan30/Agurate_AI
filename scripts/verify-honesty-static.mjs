@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
-const SCAN_DIRS = ['src', 'index.html', 'public', 'supabase/functions'];
+const SCAN_DIRS = ['src', 'index.html', 'public', 'supabase/functions', 'docs'];
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.html', '.md', '.json']);
 
 const FORBIDDEN = [
@@ -117,6 +117,7 @@ function walk(entry, files = []) {
       name === 'dist' ||
       name === '__tests__' ||
       name === 'e2e' ||
+      name === 'archive' ||
       name.startsWith('.')
     ) {
       continue;

@@ -31,7 +31,7 @@ Last updated: 2026-09-14
 - [x] Open RLS "System can INSERT/UPDATE true" policies replaced with ownership-scoped writes
 - [x] Remaining edge functions use shared `requireAuthenticatedUser` (no bare npm supabase import)
 - [x] CI Deno `check:edge` for `supabase/functions/*/index.ts`
-- [x] Beta pricing shown as discount-off-published-rate (no hardcoded $39.50 / $49)
+- [x] Beta pricing shown as discount-off-published-rate (no hardcoded dollar list prices)
 - [x] critical_alerts Jan/Nov schema reconcile migration + owned acknowledge RPC
 - [x] weather_events insert types mapped to CHECK-allowed values
 - [x] get_conversation_memory ownership check + usable cross-conversation signature
@@ -57,7 +57,7 @@ Last updated: 2026-09-14
 - [x] Demo fields UNIQUE(user_id,name) + durable beta-signup IP rate limits
 - [x] Soften DIRT “direct integration” / Instant analysis / hard 100-spot claims
 - [x] Daily briefing + predictive questions use canonical 0–100 health scores
-- [x] Soften 24/7 advisor / real-time AR overlay claims
+- [x] Soften always-on advisor / real-time AR overlay claims
 - [x] beta-signup skips field create for "multiple" crop
 - [x] Catalog SELECT policies authenticated-only (`20260914130000`)
 - [x] Demo mock assessments use 0–100 scores + symptoms arrays

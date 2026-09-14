@@ -87,22 +87,52 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
                 <Sprout className="h-4 w-4 text-muted-foreground" />
-                <span>Soil Health Improvement</span>
+                <span>Soil Health Planning Index</span>
               </div>
-              <span className="font-medium">{(prediction.soil_health_improvement * 100).toFixed(0)}%</span>
+              <span className="font-medium">
+                {Number.isFinite(Number(prediction.soil_health_improvement)) &&
+                Number(prediction.soil_health_improvement) >= 0 &&
+                Number(prediction.soil_health_improvement) <= 1
+                  ? `${(Number(prediction.soil_health_improvement) * 100).toFixed(0)}%`
+                  : '—'}
+              </span>
             </div>
-            <Progress value={prediction.soil_health_improvement * 100} className="h-2" />
+            <Progress
+              value={
+                Number.isFinite(Number(prediction.soil_health_improvement)) &&
+                Number(prediction.soil_health_improvement) >= 0 &&
+                Number(prediction.soil_health_improvement) <= 1
+                  ? Number(prediction.soil_health_improvement) * 100
+                  : 0
+              }
+              className="h-2"
+            />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
                 <CloudSun className="h-4 w-4 text-muted-foreground" />
-                <span>Climate Benefit Factor</span>
+                <span>Climate Benefit Planning Index</span>
               </div>
-              <span className="font-medium">{(prediction.climate_factor * 100).toFixed(0)}%</span>
+              <span className="font-medium">
+                {Number.isFinite(Number(prediction.climate_factor)) &&
+                Number(prediction.climate_factor) >= 0 &&
+                Number(prediction.climate_factor) <= 1
+                  ? `${(Number(prediction.climate_factor) * 100).toFixed(0)}%`
+                  : '—'}
+              </span>
             </div>
-            <Progress value={prediction.climate_factor * 100} className="h-2" />
+            <Progress
+              value={
+                Number.isFinite(Number(prediction.climate_factor)) &&
+                Number(prediction.climate_factor) >= 0 &&
+                Number(prediction.climate_factor) <= 1
+                  ? Number(prediction.climate_factor) * 100
+                  : 0
+              }
+              className="h-2"
+            />
           </div>
         </div>
 

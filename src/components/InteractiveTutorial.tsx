@@ -291,19 +291,19 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               </div>
 
               <div className="bg-primary/10 p-3 rounded-lg">
-                <p className="text-sm font-medium mb-2">Delta AI (research-framed):</p>
+                <p className="text-sm font-medium mb-2">Delta AI (illustrative demo reply):</p>
                 <p className="text-sm text-muted-foreground">
-                  "Based on publicly available LSU AgCenter research for Morehouse Parish soybeans:
+                  "For soybeans heading into a forecast heat stretch in the Delta, publicly available LSU AgCenter nutrient guidance often discusses potassium management. In the live product, any rates or timing should come from your recorded soil tests and local AgCenter guidance — this demo does not invent a prescription.
                 </p>
                 <ul className="text-sm text-muted-foreground mt-2 space-y-1 ml-4">
-                  <li>• Apply 60-80 lbs K₂O/acre via foliar spray</li>
-                  <li>• Apply by Friday (before heat stress)</li>
-                  <li>• Early morning application (before 10 AM)</li>
-                  <li>• Expected recovery: 5-7 days</li>
-                  <li>• Helps reduce heat-stress yield risk</li>
+                  <li>• Review your latest soil-test K notes (farmer-recorded)</li>
+                  <li>• Check the heat-wave window in your weather forecast</li>
+                  <li>• Prefer cooler application windows when treating</li>
+                  <li>• Re-assess after stress passes — recovery timing varies</li>
+                  <li>• Ask your parish agent before changing rates</li>
                 </ul>
                 <p className="text-xs text-muted-foreground mt-3 italic">
-                  Source framing: LSU AgCenter soybean nutrient / potassium guidance (public research). Decision aid only — not an official LSU validation.
+                  Illustrative decision-aid demo only — not an LSU prescription or measured outcome.
                 </p>
               </div>
             </div>
@@ -506,8 +506,8 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             <CardContent className="p-4">
               <p className="font-semibold mb-2 text-sm">🚨 Early Outbreak Alert:</p>
               <p className="text-xs text-muted-foreground">
-                "3 farms within 10 miles detected <span className="font-bold text-destructive">rice blast fungus</span>. 
-                Check your fields immediately. LSU recommends preventative fungicide application."
+                "3 farms within 10 miles reported possible <span className="font-bold text-destructive">rice blast</span> symptoms.
+                Check your fields soon. Public LSU AgCenter disease guides discuss preventative options — confirm with your parish agent before treating."
               </p>
               <Badge className="mt-2 text-xs">Helped James act before stress worsened</Badge>
             </CardContent>

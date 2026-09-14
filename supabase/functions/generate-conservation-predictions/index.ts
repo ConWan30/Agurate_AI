@@ -197,6 +197,15 @@ Return JSON with: current_impact, predicted_impact_1_year, predicted_impact_5_ye
       predictionData[field] = value;
     }
 
+    const ratioFields = ['climate_factor', 'soil_health_improvement'] as const;
+    for (const field of ratioFields) {
+      const value = Number(predictionData[field]);
+      if (!Number.isFinite(value) || value < 0 || value > 1) {
+        throw new Error(`Conservation prediction ${field} must be a finite 0–1 planning factor`);
+      }
+      predictionData[field] = value;
+    }
+
     // Save to database (use regular client, RLS allows user to insert their own data)
     const { data, error } = await supabase
       .from('conservation_predictions')

@@ -408,7 +408,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Insurance Claims</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    AI-verified documentation
+                    AI-assisted field documentation
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>

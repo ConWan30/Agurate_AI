@@ -1678,7 +1678,7 @@ Anything else you'd like to know?"
 5. **Document Upload** (#3): Integrates LSU soil test reports, variety guides
 
 **Partnership Pitch Value:**
-> "Delta Intelligence is a 24/7 extension agent powered by LSU AgCenter research, 
+> "Delta Intelligence is an on-demand decision aid framed around publicly available LSU AgCenter research, 
   with automatic escalation to human experts for complex cases. It doesn't replace 
   extension agents—it multiplies their reach 100x."
 

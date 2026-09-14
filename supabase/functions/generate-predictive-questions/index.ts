@@ -125,64 +125,29 @@ serve(async (req) => {
     const aiData = await aiResponse.json();
     const aiContent = aiData.choices?.[0]?.message?.content || '[]';
 
-    // Parse AI response (might be JSON or text)
+    // Parse AI response — fail closed on unparseable invent
     let questions: string[] = [];
     try {
-      // Try to parse as JSON first
       const parsed = JSON.parse(aiContent);
       if (Array.isArray(parsed)) {
-        questions = parsed;
-      } else if (typeof parsed === 'string') {
-        // Sometimes AI returns a single string, try to split it
-        questions = [parsed];
+        questions = parsed
+          .filter((q: unknown): q is string => typeof q === 'string')
+          .map((q: string) => q.trim())
+          .filter((q: string) => q.length > 10 && q.length < 100)
+          .slice(0, maxQuestions);
       }
     } catch {
-      // If not JSON, try to extract questions from text
-      const lines = aiContent.split('\n').filter((line: string) => line.trim());
-      questions = lines
-        .map((line: string) => {
-          // Remove numbering, quotes, etc.
-          return line
-            .replace(/^\d+\.\s*/, '')
-            .replace(/^[-*]\s*/, '')
-            .replace(/^["']|["']$/g, '')
-            .trim();
-        })
-        .filter((q: string) => q.length > 10 && q.length < 100)
-        .slice(0, maxQuestions);
+      throw new Error('Predictive questions AI returned unparseable JSON — refusing to invent questions');
     }
 
-    // Fallback questions — never invent stress narratives from a missing health score
-    if (questions.length === 0 || questions.some((q: string) => q.length < 10)) {
+    // Generic fallbacks only — never invent stress narratives from health bands
+    if (questions.length === 0) {
       const cropType = fieldContext?.cropType || 'crops';
-      if (!hasHealthScore(fieldContext?.healthScore)) {
-        questions = [
-          `What should I check in my ${cropType} this week?`,
-          'Any weather concerns I should plan around?',
-          'When should I take my next field assessment?',
-        ];
-      } else {
-        const healthScore = toHealthPercent(fieldContext.healthScore);
-        if (healthScore < 70) {
-          questions = [
-            `What's causing the stress in my ${cropType}?`,
-            'Should I treat immediately or wait?',
-            'How much will treatment cost vs. potential loss?',
-          ];
-        } else if (healthScore < 85) {
-          questions = [
-            `Is my ${cropType} recovery on track?`,
-            'Do I need additional monitoring?',
-            'What preventive measures should I take?',
-          ];
-        } else {
-          questions = [
-            `What should I monitor in my ${cropType} this week?`,
-            'Any upcoming weather concerns?',
-            'Best practices for maintaining health?',
-          ];
-        }
-      }
+      questions = [
+        `What should I check in my ${cropType} this week?`,
+        'Any weather concerns I should plan around?',
+        'When should I take my next field assessment?',
+      ].slice(0, maxQuestions);
     }
 
     return new Response(

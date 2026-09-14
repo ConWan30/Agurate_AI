@@ -65,6 +65,6 @@ Earlier “edit Edge Functions in the Supabase Dashboard” and placeholder
 citation checklist items are superseded by repo migrations + edge function
 source under `supabase/functions/`. Prefer git + CI over dashboard edits.
 
-- [x] Soften 24/7 advisor / real-time AR overlay claims
+- [x] Soften always-on advisor / real-time AR overlay claims
 - [x] beta-signup skips field create for "multiple" crop
 - [x] Catalog SELECT policies authenticated-only (`20260914130000`)

@@ -2434,7 +2434,7 @@ if (symptoms.includes('yellowing') && soilType === 'claypan') {
 
 **Structure:**
 - LSU AgCenter licenses AgurateAI as **"LSU Precision Ag Platform"**
-- Branded as official LSU AgCenter tool
+- Could be co-branded only with explicit LSU AgCenter agreement — currently independent
 - AgurateAI handles technology, LSU provides research/credibility
 
 **Revenue Split:**
