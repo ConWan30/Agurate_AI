@@ -102,7 +102,7 @@ serve(async (req) => {
 
 Field Data:
 - Crop: ${cropType}
-- Acreage: ${field?.acreage ?? 'not recorded'}
+- Acreage: ${field?.acreage != null && Number.isFinite(Number(field.acreage)) ? field.acreage : 'not recorded'}
 - Scored Assessments (health only when recorded): ${JSON.stringify(scoredAssessments)}
 - Weather Forecast: not provided (do not invent weather conditions)
 
