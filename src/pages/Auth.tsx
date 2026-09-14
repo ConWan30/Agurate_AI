@@ -146,7 +146,7 @@ export default function Auth() {
       });
       navigate("/dashboard");
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create account';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in';
       toast({
         title: "Error",
         description: errorMessage,
@@ -482,10 +482,15 @@ export default function Auth() {
                         className="h-11 border-2 focus:border-primary transition-colors"
                         required
                         minLength={8}
+                        autoComplete="new-password"
                       />
-                      <p className="text-xs text-muted-foreground">
-                        At least 8 characters with a letter and a number
-                      </p>
+                      {errors.password ? (
+                        <p className="text-sm text-destructive mt-1">{errors.password}</p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          At least 8 characters with a letter and a number
+                        </p>
+                      )}
                     </div>
 
                     {/* Trust indicators */}

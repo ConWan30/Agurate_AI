@@ -14,13 +14,13 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: 'prompt',
-      injectRegister: null,
-      includeAssets: ['favicon.ico', 'robots.txt', 'src/assets/*.png', 'src/assets/*.jpg'],
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      includeAssets: ['favicon.ico', 'robots.txt', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'AgurateAI - Crop Health Monitoring',
         short_name: 'AgurateAI',
-        description: 'AI-powered crop health monitoring for Louisiana Delta agriculture',
+        description: 'Closed-beta AI crop health monitoring for Louisiana Delta agriculture',
         theme_color: '#16a34a',
         background_color: '#ffffff',
         display: 'standalone',
@@ -32,13 +32,25 @@ export default defineConfig(({ mode }) => ({
             src: '/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: '/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable'
           },
           {
             src: '/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ],
         categories: ['agriculture', 'productivity', 'business'],

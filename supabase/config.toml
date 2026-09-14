@@ -4,7 +4,7 @@ project_id = "rkfvefhjyuyhjmcljzev"
 verify_jwt = true
 
 [functions.setup-demo-account]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ar-analyze]
 verify_jwt = true
@@ -39,8 +39,8 @@ verify_jwt = true
 [functions.conversational-form]
 verify_jwt = true
 
-# These functions verify the user token themselves, so the gateway-level JWT
-# check is disabled to let CORS preflight (OPTIONS) requests through.
+# Gateway JWT stays off so OPTIONS preflight works; these functions must
+# call requireAuthenticatedUser themselves.
 [functions.get-market-prices]
 verify_jwt = false
 
@@ -49,3 +49,18 @@ verify_jwt = false
 
 [functions.generate-predictive-questions]
 verify_jwt = false
+
+[functions.beta-signup]
+verify_jwt = false
+
+[functions.compare-images]
+verify_jwt = true
+
+[functions.detect-critical-alerts]
+verify_jwt = true
+
+[functions.generate-image-annotations]
+verify_jwt = true
+
+[functions.get-usage-stats]
+verify_jwt = true

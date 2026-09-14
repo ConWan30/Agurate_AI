@@ -51,15 +51,7 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Defer service worker registration for better LCP -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/registerSW.js');
-        });
-      }
-    </script>
+    <!-- Service worker is injected by vite-plugin-pwa (injectRegister: auto) -->
     
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
@@ -82,7 +74,7 @@
         "GPS-Tagged Field Assessments",
         "LSU AgCenter research framing (not official partnership)"
       ],
-      "screenshot": "https://agurateai.lovable.app/screenshot.png"
+      "screenshot": "https://agurateai.lovable.app/screenshot-mobile.png"
     }
     </script>
   </body>

@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireSetupSecret } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-demo-setup-secret',
 };
 
 serve(async (req) => {
@@ -12,7 +13,12 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🌾 Starting demo account setup...');
+    const secretCheck = requireSetupSecret(req, corsHeaders);
+    if (secretCheck !== true) {
+      return secretCheck;
+    }
+
+    console.log('Starting demo account setup...');
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

@@ -42,7 +42,7 @@ export default function HowItWorks() {
     {
       icon: TrendingUp,
       title: 'Unified Recommendations',
-      description: 'AI synthesizes all parallel analyses into prioritized actions, matching you with LSU researchers if needed, and updating predictive forecasts',
+      description: 'AI synthesizes all parallel analyses into prioritized actions, surfaces the public LSU researcher directory when useful, and updates predictive forecasts',
       tech: 'Multi-Source Recommendation Engine',
       color: 'bg-orange-500/10 text-orange-700 border-orange-500/20'
     },

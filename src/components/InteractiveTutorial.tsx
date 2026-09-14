@@ -77,7 +77,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <Scan className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
               <p className="text-sm font-semibold mb-1">AI Scanner</p>
-              <p className="text-xs text-muted-foreground">Instant crop health diagnosis</p>
+              <p className="text-xs text-muted-foreground">Fast phone-camera crop health read</p>
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <TrendingUp className="h-8 w-8 text-secondary mb-2 group-hover:scale-110 transition-transform" />
@@ -400,7 +400,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <CardContent className="p-4">
                 <p className="font-semibold mb-1">📱 For Farmers</p>
                 <p className="text-sm text-muted-foreground">
-                  Instant expertise • Proactive decisions • Faster insurance payouts
+                  Research-framed guidance • Proactive decisions • Clearer insurance documentation
                 </p>
               </CardContent>
             </Card>
@@ -418,7 +418,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <CardContent className="p-4">
                 <p className="font-semibold mb-1">🌾 For Louisiana</p>
                 <p className="text-sm text-muted-foreground">
-                  Higher yields • Less crop loss • Leading precision ag innovation
+                  Decision support for Delta conditions • Documented field history
                 </p>
               </CardContent>
             </Card>
@@ -510,7 +510,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                 "3 farms within 10 miles detected <span className="font-bold text-destructive">rice blast fungus</span>. 
                 Check your fields immediately. LSU recommends preventative fungicide application."
               </p>
-              <Badge className="mt-2 text-xs">Saved James from 40% yield loss</Badge>
+              <Badge className="mt-2 text-xs">Helped James act before stress worsened</Badge>
             </CardContent>
           </Card>
         </div>

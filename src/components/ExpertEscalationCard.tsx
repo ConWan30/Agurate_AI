@@ -135,7 +135,7 @@ export function ExpertEscalationCard({
           Expert Consultation Available
         </CardTitle>
         <CardDescription>
-          Connect with LSU AgCenter researchers for complex cases
+          Save a consultation note and use public LSU AgCenter channels for complex cases
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -163,7 +163,7 @@ export function ExpertEscalationCard({
                 <CheckCircle2 className="h-4 w-4 text-success" />
                 <AlertTitle>Consultation Requested</AlertTitle>
                 <AlertDescription>
-                  Your request has been sent to {researcher.name}. You will receive a notification when they respond.
+                  Your consultation note was saved locally in AgurateAI. Contact {researcher.name} through official LSU AgCenter channels — we do not broker introductions.
                 </AlertDescription>
               </Alert>
             ) : (

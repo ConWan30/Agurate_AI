@@ -4,5 +4,7 @@
 - [x] Verify preview and security hardening (view SECURITY INVOKER migration; build + public-page honesty checks)
 - [x] Fix PeerComparison RPC/UI mismatch and expand Phase 4 unit coverage
 - [x] Add production fail-safes (env validation, ErrorBoundary, auth password rules, CI, SEO/security headers)
+- [x] Remove tracked secrets/artifacts; lock down demo setup + market/weather/AR edge auth
+- [x] Harden beta signup + daily briefing/predictive questions auth; gate demo routes; honesty CI
 - [ ] Apply Supabase migrations + enable leaked-password protection
 - [ ] Publish updated app (Lovable / production deploy)

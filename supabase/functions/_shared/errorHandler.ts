@@ -35,6 +35,12 @@ export function handleAuthError(corsHeaders: Record<string, string>): Response {
   );
 }
 
+/** Default permissive CORS for edge functions (override per-function when locking origins). */
+export const corsHeaders: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-demo-setup-secret',
+};
+
 export function handleForbiddenError(corsHeaders: Record<string, string>): Response {
   return new Response(
     JSON.stringify({ error: 'Access denied' }),
@@ -78,3 +84,10 @@ export function addRateLimitHeaders(
     'X-RateLimit-Reset': resetTime.toString()
   };
 }
+
+/** Shared default CORS headers for edge functions that import from this module. */
+export const corsHeaders: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type, x-demo-setup-secret',
+};

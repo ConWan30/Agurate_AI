@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.178.0/http/server.ts';
-import { handleAuthError, handleError } from '../_shared/errorHandler.ts';
+import { handleError } from '../_shared/errorHandler.ts';
+import { requireAuthenticatedUser } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,38 +15,43 @@ interface MarketPrice {
   unit: string;
   source: string;
   last_updated: string;
+  disclaimer: string;
 }
 
-// Mock market prices (in production, integrate with USDA/CBOT API)
-const MOCK_MARKET_PRICES: Record<string, MarketPrice> = {
+// Placeholder estimates only — not a live USDA/CBOT feed.
+const ESTIMATED_MARKET_PRICES: Record<string, MarketPrice> = {
   rice: {
     commodity: 'Rice',
     price_per_bushel: 14.50,
     unit: 'bushel',
-    source: 'USDA',
+    source: 'Estimated placeholder (not live USDA)',
     last_updated: new Date().toISOString(),
+    disclaimer: 'Illustrative estimate for closed-beta planning only. Not an official market quote.',
   },
   soybeans: {
     commodity: 'Soybeans',
     price_per_bushel: 12.80,
     unit: 'bushel',
-    source: 'USDA',
+    source: 'Estimated placeholder (not live USDA)',
     last_updated: new Date().toISOString(),
+    disclaimer: 'Illustrative estimate for closed-beta planning only. Not an official market quote.',
   },
   cotton: {
     commodity: 'Cotton',
     price_per_pound: 0.75,
-    price_per_bushel: 0, // Not applicable
+    price_per_bushel: 0,
     unit: 'pound',
-    source: 'USDA',
+    source: 'Estimated placeholder (not live USDA)',
     last_updated: new Date().toISOString(),
+    disclaimer: 'Illustrative estimate for closed-beta planning only. Not an official market quote.',
   },
   corn: {
     commodity: 'Corn',
     price_per_bushel: 5.20,
     unit: 'bushel',
-    source: 'USDA',
+    source: 'Estimated placeholder (not live USDA)',
     last_updated: new Date().toISOString(),
+    disclaimer: 'Illustrative estimate for closed-beta planning only. Not an official market quote.',
   },
 };
 
@@ -55,9 +61,9 @@ serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      return handleAuthError(corsHeaders);
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) {
+      return auth;
     }
 
     const url = new URL(req.url);
@@ -70,7 +76,6 @@ serve(async (req) => {
       );
     }
 
-    // Map crop types to commodities
     const cropToCommodity: Record<string, string> = {
       rice: 'rice',
       soybean: 'soybeans',
@@ -80,13 +85,13 @@ serve(async (req) => {
     };
 
     const commodity = cropToCommodity[cropType] || cropType;
-    const price = MOCK_MARKET_PRICES[commodity];
+    const price = ESTIMATED_MARKET_PRICES[commodity];
 
     if (!price) {
       return new Response(
-        JSON.stringify({ 
-          error: `No market price data available for ${cropType}`,
-          available_crops: Object.keys(MOCK_MARKET_PRICES),
+        JSON.stringify({
+          error: `No market price estimate available for ${cropType}`,
+          available_crops: Object.keys(ESTIMATED_MARKET_PRICES),
         }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -103,4 +108,3 @@ serve(async (req) => {
     return handleError(error, 'get-market-prices', corsHeaders);
   }
 });
-

@@ -1,7 +1,6 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { requireAuthenticatedUser, getServiceClient } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,6 +29,11 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) {
+      return auth;
+    }
+
     // Validate input
     const body = weatherAlertsSchema.parse(await req.json());
     const { latitude, longitude } = body;
@@ -84,10 +88,8 @@ serve(async (req) => {
       alert.type === "excessive_rain"
     );
 
-    // Store alerts in Supabase for notification system
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Store alerts with service role only after the caller is authenticated
+    const supabase = getServiceClient();
 
     // Store weather events for historical tracking
     for (const alert of agAlerts) {

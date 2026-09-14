@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireAuthenticatedUser } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +12,11 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthenticatedUser(req, corsHeaders);
+    if (auth instanceof Response) {
+      return auth;
+    }
+
     const { imageData } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 

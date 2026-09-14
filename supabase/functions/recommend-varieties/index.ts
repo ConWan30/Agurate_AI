@@ -145,9 +145,9 @@ ${communityInsights.map(c => `- ${c.practice_name}: ${c.success_rate}% success, 
 Conservation Context:
 ${conservationData.length > 0 ? `Soil health trending ${conservationData[0].soil_health_improvement > 0.5 ? 'upward' : 'stable'}` : 'No conservation data'}
 
-LSU AgCenter Approved Varieties: ${lsuVarieties.join(', ')}
+LSU AgCenter published variety references: ${lsuVarieties.join(', ')}
 
-TASK: Recommend the BEST LSU variety for this specific field based on:
+TASK: Recommend the most suitable publicly listed LSU-related variety for this field based on:
 1. Historical health patterns
 2. Disease resistance needs
 3. Soil type compatibility
@@ -165,7 +165,7 @@ Return JSON with: recommended_variety, expected_improvement (decimal), risk_asse
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: 'You are a crop variety specialist with expertise in LSU AgCenter breeding programs.' },
+          { role: 'system', content: 'You are a crop variety decision-aid assistant. Cite publicly available LSU AgCenter variety guidance as context only — do not claim official approval or partnership.' },
           { role: 'user', content: aiPrompt }
         ],
         temperature: 0.3,
@@ -188,7 +188,7 @@ Return JSON with: recommended_variety, expected_improvement (decimal), risk_asse
         recommended_variety: lsuVarieties[0] || 'Contact LSU AgCenter',
         expected_improvement: 0.15,
         risk_assessment: 'low',
-        lsu_research_basis: ['LSU AgCenter Breeding Program 2024'],
+        lsu_research_basis: ['Publicly available LSU AgCenter variety guidance'],
       };
     }
 

@@ -1,73 +1,55 @@
-# Welcome to your Lovable project
+# AgurateAI
 
-## Project info
+Closed-beta crop health monitoring for Louisiana Delta farms.
 
-**URL**: https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f
+Guidance is framed around publicly available LSU AgCenter research. AgurateAI is **not** an official LSU partner and is **not** a scientifically validated diagnostic tool.
 
-## How can I edit this code?
+## Stack
 
-There are several ways of editing your application.
+- Vite + React + TypeScript + Tailwind + shadcn/ui
+- Supabase (Auth, Postgres/RLS, Edge Functions)
+- Playwright + Vitest
 
-**Use Lovable**
+## Local setup
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+cp .env.example .env
+# fill VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY
+npm install --legacy-peer-deps
+npm run dev   # serves on http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+## Quality gates
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run typecheck
+npm run test:ci
+npm run verify:honesty:static
+npm run build
+npm run test:e2e:honesty   # requires Playwright browsers; optional locally
+```
 
-**Use GitHub Codespaces**
+CI runs typecheck, unit tests, static honesty verify, and production build.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Production shipping
 
-## What technologies are used for this project?
+1. Apply pending Supabase migrations (including view `security_invoker`)
+2. Enable Supabase Auth **Leaked Password Protection**
+3. Deploy edge functions with current honesty/citation prompts
+4. Set `DEMO_SETUP_SECRET` before using `setup-demo-account` (disabled without it)
+5. Publish via Lovable **Share → Publish** (or your host)
+6. Smoke-test live `/`, `/beta-signup`, `/auth`, `/how-it-works`
 
-This project is built with:
+See `docs/PRODUCTION-SHIPPING-CHECKLIST.md` for the full gate list.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Security notes
 
-## How can I deploy this project?
+- `.env` is gitignored; use `.env.example` as the template
+- `setup-demo-account` requires `x-demo-setup-secret`
+- Market prices are labeled as estimates, not USDA live quotes
+- Edge functions that mutate data or call paid AI require authenticated users
+- `/demo/*` and `/integration-test` routes are development-only
 
-Simply open [Lovable](https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f) and click on Share -> Publish.
+## Project links
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Lovable project: https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f

@@ -1,11 +1,23 @@
 User-agent: *
 Allow: /
+Allow: /beta-signup
+Allow: /join-beta
+Allow: /auth
+Allow: /how-it-works
+Allow: /install
 Disallow: /dashboard
 Disallow: /fields
 Disallow: /history
 Disallow: /upload
 Disallow: /scanner
 Disallow: /profile
+Disallow: /predictions
+Disallow: /delta
+Disallow: /delta-intelligence
+Disallow: /analytics
+Disallow: /onboarding
+Disallow: /beta-metrics
+Disallow: /integration-test
 Disallow: /demo/
 
 Sitemap: https://agurateai.lovable.app/sitemap.xml

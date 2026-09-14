@@ -348,7 +348,7 @@ export default function DeltaIntelligence() {
               </div>
             </div>
             <p className="text-white/90 text-base leading-relaxed">
-              Get instant, Louisiana-specific farming advice powered by decades of LSU research and real Delta field data
+              Louisiana-specific farming guidance framed around publicly available LSU AgCenter research and Delta agronomy context
             </p>
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>

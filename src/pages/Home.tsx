@@ -61,7 +61,7 @@ export default function Home() {
     {
       icon: Scan,
       title: "AI Crop Scanner",
-      description: "Instant crop health analysis from any smartphone camera. Detect stress, disease, and nutrient deficiency signals from a phone photo in seconds.",
+      description: "Phone-camera crop health reads in seconds. Surfaces possible stress, disease, and nutrient signals as a decision aid.",
       color: "gradient-delta"
     },
     {
@@ -130,7 +130,7 @@ export default function Home() {
     "Variety recommendations for rice and soybeans",
     "GPS-tagged field mapping and health visualization",
     "Insurance claim automation with AI verification",
-    "Mobile-first design with offline capabilities"
+    "Mobile-first design with installable PWA support"
   ];
 
   const stats = [

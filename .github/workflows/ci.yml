@@ -17,11 +17,15 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
+      - name: Typecheck
+        run: npm run typecheck
       - name: Lint
         run: npm run lint
         continue-on-error: true
       - name: Unit tests
-        run: npm test -- --run
+        run: npm run test:ci
+      - name: Honesty copy (static)
+        run: npm run verify:honesty:static
       - name: Production build
         run: npm run build
         env:
