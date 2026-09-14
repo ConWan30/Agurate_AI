@@ -7,7 +7,9 @@ import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 const conservationSchema = z.object({
   fieldId: z.string().uuid(),
   practiceType: z.string().min(1).max(100),
+  /** @deprecated Ignored — history is loaded from owned assessments. */
   fieldHistory: z.any().optional(),
+  /** @deprecated Ignored — weather is loaded from weather_events, never client invent. */
   weatherForecast: z.any().optional()
 });
 
@@ -47,17 +49,24 @@ serve(async (req) => {
       });
     }
 
-    const { fieldId, practiceType, fieldHistory, weatherForecast } = validation.data;
+    // Client fieldHistory / weatherForecast intentionally ignored (schema accepts for back-compat).
+    const { fieldId, practiceType } = validation.data;
 
-    // Gather comprehensive field and community context
-    const [fieldData, fieldAssessments, communityPractices, weatherData] = await Promise.all([
-      supabase
-        .from('fields')
-        .select('*')
-        .eq('id', fieldId)
-        .single()
-        .then(res => res.data),
-      
+    // Ownership first — then load server-side history/weather only.
+    const { data: fieldData } = await supabase
+      .from('fields')
+      .select('*')
+      .eq('id', fieldId)
+      .maybeSingle();
+
+    if (!fieldData || fieldData.user_id !== user.id) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const [fieldAssessments, communityPractices, weatherData] = await Promise.all([
       supabase
         .from('assessments')
         .select('health_score, analyzed_at')
@@ -81,13 +90,6 @@ serve(async (req) => {
         .limit(10)
         .then(res => res.data || [])
     ]);
-
-    if (!fieldData || fieldData.user_id !== user.id) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {

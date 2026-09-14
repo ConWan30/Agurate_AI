@@ -9,6 +9,7 @@ const varietySchema = z.object({
   fieldId: z.string().uuid(),
   /** @deprecated Ignored when field crop_type is present — field crop is authoritative. */
   cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), cropEnum).optional(),
+  /** @deprecated Ignored — variety is loaded from owned field columns. */
   currentVariety: z.string().max(100).optional(),
   /** @deprecated Ignored — disease pressure is derived from owned assessments. */
   fieldHistory: z.any().optional(),
@@ -21,6 +22,25 @@ function normalizeCrop(raw: unknown): z.infer<typeof cropEnum> | null {
   const v = raw.toLowerCase() === 'soybeans' ? 'soybean' : raw.toLowerCase();
   const parsed = cropEnum.safeParse(v);
   return parsed.success ? parsed.data : null;
+}
+
+/** Bind current variety from owned field columns — never trust client invent. */
+function varietyFromField(
+  field: Record<string, unknown>,
+  crop: z.infer<typeof cropEnum>,
+): string | null {
+  const key =
+    crop === 'rice'
+      ? 'rice_variety'
+      : crop === 'soybean'
+        ? 'soybean_variety'
+        : crop === 'cotton'
+          ? 'cotton_variety'
+          : 'corn_hybrid';
+  const raw = field[key];
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  return trimmed.length > 0 ? trimmed.slice(0, 100) : null;
 }
 
 const LSU_VARIETIES = {
@@ -66,9 +86,9 @@ serve(async (req) => {
       });
     }
 
-    const { fieldId, currentVariety } = validation.data;
+    const { fieldId } = validation.data;
 
-    // Load owned field first — crop_type is authoritative (ignore client crop/disease invent).
+    // Load owned field first — crop_type + variety columns are authoritative (ignore client invent).
     const { data: fieldData, error: fieldError } = await supabase
       .from('fields')
       .select('*')
@@ -89,6 +109,8 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
+
+    const currentVariety = varietyFromField(fieldData as Record<string, unknown>, cropType);
 
     const [fieldAssessments, communityInsights, conservationData] = await Promise.all([
       supabase
@@ -143,7 +165,7 @@ Field Profile:
 - Crop: ${cropType}
 - Acreage: ${fieldData.acreage}
 - Soil Type: ${fieldData.soil_type}
-- Current Variety: ${currentVariety}
+- Current Variety: ${currentVariety ?? 'not recorded on field'}
 - Average Health Score: ${avgHealth == null ? "no scored assessments yet" : avgHealth.toFixed(1)}
 
 Historical Performance (Last 20 Assessments):
@@ -245,7 +267,7 @@ Return JSON with: recommended_variety, expected_improvement (decimal 0-1 or null
       .from('variety_recommendations')
       .insert({
         field_id: fieldId,
-        current_variety: currentVariety,
+        current_variety: currentVariety, // null when field has no variety column set
         recommended_variety: recommendationData.recommended_variety,
         expected_improvement: expectedImprovement,
         risk_assessment: riskAssessment,

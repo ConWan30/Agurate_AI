@@ -33,6 +33,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] Claim loss % CHECK + expert priority freeze + form completed@100% + field_uniformity CHECK (`20260914280000`)
 - [x] Yield/canopy CHECKs + feedback assessment RLS + insurance event_type allowlist + bug_report status freeze + acreage CHECK (`20260914290000`)
 - [x] Success-story / peer cost CHECKs + recommendation UPDATE freeze (`20260914300000`); predict-stress fail-closed + Predictions unknown risk honesty; local gates include honesty e2e
+- [x] Residual invent: recommend-varieties binds variety from field columns; conservation ignores client history/weather; predict-stress uses real water_stress_events + community_insights; unified vision fail-closes score validation before pool write
 
 ## Still open (platform / external)
 

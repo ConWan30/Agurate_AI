@@ -46,7 +46,13 @@ serve(async (req) => {
       return handleRateLimitError(corsHeaders);
     }
 
-    // Gather comprehensive context data
+    // Gather context from real tables only — never query invent / non-existent relations.
+    const { data: ownedFields } = await supabaseClient
+      .from('fields')
+      .select('id')
+      .eq('user_id', user.id);
+    const ownedFieldIds = (ownedFields || []).map((f: { id: string }) => f.id);
+
     const [assessments, weatherEvents, waterStress, communityInsights] = await Promise.all([
       supabaseClient
         .from('assessment_details')
@@ -63,23 +69,24 @@ serve(async (req) => {
         .limit(10)
         .then(res => res.data || []),
       
-      supabaseClient
-        .from('water_stress_intelligence')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('measurement_date', { ascending: false })
-        .limit(10)
-        .then(res => res.data || []),
+      ownedFieldIds.length > 0
+        ? supabaseClient
+            .from('water_stress_events')
+            .select('field_id, stress_score, severity, confidence, symptoms_detected, irrigation_applied, created_at')
+            .in('field_id', ownedFieldIds)
+            .order('created_at', { ascending: false })
+            .limit(10)
+            .then(res => res.data || [])
+        : Promise.resolve([] as Array<Record<string, unknown>>),
       
+      // Real community_insights rows only — omit savings / lsu_validation invent amplification.
       supabaseClient
-        .from('community_intelligence')
-        .select('*')
+        .from('community_insights')
+        .select('insight_type, practice, outcome, community_rating, created_at')
         .order('created_at', { ascending: false })
         .limit(5)
         .then(res => res.data || [])
     ]);
-
-    const assessError = !assessments;
 
     if (!assessments || assessments.length < 3) {
       return new Response(
@@ -109,16 +116,24 @@ serve(async (req) => {
     }));
 
     const waterStressSummary = waterStress.map(w => ({
-      date: w.measurement_date,
-      stress_index: w.stress_index,
-      soil_moisture: w.soil_moisture_percent,
-      irrigation_needed: w.irrigation_recommendation
+      field_id: w.field_id,
+      date: w.created_at,
+      stress_score: w.stress_score,
+      severity: w.severity,
+      confidence: w.confidence,
+      irrigation_applied: w.irrigation_applied,
+      symptoms: w.symptoms_detected,
     }));
 
     const communityPatterns = communityInsights.map(c => ({
-      pattern_type: c.pattern_type,
-      insight: c.insight_summary,
-      confidence: c.confidence_score
+      insight_type: c.insight_type,
+      practice: c.practice,
+      outcome: c.outcome,
+      // community_rating only when finite — never invent 0
+      rating:
+        c.community_rating != null && Number.isFinite(Number(c.community_rating))
+          ? Number(c.community_rating)
+          : null,
     }));
 
     // Generate predictions using Lovable AI
@@ -146,13 +161,14 @@ Current date: ${new Date().toISOString().split('T')[0]}
 
 UNIFIED INTELLIGENCE CONTEXT:
 - Historical crop health patterns from field assessments
-- Water stress intelligence and irrigation data
-- Community-wide patterns and early warnings
+- Recorded water stress events (when present)
+- Community-reported practices/outcomes (when present — not farm savings invent)
 - Regional weather event correlations
 - LSU AgCenter research-informed stress thresholds (public guidance; not an official validation)
 
 Analyze all available data streams to predict crop stress for the next ${days} days.
-Consider: heat stress (>90°F), water stress, disease patterns, Louisiana's climate, and community intelligence.
+Consider: heat stress (>90°F), water stress, disease patterns, Louisiana's climate, and community signals.
+If water stress or community context is empty, say so — do not invent metrics.
 Base predictions on LSU AgCenter research and historical Delta weather patterns.`
           },
           {
@@ -161,14 +177,14 @@ Base predictions on LSU AgCenter research and historical Delta weather patterns.
 
 Historical Assessments (Last 10): ${JSON.stringify(recentAssessments)}
 
-Water Stress Intelligence: ${JSON.stringify(waterStressSummary)}
+Water Stress Events: ${waterStressSummary.length > 0 ? JSON.stringify(waterStressSummary) : 'none recorded for owned fields'}
 
-Community Patterns: ${JSON.stringify(communityPatterns)}
+Community Insights: ${communityPatterns.length > 0 ? JSON.stringify(communityPatterns) : 'none recorded'}
 
 Recent Weather Events: ${JSON.stringify(weatherEvents || [])}
 
-TASK: Generate ${days}-day forecast predicting crop stress levels using ALL context sources. 
-Leverage community patterns for early warning signals and water stress data for irrigation timing.
+TASK: Generate ${days}-day forecast predicting crop stress levels using ONLY the context above.
+Do not invent missing water-stress or community metrics.
 Return JSON only with structured predictions.`
           }
         ],
