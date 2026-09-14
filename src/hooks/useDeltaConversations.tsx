@@ -108,15 +108,20 @@ export function useDeltaConversations() {
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data: savedUserMsg, error } = await supabase
           .from('delta_messages')
           .insert({ 
             conversation_id: conversationId, 
             role: 'user', 
             content,
             context_snapshot: contextSnapshot || {}
-          });
+          })
+          .select('id')
+          .maybeSingle();
         if (error) throw error;
+        if (!savedUserMsg) {
+          throw new Error('User message was not saved (insert returned no row or not permitted)');
+        }
       }
 
       await supabase
