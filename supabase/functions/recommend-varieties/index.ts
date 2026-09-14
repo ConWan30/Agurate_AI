@@ -163,8 +163,8 @@ UNIFIED INTELLIGENCE CONTEXT:
 
 Field Profile:
 - Crop: ${cropType}
-- Acreage: ${fieldData.acreage}
-- Soil Type: ${fieldData.soil_type}
+- Acreage: ${fieldData.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? fieldData.acreage : 'not recorded'}
+- Soil Type: ${fieldData.soil_type || 'not recorded'}
 - Current Variety: ${currentVariety ?? 'not recorded on field'}
 - Average Health Score: ${avgHealth == null ? "no scored assessments yet" : avgHealth.toFixed(1)}
 

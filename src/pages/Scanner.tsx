@@ -217,16 +217,15 @@ export default function Scanner() {
       const unifiedContext = await gatherUnifiedContext(selectedFieldId);
 
       // Call analyze-crop; edge persists scored assessment (clients cannot write health_score)
+      // Weather binds from owned field coords on the edge — send device GPS as photo metadata only.
       const { data: aiResult, error: aiError } = await supabase.functions.invoke('analyze-crop', {
         body: {
           imageUrl: signedImageUrl,
           cropType: selectedField.crop_type,
           fieldId: selectedFieldId,
-          latitude: gpsCoords?.lat ?? selectedField.location_lat ?? undefined,
-          longitude: gpsCoords?.lng ?? selectedField.location_lng ?? undefined,
           storagePath: fileName,
-          photoLocationLat: gpsCoords?.lat ?? selectedField.location_lat ?? undefined,
-          photoLocationLng: gpsCoords?.lng ?? selectedField.location_lng ?? undefined,
+          photoLocationLat: gpsCoords?.lat ?? undefined,
+          photoLocationLng: gpsCoords?.lng ?? undefined,
           gpsAccuracyMeters: gpsCoords?.accuracy,
           capturedOffline: !isOnline,
           unifiedContext,

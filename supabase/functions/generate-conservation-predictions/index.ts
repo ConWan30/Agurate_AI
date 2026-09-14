@@ -117,9 +117,9 @@ serve(async (req) => {
 UNIFIED INTELLIGENCE CONTEXT:
 
 Field Profile:
-- Crop: ${fieldData.crop_type}
-- Acreage: ${fieldData.acreage}
-- Soil Type: ${fieldData.soil_type}
+- Crop: ${fieldData.crop_type || 'not recorded'}
+- Acreage: ${fieldData.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? fieldData.acreage : 'not recorded'}
+- Soil Type: ${fieldData.soil_type || 'not recorded'}
 - Health Trend: ${healthTrendLabel}
 
 Conservation Practice: ${practiceType}

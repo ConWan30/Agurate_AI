@@ -70,7 +70,7 @@ const SYSTEM_PROMPT = (simplified: boolean = false) => simplified ? `You are Del
 
 Example of simple language:
 ❌ "Apply a systemic fungicide with azoxystrobin as the active ingredient at a rate of 6.2 fl oz per acre during the R3 growth stage."
-✅ "Use a fungicide spray. Put 6 ounces on each acre. Do this when your soybeans start making pods. This stops the disease from spreading."
+✅ "Use a fungicide labeled for this disease. Check the product label and LSU AgCenter guidance for the right rate for your crop — do not invent a farm-specific rate. Scout again after pods start forming."
 
 You have access to the user's field data and can help with their farming questions.` : `You are Delta Intelligence, an AI expert assistant specialized in Louisiana Delta agriculture. You have deep knowledge of:
 
@@ -216,9 +216,14 @@ serve(async (req) => {
         .limit(5);
 
       if (fields && fields.length > 0) {
-        contextPrompt += `\n\nUser's Current Fields:\n${fields.map((f: any) => 
-          `- ${f.name}: ${f.acreage} acres of ${f.crop_type}`
-        ).join('\n')}`;
+        contextPrompt += `\n\nUser's Current Fields:\n${fields.map((f: any) => {
+          const acres =
+            f.acreage != null && Number.isFinite(Number(f.acreage))
+              ? `${f.acreage} acres`
+              : 'acreage not recorded';
+          const crop = f.crop_type || 'crop not recorded';
+          return `- ${f.name}: ${acres} of ${crop}`;
+        }).join('\n')}`;
       }
 
       if (recentAssessments && recentAssessments.length > 0) {

@@ -153,8 +153,10 @@ serve(async (req) => {
     }
     
 
-    // When fieldId is present, field.crop_type is authoritative — never trust client crop invent.
+    // When fieldId is present, field.crop_type + field coords are authoritative — never trust client invent.
     let resolvedCropType = cropType ?? null;
+    let ownedFieldLat: number | null = null;
+    let ownedFieldLng: number | null = null;
     if (fieldId) {
       const { data: ownedField, error: cropFieldError } = await supabaseAuth
         .from('fields')
@@ -184,6 +186,12 @@ serve(async (req) => {
         });
       }
       resolvedCropType = fieldCrop as 'rice' | 'soybean' | 'cotton' | 'corn';
+      if (ownedField.location_lat != null && Number.isFinite(Number(ownedField.location_lat))) {
+        ownedFieldLat = Number(ownedField.location_lat);
+      }
+      if (ownedField.location_lng != null && Number.isFinite(Number(ownedField.location_lng))) {
+        ownedFieldLng = Number(ownedField.location_lng);
+      }
     }
     if (!resolvedCropType) {
       return new Response(JSON.stringify({ error: 'cropType is required when fieldId is not provided' }), {
@@ -300,20 +308,17 @@ Prefer the current media as ground truth. Use recorded history only when it clea
       console.log('Unified context gathered for field:', fieldId);
     }
 
-    // STEP 1: Fetch weather only for real field/photo coordinates — never invent parish defaults
+    // STEP 1: Fetch weather from owned field coords when fieldId is set — ignore client lat/lng invent.
+    // Client lat/lng may still be stored as photo_location_* metadata only.
     let weatherData = null;
-    let weatherLat: number | null = latitude ?? null;
-    let weatherLng: number | null = longitude ?? null;
-    if ((weatherLat == null || weatherLng == null) && fieldId) {
-      const { data: fieldCoords } = await supabaseAuth
-        .from('fields')
-        .select('location_lat, location_lng')
-        .eq('id', fieldId)
-        .maybeSingle();
-      if (fieldCoords?.location_lat != null && fieldCoords?.location_lng != null) {
-        weatherLat = Number(fieldCoords.location_lat);
-        weatherLng = Number(fieldCoords.location_lng);
-      }
+    let weatherLat: number | null = null;
+    let weatherLng: number | null = null;
+    if (fieldId) {
+      weatherLat = ownedFieldLat;
+      weatherLng = ownedFieldLng;
+    } else {
+      weatherLat = latitude ?? null;
+      weatherLng = longitude ?? null;
     }
     try {
       if (weatherLat != null && weatherLng != null) {
@@ -564,7 +569,7 @@ Respond with JSON:
 {
   \"recommendations\": [
     {
-      \"text\": \"<specific actionable recommendation with quantities/timing>\",
+      \"text\": \"<actionable recommendation citing public LSU ranges or asking for farmer-recorded rates — never invent farm-specific oz/acre or lbs/acre>\",
       \"priority\": \"urgent\" | \"normal\" | \"low\",
       \"category\": \"irrigation\" | \"fertilization\" | \"pest_management\" | \"weather_alert\" | \"general\",
       \"reasoning\": \"<why this action is needed based on symptoms and weather>\"
