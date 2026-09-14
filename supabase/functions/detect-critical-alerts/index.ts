@@ -115,12 +115,14 @@ serve(async (req) => {
       stressLevel: stress_level,
       diseaseSeverity:
         normalizedDiseases.reduce((max, d) => {
-          const severity = d.severity === 'severe' ? 3 : d.severity === 'moderate' ? 2 : 1;
+          const severity =
+            d.severity === 'severe' ? 3 : d.severity === 'moderate' ? 2 : d.severity === 'mild' || d.severity === 'low' ? 1 : 0;
           return Math.max(max, severity * d.confidence);
         }, 0),
       pestSeverity:
         normalizedPests.reduce((max, p) => {
-          const severity = p.severity === 'severe' ? 3 : p.severity === 'moderate' ? 2 : 1;
+          const severity =
+            p.severity === 'severe' ? 3 : p.severity === 'moderate' ? 2 : p.severity === 'mild' || p.severity === 'low' ? 1 : 0;
           return Math.max(max, severity * p.confidence);
         }, 0),
       yieldImpact: estimated_yield_impact_percent || 0,

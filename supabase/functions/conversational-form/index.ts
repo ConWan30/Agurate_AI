@@ -194,16 +194,16 @@ Your goal: Extract the following information through conversation:
 - Buffer strips (yes/no, width)
 - Precision fertilization (yes/no, technology used)
 
-Real-time Calculations:
-- Calculate nitrogen credit from cover crops (illustrative mid double-digit $/acre)
-- Estimate fuel savings from reduced tillage (illustrative low double-digit $/acre)
-- Calculate USDA Climate-Smart Agriculture Program eligibility
-- Reference LSU AgCenter research on practice effectiveness
+Honesty rules for cost figures:
+- Do NOT invent nitrogen-credit, fuel-savings, or other $/acre dollar amounts.
+- Set cost_savings_estimate to null unless the farmer explicitly stated a dollar figure in this conversation.
+- You may discuss directional benefits (soil health, input reduction) without fabricating currency.
+- Reference publicly available LSU AgCenter guidance as framing only — not measured farm savings.
 
 Educational Approach:
 - Explain benefits of each practice during conversation
-- Cite LSU research findings
-- Provide cost-benefit analysis in real-time
+- Cite public LSU research framing when relevant
+- Ask the farmer for their recorded costs if they want dollar planning
 - Guide on USDA documentation requirements
 
 CRITICAL JSON FORMAT REQUIREMENTS:
@@ -218,7 +218,7 @@ REQUIRED FORMAT:
   "completion_percentage": 50,
   "next_question": "Brief next question prompt",
   "suggestions": [...],
-  "cost_savings_estimate": 850
+  "cost_savings_estimate": null
 }`,
   
   'onboarding': `You are Delta Intelligence, welcoming a new Louisiana Delta farmer to AgurateAI!

@@ -4,7 +4,7 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| In-repo honesty, security, quality | **Complete** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`); local `npm run verify:local-gates` PASS; GitHub CI `build-and-test` PASS on tip |
+| In-repo honesty, security, quality | **Complete (tip)** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`); includes residual invent closures (conservation $, community savings, Home 24/7 split, variety %, null→0 health prompts, unknown alert severity, crop $/acre defaults). Re-confirm with `npm run verify:local-gates` + tip CI after each push. |
 | Apply Supabase migrations through tip | **Blocked** | Needs project DB credentials (`supabase db push` or Dashboard SQL) |
 | Auth Leaked Password Protection | **Blocked** | Needs Supabase Dashboard access |
 | Deploy edge functions | **Blocked** | Needs Supabase CLI linked project + secrets |

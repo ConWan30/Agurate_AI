@@ -85,7 +85,7 @@ export default function Home() {
     {
       icon: Leaf,
       title: "Conservation Tracking",
-      description: "Track sustainable practices with AI-powered cost-benefit analysis. Monitor cover crops, no-till, and precision fertilization impact.",
+      description: "Track sustainable practices with planning indexes and your recorded costs. Monitor cover crops, no-till, and precision fertilization notes.",
       color: "gradient-sky"
     },
     {
@@ -137,7 +137,7 @@ export default function Home() {
     { value: 7, label: "Day Stress Forecasts", suffix: "+", prefix: "" },
     { value: 4, label: "Delta Crops Supported", suffix: "", prefix: "" },
     { value: 100, label: "Beta Partner Spots", suffix: "", prefix: "" },
-    { value: 24, label: "AI Advisor Available", suffix: "/7", prefix: "" }
+    { value: 1, label: "On-Demand AI Advisor", suffix: "", prefix: "" }
   ];
 
   return (

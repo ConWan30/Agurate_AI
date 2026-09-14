@@ -42,22 +42,31 @@ export function VarietyRecommendationCard({ recommendation, onAdopt }: VarietyRe
           </div>
         </div>
 
-        <div className="flex items-center gap-4 p-3 rounded-lg bg-accent/10">
-          <TrendingUp className="h-8 w-8 text-accent" />
-          <div>
-            <div className="text-sm text-muted-foreground">Expected Improvement</div>
-            <div className="text-xl font-bold text-accent">
-              +{(recommendation.expected_improvement * 100).toFixed(0)}%
+        {recommendation.expected_improvement != null &&
+        Number.isFinite(Number(recommendation.expected_improvement)) ? (
+          <div className="flex items-center gap-4 p-3 rounded-lg bg-accent/10">
+            <TrendingUp className="h-8 w-8 text-accent" />
+            <div>
+              <div className="text-sm text-muted-foreground">Planning yield delta</div>
+              <div className="text-xl font-bold text-accent">
+                +{(Number(recommendation.expected_improvement) * 100).toFixed(0)}%
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Illustrative estimate from cited public trial ranges — not a measured farm outcome
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground">yield potential</div>
           </div>
-        </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            No cited yield-delta estimate — variety choice is framed by field conditions only.
+          </p>
+        )}
 
         {recommendation.lsu_research_basis && recommendation.lsu_research_basis.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Shield className="h-4 w-4 text-primary" />
-              <span>Research framing:</span>
+              <span>Public research framing:</span>
             </div>
             <ul className="space-y-1 pl-6">
               {recommendation.lsu_research_basis.map((citation, idx) => (
@@ -77,7 +86,7 @@ export function VarietyRecommendationCard({ recommendation, onAdopt }: VarietyRe
         </Button>
 
         <p className="text-xs text-muted-foreground text-center">
-          * Recommendation based on field conditions and LSU AgCenter breeding research
+          * Decision aid only — cites public LSU AgCenter variety guidance; not an official endorsement.
         </p>
       </CardContent>
     </Card>

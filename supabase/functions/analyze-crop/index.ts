@@ -38,11 +38,20 @@ function toHealthPercent(score: number | null | undefined): number {
   return Math.min(100, Math.round(n * 10) / 10);
 }
 
+function hasHealthScore(score: unknown): score is number {
+  return score != null && !Number.isNaN(Number(score));
+}
+
 function requireHealthScore(score: unknown, label = 'health_score'): number {
-  if (score == null || Number.isNaN(Number(score))) {
+  if (!hasHealthScore(score)) {
     throw new Error(`AI analysis omitted ${label}`);
   }
   return toHealthPercent(Number(score));
+}
+
+function formatHealthForPrompt(score: unknown): string {
+  if (!hasHealthScore(score)) return 'not recorded';
+  return `${toHealthPercent(Number(score))}%`;
 }
 
 serve(async (req) => {
@@ -166,7 +175,7 @@ serve(async (req) => {
 📈 HISTORICAL HEALTH TREND (Last 5 Assessments):
 ${assessmentHistory && assessmentHistory.length > 0 
   ? assessmentHistory.map((a: any, i: number) => 
-      `${i + 1}. ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${toHealthPercent(a.health_score)}%, Stress: ${a.stress_level}${a.symptoms?.length > 0 ? `, Symptoms: ${a.symptoms.join(', ')}` : ''}`
+      `${i + 1}. ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${formatHealthForPrompt(a.health_score)}, Stress: ${a.stress_level ?? 'not recorded'}${a.symptoms?.length > 0 ? `, Symptoms: ${a.symptoms.join(', ')}` : ''}`
     ).join('\n') 
   : '- No historical data available (first assessment)'}
 

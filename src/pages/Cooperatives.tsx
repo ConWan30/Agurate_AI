@@ -481,9 +481,16 @@ export default function Cooperatives() {
                     <DollarSign className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Avg. Savings</p>
+                    <p className="text-sm text-muted-foreground">Self-reported avg. savings</p>
                     <p className="text-2xl font-bold">
-                      ${(adoptionMetrics.reduce((sum, m) => sum + Number(m.average_savings), 0) / (adoptionMetrics.length || 1)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      {(() => {
+                        const reported = adoptionMetrics
+                          .map((m) => Number(m.average_savings))
+                          .filter((n) => Number.isFinite(n) && n > 0);
+                        if (reported.length === 0) return '—';
+                        const avg = reported.reduce((sum, n) => sum + n, 0) / reported.length;
+                        return `$${avg.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+                      })()}
                     </p>
                   </div>
                 </div>
@@ -517,8 +524,8 @@ export default function Cooperatives() {
                 <Award className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h2 className="text-2xl font-display font-bold">Proven Best Practices</h2>
-                <p className="text-sm text-muted-foreground">Community techniques informed by LSU AgCenter research framing</p>
+                <h2 className="text-2xl font-display font-bold">Community-Reported Practices</h2>
+                <p className="text-sm text-muted-foreground">Farmer-shared techniques with public LSU AgCenter research framing</p>
               </div>
             </div>
 

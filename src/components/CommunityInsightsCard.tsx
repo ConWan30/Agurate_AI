@@ -42,17 +42,23 @@ export function CommunityInsightsCard({ practice }: CommunityInsightsCardProps) 
           <div className="text-center p-3 rounded-lg bg-accent/10">
             <Star className="h-5 w-5 mx-auto mb-1 text-accent" />
             <div className="text-lg font-bold">
-              {(practice.success_rate * 100).toFixed(0)}%
+              {practice.success_rate != null && Number.isFinite(Number(practice.success_rate))
+                ? `${(Number(practice.success_rate) * 100).toFixed(0)}%`
+                : '—'}
             </div>
-            <div className="text-xs text-muted-foreground">Success Rate</div>
+            <div className="text-xs text-muted-foreground">Reported success</div>
           </div>
 
           <div className="text-center p-3 rounded-lg bg-secondary/10">
             <DollarSign className="h-5 w-5 mx-auto mb-1 text-secondary" />
             <div className="text-lg font-bold">
-              ${practice.average_savings.toLocaleString()}
+              {practice.average_savings != null &&
+              Number.isFinite(Number(practice.average_savings)) &&
+              Number(practice.average_savings) > 0
+                ? `$${Number(practice.average_savings).toLocaleString()}`
+                : '—'}
             </div>
-            <div className="text-xs text-muted-foreground">Avg. Savings</div>
+            <div className="text-xs text-muted-foreground">Self-reported avg. savings</div>
           </div>
         </div>
 

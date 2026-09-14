@@ -146,9 +146,13 @@ TASK: Recommend the most suitable publicly listed LSU-related variety for this f
 2. Disease resistance needs
 3. Soil type compatibility
 4. Community success rates
-5. Expected yield improvement (%)
+5. Optional planning yield-delta only when grounded in cited public trial ranges — otherwise null
 
-Return JSON with: recommended_variety, expected_improvement (decimal), risk_assessment (low/medium/high), lsu_research_basis (array of citations).`;
+HONESTY:
+- Do NOT invent expected_improvement percentages without a cited public LSU/variety trial basis.
+- If no cited basis exists, set expected_improvement to null.
+
+Return JSON with: recommended_variety, expected_improvement (decimal 0-1 or null), risk_assessment (low/medium/high), lsu_research_basis (array of citations).`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -183,6 +187,19 @@ Return JSON with: recommended_variety, expected_improvement (decimal), risk_asse
       throw new Error('Variety recommendation omitted recommended_variety');
     }
 
+    const rawImprovement = recommendationData.expected_improvement;
+    const hasCitedBasis =
+      Array.isArray(recommendationData.lsu_research_basis) &&
+      recommendationData.lsu_research_basis.length > 0;
+    const expectedImprovement =
+      hasCitedBasis &&
+      rawImprovement != null &&
+      Number.isFinite(Number(rawImprovement)) &&
+      Number(rawImprovement) >= 0 &&
+      Number(rawImprovement) <= 1
+        ? Number(rawImprovement)
+        : null;
+
     // Save to database (use regular client, RLS allows user to insert their own data)
     const { data, error } = await supabase
       .from('variety_recommendations')
@@ -190,7 +207,7 @@ Return JSON with: recommended_variety, expected_improvement (decimal), risk_asse
         field_id: fieldId,
         current_variety: currentVariety,
         recommended_variety: recommendationData.recommended_variety,
-        expected_improvement: recommendationData.expected_improvement,
+        expected_improvement: expectedImprovement,
         risk_assessment: recommendationData.risk_assessment,
         lsu_research_basis: recommendationData.lsu_research_basis,
       })

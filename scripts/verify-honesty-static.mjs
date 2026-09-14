@@ -69,6 +69,10 @@ const FORBIDDEN = [
   { name: '24/7 AI advisor claim', re: /24\/7 (AI |agricultural |Louisiana )?advisor/i },
   { name: '24/7 farming assistant claim', re: /24\/7 Louisiana farming assistant/i },
   { name: '24/7 crop monitoring claim', re: /24\/7 crop monitoring/i },
+  // Split counter patterns that reassemble to a 24/7 availability claim
+  { name: 'split 24+/7 AI advisor counter', re: /value:\s*24[\s\S]{0,80}(?:AI Advisor|advisor)[\s\S]{0,40}suffix:\s*["']\/7["']/i },
+  { name: 'invented crop $/acre defaults', re: /rice:\s*850|soybean(?:s)?:\s*400|cotton:\s*750|corn:\s*600/i },
+  { name: 'conservation cost_savings invent example', re: /"cost_savings_estimate":\s*850/ },
   { name: 'first 100 louisiana delta farmers claim', re: /Limited to First 100 Louisiana Delta Farmers/i },
   { name: 'direct DIRT integration claim', re: /direct integration to MSU DIRT/i },
   { name: '50% OFF LIFETIME badge', re: /50%\s*OFF\s*LIFETIME/i },

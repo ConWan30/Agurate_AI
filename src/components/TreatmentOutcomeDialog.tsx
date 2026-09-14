@@ -81,7 +81,6 @@ export function TreatmentOutcomeDialog({
 
       const healthAfter = parseFloat(healthScoreAfter);
       const days = parseInt(daysAfter);
-      const cost = costPerAcre ? parseFloat(costPerAcre) : (recommendation.estimated_cost || 0);
 
       if (isNaN(healthAfter) || healthAfter < 0 || healthAfter > 100) {
         toast({

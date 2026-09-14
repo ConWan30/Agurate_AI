@@ -130,15 +130,9 @@ export function formatCurrency(amount: number): string {
 }
 
 /**
- * Get crop value per acre (Louisiana averages)
+ * Crop $/acre is farm-specific — never invent Louisiana commodity defaults.
+ * Callers must require a farmer-entered value when USD math is needed.
  */
-export function getCropValuePerAcre(cropType: string): number {
-  const values: Record<string, number> = {
-    rice: 850,
-    soybean: 400,
-    soybeans: 400,
-    cotton: 750,
-    corn: 600
-  };
-  return values[cropType?.toLowerCase()] || 500;
+export function getCropValuePerAcre(_cropType: string): number | null {
+  return null;
 }

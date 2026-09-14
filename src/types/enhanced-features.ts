@@ -110,7 +110,7 @@ export interface VarietyRecommendation {
   field_id: string;
   current_variety?: string;
   recommended_variety: string;
-  expected_improvement: number;
+  expected_improvement: number | null;
   risk_assessment: 'low' | 'medium' | 'high';
   lsu_research_basis: string[];
   created_at: string;

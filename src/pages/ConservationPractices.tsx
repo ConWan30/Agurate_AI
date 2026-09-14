@@ -116,7 +116,7 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
         steps={[
           { id: "welcome", title: "Conservation Practices", content: "Document conservation practices for USDA compliance and ROI tracking", position: "bottom" },
           { id: "delta-ai", title: "Delta AI Assistant", content: "Use conversational form for easy documentation of your practices", position: "bottom" },
-          { id: "predictions", title: "Predictive Analytics", content: "See future savings and environmental impact from conservation", position: "bottom" },
+          { id: "predictions", title: "Predictive Analytics", content: "Review planning indexes and environmental notes for conservation — not guaranteed dollar forecasts", position: "bottom" },
           { id: "field-tracking", title: "Field-by-Field", content: "Monitor practices and performance for each field independently", position: "bottom" }
         ]}
         storageKey="tutorial-conservation-shown"
