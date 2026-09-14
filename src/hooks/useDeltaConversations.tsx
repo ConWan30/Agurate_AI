@@ -180,7 +180,6 @@ export function useDeltaConversations() {
         throw new Error('Conversation title was not updated (no matching row or update not permitted)');
       }
 
-      if (error) throw error;
       await loadConversations();
     } catch (error) {
       console.error('Error updating title:', error);
