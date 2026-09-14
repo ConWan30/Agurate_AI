@@ -3,6 +3,8 @@
  * Kept separate so Phase 4 behavior can be unit-tested without dialog UI.
  */
 
+import { toHealthPercent } from '@/lib/health-score';
+
 export function getTreatmentType(category: string): string {
   const categoryLower = category.toLowerCase();
   if (categoryLower.includes('pest') || categoryLower.includes('disease')) return 'fungicide';
@@ -78,7 +80,7 @@ export function generateFallbackPredictiveQuestions(input: {
       'When should I schedule the next field check?',
     ];
   }
-  const healthScore = Number(input.healthScore);
+  const healthScore = toHealthPercent(Number(input.healthScore));
   if (healthScore < 70) {
     return [
       `What's causing the stress in my ${cropType}?`,

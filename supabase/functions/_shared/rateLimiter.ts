@@ -1,7 +1,17 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 /**
  * Shared rate limiter for edge functions (Deno-compatible).
  * Fail-closed: deny when rate-limit state cannot be read or written.
  */
+
+
+/** Service-role client for request_logs — clients can no longer invent rate-limit rows. */
+function getRateLimitServiceClient() {
+  return createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  );
+}
 
 export interface RateLimitConfig {
   maxRequests: number;
@@ -18,10 +28,11 @@ export interface RateLimitResult {
 
 export async function checkRateLimit(
   // deno-lint-ignore no-explicit-any
-  supabaseClient: any,
+  _supabaseClient: any,
   userId: string,
   config: RateLimitConfig
 ): Promise<RateLimitResult> {
+  const supabaseClient = getRateLimitServiceClient();
   const windowStart = new Date(Date.now() - config.windowMs);
 
   const { data: recentRequests, error } = await supabaseClient
@@ -53,13 +64,14 @@ export async function checkRateLimit(
 /** Returns false when the write fails so callers can fail closed. */
 export async function logRequest(
   // deno-lint-ignore no-explicit-any
-  supabaseClient: any,
+  _supabaseClient: any,
   userId: string,
   functionName: string,
   ipAddress?: string | null,
   userAgent?: string | null
 ): Promise<boolean> {
   try {
+    const supabaseClient = getRateLimitServiceClient();
     const { error } = await supabaseClient.from('request_logs').insert({
       user_id: userId,
       function_name: functionName,

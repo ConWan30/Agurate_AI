@@ -588,7 +588,7 @@ export default function DeltaIntelligence() {
             <CardContent className="space-y-3">
               <div className="flex items-start gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
-                <p className="text-sm text-muted-foreground">LSU AgCenter production recommendations</p>
+                <p className="text-sm text-muted-foreground">Public LSU AgCenter guidance (research framing — not a partnership endorsement)</p>
               </div>
               <div className="flex items-start gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />

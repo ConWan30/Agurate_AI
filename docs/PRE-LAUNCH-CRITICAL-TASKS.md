@@ -27,10 +27,11 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 - [x] Assessment health/AI scores persisted only via analyze-crop service role (`20260914210000`)
 - [x] AI metric tables locked from client invent; DIRT click via RPC (`20260914220000`)
 - [x] Peer effectiveness_score CHECK 0–100 (`20260914230000`); critical-alert UPDATE freeze + claim↔assessment field match (`20260914240000`)
+- [x] Conversational-form metrics/messages + request_logs invent lock (`20260914250000`)
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914240000` (critical-alert UPDATE freeze + claim
+1. Apply pending Supabase migrations through `20260914250000` (critical-alert UPDATE freeze + claim
    assessment field match; peer effectiveness CHECK `20260914230000`; AI metric client-write lock
    `20260914220000` + assessment AI-score service-role persist `20260914210000`; claim INSERT status
    lock + coop-alert member INSERT drop `20260914200000`; claim UPDATE/

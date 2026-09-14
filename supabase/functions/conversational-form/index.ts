@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { getAnonClient, getServiceClient, requireAuthenticatedUser } from '../_shared/auth.ts'
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 import { handleError, handleRateLimitError } from '../_shared/errorHandler.ts';
@@ -302,6 +302,7 @@ serve(async (req) => {
     if (auth instanceof Response) return auth;
     const { user, authHeader } = auth;
     const supabaseClient = getAnonClient(authHeader);
+    const serviceClient = getServiceClient();
 
     const rawBody = await req.json();
     const { sessionId, message, formType } = rawBody;
@@ -549,17 +550,17 @@ ${JSON.stringify(FORM_SCHEMAS[formType] || FORM_SCHEMAS['field-registration'], n
     });
     const completionPercentage = Math.round((completedFields.length / requiredFields.length) * 100);
 
-    // Update session
-    await supabaseClient
+    // Update session + assistant message via service role (client RLS freezes metrics / blocks assistant inserts)
+    await serviceClient
       .from('conversational_form_sessions')
       .update({
         extracted_data: updatedData,
         completion_percentage: completionPercentage
       })
-      .eq('id', sessionId);
+      .eq('id', sessionId)
+      .eq('user_id', user.id);
 
-    // Save assistant message
-    await supabaseClient
+    await serviceClient
       .from('conversational_form_messages')
       .insert({
         session_id: sessionId,

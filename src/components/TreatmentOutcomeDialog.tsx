@@ -134,8 +134,8 @@ export function TreatmentOutcomeDialog({
       toast({
         title: 'Treatment outcome logged successfully!',
         description: success
-          ? 'Logged as a positive community signal to improve future recommendations.'
-          : 'Logged so community comparisons stay honest about mixed results.',
+          ? 'Self-reported outcome logged as a community signal — not a verified yield result.'
+          : 'Self-reported mixed result logged so community comparisons stay honest.',
       });
 
       // Reset form

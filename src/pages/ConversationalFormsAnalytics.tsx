@@ -53,7 +53,7 @@ export default function ConversationalFormsAnalytics() {
           <div>
             <h1 className="text-3xl font-bold mb-2">Conversational Forms Analytics</h1>
             <p className="text-muted-foreground">
-              Track performance, adoption, and farmer feedback for Delta Intelligence conversational forms
+              Your conversational form activity (session-scoped — not platform-wide cohort metrics)
             </p>
           </div>
           <div className="flex gap-2">

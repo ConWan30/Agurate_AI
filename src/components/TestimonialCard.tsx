@@ -47,7 +47,7 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
         {/* ROI badge */}
         {testimonial.roi_achieved && testimonial.roi_achieved > 0 && (
           <Badge className="bg-primary/10 text-primary border-primary/30">
-            💰 Saved ${testimonial.roi_achieved.toLocaleString()} this season
+            Farmer-reported savings (moderated): ${testimonial.roi_achieved.toLocaleString()} this season
           </Badge>
         )}
       </CardContent>

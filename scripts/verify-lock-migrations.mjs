@@ -70,6 +70,16 @@ const required = [
     ],
   },
   {
+    id: '20260914250000_lock_conversational_form_and_request_logs',
+    needles: [
+      'protect_conversational_form_session_metrics',
+      'Users can create user messages in their sessions',
+      'reject_client_insert_request_logs_trg',
+      'reject_client_insert_form_completion_analytics_trg',
+      "role = 'user'",
+    ],
+  },
+  {
     id: '20260914240000_protect_critical_alerts_and_claim_link',
     needles: [
       'protect_critical_alerts_ai_columns',
@@ -77,6 +87,17 @@ const required = [
       'a.field_id = ic.field_id',
     ],
   },
+  {
+    id: '20260914250000_lock_conversational_form_and_request_logs',
+    needles: [
+      'protect_conversational_form_session_metrics',
+      'Users can create user messages in their sessions',
+      'reject_client_insert_request_logs_trg',
+      'reject_client_insert_form_completion_analytics_trg',
+      "role = 'user'",
+    ],
+  },
+
 ];
 
 for (const req of required) {
@@ -96,8 +117,8 @@ for (const req of required) {
 
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
-if (!tip.startsWith('2026091424') && tip < '20260914240000_protect_critical_alerts_and_claim_link') {
-  fail(`tip migration ${tip} should include critical-alert UPDATE + claim-link lock (20260914240000+)`);
+if (!tip.startsWith('2026091425') && tip < '20260914250000_lock_conversational_form_and_request_logs') {
+  fail(`tip migration ${tip} should include conversational-form + request_logs lock (20260914250000+)`);
 }
 
 if (process.exitCode) {

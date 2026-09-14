@@ -35,16 +35,7 @@ export const useConversationalForm = (formType: FormType, contextData?: Record<s
     },
     onSuccess: (data) => {
       setSessionId(data.id);
-      
-      // Insert initial system message
-      supabase
-        .from('conversational_form_messages')
-        .insert({
-          session_id: data.id,
-          role: 'assistant',
-          content: getInitialMessage(formType)
-        })
-        .then(() => {});
+      // Greeting is rendered locally; assistant rows are service-role only.
     },
     onError: (error) => {
       console.error('Failed to create session:', error);
@@ -166,8 +157,21 @@ export const useConversationalForm = (formType: FormType, contextData?: Record<s
     createSession: createSessionMutation.mutate,
     isCreatingSession: createSessionMutation.isPending,
     
-    // Messages
-    messages,
+    // Messages (seed a local greeting until the edge persists the first assistant turn)
+    messages: (() => {
+      const hasAssistant = messages.some((m) => m.role === 'assistant');
+      if (hasAssistant || !sessionId) return messages;
+      return [
+        {
+          id: `local-greeting-${sessionId}`,
+          session_id: sessionId,
+          role: 'assistant' as const,
+          content: getInitialMessage(formType),
+          created_at: new Date().toISOString(),
+        } as FormMessage,
+        ...messages,
+      ];
+    })(),
     isLoadingMessages,
     sendMessage: (message: string) => {
       if (import.meta.env.DEV) {
