@@ -16,8 +16,18 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://agurateai.lovable.app/join-beta</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://agurateai.lovable.app/auth</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://agurateai.lovable.app/install</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>

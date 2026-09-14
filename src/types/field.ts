@@ -31,7 +31,7 @@ export interface Assessment {
   id: string;
   field_id: string;
   image_url: string;
-  health_score: number; // 0-100 or 0-1 depending on schema version
+  health_score: number; // canonical 0-100 (AI 0-1 inputs normalized via toHealthPercent)
   stress_level: StressLevel;
   symptoms?: string[] | null;
   confidence_score?: number | null;

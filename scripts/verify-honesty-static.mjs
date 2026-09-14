@@ -80,6 +80,9 @@ const FORBIDDEN = [
   { name: 'Cutting-Edge Agricultural Technology', re: /Cutting-Edge Agricultural Technology/i },
   { name: 'Real-time Processing marketing', re: /Real-time Processing/i },
   { name: 'master all 17 features claim', re: /master all 17/i },
+  { name: 'faster claims processing claim', re: /faster claims processing/i },
+  { name: 'enhance all future analyses claim', re: /enhance all future analyses/i },
+  { name: 'Multi-Model Parallel Processing claim', re: /Multi-Model Parallel Processing/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

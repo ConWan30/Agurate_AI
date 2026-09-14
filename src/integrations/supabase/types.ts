@@ -1785,6 +1785,7 @@ export type Database = {
           allow_farm_name: boolean | null
           allow_name: boolean | null
           allow_public_use: boolean | null
+          approved: boolean
           assessment_id: string | null
           created_at: string | null
           estimated_savings: number | null
@@ -1800,6 +1801,7 @@ export type Database = {
           allow_farm_name?: boolean | null
           allow_name?: boolean | null
           allow_public_use?: boolean | null
+          approved?: boolean
           assessment_id?: string | null
           created_at?: string | null
           estimated_savings?: number | null
@@ -1815,6 +1817,7 @@ export type Database = {
           allow_farm_name?: boolean | null
           allow_name?: boolean | null
           allow_public_use?: boolean | null
+          approved?: boolean
           assessment_id?: string | null
           created_at?: string | null
           estimated_savings?: number | null

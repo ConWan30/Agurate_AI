@@ -74,10 +74,15 @@ Last updated: 2026-09-14
 - [x] Fix HowItWorks Rules-of-Hooks via reveal card components
 - [x] Honest Upgrade/conversion waitlist CTAs (no fake checkout)
 - [x] PWA runtime cache includes lovable.cloud hosts
+- [x] Profile entitlement INSERT clamp (`20260914150000`)
+- [x] Upload fail-closed when AI omits health_score
+- [x] Honest offline/sync messaging (no fake sync complete)
+- [x] Soften Home/HowItWorks residual enrichment & claims-speed copy
+- [x] Remove wildcard CORS static export; robots/sitemap route alignment
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (through `20260914140000` researcher PII + crop checks, plus prior RLS/RPC/storage)
+- [ ] Apply pending Supabase migrations (through `20260914150000` researcher PII + crop checks, plus prior RLS/RPC/storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

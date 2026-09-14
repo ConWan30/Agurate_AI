@@ -226,6 +226,9 @@ export default function Upload() {
 
     if (aiError) throw aiError;
     if (!aiResult) throw new Error('No analysis results received');
+    if (aiResult.health_score == null || Number.isNaN(Number(aiResult.health_score))) {
+      throw new Error('AI analysis did not return a health score');
+    }
 
     // Insert assessment with AI results
     const { data: assessment, error: assessmentError } = await supabase
@@ -236,7 +239,10 @@ export default function Upload() {
         health_score: toHealthPercent(aiResult.health_score),
         stress_level: aiResult.stress_level,
         symptoms: aiResult.symptoms,
-        confidence_score: toHealthPercent(aiResult.confidence_score),
+        confidence_score:
+          aiResult.confidence_score == null
+            ? null
+            : toHealthPercent(aiResult.confidence_score),
         weather_temp_f: aiResult.weather_data?.temp_f,
         weather_precipitation_mm: aiResult.weather_data?.precipitation_inch ? 
           aiResult.weather_data.precipitation_inch * 25.4 : null, // Convert inches to mm

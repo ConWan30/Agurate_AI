@@ -115,7 +115,7 @@ export default function Home() {
     {
       icon: FileText,
       title: "Insurance Documentation",
-      description: "AI-verified damage documentation with GPS-stamped photos. Automated evidence collection for faster claims processing.",
+      description: "GPS-stamped crop photos and assessment notes you can export for insurance documentation. Claim outcomes still depend on your carrier.",
       color: "gradient-delta"
     }
   ];

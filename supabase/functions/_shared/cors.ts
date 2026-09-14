@@ -37,8 +37,13 @@ export function getCorsHeaders(req: Request): Record<string, string> {
   };
 }
 
-/** @deprecated Prefer getCorsHeaders(req) — wildcard origin kept only for gradual migration. */
+/**
+ * Static CORS fallback for non-request contexts.
+ * Never uses wildcard — prefer getCorsHeaders(req) in handlers.
+ */
 export const corsHeaders: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': DEFAULT_ORIGIN,
   'Access-Control-Allow-Headers': ALLOW_HEADERS,
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  Vary: 'Origin',
 };

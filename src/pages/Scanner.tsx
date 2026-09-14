@@ -264,7 +264,7 @@ export default function Scanner() {
       triggerHaptic('error');
 
       if (!isOnline) {
-        toast.error('Offline mode - assessment saved locally and will sync when online');
+        toast.error('You appear offline. Analysis was not saved — reconnect and try again.');
       } else {
         toast.error('Analysis failed. Please try again.');
       }

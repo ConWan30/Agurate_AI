@@ -27,30 +27,30 @@ export default function HowItWorks() {
     },
     {
       icon: GitBranch,
-      title: 'Parallel AI Enrichment',
-      description: 'Simultaneously runs water stress prediction, conservation impact assessment, variety recommendations, community pattern matching, and predictive analytics—all informed by vision results',
-      tech: 'Multi-Model Parallel Processing',
+      title: 'Contextual Enrichment',
+      description: 'Follow-on helpers can add water-stress context, conservation notes, variety cues, and community patterns when those features are available for your field',
+      tech: 'Contextual enrichment helpers',
       color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20'
     },
     {
       icon: Network,
       title: 'Intelligence Pool Update',
-      description: 'New insights are fed back into the central pool, creating patterns that enhance all future analyses for your field and similar farms',
-      tech: 'Circular Data Enrichment',
+      description: 'New observations can be stored with your field history so later reviews have more local context (not a guarantee of better accuracy for other farms)',
+      tech: 'Field history context',
       color: 'bg-green-500/10 text-green-700 border-green-500/20'
     },
     {
       icon: TrendingUp,
       title: 'Unified Recommendations',
-      description: 'AI synthesizes all parallel analyses into prioritized actions, surfaces the public LSU researcher directory when useful, and updates predictive forecasts',
-      tech: 'Multi-Source Recommendation Engine',
+      description: 'Results are summarized into suggested next steps and can surface the public LSU researcher directory when relevant — framed as decision support, not a validated diagnosis',
+      tech: 'Decision-aid summary',
       color: 'bg-orange-500/10 text-orange-700 border-orange-500/20'
     },
     {
       icon: Layers,
-      title: 'Continuous Learning',
-      description: 'Analyses are stored for your fields so patterns over time can inform later recommendations—variety notes, weather context, and conservation observations',
-      tech: 'Field History Context',
+      title: 'Field History Retention',
+      description: 'Analyses are stored for your fields so later reviews can reference variety notes, weather context, and conservation observations over time',
+      tech: 'Per-field history',
       color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
     }
   ];
