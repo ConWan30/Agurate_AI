@@ -129,7 +129,7 @@ export function UseCaseRevealCard({ useCase, index }: { useCase: UseCaseCard; in
             <p className="text-sm text-muted-foreground">{useCase.impact}</p>
           </div>
           <div className="flex items-center justify-between p-3 bg-health-good/10 border border-health-good/20 rounded-lg">
-            <span className="text-sm font-medium text-health-good">Estimated Savings:</span>
+            <span className="text-sm font-medium text-health-good">Planning benefit:</span>
             <span className="text-lg font-bold text-health-good">{useCase.savings}</span>
           </div>
         </CardContent>

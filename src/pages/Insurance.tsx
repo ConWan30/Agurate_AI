@@ -20,6 +20,7 @@ import bgCropDamage from "@/assets/bg-crop-damage.jpg";
 import { DeltaConversationalForm } from "@/components/forms/DeltaConversationalForm";
 import { Sparkles } from "lucide-react";
 import TutorialTooltip from '@/components/TutorialTooltip';
+import { formatHealthPercent, hasHealthScore } from '@/lib/health-score';
 
 export default function Insurance() {
   const [open, setOpen] = useState(false);
@@ -343,7 +344,12 @@ export default function Insurance() {
                     </div>
                     <div className="flex items-center gap-2">
                       <TrendingDown className="h-4 w-4 text-destructive" />
-                      <span>{claim.estimated_loss_percentage}% Est. Loss</span>
+                      <span>
+                        {claim.estimated_loss_percentage != null &&
+                        Number.isFinite(Number(claim.estimated_loss_percentage))
+                          ? `${claim.estimated_loss_percentage}% Est. Loss`
+                          : 'Est. Loss not recorded'}
+                      </span>
                     </div>
                   </div>
 
@@ -365,11 +371,17 @@ export default function Insurance() {
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
                           <span className="text-muted-foreground">Health Score:</span>
-                          <span className="ml-2 font-semibold">{claim.assessment.health_score}/100</span>
+                          <span className="ml-2 font-semibold">
+                            {hasHealthScore(claim.assessment.health_score)
+                              ? `${formatHealthPercent(claim.assessment.health_score)}`
+                              : 'Not recorded'}
+                          </span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Stress Level:</span>
-                          <span className="ml-2 font-semibold capitalize">{claim.assessment.stress_level}</span>
+                          <span className="ml-2 font-semibold capitalize">
+                            {claim.assessment.stress_level || 'not recorded'}
+                          </span>
                         </div>
                       </div>
                     </div>

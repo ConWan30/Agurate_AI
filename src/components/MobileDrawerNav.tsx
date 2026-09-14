@@ -86,7 +86,7 @@ export default function MobileDrawerNav({ navItems, commandCenterItems, business
                 Agurate<span className="text-green-600">AI</span>
               </div>
               <div className="text-xs text-muted-foreground font-normal">
-                Morehouse Parish, LA
+                Louisiana Delta · Closed beta
               </div>
             </div>
           </SheetTitle>

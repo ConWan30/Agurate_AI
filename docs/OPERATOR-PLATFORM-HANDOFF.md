@@ -9,8 +9,8 @@
 | Auth Leaked Password Protection | **Blocked** | Needs Supabase Dashboard access |
 | Deploy edge functions | **Blocked** | Needs Supabase CLI linked project + secrets |
 | `DEMO_SETUP_SECRET` policy | **Blocked** | Needs function secrets access |
-| Publish app + live `/health.json` | **Blocked** | Needs Lovable Publish / host credentials |
-| Production smoke | **Blocked** | Needs live production URL |
+| Publish app + live `/health.json` | **Blocked** | Needs Lovable Publish / host credentials. Candidate host `https://agurateai.lovable.app` currently serves a **pre-tip dishonest marketing homepage** (95%+ accuracy, fabricated testimonials, “LSU AgCenter Validated”) and **404s `/health.json`** — tip of `cursor/launch-readiness-honesty-38b2` is not published there. |
+| Production smoke | **Blocked** | `PRODUCTION_URL=https://agurateai.lovable.app EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke` currently **FAILS** (missing health tip stamp + live honesty regressions). Re-run after Publish. |
 
 **Production-complete is not achieved until every row above is evidenced.**  
 The coding agent cannot complete platform rows without service-role / Dashboard / publish credentials.
@@ -73,18 +73,23 @@ supabase secrets set DEMO_SETUP_SECRET="$(openssl rand -hex 32)"
 Use Lovable **Publish** (or your production host) so the live URL serves the
 branch/build that includes the current tip of `cursor/launch-readiness-honesty-38b2` (`git rev-parse HEAD`).
 
-Evidence: production HTML/JS matches tip commit; `/health.json` loads with that commit.
+Candidate production host observed in-repo metadata: `https://agurateai.lovable.app`.
+
+**Current live evidence (pre-publish):** that host returns HTTP 200 for public routes but:
+- `/health.json` → **404** (tip stamp not published)
+- `/` HTML still contains dishonest pre-tip marketing (e.g. 95%+ accuracy, fabricated farmer testimonials, “LSU AgCenter Validated”)
+
+Until Publish ships this tip, production smoke remains failed.
 
 ```bash
-# After publish — confirm the live build identity matches the tip SHA you intended
-curl -sS https://YOUR_PRODUCTION_HOST/health.json
+# After publish — confirm tip identity + live honesty
+curl -sS https://agurateai.lovable.app/health.json
 # Expect: "status":"ok", "stage":"closed-beta", "commit":"<tip sha>"
 
-# Or run the automated public-route + health tip match check:
-PRODUCTION_URL=https://YOUR_PRODUCTION_HOST EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke
+PRODUCTION_URL=https://agurateai.lovable.app EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke
 ```
 
-**Evidence receipt:** `curl` JSON with `commit` equal to published tip SHA, or `npm run verify:production-smoke` PASS output.
+**Evidence receipt:** `verify:production-smoke` PASS (health tip match + no live honesty regressions).
 
 ## 6. Production smoke
 
@@ -98,16 +103,16 @@ On the live URL, confirm:
 | `/how-it-works` | Honest capability copy |
 | `/health.json` | `status=ok`, `stage=closed-beta`, `commit` equals published tip SHA |
 
-Automated helper (public routes + tip match only):
+Automated helper (public routes + health tip match + live honesty phrase checks):
 
 ```bash
-PRODUCTION_URL=https://YOUR_PRODUCTION_HOST EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke
+PRODUCTION_URL=https://agurateai.lovable.app EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke
 ```
 
 Also: one authenticated scan/upload path returns a real health score or a clear
 error — never a silent invented score.
 
-**Evidence receipt:** checklist of routes OK + note of authenticated scan result (+ optional `verify:production-smoke` PASS).
+**Evidence receipt:** `verify:production-smoke` PASS + note of authenticated scan result.
 
 ## Credentials required (why the coding agent stops here)
 

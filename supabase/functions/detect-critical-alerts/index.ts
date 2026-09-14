@@ -23,32 +23,45 @@ interface CriticalAlertInput {
 }
 
 interface UrgencyFactors {
-  healthScore: number;
+  healthScore: number | null;
   stressLevel: string;
   diseaseSeverity: number;
   pestSeverity: number;
-  yieldImpact: number;
-  fieldSize: number;
+  yieldImpact: number | null;
+  fieldSize: number | null;
   cropValue: number | null;
 }
 
+type ThreatItem = { name: string; severity: string; confidence: number | null };
 
-function normalizeThreatList(raw: unknown): Array<{ name: string; severity: string; confidence: number }> {
+function normalizeThreatList(raw: unknown): ThreatItem[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((item) => {
     if (typeof item === 'string') {
-      return { name: item, severity: 'unknown', confidence: 0 };
+      // Name-only — do not invent severity or confidence
+      return { name: item, severity: 'unknown', confidence: null };
     }
     if (item && typeof item === 'object') {
       const o = item as Record<string, unknown>;
+      const conf = typeof o.confidence === 'number' && Number.isFinite(o.confidence)
+        ? o.confidence
+        : null;
       return {
         name: String(o.name ?? o.disease ?? o.pest ?? 'unknown'),
         severity: String(o.severity ?? 'unknown'),
-        confidence: typeof o.confidence === 'number' ? o.confidence : 0,
+        confidence: conf,
       };
     }
-    return { name: 'unknown', severity: 'unknown', confidence: 0 };
+    return { name: 'unknown', severity: 'unknown', confidence: null };
   }).filter((d) => d.name && d.name !== 'unknown');
+}
+
+function threatSeverityWeight(severity: string, confidence: number | null): number {
+  // Missing confidence must not invent a measured 0% — omit from urgency weighting.
+  if (confidence == null || !Number.isFinite(confidence)) return 0;
+  const level =
+    severity === 'severe' ? 3 : severity === 'moderate' ? 2 : severity === 'mild' || severity === 'low' ? 1 : 0;
+  return level * confidence;
 }
 
 serve(async (req) => {
@@ -110,23 +123,24 @@ serve(async (req) => {
       });
     }
 
+    const finiteHealth =
+      typeof health_score === 'number' && Number.isFinite(health_score) ? health_score : null;
+    const finiteYield =
+      estimated_yield_impact_percent != null && Number.isFinite(Number(estimated_yield_impact_percent))
+        ? Number(estimated_yield_impact_percent)
+        : null;
+    const finiteAcreage =
+      field_acreage != null && Number.isFinite(Number(field_acreage)) ? Number(field_acreage) : null;
+
     const urgencyScore = calculateUrgencyScore({
-      healthScore: health_score,
+      healthScore: finiteHealth,
       stressLevel: stress_level,
       diseaseSeverity:
-        normalizedDiseases.reduce((max, d) => {
-          const severity =
-            d.severity === 'severe' ? 3 : d.severity === 'moderate' ? 2 : d.severity === 'mild' || d.severity === 'low' ? 1 : 0;
-          return Math.max(max, severity * d.confidence);
-        }, 0),
+        normalizedDiseases.reduce((max, d) => Math.max(max, threatSeverityWeight(d.severity, d.confidence)), 0),
       pestSeverity:
-        normalizedPests.reduce((max, p) => {
-          const severity =
-            p.severity === 'severe' ? 3 : p.severity === 'moderate' ? 2 : p.severity === 'mild' || p.severity === 'low' ? 1 : 0;
-          return Math.max(max, severity * p.confidence);
-        }, 0),
-      yieldImpact: estimated_yield_impact_percent || 0,
-      fieldSize: field_acreage ?? 0,
+        normalizedPests.reduce((max, p) => Math.max(max, threatSeverityWeight(p.severity, p.confidence)), 0),
+      yieldImpact: finiteYield,
+      fieldSize: finiteAcreage,
       cropValue: resolveCropValuePerAcre(crop_value_per_acre),
     });
 
@@ -142,17 +156,14 @@ serve(async (req) => {
     }
 
     const alertType = determineAlertType(normalizedDiseases, normalizedPests, stress_level);
-    const yieldImpact = Number.isFinite(Number(estimated_yield_impact_percent))
-      ? Number(estimated_yield_impact_percent)
-      : null;
     const { title, message, estimatedLoss } = generateAlertContent({
       alertType,
       fieldName: field.name || 'Field',
       cropType: crop_type || 'crop',
       diseases: normalizedDiseases,
       pests: normalizedPests,
-      yieldImpact,
-      acreage: field_acreage ?? 0,
+      yieldImpact: finiteYield,
+      acreage: finiteAcreage,
       cropValue: resolveCropValuePerAcre(crop_value_per_acre),
     });
 
@@ -193,9 +204,12 @@ serve(async (req) => {
 
 function calculateUrgencyScore(factors: UrgencyFactors): number {
   let score = 0;
-  if (factors.healthScore < 50) score += 40;
-  else if (factors.healthScore < 65) score += 25;
-  else if (factors.healthScore < 75) score += 10;
+  // Missing health must not invent critical urgency (null < 50 is true in JS).
+  if (factors.healthScore != null && Number.isFinite(factors.healthScore)) {
+    if (factors.healthScore < 50) score += 40;
+    else if (factors.healthScore < 65) score += 25;
+    else if (factors.healthScore < 75) score += 10;
+  }
 
   if (factors.stressLevel === 'severe') score += 20;
   else if (factors.stressLevel === 'moderate') score += 10;
@@ -203,28 +217,36 @@ function calculateUrgencyScore(factors: UrgencyFactors): number {
   score += Math.min(factors.diseaseSeverity * 5, 15);
   score += Math.min(factors.pestSeverity * 3, 10);
 
-  if (factors.yieldImpact > 30) score += 10;
-  else if (factors.yieldImpact > 20) score += 7;
-  else if (factors.yieldImpact > 10) score += 4;
+  if (factors.yieldImpact != null && Number.isFinite(factors.yieldImpact)) {
+    if (factors.yieldImpact > 30) score += 10;
+    else if (factors.yieldImpact > 20) score += 7;
+    else if (factors.yieldImpact > 10) score += 4;
+  }
 
-  if (factors.fieldSize > 200) score += 5;
-  else if (factors.fieldSize > 100) score += 3;
-  else if (factors.fieldSize > 50) score += 1;
+  if (factors.fieldSize != null && Number.isFinite(factors.fieldSize)) {
+    if (factors.fieldSize > 200) score += 5;
+    else if (factors.fieldSize > 100) score += 3;
+    else if (factors.fieldSize > 50) score += 1;
+  }
 
   return Math.min(score, 100);
 }
 
 function determineAlertType(
-  diseases?: Array<{ name: string; severity: string; confidence: number }>,
-  pests?: Array<{ name: string; severity: string; confidence: number }>,
+  diseases?: ThreatItem[],
+  pests?: ThreatItem[],
   stressLevel?: string
 ): string {
   if (diseases?.length) {
-    const severeDisease = diseases.find((d) => d.severity === 'severe' && d.confidence > 0.7);
+    const severeDisease = diseases.find(
+      (d) => d.severity === 'severe' && d.confidence != null && d.confidence > 0.7,
+    );
     if (severeDisease) return 'disease';
   }
   if (pests?.length) {
-    const severePest = pests.find((p) => p.severity === 'severe' && p.confidence > 0.7);
+    const severePest = pests.find(
+      (p) => p.severity === 'severe' && p.confidence != null && p.confidence > 0.7,
+    );
     if (severePest) return 'pest';
   }
   if (stressLevel === 'severe') return 'water_stress';
@@ -235,14 +257,21 @@ function generateAlertContent(params: {
   alertType: string;
   fieldName: string;
   cropType: string;
-  diseases?: Array<{ name: string; severity: string; confidence: number }>;
-  pests?: Array<{ name: string; severity: string; confidence: number }>;
+  diseases?: ThreatItem[];
+  pests?: ThreatItem[];
   yieldImpact: number | null;
-  acreage: number;
+  acreage: number | null;
   cropValue: number | null;
 }): { title: string; message: string; estimatedLoss: number | null } {
   const { alertType, cropType, diseases, pests, yieldImpact, acreage, cropValue } = params;
-  const hasYieldImpact = yieldImpact != null && Number.isFinite(yieldImpact) && acreage > 0 && cropValue != null && Number.isFinite(cropValue) && cropValue > 0;
+  const hasYieldImpact =
+    yieldImpact != null &&
+    Number.isFinite(yieldImpact) &&
+    acreage != null &&
+    acreage > 0 &&
+    cropValue != null &&
+    Number.isFinite(cropValue) &&
+    cropValue > 0;
   const estimatedLoss = hasYieldImpact
     ? (Number(yieldImpact) / 100) * acreage * cropValue
     : null;

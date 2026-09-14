@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Calendar, Camera, FileText, Send, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { resolveCropImageUrls } from '@/lib/crop-image';
+import { formatHealthPercent, hasHealthScore } from '@/lib/health-score';
 
 type ClaimDetailProps = {
   claimId: string;
@@ -183,7 +184,12 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
                 </div>
                 <div>
                   <p className="text-muted-foreground mb-1">Estimated Loss</p>
-                  <p className="font-semibold text-destructive">{claim?.estimated_loss_percentage}%</p>
+                  <p className="font-semibold text-destructive">
+                    {claim?.estimated_loss_percentage != null &&
+                    Number.isFinite(Number(claim.estimated_loss_percentage))
+                      ? `${claim.estimated_loss_percentage}%`
+                      : 'Not recorded'}
+                  </p>
                 </div>
               </div>
 
@@ -217,8 +223,13 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
                     />
                     <CardContent className="p-3 space-y-2">
                       <div className="flex justify-between text-xs">
-                        <span>Health: {assessment.health_score}/100</span>
-                        <span className="capitalize">{assessment.stress_level}</span>
+                        <span>
+                          Health:{' '}
+                          {hasHealthScore(assessment.health_score)
+                            ? formatHealthPercent(assessment.health_score)
+                            : 'Not recorded'}
+                        </span>
+                        <span className="capitalize">{assessment.stress_level || 'not recorded'}</span>
                       </div>
                       <p className="text-xs text-muted-foreground">
                         {new Date(assessment.analyzed_at).toLocaleDateString()}

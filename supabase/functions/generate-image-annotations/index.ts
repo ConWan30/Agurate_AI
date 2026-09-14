@@ -68,7 +68,7 @@ serve(async (req) => {
 
 ${analysis_context ? `
 CONTEXT:
-- Health Score: ${analysis_context.health_score || 'Unknown'}%
+- Health Score: ${analysis_context.health_score != null && Number.isFinite(Number(analysis_context.health_score)) ? `${analysis_context.health_score}%` : 'not recorded'}
 - Stress Level: ${analysis_context.stress_level || 'Unknown'}
 - Symptoms: ${(analysis_context.symptoms || []).join(', ') || 'None'}
 - Diseases: ${(analysis_context.diseases || []).join(', ') || 'None'}

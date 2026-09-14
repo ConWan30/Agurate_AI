@@ -365,7 +365,7 @@ export default function DeltaIntelligence() {
                 <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-1">
                   Delta Intelligence AI
                 </h1>
-                <p className="text-white/80 text-sm">LSU AgCenter Research • Louisiana Delta Expertise</p>
+                <p className="text-white/80 text-sm">Framed around public LSU AgCenter research · Louisiana Delta</p>
               </div>
             </div>
             <p className="text-white/90 text-base leading-relaxed">

@@ -194,7 +194,7 @@ export default function Profile() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>
-              AgurateAI helps farmers in Morehouse Parish, Louisiana monitor crop health using AI-powered image analysis.
+              AgurateAI helps Louisiana Delta farmers monitor crop health using AI-powered image analysis (closed beta).
             </p>
             <p className="pt-2">
               <strong>Supported Crops:</strong> Rice, Soybean, Cotton, Corn

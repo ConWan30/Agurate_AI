@@ -201,7 +201,7 @@ export default function Dashboard() {
           <div className="relative z-10 flex items-start justify-between">
             <div>
               <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                🌾 Morehouse Parish Precision Agriculture
+                🌾 Louisiana Delta Closed Beta
               </Badge>
               <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3 drop-shadow-lg">
                 Welcome to Your Farm Dashboard

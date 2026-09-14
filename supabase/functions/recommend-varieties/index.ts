@@ -128,13 +128,13 @@ Field Profile:
 - Average Health Score: ${avgHealth == null ? "no scored assessments yet" : avgHealth.toFixed(1)}
 
 Historical Performance (Last 20 Assessments):
-${fieldAssessments.map((a, i) => `  ${i + 1}. Health: ${a.health_score}, Stress: ${a.stress_level}`).join('\n')}
+${fieldAssessments.map((a, i) => `  ${i + 1}. Health: ${a.health_score != null && Number.isFinite(Number(a.health_score)) ? a.health_score : 'not recorded'}, Stress: ${a.stress_level ?? 'not recorded'}`).join('\n')}
 
 Disease Pressure Patterns:
 ${diseaseSymptoms.length > 0 ? diseaseSymptoms.slice(0, 10).join(', ') : 'No significant disease pressure'}
 
 Community Intelligence (Best Performing Varieties):
-${communityInsights.map(c => `- ${c.practice_name}: ${c.success_rate}% success, ${c.adoption_count} farmers`).join('\n')}
+${communityInsights.map(c => `- ${c.practice_name}: ${c.success_rate != null && Number.isFinite(Number(c.success_rate)) ? `${c.success_rate}% success` : 'success not recorded'}, ${c.adoption_count} farmers`).join('\n')}
 
 Conservation Context:
 ${conservationData.length > 0 ? `Soil health trending ${conservationData[0].soil_health_improvement > 0.5 ? 'upward' : 'stable'}` : 'No conservation data'}

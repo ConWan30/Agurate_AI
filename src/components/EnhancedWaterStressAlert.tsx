@@ -104,8 +104,11 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
         )}
 
         <div className="text-xs text-muted-foreground">
-          Confidence: {(waterStress.confidence * 100).toFixed(0)}% | 
-          Detected: {new Date(waterStress.created_at).toLocaleDateString()}
+          Confidence:{' '}
+          {waterStress.confidence != null && Number.isFinite(Number(waterStress.confidence))
+            ? `${(Number(waterStress.confidence) * 100).toFixed(0)}%`
+            : 'not recorded'}{' '}
+          | Detected: {new Date(waterStress.created_at).toLocaleDateString()}
         </div>
       </AlertDescription>
     </Alert>

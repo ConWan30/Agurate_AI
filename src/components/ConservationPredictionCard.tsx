@@ -24,7 +24,10 @@ function relativeChangeLabel(current: number, future: number): string {
 }
 
 export function ConservationPredictionCard({ prediction }: ConservationPredictionCardProps) {
-  const confidencePercent = prediction.confidence_score * 100;
+  const confidencePercent =
+    prediction.confidence_score != null && Number.isFinite(Number(prediction.confidence_score))
+      ? Number(prediction.confidence_score) * 100
+      : null;
 
   return (
     <Card className="border-primary/20">
@@ -34,8 +37,8 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
             <CardTitle className="text-lg">Conservation Impact Prediction</CardTitle>
             <CardDescription>{prediction.practice_type}</CardDescription>
           </div>
-          <Badge variant={confidencePercent > 75 ? "default" : "secondary"}>
-            {confidencePercent.toFixed(0)}% confidence
+          <Badge variant={confidencePercent != null && confidencePercent > 75 ? "default" : "secondary"}>
+            {confidencePercent != null ? `${confidencePercent.toFixed(0)}% confidence` : 'Confidence not recorded'}
           </Badge>
         </div>
       </CardHeader>

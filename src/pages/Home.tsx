@@ -507,7 +507,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* LSU Partnership Section */}
+      {/* LSU research framing (not a partnership claim) */}
       <LSUResearchFramingSection />
 
       {/* Comparison Section */}
@@ -641,12 +641,12 @@ export default function Home() {
           {/* Bottom Bar */}
           <div className="pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © 2025 AgurateAI. Proudly serving Morehouse Parish, Louisiana
+              © 2025 AgurateAI. Louisiana Delta closed beta
             </p>
             <div className="flex items-center gap-6">
               <Badge variant="outline" className="text-xs">
                 <MapPin className="h-3 w-3 mr-1" />
-                Morehouse Parish, LA
+                Louisiana Delta
               </Badge>
               <Badge variant="outline" className="text-xs">
                 <Award className="h-3 w-3 mr-1" />

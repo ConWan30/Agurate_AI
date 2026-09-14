@@ -200,7 +200,7 @@ export default function Auth() {
               <h1 className="text-5xl font-heading font-bold">
                 Agurate<span className="text-primary-foreground">AI</span>
               </h1>
-              <p className="text-sm opacity-75 mt-1">Morehouse Parish, Louisiana</p>
+              <p className="text-sm opacity-75 mt-1">Louisiana Delta · Closed beta</p>
             </div>
           </div>
 
@@ -283,7 +283,7 @@ export default function Auth() {
                 <span className="text-3xl font-display font-bold">
                   Agurate<span className="text-primary">AI</span>
                 </span>
-                <p className="text-xs text-muted-foreground">Morehouse Parish, LA</p>
+                <p className="text-xs text-muted-foreground">Louisiana Delta · Closed beta</p>
               </div>
             </div>
             <p className="text-muted-foreground">AI-Powered Crop Health Monitoring</p>

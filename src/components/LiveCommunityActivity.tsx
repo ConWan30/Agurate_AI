@@ -65,7 +65,7 @@ export function LiveCommunityActivity() {
             {stats?.weeklyAssessments || 0} of your scans this week
           </p>
           <p>Closed beta for Louisiana Delta farms — savings claims not yet validated</p>
-          <p>Protecting crops from Morehouse to East Carroll Parish</p>
+          <p>Focus region: Louisiana Delta (parish set by each farmer)</p>
         </div>
       </CardContent>
     </Card>

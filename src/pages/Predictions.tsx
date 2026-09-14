@@ -321,7 +321,11 @@ export default function Predictions() {
 
                     <div className="flex items-center justify-between py-2">
                       <span className="text-sm font-semibold">Confidence:</span>
-                      <span className="text-base font-bold font-mono">{(pred.confidence * 100).toFixed(0)}%</span>
+                      <span className="text-base font-bold font-mono">
+                        {pred.confidence != null && Number.isFinite(Number(pred.confidence))
+                          ? `${(Number(pred.confidence) * 100).toFixed(0)}%`
+                          : '—'}
+                      </span>
                     </div>
 
                     <div className="pt-4 border-t space-y-2">

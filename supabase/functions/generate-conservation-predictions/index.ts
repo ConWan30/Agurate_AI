@@ -125,7 +125,15 @@ Historical Field Performance:
 Average Health: ${scoredAssessments.length > 0 ? (scoredAssessments.reduce((sum, a) => sum + Number(a.health_score), 0) / scoredAssessments.length).toFixed(1) : 'N/A'}
 
 Community Adoption Data (${practiceType}):
-${communityPractices.map(p => `- ${p.total_adopters} farmers: reported community avg savings $${p.average_annual_savings} (community-reported, not this farm's measured savings), Success: ${(p.success_rate * 100).toFixed(0)}%`).join('\n')}
+${communityPractices.map(p => {
+  const savings = p.average_annual_savings != null && Number.isFinite(Number(p.average_annual_savings))
+    ? `$${p.average_annual_savings}`
+    : 'not recorded';
+  const success = p.success_rate != null && Number.isFinite(Number(p.success_rate))
+    ? `${(Number(p.success_rate) * 100).toFixed(0)}%`
+    : 'not recorded';
+  return `- ${p.total_adopters} farmers: reported community avg savings ${savings} (community-reported, not this farm's measured savings), Success: ${success}`;
+}).join('\n')}
 
 Weather Context (Recent Events):
 ${weatherData.slice(0, 5).map(w => `- ${w.event_type}: ${w.event_date}`).join('\n')}
