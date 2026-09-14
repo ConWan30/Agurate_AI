@@ -28,7 +28,7 @@ export default function LSUResearchers() {
     setLoading(true);
     try {
       const [{ data: researchersData }, { data: publicationsData }] = await Promise.all([
-        supabase.from('lsu_researchers').select('*').order('name'),
+        supabase.from('lsu_researchers_directory').select('*').order('name'),
         supabase.from('lsu_publications').select('*').order('year', { ascending: false }).limit(10)
       ]);
 

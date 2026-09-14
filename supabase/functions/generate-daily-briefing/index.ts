@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -48,10 +49,22 @@ serve(async (req) => {
     const { user, authHeader } = auth;
     const supabaseClient = getAnonClient(authHeader);
 
+    const rateLimit = await enforceRateLimit(supabaseClient, user.id, {
+      functionName: 'generate-daily-briefing',
+      maxRequests: RATE_LIMITS['generate-daily-briefing'].maxRequests,
+      windowMs: RATE_LIMITS['generate-daily-briefing'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Fetch user's fields
     const { data: fields } = await supabaseClient
       .from('fields')
-      .select('id, name, crop_type, latitude, longitude')
+      .select('id, name, crop_type, location_lat, location_lng')
       .eq('user_id', user.id);
 
     if (!fields || fields.length === 0) {
@@ -63,8 +76,8 @@ serve(async (req) => {
 
     // Get weather data (use first field's location or default)
     const firstField = fields[0];
-    const lat = firstField.latitude || DEFAULT_LAT;
-    const lon = firstField.longitude || DEFAULT_LON;
+    const lat = firstField.location_lat || DEFAULT_LAT;
+    const lon = firstField.location_lng || DEFAULT_LON;
     const weather = await getWeatherData(lat, lon);
 
     // Fetch recent assessments for each field

@@ -11,7 +11,6 @@ interface LSUResearcher {
   id: string;
   name: string;
   title: string;
-  email: string;
   specialties: string[];
   typical_response_time: string;
 }
@@ -75,7 +74,6 @@ export function ExpertEscalationCard({
           id: match.id,
           name: match.name,
           title: match.department || 'LSU AgCenter',
-          email: match.email,
           specialties: match.expertise || [],
           typical_response_time: match.availability || 'varies',
         });
@@ -115,7 +113,7 @@ export function ExpertEscalationCard({
       if (error) throw error;
 
       setConsultationCreated(true);
-      toast.success('Expert consultation requested! You will be notified when the researcher responds.');
+      toast.success('Consultation note saved. This does not email LSU staff — use public AgCenter channels for follow-up.');
       
       if (onEscalationCreated) {
         onEscalationCreated(data.id);

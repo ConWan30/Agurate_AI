@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,6 +26,18 @@ serve(async (req) => {
     if (auth instanceof Response) return auth;
     const { user, authHeader } = auth;
     const supabase = getAnonClient(authHeader);
+
+    const rateLimit = await enforceRateLimit(supabase, user.id, {
+      functionName: 'predict-water-stress',
+      maxRequests: RATE_LIMITS['predict-water-stress'].maxRequests,
+      windowMs: RATE_LIMITS['predict-water-stress'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const rawBody = await req.json();
     const validation = waterStressSchema.safeParse(rawBody);

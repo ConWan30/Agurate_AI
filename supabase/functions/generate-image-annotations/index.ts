@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.178.0/http/server.ts';
-import { requireAuthenticatedUser } from '../_shared/auth.ts';
+import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 import { corsHeaders, handleError } from '../_shared/errorHandler.ts';
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -36,6 +37,19 @@ serve(async (req) => {
     const auth = await requireAuthenticatedUser(req, corsHeaders);
     if (auth instanceof Response) return auth;
     const { user, authHeader } = auth;
+    const rateLimitClient = getAnonClient(authHeader);
+
+    const rateLimit = await enforceRateLimit(rateLimitClient, user.id, {
+      functionName: 'generate-image-annotations',
+      maxRequests: RATE_LIMITS['generate-image-annotations'].maxRequests,
+      windowMs: RATE_LIMITS['generate-image-annotations'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const { image_url, analysis_context }: AnnotationRequest = await req.json();
 

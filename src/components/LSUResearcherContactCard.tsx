@@ -34,8 +34,8 @@ export function LSUResearcherContactCard({ researcher, onContact }: LSUResearche
       });
 
       toast({
-        title: "Contact request sent",
-        description: `Your request to contact ${researcher.name} has been recorded`,
+        title: "Request recorded (no email sent)",
+        description: `Request recorded for ${researcher.name}. This does not send email to LSU staff`,
       });
       
       onContact?.();

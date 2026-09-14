@@ -12,9 +12,10 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations (view invoker, RLS lock-down,
-   testimonial unapprove, critical_alerts reconcile, secure RPCs,
-   cooperative auth helper fix, peer/expert/coop schema reconcile, crop-images storage ownership)
+1. Apply pending Supabase migrations (through `20260914100000` researcher PII
+   + soybean crop checks, plus view invoker, RLS lock-down, testimonials,
+   critical_alerts, secure RPCs, coop auth, peer/expert/coop reconcile,
+   crop-images storage)
 2. Enable Auth **Leaked Password Protection**
 3. Deploy updated edge functions
 4. Set `DEMO_SETUP_SECRET` (or leave unset to keep demo setup disabled)
@@ -39,6 +40,10 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 - Fail-closed shared rate limiter on high-traffic AI edge functions
 - Soybean crop_type normalization to match fields CHECK
 - Community/beta metrics honesty (RPC count + own-scoped assessment labels)
+- Fail-closed rate limits on remaining AI edges (ar/unified/briefing/predictions/etc.)
+- Researcher PII locked: directory view + RPC without email; base table SELECT revoked
+- Softened false invite-email / researcher-notification claims
+- Daily briefing field coords use `location_lat` / `location_lng`
 
 ## Obsolete guidance
 

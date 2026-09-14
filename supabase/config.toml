@@ -41,16 +41,15 @@ verify_jwt = true
 [functions.conversational-form]
 verify_jwt = true
 
-# Gateway JWT stays off so OPTIONS preflight works; these functions must
-# call requireAuthenticatedUser themselves.
+# JWT required — functions also call requireAuthenticatedUser as defense in depth.
 [functions.get-market-prices]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-daily-briefing]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-predictive-questions]
-verify_jwt = false
+verify_jwt = true
 
 [functions.beta-signup]
 verify_jwt = false

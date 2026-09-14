@@ -94,7 +94,7 @@ export function CooperativeInviteDialog({ cooperativeId, cooperativeName, open, 
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              They'll receive an email with instructions to join
+              Share the code or link below. The invitee must sign in with this same email to join.
             </p>
           </div>
 

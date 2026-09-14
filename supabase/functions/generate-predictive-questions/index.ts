@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { requireAuthenticatedUser } from '../_shared/auth.ts';
+import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,7 +16,20 @@ serve(async (req) => {
   try {
     const auth = await requireAuthenticatedUser(req, corsHeaders);
     if (auth instanceof Response) return auth;
-    const { user } = auth;
+    const { user, authHeader } = auth;
+    const rateLimitClient = getAnonClient(authHeader);
+
+    const rateLimit = await enforceRateLimit(rateLimitClient, user.id, {
+      functionName: 'generate-predictive-questions',
+      maxRequests: RATE_LIMITS['generate-predictive-questions'].maxRequests,
+      windowMs: RATE_LIMITS['generate-predictive-questions'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Parse request body
     const body = await req.json();

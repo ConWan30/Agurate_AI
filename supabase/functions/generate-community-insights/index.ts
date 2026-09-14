@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { requireAuthenticatedUser, getServiceClient } from '../_shared/auth.ts';
+import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,6 +23,19 @@ serve(async (req) => {
     const auth = await requireAuthenticatedUser(req, corsHeaders);
     if (auth instanceof Response) return auth;
     const { user, authHeader } = auth;
+    const rateLimitClient = getAnonClient(authHeader);
+
+    const rateLimit = await enforceRateLimit(rateLimitClient, user.id, {
+      functionName: 'generate-community-insights',
+      maxRequests: RATE_LIMITS['generate-community-insights'].maxRequests,
+      windowMs: RATE_LIMITS['generate-community-insights'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const rawBody = await req.json();
     const validation = communityInsightsSchema.safeParse(rawBody);

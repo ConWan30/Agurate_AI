@@ -47,10 +47,15 @@ Last updated: 2026-09-14
 - [x] Shared edge rate limiter fail-closed on read/write errors; migrate high-traffic AI funcs
 - [x] Normalize soybean crop_type (DB CHECK singular) across client + edges
 - [x] Community/beta metrics use get_beta_farmer_count + honest own-assessment labels
+- [x] Expand fail-closed `enforceRateLimit` across remaining AI/edge functions
+- [x] Researcher PII: directory view (no email) + RPC without email + base table SELECT revoked
+- [x] Daily briefing uses `location_lat` / `location_lng`
+- [x] Soften false invite-email / researcher-notification delivery claims
+- [x] `verify_jwt=true` for get-market-prices / generate-daily-briefing / generate-predictive-questions
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (view invoker + RLS lock-down + testimonials + critical_alerts reconcile + secure RPCs + coop auth fix + peer/expert/coop reconcile + crop-images storage)
+- [ ] Apply pending Supabase migrations (through `20260914100000` researcher PII + crop checks, plus prior RLS/RPC/storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

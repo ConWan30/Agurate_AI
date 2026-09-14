@@ -51,6 +51,9 @@ const FORBIDDEN = [
   { name: 'fabricated tutorial health 68%→92%', re: /Health Score 68%\s*→\s*92%/i },
   { name: 'default USDA source without estimate label', re: /source:\s*priceData\.source\s*\|\|\s*'USDA'/ },
   { name: 'exponentially smarter claim', re: /exponentially smarter/i },
+  { name: 'false email invite delivery claim', re: /They'll receive an email with instructions to join/i },
+  { name: 'brokered researcher notification claim', re: /You will be notified when the researcher responds/i },
+  { name: 'contact request implies email sent', re: /Contact request sent(?![^.\n]*(?:no email|recorded only))/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

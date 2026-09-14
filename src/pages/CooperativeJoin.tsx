@@ -48,7 +48,7 @@ export default function CooperativeJoin() {
   const acceptInvitation = useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Please log in to accept this invitation');
+      if (!user) throw new Error('Please log in with the invited email address to accept this invitation');
       if (!invitation) throw new Error('No invitation found');
 
       // Add user to cooperative

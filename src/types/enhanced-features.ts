@@ -2,7 +2,8 @@
 export interface LSUResearcher {
   id: string;
   name: string;
-  email: string;
+  /** Not exposed via directory / matching RPC — optional for legacy types only */
+  email?: string;
   expertise: string[];
   department: string;
   availability: 'available' | 'busy' | 'unavailable';

@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.178.0/http/server.ts';
 import { handleError } from '../_shared/errorHandler.ts';
-import { requireAuthenticatedUser } from '../_shared/auth.ts';
+import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -64,6 +65,20 @@ serve(async (req) => {
     const auth = await requireAuthenticatedUser(req, corsHeaders);
     if (auth instanceof Response) {
       return auth;
+    }
+    const { user, authHeader } = auth;
+    const rateLimitClient = getAnonClient(authHeader);
+
+    const rateLimit = await enforceRateLimit(rateLimitClient, user.id, {
+      functionName: 'get-market-prices',
+      maxRequests: RATE_LIMITS['get-market-prices'].maxRequests,
+      windowMs: RATE_LIMITS['get-market-prices'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const url = new URL(req.url);
