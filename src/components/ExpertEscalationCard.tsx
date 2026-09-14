@@ -55,16 +55,24 @@ export function ExpertEscalationCard({
     setLoading(true);
     try {
       // Map issue type to specialties
-      const specialties: string[] = [];
-      if (issueType.includes('disease')) specialties.push('disease_diagnostics');
-      if (issueType.includes('pest')) specialties.push('pest_management');
-      if (issueType.includes('nutrient')) specialties.push('soil_health');
-      if (issueType.includes('rice')) specialties.push('rice_specialist');
-      if (issueType.includes('soybean')) specialties.push('soybean_pathology');
+      // Match directory expertise tokens (crops / issue themes), not fabricated specialty slugs.
+      const cropHints = ['rice', 'soybean', 'cotton', 'corn'] as const;
+      const issue = (issueType || '').toLowerCase();
+      const cropType =
+        cropHints.find((c) => issue.includes(c)) ||
+        cropHints.find((c) => (issueType || '').toLowerCase().includes(c)) ||
+        'rice';
+      const issueKey = issue.includes('pest')
+        ? 'pest'
+        : issue.includes('nutrient') || issue.includes('soil')
+          ? 'soil'
+          : issue.includes('disease') || issue.includes('patholog')
+            ? 'disease'
+            : issue;
 
       const { data, error } = await supabase.rpc('find_matching_researcher', {
-        p_crop_type: specialties.length > 0 ? specialties[0] : issueType,
-        p_issue_type: issueType,
+        p_crop_type: cropType,
+        p_issue_type: issueKey,
       });
 
       if (error) throw error;

@@ -58,6 +58,10 @@ const FORBIDDEN = [
   { name: 'real-time ROI for every recommendation', re: /(?:real-time|realtime) return on investment for every recommendation/i },
   { name: 'instant AI-powered analysis claim', re: /Instant AI-powered analysis/i },
   { name: 'contact request implies email sent', re: /Contact request sent(?![^.\n]*(?:no email|recorded only))/i },
+  { name: 'first 100 farmers lifetime 50% claim', re: /Free for First 100.*Lifetime 50%/i },
+  { name: 'real-time AI + DIRT integration claim', re: /Real-time AI \+ DIRT integration/i },
+  { name: 'instant smartphone analysis claim', re: /Instant smartphone analysis/i },
+  { name: 'direct DIRT integration claim', re: /direct integration to MSU DIRT/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

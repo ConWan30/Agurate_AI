@@ -107,7 +107,7 @@ export default function Onboarding() {
         const fieldData: FieldData = {
           user_id: user.id,
           name: extractedData.field_name!,
-          crop_type: extractedData.field_crop_type!,
+          crop_type: (extractedData.field_crop_type === 'soybeans' ? 'soybean' : extractedData.field_crop_type)!,
           acreage: extractedData.field_acreage || extractedData.total_acreage,
         };
 

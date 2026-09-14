@@ -33,6 +33,7 @@ import { SkeletonDashboard } from "@/components/ui/skeleton-card";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { EmptyState } from "@/components/ui/empty-state";
+import { toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -311,7 +312,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Water Stress</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Real-time monitoring + DIRT link
+                    Water stress monitoring + DIRT link
                   </p>
                   <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
                 </CardContent>
@@ -633,7 +634,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-6">
                         <div className="text-right">
                           <p className="text-3xl font-mono font-bold text-primary">
-                            <AnimatedCounter value={Math.round((assessment.health_score || 0) * 100)} suffix="%" />
+                            <AnimatedCounter value={Math.round(toHealthPercent(assessment.health_score))} suffix="%" />
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">Health Score</p>
                         </div>

@@ -14,6 +14,7 @@ import TutorialTooltip from '@/components/TutorialTooltip';
 import { useHaptics } from '@/hooks/use-haptics';
 import { useGlobalKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
+import { toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -228,10 +229,10 @@ export default function Scanner() {
         .insert({
           field_id: selectedFieldId,
           image_url: imageUrl,
-          health_score: aiResult.health_score || 0.75,
+          health_score: toHealthPercent(aiResult.health_score ?? 0.75),
           stress_level: aiResult.stress_level || 'healthy',
           symptoms: aiResult.symptoms || [],
-          confidence_score: aiResult.confidence_score || 0.85,
+          confidence_score: toHealthPercent(aiResult.confidence_score ?? 0.85),
           photo_location_lat: gpsCoords?.lat || selectedField.location_lat,
           photo_location_lng: gpsCoords?.lng || selectedField.location_lng,
           gps_accuracy_meters: gpsCoords?.accuracy,
@@ -391,7 +392,7 @@ export default function Scanner() {
                       <div className="absolute top-4 right-4 bg-card/90 backdrop-blur-sm border text-card-foreground px-4 py-2 rounded-lg shadow-md">
                         <div className="text-xs text-muted-foreground">Health Score</div>
                         <div className="text-2xl font-bold text-foreground">
-                          {(aiOverlay.health_score * 100).toFixed(0)}%
+                          {toHealthPercent(aiOverlay.health_score).toFixed(0)}%
                         </div>
                       </div>
 
@@ -410,7 +411,7 @@ export default function Scanner() {
                               ? 'bg-secondary/20 text-secondary-foreground'
                               : 'bg-destructive/20 text-destructive'
                           }`}>
-                            {aiOverlay.confidence_score && `${(aiOverlay.confidence_score * 100).toFixed(0)}% conf.`}
+                            {aiOverlay.confidence_score && `${toHealthPercent(aiOverlay.confidence_score).toFixed(0)}% conf.`}
                           </span>
                         </div>
                         {aiOverlay.visual_cues && (

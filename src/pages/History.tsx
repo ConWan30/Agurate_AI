@@ -27,6 +27,7 @@ import { ImageHistoryComparison } from "@/components/ImageHistoryComparison";
 import { ExpertEscalationCard } from "@/components/ExpertEscalationCard";
 import { PeerComparisonCard } from "@/components/PeerComparisonCard";
 import { AnnotatedImage, type ImageAnnotation } from "@/components/AnnotatedImage";
+import { toHealthPercent } from '@/lib/health-score';
 
 interface Assessment {
   id: string;
@@ -233,7 +234,7 @@ export default function History() {
                         </div>
                        <div className="text-right">
                           <div className="text-3xl font-bold font-mono text-foreground">
-                            {Math.round((assessment.health_score || 0) * 100)}
+                            {Math.round(toHealthPercent(assessment.health_score))}
                           </div>
                           <p className="text-xs text-muted-foreground">Health Score</p>
                         </div>
@@ -334,7 +335,7 @@ export default function History() {
                                   body: JSON.stringify({
                                     image_url: selectedAssessment.image_url,
                                     analysis_context: {
-                                      health_score: (selectedAssessment.health_score || 0) * 100,
+                                      health_score: toHealthPercent(selectedAssessment.health_score),
                                       stress_level: selectedAssessment.stress_level,
                                       symptoms: selectedAssessment.symptoms,
                                       diseases: selectedAssessment.disease_identified,
@@ -390,7 +391,7 @@ export default function History() {
 
                   {/* Executive Summary */}
                   <AnalysisExecutiveSummary
-                    healthScore={(selectedAssessment.health_score || 0) * 100}
+                    healthScore={toHealthPercent(selectedAssessment.health_score)}
                     stressLevel={selectedAssessment.stress_level}
                     condition={selectedAssessment.stress_level}
                     yieldImpact={selectedAssessment.estimated_yield_impact_percent || 0}
@@ -420,7 +421,7 @@ export default function History() {
                         : "none"
                     }
                     criticalIssue={
-                      (selectedAssessment.health_score || 0) * 100 < 50
+                      toHealthPercent(selectedAssessment.health_score) < 50
                         ? "Severe crop stress"
                         : (selectedAssessment.severity_ratings?.disease_pressure === "severe" ||
                             selectedAssessment.severity_ratings?.disease_pressure === "high")
@@ -441,7 +442,7 @@ export default function History() {
                         fieldId={selectedAssessment.field.id}
                         fieldName={selectedAssessment.field.name}
                         cropType={selectedAssessment.field.crop_type}
-                        healthScoreBefore={(selectedAssessment.health_score || 0) * 100}
+                        healthScoreBefore={toHealthPercent(selectedAssessment.health_score)}
                         stressLevel={selectedAssessment.stress_level}
                         symptoms={selectedAssessment.symptoms || []}
                         onSetReminder={(rec) => {
@@ -477,7 +478,7 @@ export default function History() {
                           }
                           cropType={selectedAssessment.field.crop_type}
                           stressLevel={selectedAssessment.stress_level}
-                          currentHealthScore={(selectedAssessment.health_score || 0) * 100}
+                          currentHealthScore={toHealthPercent(selectedAssessment.health_score)}
                         />
                       )}
                     </>
@@ -495,9 +496,9 @@ export default function History() {
                       }
                       issueDescription={
                         selectedAssessment.detailed_visual_analysis ||
-                        `Health score: ${(selectedAssessment.health_score || 0) * 100}%, Stress: ${selectedAssessment.stress_level}`
+                        `Health score: ${toHealthPercent(selectedAssessment.health_score)}%, Stress: ${selectedAssessment.stress_level}`
                       }
-                      confidenceScore={(selectedAssessment.confidence_score || 0) * 100}
+                      confidenceScore={toHealthPercent(selectedAssessment.confidence_score)}
                       fieldId={selectedAssessment.field.id}
                       assessmentId={selectedAssessment.id}
                       aiAnalysis={{
@@ -534,7 +535,7 @@ export default function History() {
 
                   {/* Detailed Analysis Tabs */}
                   <DetailedAnalysisTabs
-                    healthScore={(selectedAssessment.health_score || 0) * 100}
+                    healthScore={toHealthPercent(selectedAssessment.health_score)}
                     stressLevel={selectedAssessment.stress_level}
                     growthStage={selectedAssessment.growth_stage}
                     canopyCoverage={selectedAssessment.canopy_coverage_percent}

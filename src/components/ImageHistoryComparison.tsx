@@ -8,6 +8,7 @@ import { Calendar, TrendingUp, TrendingDown, Minus, Loader2, Image as ImageIcon 
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { ProgressiveImage } from '@/components/ui/progressive-image';
+import { toHealthPercent } from '@/lib/health-score';
 
 interface Assessment {
   id: string;
@@ -144,7 +145,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
             ...(assessment2.symptoms || []),
           ],
           visual_changes: [
-            `Health score changed from ${assessment1.health_score}% to ${assessment2.health_score}%`,
+            `Health score changed from ${toHealthPercent(assessment1.health_score)}% to ${toHealthPercent(assessment2.health_score)}%`,
             `Stress level: ${assessment1.stress_level} → ${assessment2.stress_level}`,
           ],
         });
@@ -235,7 +236,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
               <SelectContent>
                 {assessments.map((assessment) => (
                   <SelectItem key={assessment.id} value={assessment.id}>
-                    {format(new Date(assessment.analyzed_at), 'MMM d, yyyy')} - {assessment.health_score}% health
+                    {format(new Date(assessment.analyzed_at), 'MMM d, yyyy')} - {toHealthPercent(assessment.health_score)}% health
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -254,7 +255,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
               <SelectContent>
                 {assessments.map((assessment) => (
                   <SelectItem key={assessment.id} value={assessment.id}>
-                    {format(new Date(assessment.analyzed_at), 'MMM d, yyyy')} - {assessment.health_score}% health
+                    {format(new Date(assessment.analyzed_at), 'MMM d, yyyy')} - {toHealthPercent(assessment.health_score)}% health
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -288,7 +289,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
                     {format(new Date(assessment1.analyzed_at), 'MMM d, yyyy')}
                   </CardTitle>
                   <Badge variant={assessment1.stress_level === 'severe' ? 'destructive' : assessment1.stress_level === 'moderate' ? 'default' : 'outline'}>
-                    {assessment1.health_score}% health
+                    {toHealthPercent(assessment1.health_score)}% health
                   </Badge>
                 </div>
               </CardHeader>
@@ -313,7 +314,7 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
                     {format(new Date(assessment2.analyzed_at), 'MMM d, yyyy')}
                   </CardTitle>
                   <Badge variant={assessment2.stress_level === 'severe' ? 'destructive' : assessment2.stress_level === 'moderate' ? 'default' : 'outline'}>
-                    {assessment2.health_score}% health
+                    {toHealthPercent(assessment2.health_score)}% health
                   </Badge>
                 </div>
               </CardHeader>

@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -25,8 +26,8 @@ export default function FieldMapLeaflet({ fields }: FieldMapLeafletProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   const getHealthColor = (healthScore: number = 0.5) => {
-    if (healthScore >= 0.75) return '#10b981';
-    if (healthScore >= 0.50) return '#eab308';
+    if (toHealthPercent(healthScore) >= 75) return '#10b981';
+    if (toHealthPercent(healthScore) >= 50) return '#eab308';
     return '#ef4444';
   };
 
@@ -75,7 +76,7 @@ export default function FieldMapLeaflet({ fields }: FieldMapLeafletProps) {
       }).addTo(map.current!);
 
       // Add popup with field details
-      const healthPercentage = ((field.health_score || 0.5) * 100).toFixed(0);
+      const healthPercentage = toHealthPercent(field.health_score).toFixed(0);
       marker.bindPopup(`
         <div style="font-family: system-ui; padding: 8px;">
           <h3 style="font-weight: bold; margin: 0 0 8px 0; font-size: 16px;">${field.name}</h3>

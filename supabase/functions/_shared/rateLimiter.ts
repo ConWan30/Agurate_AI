@@ -138,4 +138,73 @@ export const RATE_LIMITS = {
   'compare-images': { maxRequests: 10, windowMs: 60_000 },
   'weather-alerts': { maxRequests: 20, windowMs: 60_000 },
   'get-usage-stats': { maxRequests: 30, windowMs: 60_000 },
+  'beta-signup': { maxRequests: 5, windowMs: 15 * 60_000 },
 } as const;
+
+/** Fail-closed IP bucket limiter for public (unauthenticated) edges. */
+export async function enforceIpRateLimit(
+  // deno-lint-ignore no-explicit-any
+  serviceClient: any,
+  ip: string,
+  config: { bucket: string; maxRequests: number; windowMs: number }
+): Promise<RateLimitResult> {
+  const windowStart = new Date(Date.now() - config.windowMs).toISOString();
+  const ipHash = await hashIp(ip || 'unknown');
+
+  const { count, error } = await serviceClient
+    .from('edge_ip_rate_limits')
+    .select('id', { count: 'exact', head: true })
+    .eq('bucket', config.bucket)
+    .eq('ip_hash', ipHash)
+    .gte('created_at', windowStart);
+
+  if (error) {
+    console.error('[rateLimiter] IP rate limit read failed (fail closed):', error);
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + config.windowMs,
+      limit: config.maxRequests,
+    };
+  }
+
+  if ((count ?? 0) >= config.maxRequests) {
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + config.windowMs,
+      limit: config.maxRequests,
+    };
+  }
+
+  const { error: insertError } = await serviceClient.from('edge_ip_rate_limits').insert({
+    bucket: config.bucket,
+    ip_hash: ipHash,
+  });
+
+  if (insertError) {
+    console.error('[rateLimiter] IP rate limit write failed (fail closed):', insertError);
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + config.windowMs,
+      limit: config.maxRequests,
+    };
+  }
+
+  return {
+    allowed: true,
+    remaining: Math.max(0, config.maxRequests - (count ?? 0) - 1),
+    resetTime: Date.now() + config.windowMs,
+    limit: config.maxRequests,
+  };
+}
+
+async function hashIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode(ip);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 32);
+}

@@ -42,13 +42,9 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
   const { data: betaCount } = useQuery({
     queryKey: ['beta-count'],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('beta_farmer', true);
-
+      const { data, error } = await supabase.rpc('get_beta_farmer_count');
       if (error) throw error;
-      return count || 0;
+      return data ?? 0;
     }
   });
 
@@ -104,7 +100,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             Welcome to AgurateAI Beta! 🎉
           </h2>
           <p className="text-xl text-muted-foreground">
-            You're Beta Farmer #{betaCount} of 100
+            You're Beta Farmer #{betaCount}
           </p>
         </div>
 

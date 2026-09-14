@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
+import { toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -232,10 +233,10 @@ export default function Upload() {
       .insert({
         field_id: fieldId,
         image_url: imageUrl,
-        health_score: aiResult.health_score,
+        health_score: toHealthPercent(aiResult.health_score),
         stress_level: aiResult.stress_level,
         symptoms: aiResult.symptoms,
-        confidence_score: aiResult.confidence_score,
+        confidence_score: toHealthPercent(aiResult.confidence_score),
         weather_temp_f: aiResult.weather_data?.temp_f,
         weather_precipitation_mm: aiResult.weather_data?.precipitation_inch ? 
           aiResult.weather_data.precipitation_inch * 25.4 : null, // Convert inches to mm
@@ -290,7 +291,7 @@ export default function Upload() {
         body: {
           assessment_id: assessment.id,
           field_id: fieldId,
-          health_score: aiResult.health_score,
+          health_score: toHealthPercent(aiResult.health_score),
           stress_level: aiResult.stress_level,
           diseases: aiResult.disease_identified,
           pests: aiResult.pest_identified,

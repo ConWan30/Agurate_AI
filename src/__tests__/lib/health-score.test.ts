@@ -1,0 +1,28 @@
+import { describe, expect, it } from 'vitest';
+import {
+  formatHealthPercent,
+  healthTone,
+  toHealthFraction,
+  toHealthPercent,
+} from '@/lib/health-score';
+
+describe('health-score helpers', () => {
+  it('treats 0–1 fractions as percentages', () => {
+    expect(toHealthPercent(0.72)).toBe(72);
+    expect(toHealthPercent(1)).toBe(100);
+    expect(toHealthPercent(0)).toBe(0);
+  });
+
+  it('passes through 0–100 values', () => {
+    expect(toHealthPercent(68)).toBe(68);
+    expect(toHealthPercent(91.5)).toBe(91.5);
+  });
+
+  it('formats and classifies tones', () => {
+    expect(formatHealthPercent(0.8)).toBe('80%');
+    expect(healthTone(0.9)).toBe('good');
+    expect(healthTone(60)).toBe('moderate');
+    expect(healthTone(0.2)).toBe('severe');
+    expect(toHealthFraction(80)).toBe(0.8);
+  });
+});

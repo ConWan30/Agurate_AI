@@ -30,6 +30,15 @@ function validateImageUrl(url: string, mediaType: string): boolean {
   return false;
 }
 
+
+/** Canonical assessment scores are 0–100 (DB check). AI often returns 0–1. */
+function toHealthPercent(score: number | null | undefined): number {
+  if (score == null || Number.isNaN(Number(score))) return 0;
+  const n = Number(score);
+  if (n <= 1) return Math.round(n * 1000) / 10;
+  return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -149,7 +158,7 @@ serve(async (req) => {
 📈 HISTORICAL HEALTH TREND (Last 5 Assessments):
 ${assessmentHistory && assessmentHistory.length > 0 
   ? assessmentHistory.map((a: any, i: number) => 
-      `${i + 1}. ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${a.health_score}%, Stress: ${a.stress_level}${a.symptoms?.length > 0 ? `, Symptoms: ${a.symptoms.join(', ')}` : ''}`
+      `${i + 1}. ${new Date(a.analyzed_at).toLocaleDateString()}: Health ${toHealthPercent(a.health_score)}%, Stress: ${a.stress_level}${a.symptoms?.length > 0 ? `, Symptoms: ${a.symptoms.join(', ')}` : ''}`
     ).join('\n') 
   : '- No historical data available (first assessment)'}
 
@@ -464,12 +473,12 @@ Respond with JSON:
     // Combine both AI outputs
     const finalResult = {
       // From image analysis
-      health_score: imageAnalysis.health_score,
+      health_score: toHealthPercent(imageAnalysis.health_score),
       stress_level: normalizeStressLevel(imageAnalysis.condition),
       stress_score: imageAnalysis.stress_score,
       symptoms: imageAnalysis.symptoms,
       visual_cues: imageAnalysis.visual_cues,
-      confidence_score: imageAnalysis.confidence_score,
+      confidence_score: toHealthPercent(imageAnalysis.confidence_score),
       
       // Enhanced analytical fields
       growth_stage: imageAnalysis.growth_stage,

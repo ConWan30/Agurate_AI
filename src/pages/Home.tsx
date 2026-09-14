@@ -79,7 +79,7 @@ export default function Home() {
     {
       icon: Droplets,
       title: "Water Stress Intelligence",
-      description: "Real-time water stress detection with direct integration to MSU DIRT irrigation scheduling for precision water management.",
+      description: "Water stress signals with a deep-link to the public MSU DIRT irrigation scheduling tool (opens in a new tab — not an embedded integration).",
       color: "gradient-delta"
     },
     {
@@ -123,7 +123,7 @@ export default function Home() {
   const benefits = [
     "Phone-camera crop health reads for Delta crops",
     "7-14 day predictive analytics for proactive decisions",
-    "Water stress monitoring with DIRT integration",
+    "Water stress monitoring with link to MSU DIRT",
     "Insights informed by LSU AgCenter research framing",
     "Conservation practice tracking and ROI analysis",
     "Community intelligence and cooperative insights",

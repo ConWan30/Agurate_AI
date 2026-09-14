@@ -3,6 +3,14 @@ import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
+function toHealthPercent(score: number | null | undefined): number {
+  if (score == null || Number.isNaN(Number(score))) return 0;
+  const n = Number(score);
+  if (n <= 1) return Math.round(n * 1000) / 10;
+  return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
+}
+
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -126,11 +134,11 @@ Return JSON with complete predictive analysis including confidence scores.`;
     try {
       predictionData = JSON.parse(aiResponse);
     } catch {
-      const avgHealth = assessments?.reduce((sum, a) => sum + (a.health_score || 0), 0) / (assessments?.length || 1);
+      const avgHealth = assessments?.reduce((sum, a) => sum + toHealthPercent(a.health_score), 0) / (assessments?.length || 1);
       predictionData = {
         yield_prediction: avgHealth > 75 ? 'Above average' : 'Average',
         disease_risk: avgHealth < 70 ? 0.6 : 0.3,
-        confidence_score: 0.75,
+        confidence_score: 75,
         recommendations: ['Monitor field conditions regularly'],
       };
     }
@@ -142,7 +150,7 @@ Return JSON with complete predictive analysis including confidence scores.`;
         model_type: 'comprehensive',
         field_id: fieldId,
         prediction_horizon: 30,
-        confidence_score: predictionData.confidence_score || 0.75,
+        confidence_score: toHealthPercent(predictionData.confidence_score ?? 0.75),
         prediction_data: predictionData,
         lsu_validation: false,
       })

@@ -168,14 +168,14 @@ export default function BetaSignup() {
             🌾 Join AgurateAI Beta Program
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground">
-            Free for First 100 Louisiana Delta Farmers + Lifetime 50% Discount
+            Closed beta for Louisiana Delta farmers — 50% off the published rate after launch
           </p>
           
           {/* Beta Status */}
           <div className="flex flex-col items-center gap-4 py-6">
             <Badge variant={isCritical ? "destructive" : showUrgency ? "default" : "secondary"} className="text-lg px-4 py-2">
               <Sparkles className="mr-2 h-4 w-4" />
-              {betaCount}/100 spots filled
+              {betaCount} beta farmers enrolled
             </Badge>
             <div className="w-full max-w-md">
               <Progress value={spotsPercentage} className="h-3" />
@@ -219,11 +219,11 @@ export default function BetaSignup() {
             <Card className="border-2 hover:border-primary transition-colors">
               <CardHeader>
                 <DollarSign className="h-10 w-10 text-primary mb-2" />
-                <CardTitle className="text-xl">Lifetime 50% Discount</CardTitle>
+                <CardTitle className="text-xl">Beta pricing benefit</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Lock in 50% off forever when beta ends
+                  Keep 50% off the published plan rate when paid plans launch
                 </p>
               </CardContent>
             </Card>
@@ -290,7 +290,7 @@ export default function BetaSignup() {
             <CardHeader>
               <CardTitle className="text-2xl font-heading">Start Your Free Beta</CardTitle>
               <CardDescription>
-                Join the first 100 Louisiana Delta farmers to get lifetime 50% discount
+                Join the Louisiana Delta closed beta for research-framed crop health tools
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -509,14 +509,14 @@ export default function BetaSignup() {
             <AccordionItem value="item-1">
               <AccordionTrigger>How long is the beta program?</AccordionTrigger>
               <AccordionContent>
-                Beta program runs until we reach 100 farmers. After that, beta farmers continue with lifetime 50% discount.
+                Closed beta enrollment is limited. Beta farmers keep 50% off the published plan rate when paid plans launch.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2">
               <AccordionTrigger>What happens when beta ends?</AccordionTrigger>
               <AccordionContent>
-                You'll automatically get lifetime 50% discount on all paid plans. Free access continues until paid plans launch.
+                You'll keep 50% off the published plan rate on paid plans. Free access continues until paid plans launch.
               </AccordionContent>
             </AccordionItem>
 

@@ -214,7 +214,7 @@ export default function Auth() {
           </h2>
           
               <p className="text-lg opacity-90 mb-8 leading-relaxed">
-            Real-time crop health monitoring for rice, soybean, cotton, and corn. 
+            Crop health assessments for rice, soybean, cotton, and corn. 
             Guidance framed around publicly available LSU AgCenter research.
           </p>
 
@@ -225,7 +225,7 @@ export default function Auth() {
                 <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
-                <p className="font-semibold">Real-time Crop Assessment</p>
+                <p className="font-semibold">Crop Health Assessment</p>
                 <p className="text-sm opacity-75">Research-framed crop health assessments</p>
               </div>
             </div>

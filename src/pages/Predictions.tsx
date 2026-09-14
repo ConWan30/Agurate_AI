@@ -361,7 +361,7 @@ export default function Predictions() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
                     <Cloud className="h-4 w-4" />
-                    <span>Real-time weather correlation</span>
+                    <span>Weather correlation</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
                     <TrendingUp className="h-4 w-4" />

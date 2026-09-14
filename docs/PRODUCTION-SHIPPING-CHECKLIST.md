@@ -53,12 +53,16 @@ Last updated: 2026-09-14
 - [x] Soften false invite-email / researcher-notification delivery claims
 - [x] `verify_jwt=true` for get-market-prices / generate-daily-briefing / generate-predictive-questions
 - [x] Case-insensitive cooperative invitation SELECT + join email-binding UX
+- [x] Canonical health_score/confidence 0–100 across analyze-crop + UI
+- [x] Demo fields UNIQUE(user_id,name) + durable beta-signup IP rate limits
+- [x] Soften DIRT “direct integration” / Instant analysis / hard 100-spot claims
+- [x] Researcher match uses crop tokens; onboarding soybeans→soybean
 - [x] get-usage-stats fail-closed rate limit
 - [x] Soften expert-escalation “researcher will receive” delivery claim
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (through `20260914110000` researcher PII + crop checks, plus prior RLS/RPC/storage)
+- [ ] Apply pending Supabase migrations (through `20260914120000` researcher PII + crop checks, plus prior RLS/RPC/storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

@@ -9,7 +9,7 @@ export const ComparisonSection = memo(function ComparisonSection() {
       feature: "AI Crop Analysis",
       agurate: true,
       traditional: false,
-      description: "Instant smartphone analysis vs. lab samples"
+      description: "Smartphone photo analysis vs. waiting on lab samples"
     },
     {
       feature: "Predictive Analytics",
@@ -33,7 +33,7 @@ export const ComparisonSection = memo(function ComparisonSection() {
       feature: "Water Stress Detection",
       agurate: true,
       traditional: false,
-      description: "Real-time AI + DIRT integration"
+      description: "AI water-stress cues + link out to MSU DIRT"
     },
     {
       feature: "Variety Recommendations",

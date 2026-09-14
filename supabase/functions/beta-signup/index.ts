@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { enforceIpRateLimit, RATE_LIMITS } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,11 +18,6 @@ interface BetaSignupData {
   email_consent: boolean;
 }
 
-/** Simple per-isolate IP rate limit (best-effort across cold starts). */
-const recentAttempts = new Map<string, number[]>();
-const RATE_WINDOW_MS = 15 * 60 * 1000;
-const RATE_MAX = 5;
-
 function clientIp(req: Request): string {
   return (
     req.headers.get('cf-connecting-ip') ??
@@ -29,18 +25,6 @@ function clientIp(req: Request): string {
     req.headers.get('x-real-ip') ??
     'unknown'
   );
-}
-
-function allowAttempt(ip: string): boolean {
-  const now = Date.now();
-  const prior = (recentAttempts.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
-  if (prior.length >= RATE_MAX) {
-    recentAttempts.set(ip, prior);
-    return false;
-  }
-  prior.push(now);
-  recentAttempts.set(ip, prior);
-  return true;
 }
 
 function isValidEmail(email: string): boolean {
@@ -54,7 +38,17 @@ serve(async (req) => {
 
   try {
     const ip = clientIp(req);
-    if (!allowAttempt(ip)) {
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const ipLimit = await enforceIpRateLimit(supabase, ip, {
+      bucket: 'beta-signup',
+      maxRequests: RATE_LIMITS['beta-signup'].maxRequests,
+      windowMs: RATE_LIMITS['beta-signup'].windowMs,
+    });
+    if (!ipLimit.allowed) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -67,10 +61,6 @@ serve(async (req) => {
         }
       );
     }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const formData: BetaSignupData = await req.json();
 

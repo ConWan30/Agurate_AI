@@ -10,6 +10,7 @@ import { Cloud, CloudRain, Sun, Wind, Droplets, AlertTriangle, Activity } from '
 import { Button } from '@/components/ui/button';
 import TutorialTooltip from '@/components/TutorialTooltip';
 import bgWeatherStation from "@/assets/bg-weather-station.jpg";
+import { toHealthPercent } from '@/lib/health-score';
 
 interface Assessment {
   id: string;
@@ -96,7 +97,7 @@ export default function WeatherTimeline() {
     if (assessmentsData && assessmentsData.length > 0) {
       const timeline: TimelineDataPoint[] = assessmentsData.map(assessment => ({
         date: new Date(assessment.analyzed_at).toLocaleDateString(),
-        healthScore: (assessment.health_score || 0) * 100,
+        healthScore: toHealthPercent(assessment.health_score),
         temperature: assessment.weather_temp_f,
         precipitation: assessment.weather_precipitation_mm ? assessment.weather_precipitation_mm / 25.4 : null, // mm to inches
         events: (eventsData || []).filter(e => 
@@ -286,7 +287,7 @@ export default function WeatherTimeline() {
                     <div className="flex items-center gap-3">
                       <div className="text-right">
                         <p className="font-mono font-semibold">
-                          {((assessment.health_score || 0) * 100).toFixed(0)}%
+                          {(toHealthPercent(assessment.health_score)).toFixed(0)}%
                         </p>
                         {assessment.weather_temp_f && (
                           <p className="text-xs text-muted-foreground">

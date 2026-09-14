@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import FieldMapLeaflet from '@/components/FieldMapLeaflet';
 import bgFieldAerial from "@/assets/bg-field-aerial.jpg";
 import TutorialTooltip from '@/components/TutorialTooltip';
+import { toHealthPercent } from '@/lib/health-score';
 
 interface Field {
   id: string;
@@ -85,8 +86,8 @@ export default function FieldMap() {
   };
 
   const getHealthColor = (healthScore: number) => {
-    if (healthScore >= 0.75) return 'bg-health-good';
-    if (healthScore >= 0.50) return 'bg-health-moderate';
+    if (toHealthPercent(healthScore) >= 75) return 'bg-health-good';
+    if (toHealthPercent(healthScore) >= 50) return 'bg-health-moderate';
     return 'bg-health-severe';
   };
 
@@ -142,7 +143,7 @@ export default function FieldMap() {
             Delta Field Command Center
           </h1>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Real-time spatial visualization of crop health across Louisiana Delta
+            Spatial visualization of crop health across Louisiana Delta fields
           </p>
         </div>
       </div>
