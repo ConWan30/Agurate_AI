@@ -58,9 +58,12 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
           Water Stress Detected - {(waterStress.severity || 'unknown').toUpperCase()}
         </span>
         <Badge variant="outline" className="text-xs">
-          {waterStress.stress_score != null && Number.isFinite(Number(waterStress.stress_score))
-            ? `${(Number(waterStress.stress_score) * 100).toFixed(0)}% severity`
-            : 'severity not recorded'}
+          {(() => {
+            const n = Number(waterStress.stress_score);
+            return Number.isFinite(n) && n >= 0 && n <= 1
+              ? `${(n * 100).toFixed(0)}% severity`
+              : 'severity not recorded';
+          })()}
         </Badge>
       </AlertTitle>
       <AlertDescription className="space-y-3">
@@ -118,9 +121,12 @@ export function EnhancedWaterStressAlert({ waterStress }: EnhancedWaterStressAle
 
         <div className="text-xs text-muted-foreground">
           Confidence:{' '}
-          {waterStress.confidence != null && Number.isFinite(Number(waterStress.confidence))
-            ? `${(Number(waterStress.confidence) * 100).toFixed(0)}%`
-            : 'not recorded'}{' '}
+          {(() => {
+            const n = Number(waterStress.confidence);
+            return Number.isFinite(n) && n >= 0 && n <= 1
+              ? `${(n * 100).toFixed(0)}%`
+              : 'not recorded';
+          })()}{' '}
           | Detected: {new Date(waterStress.created_at).toLocaleDateString()}
         </div>
       </AlertDescription>

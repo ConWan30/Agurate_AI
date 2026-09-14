@@ -73,26 +73,55 @@ export function CriticalAlertsManager() {
     }
   };
 
-  const getSeverityVariant = (severity: string): 'default' | 'destructive' | 'outline' => {
-    switch (severity) {
+  const normalizeSeverity = (severity: string): 'critical' | 'high' | 'medium' | 'unknown' => {
+    const s = (severity || '').toLowerCase();
+    if (s === 'critical' || s === 'high' || s === 'medium') return s;
+    return 'unknown';
+  };
+
+  const getSeverityVariant = (severity: string): 'default' | 'destructive' | 'outline' | 'secondary' => {
+    switch (normalizeSeverity(severity)) {
       case 'critical':
         return 'destructive';
       case 'high':
         return 'default';
-      default:
+      case 'medium':
         return 'outline';
+      default:
+        // Fail closed — never style unknown severity as medium/yellow urgency
+        return 'secondary';
     }
   };
 
   const getSeverityColor = (severity: string) => {
-    switch (severity) {
+    switch (normalizeSeverity(severity)) {
       case 'critical':
         return 'text-destructive';
       case 'high':
         return 'text-orange-600';
-      default:
+      case 'medium':
         return 'text-yellow-600';
+      default:
+        return 'text-muted-foreground';
     }
+  };
+
+  const getSeverityBorder = (severity: string) => {
+    switch (normalizeSeverity(severity)) {
+      case 'critical':
+        return 'border-destructive animate-pulse';
+      case 'high':
+        return 'border-orange-500';
+      case 'medium':
+        return 'border-yellow-500';
+      default:
+        return 'border-muted';
+    }
+  };
+
+  const getSeverityLabel = (severity: string) => {
+    const n = normalizeSeverity(severity);
+    return n === 'unknown' ? 'SEVERITY UNKNOWN' : n.toUpperCase();
   };
 
   if (loading) {
@@ -148,13 +177,7 @@ export function CriticalAlertsManager() {
       {alerts.map((alert) => (
         <Card 
           key={alert.id} 
-          className={`border-2 ${
-            alert.severity === 'critical' 
-              ? 'border-destructive animate-pulse' 
-              : alert.severity === 'high'
-              ? 'border-orange-500'
-              : 'border-yellow-500'
-          }`}
+          className={`border-2 ${getSeverityBorder(alert.severity)}`}
         >
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -163,7 +186,7 @@ export function CriticalAlertsManager() {
                   <AlertTriangle className={`h-5 w-5 ${getSeverityColor(alert.severity)}`} />
                   <CardTitle className="text-lg">{alert.title}</CardTitle>
                   <Badge variant={getSeverityVariant(alert.severity)}>
-                    {alert.severity.toUpperCase()}
+                    {getSeverityLabel(alert.severity)}
                   </Badge>
                 </div>
                 {alert.field_name && (

@@ -36,7 +36,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations through `20260914310000` (success/peer-cost/recommendation-update;
+1. Apply pending Supabase migrations through `20260914330000` (success/peer-cost/recommendation-update;
    yield/feedback/event/bug/acreage `20260914290000`;
    claim loss / priority / form-complete `20260914280000`;
    alert-ack + conversation_memory invent lock `20260914270000`;

@@ -42,9 +42,12 @@ export function CommunityInsightsCard({ practice }: CommunityInsightsCardProps) 
           <div className="text-center p-3 rounded-lg bg-accent/10">
             <Star className="h-5 w-5 mx-auto mb-1 text-accent" />
             <div className="text-lg font-bold">
-              {practice.success_rate != null && Number.isFinite(Number(practice.success_rate))
-                ? `${(Number(practice.success_rate) * 100).toFixed(0)}%`
-                : '—'}
+              {(() => {
+                const n = Number(practice.success_rate);
+                return Number.isFinite(n) && n >= 0 && n <= 1
+                  ? `${(n * 100).toFixed(0)}%`
+                  : '—';
+              })()}
             </div>
             <div className="text-xs text-muted-foreground">Reported success</div>
           </div>

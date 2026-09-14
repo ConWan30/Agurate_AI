@@ -42,12 +42,21 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
       // Save farm profile to database
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        const acreageRaw = totalAcreage.trim() === '' ? null : Number(totalAcreage);
+        if (acreageRaw != null && (!Number.isFinite(acreageRaw) || acreageRaw < 0)) {
+          toast({
+            variant: "destructive",
+            title: "Invalid acreage",
+            description: "Total acreage must be a number greater than or equal to 0.",
+          });
+          return;
+        }
         const { error } = await supabase
           .from('profiles')
           .update({
             farm_name: farmName,
             parish: parish,
-            total_acreage: parseFloat(totalAcreage) || null,
+            total_acreage: acreageRaw,
             primary_crops: primaryCrops,
           })
           .eq('id', user.id);

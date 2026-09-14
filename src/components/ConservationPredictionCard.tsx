@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, Gauge, Sprout, CloudSun } from "lucide-react";
 import { ConservationPrediction } from "@/types/enhanced-features";
+import { formatConfidencePercent } from "@/lib/risk-confidence";
 
 interface ConservationPredictionCardProps {
   prediction: ConservationPrediction;
@@ -23,11 +24,16 @@ function relativeChangeLabel(current: number, future: number): string {
   return `${sign}${pct.toFixed(0)}% vs current index`;
 }
 
+function formatFractionPercent(raw: unknown): string {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0 || n > 1) return '—';
+  return formatConfidencePercent(n);
+}
+
 export function ConservationPredictionCard({ prediction }: ConservationPredictionCardProps) {
+  const confidenceLabel = formatConfidencePercent(prediction.confidence_score);
   const confidencePercent =
-    prediction.confidence_score != null && Number.isFinite(Number(prediction.confidence_score))
-      ? Number(prediction.confidence_score) * 100
-      : null;
+    confidenceLabel === '—' ? null : Number(confidenceLabel.replace('%', ''));
 
   return (
     <Card className="border-primary/20">
@@ -38,7 +44,7 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
             <CardDescription>{prediction.practice_type}</CardDescription>
           </div>
           <Badge variant={confidencePercent != null && confidencePercent > 75 ? "default" : "secondary"}>
-            {confidencePercent != null ? `${confidencePercent.toFixed(0)}% confidence` : 'Confidence not recorded'}
+            {confidenceLabel === '—' ? 'Confidence not recorded' : `${confidenceLabel} confidence`}
           </Badge>
         </div>
       </CardHeader>
@@ -93,21 +99,14 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
                 <span>Soil Health Planning Index</span>
               </div>
               <span className="font-medium">
-                {Number.isFinite(Number(prediction.soil_health_improvement)) &&
-                Number(prediction.soil_health_improvement) >= 0 &&
-                Number(prediction.soil_health_improvement) <= 1
-                  ? `${(Number(prediction.soil_health_improvement) * 100).toFixed(0)}%`
-                  : '—'}
+                {formatFractionPercent(prediction.soil_health_improvement)}
               </span>
             </div>
             <Progress
-              value={
-                Number.isFinite(Number(prediction.soil_health_improvement)) &&
-                Number(prediction.soil_health_improvement) >= 0 &&
-                Number(prediction.soil_health_improvement) <= 1
-                  ? Number(prediction.soil_health_improvement) * 100
-                  : 0
-              }
+              value={(() => {
+                const n = Number(prediction.soil_health_improvement);
+                return Number.isFinite(n) && n >= 0 && n <= 1 ? n * 100 : 0;
+              })()}
               className="h-2"
             />
           </div>
@@ -119,21 +118,14 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
                 <span>Climate Benefit Planning Index</span>
               </div>
               <span className="font-medium">
-                {Number.isFinite(Number(prediction.climate_factor)) &&
-                Number(prediction.climate_factor) >= 0 &&
-                Number(prediction.climate_factor) <= 1
-                  ? `${(Number(prediction.climate_factor) * 100).toFixed(0)}%`
-                  : '—'}
+                {formatFractionPercent(prediction.climate_factor)}
               </span>
             </div>
             <Progress
-              value={
-                Number.isFinite(Number(prediction.climate_factor)) &&
-                Number(prediction.climate_factor) >= 0 &&
-                Number(prediction.climate_factor) <= 1
-                  ? Number(prediction.climate_factor) * 100
-                  : 0
-              }
+              value={(() => {
+                const n = Number(prediction.climate_factor);
+                return Number.isFinite(n) && n >= 0 && n <= 1 ? n * 100 : 0;
+              })()}
               className="h-2"
             />
           </div>

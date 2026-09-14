@@ -147,6 +147,28 @@ const required = [
       "NEW.extracted_data := '{}'::jsonb",
     ],
   },
+  {
+    id: '20260914320000_lock_water_claim_conservation_acreage',
+    needles: [
+      'water_stress_events_severity_check',
+      'water_stress_events_stress_score_check',
+      'NEW.estimated_loss_percentage := OLD.estimated_loss_percentage',
+      'conservation_predictions_confidence_score_check',
+      'profiles_total_acreage_check',
+    ],
+  },
+  {
+    id: '20260914330000_lock_claim_story_peer_link_metrics',
+    needles: [
+      'NEW.assessment_id := OLD.assessment_id',
+      'NEW.claim_number := OLD.claim_number',
+      'Users can create stories',
+      'Farmers can insert treatment outcomes for own fields',
+      'variety_performance_metrics_performance_score_check',
+      'prediction_outcomes_accuracy_achieved_check',
+      'NEW.outcome_improvement := OLD.outcome_improvement',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -167,11 +189,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091431') &&
-  tip < '20260914310000_lock_expert_coop_variety_extracted'
+  !tip.startsWith('2026091433') &&
+  tip < '20260914330000_lock_claim_story_peer_link_metrics'
 ) {
   fail(
-    `tip migration ${tip} should include expert/coop/variety/extracted invent lock (20260914310000+)`
+    `tip migration ${tip} should include claim/story/peer-link/metrics invent lock (20260914330000+)`
   );
 }
 
