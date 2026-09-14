@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client"
+import { formatAcreage } from "@/lib/agricultural-utils";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Plus, Edit, Trash2 } from "lucide-react";
 import riceIcon from "@/assets/rice-icon.png";
@@ -468,7 +469,7 @@ export default function Fields() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Acreage:</span>
-                      <span className="font-mono font-medium">{field.acreage} acres</span>
+                      <span className="font-mono font-medium">{formatAcreage(field.acreage)}</span>
                     </div>
                     {field.location_lat && field.location_lng && (
                       <div className="flex justify-between">

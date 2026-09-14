@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { formatAcreage } from '@/lib/agricultural-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
@@ -196,7 +197,7 @@ export default function FieldMap() {
                     <div className="space-y-1">
                       <h3 className="font-heading font-bold text-lg">{field.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {field.crop_type} • {field.acreage != null && Number.isFinite(Number(field.acreage)) ? field.acreage : 'not recorded'} acres
+                        {field.crop_type} • {formatAcreage(field.acreage)}
                       </p>
                     </div>
                     <div

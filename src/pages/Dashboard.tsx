@@ -5,7 +5,8 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { LoadingState } from "@/components/ui/loading-state";
 import { AgriculturalBadge } from "@/components/ui/agricultural-badge";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client"
+import { formatAcreage } from "@/lib/agricultural-utils";
 import { Link } from "react-router-dom";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { BetaWelcomeBanner } from "@/components/BetaWelcomeBanner";
@@ -552,7 +553,7 @@ export default function Dashboard() {
                         <div className="flex-1">
                           <CardTitle className="text-lg group-hover:text-primary transition-colors">{field.name}</CardTitle>
                           <CardDescription className="capitalize">
-                            {field.crop_type} • {field.acreage} acres
+                            {field.crop_type} • {formatAcreage(field.acreage)}
                           </CardDescription>
                         </div>
                       </div>

@@ -116,10 +116,11 @@ export function getSoilTypeLabel(soilType: string): string {
 }
 
 /**
- * Format acreage for display
+ * Format acreage for display — never invent 0/null acres as a real value.
  */
-export function formatAcreage(acres: number): string {
-  return `${acres.toLocaleString()} acres`;
+export function formatAcreage(acres: number | null | undefined): string {
+  if (acres == null || !Number.isFinite(Number(acres))) return 'not recorded';
+  return `${Number(acres).toLocaleString()} acres`;
 }
 
 /**

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client'
+import { formatAcreage } from '@/lib/agricultural-utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -166,7 +167,7 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
                   <p className="text-muted-foreground mb-1">Field</p>
                   <p className="font-semibold">{claim?.field?.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {claim?.field?.crop_type} • {claim?.field?.acreage} acres
+                    {claim?.field?.crop_type} • {formatAcreage(claim?.field?.acreage)}
                   </p>
                 </div>
                 <div>

@@ -149,7 +149,7 @@ serve(async (req) => {
     contextPrompt += `\n\nFormat as JSON:\n`;
     contextPrompt += `{\n`;
     contextPrompt += `  "priorities": [\n`;
-    contextPrompt += `    {"fieldName": "Field 3", "issue": "Rice blast detected", "urgency": "high", "action": "Scout today for spread. If lesions increased, spray azoxystrobin by evening."}\n`;
+    contextPrompt += `    {"fieldName": "Field 3", "issue": "Rice blast detected", "urgency": "high", "action": "Scout today for spread. If lesions increased, check the product label and LSU AgCenter guidance before treating — do not invent a farm-specific rate."}\n`;
     contextPrompt += `  ],\n`;
     if (weather) {
       contextPrompt += `  "weatherRecommendation": "string grounded in provided weather",\n`;

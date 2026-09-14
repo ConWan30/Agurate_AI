@@ -248,7 +248,7 @@ UNIFIED FIELD INTELLIGENCE (recorded history only — do not invent missing valu
 
 FIELD PROFILE:
 - Variety: ${fieldData?.rice_variety || fieldData?.soybean_variety || fieldData?.cotton_variety || fieldData?.corn_hybrid || 'Unknown'}
-- Acreage: ${fieldData?.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? fieldData.acreage : 'not recorded'} acres
+- Acreage: ${fieldData?.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? `${fieldData.acreage} acres` : 'not recorded'}
 - Soil Type: ${fieldData?.soil_type || 'Not specified'}
 
 HISTORICAL HEALTH TREND (Last 5 Assessments):

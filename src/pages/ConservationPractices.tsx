@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client'
+import { formatAcreage } from '@/lib/agricultural-utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -232,7 +233,7 @@ ${extractedData.notes ? `\nNotes: ${extractedData.notes}` : ''}
                           <h3 className="text-lg font-semibold mb-2">{field.name}</h3>
                           <div className="flex gap-2 flex-wrap mb-2">
                             <Badge variant="secondary">{field.crop_type}</Badge>
-                            <Badge variant="outline">{field.acreage} acres</Badge>
+                            <Badge variant="outline">{formatAcreage(field.acreage)}</Badge>
                           </div>
                           {field.notes && (
                             <p className="text-sm text-muted-foreground whitespace-pre-line">

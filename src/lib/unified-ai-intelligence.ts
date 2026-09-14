@@ -140,7 +140,7 @@ UNIFIED FIELD INTELLIGENCE CONTEXT:
 FIELD INFORMATION:
 - Crop Type: ${fieldData?.crop_type || 'Unknown'}
 - Variety: ${fieldData?.rice_variety || fieldData?.soybean_variety || fieldData?.cotton_variety || fieldData?.corn_hybrid || 'Not specified'}
-- Acreage: ${fieldData?.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? fieldData.acreage : 'not recorded'} acres
+- Acreage: ${fieldData?.acreage != null && Number.isFinite(Number(fieldData.acreage)) ? `${fieldData.acreage} acres` : 'not recorded'}
 - Location: ${fieldData?.location_lat != null ? fieldData.location_lat : 'not recorded'}, ${fieldData?.location_lng != null ? fieldData.location_lng : 'not recorded'}
 
 HISTORICAL ASSESSMENT TRENDS (Last 10):

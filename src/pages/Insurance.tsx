@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client'
+import { formatAcreage } from "@/lib/agricultural-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { AgriculturalBadge } from '@/components/ui/agricultural-badge';
@@ -352,7 +353,7 @@ export default function Insurance() {
                         {claim.field?.name}
                       </CardTitle>
                       <CardDescription>
-                        {claim.field?.crop_type} • {claim.field?.acreage} acres
+                        {claim.field?.crop_type} • {formatAcreage(claim.field?.acreage)}
                       </CardDescription>
                     </div>
                     <Badge 

@@ -615,10 +615,13 @@ export default function History() {
                           <p className="text-xs text-muted-foreground">Temperature</p>
                         </div>
                         )}
-                        {selectedAssessment.weather_precipitation_mm != null && (
+                        {selectedAssessment.weather_precipitation_mm != null &&
+                          Number.isFinite(Number(selectedAssessment.weather_precipitation_mm)) && (
                         <div>
-                          <p className="text-2xl font-bold">{selectedAssessment.weather_precipitation_mm} mm</p>
-                          <p className="text-xs text-muted-foreground">Precipitation</p>
+                          <p className="text-2xl font-bold">
+                            {(Number(selectedAssessment.weather_precipitation_mm) / 25.4).toFixed(2)}"
+                          </p>
+                          <p className="text-xs text-muted-foreground">Precipitation (7-day)</p>
                         </div>
                         )}
                       </div>

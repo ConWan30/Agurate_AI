@@ -119,13 +119,17 @@ export default function Analytics() {
               }
             }
             existing.temp_f = assessment.weather_temp_f ?? existing.temp_f;
-            existing.precipitation = assessment.weather_precipitation_mm ?? existing.precipitation;
+            existing.precipitation = assessment.weather_precipitation_mm != null && Number.isFinite(Number(assessment.weather_precipitation_mm))
+              ? Number(assessment.weather_precipitation_mm) / 25.4
+              : existing.precipitation;
           } else {
             acc.push({
               date,
               health_score: normalizedScore,
               temp_f: assessment.weather_temp_f ?? null,
-              precipitation: assessment.weather_precipitation_mm ?? null
+              precipitation: assessment.weather_precipitation_mm != null && Number.isFinite(Number(assessment.weather_precipitation_mm))
+              ? Number(assessment.weather_precipitation_mm) / 25.4
+              : null
             });
           }
           return acc;
@@ -365,7 +369,7 @@ export default function Analytics() {
                     dataKey="precipitation" 
                     stroke="hsl(var(--secondary))" 
                     strokeWidth={2}
-                    name="Precipitation (mm)"
+                    name="Precipitation (in)"
                     dot={{ fill: "hsl(var(--secondary))", r: 3 }}
                   />
                 </LineChart>
