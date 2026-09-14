@@ -33,7 +33,8 @@ export async function gatherConversationMemory(
   try {
     const { data, error } = await supabase.rpc('get_conversation_memory', {
       p_user_id: userId,
-      p_conversation_id: excludeConversationId || '',
+      p_limit: limit,
+      p_exclude_conversation_id: excludeConversationId || null,
     });
 
     if (error) {
@@ -41,14 +42,14 @@ export async function gatherConversationMemory(
       return [];
     }
 
-    // Map DB response to ConversationMemoryMessage format
     return (data || []).map((item: any) => ({
       id: item.id,
-      conversation_id: '',  // Not returned by RPC
-      role: 'assistant' as const,
-      content: JSON.stringify(item.context_data),
-      context_snapshot: item.context_data as any,
-      created_at: item.last_referenced_at,
+      conversation_id: item.conversation_id,
+      role: (item.role as ConversationMemoryMessage['role']) || 'assistant',
+      content: item.content,
+      context_snapshot: item.context_snapshot as any,
+      created_at: item.created_at,
+      conversation_title: item.conversation_title,
     }));
   } catch (error) {
     console.error('Error in gatherConversationMemory:', error);

@@ -168,10 +168,11 @@ serve(async (req) => {
       .from('profiles')
       .upsert({
         id: authData.user.id,
-        user_id: authData.user.id,
-        name: formData.name.trim(),
+        full_name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
         farm_name: formData.farm_name,
+        parish: formData.location?.trim() || null,
+        primary_crops: formData.primary_crop ? [formData.primary_crop.trim()] : null,
         beta_farmer: true,
         beta_signup_date: new Date().toISOString(),
         beta_feedback_provided: false,
@@ -182,12 +183,18 @@ serve(async (req) => {
     }
 
     if (formData.location && formData.primary_crop) {
+      const normalizeCrop = (raw: string) => {
+        const c = raw.toLowerCase().replace(/\s+/g, '');
+        if (c === 'soybeans' || c === 'soybean') return 'soybean';
+        if (c === 'rice' || c === 'cotton' || c === 'corn') return c;
+        return 'rice';
+      };
       const { error: fieldError } = await supabase
         .from('fields')
         .insert({
           user_id: authData.user.id,
           name: formData.farm_name || 'Main Field',
-          crop_type: formData.primary_crop.toLowerCase().replace(' ', ''),
+          crop_type: normalizeCrop(formData.primary_crop),
           acreage: formData.acreage,
           location_lat: 32.73,
           location_lng: -91.76,

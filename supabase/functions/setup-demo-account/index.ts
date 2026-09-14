@@ -64,49 +64,42 @@ serve(async (req) => {
     // STEP 1: Create profile
     await supabase.from('profiles').upsert({
       id: demoUser.id,
-      user_id: demoUser.id,
-      name: 'Demo Farmer',
+      full_name: 'Demo Farmer',
       email: 'demo@agurateai.com',
       farm_name: 'Demo Delta Farms',
-      beta_farmer: true
+      beta_farmer: true,
+      primary_crops: ['rice', 'soybean', 'cotton'],
     });
 
-    // STEP 2: Create 3 fields
+    // STEP 2: Create 3 fields (crop_type must match fields CHECK: rice|soybean|cotton|corn)
     const fieldsData = [
       {
         user_id: demoUser.id,
         name: 'North Rice Field',
         crop_type: 'rice',
         acreage: 120,
-        soil_type: 'alluvial',
         location_lat: 32.7340,
         location_lng: -91.7573,
-        planting_date: '2025-04-15',
-        irrigation_type: 'flood',
-        rice_variety: 'CL153'
+        rice_variety: 'CL153',
       },
       {
         user_id: demoUser.id,
         name: 'South Soybean Field',
-        crop_type: 'soybeans',
+        crop_type: 'soybean',
         acreage: 180,
-        soil_type: 'claypan',
         location_lat: 32.7300,
         location_lng: -91.7600,
-        planting_date: '2025-05-01',
-        soybean_variety: 'Asgrow AG48X9'
+        soybean_variety: 'Asgrow AG48X9',
       },
       {
         user_id: demoUser.id,
         name: 'West Cotton Field',
         crop_type: 'cotton',
         acreage: 90,
-        soil_type: 'mixed',
         location_lat: 32.7380,
         location_lng: -91.7550,
-        planting_date: '2025-04-20',
-        cotton_variety: 'DP 2012 B3XF'
-      }
+        cotton_variety: 'DP 2012 B3XF',
+      },
     ];
 
     const { data: fields, error: fieldsError } = await supabase

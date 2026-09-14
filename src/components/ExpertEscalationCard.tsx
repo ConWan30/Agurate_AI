@@ -69,8 +69,16 @@ export function ExpertEscalationCard({
       });
 
       if (error) throw error;
-      if (data) {
-        setResearcher(data as any as LSUResearcher);
+      const match = Array.isArray(data) ? data[0] : data;
+      if (match) {
+        setResearcher({
+          id: match.id,
+          name: match.name,
+          title: match.department || 'LSU AgCenter',
+          email: match.email,
+          specialties: match.expertise || [],
+          typical_response_time: match.availability || 'varies',
+        });
       }
     } catch (error) {
       console.error('Error loading researcher:', error);
@@ -98,11 +106,8 @@ export function ExpertEscalationCard({
           assessment_id: assessmentId || null,
           researcher_id: researcher.id,
           question: issueDescription,
-          issue_description: issueDescription,
-          ai_analysis: aiAnalysis || {},
-          confidence_score: confidenceScore,
           status: 'pending',
-          priority: confidenceScore < 50 ? 'urgent' : confidenceScore < 70 ? 'high' : 'normal',
+          priority: confidenceScore < 50 ? 'urgent' : confidenceScore < 70 ? 'high' : 'medium',
         })
         .select()
         .single();

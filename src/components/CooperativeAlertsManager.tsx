@@ -102,7 +102,6 @@ export function CooperativeAlertsManager() {
 
       const { error } = await supabase.rpc('acknowledge_cooperative_alert', {
         alert_id: alertId,
-        user_id: user.id,
       });
 
       if (error) throw error;

@@ -2298,13 +2298,19 @@ export type Database = {
       }
       get_beta_farmer_count: { Args: never; Returns: number }
       get_conversation_memory: {
-        Args: { p_conversation_id: string; p_user_id: string }
+        Args: {
+          p_user_id: string
+          p_limit?: number
+          p_exclude_conversation_id?: string | null
+        }
         Returns: {
-          context_data: Json
-          context_type: string
           id: string
-          last_referenced_at: string
-          relevance_score: number
+          conversation_id: string
+          role: string
+          content: string
+          context_snapshot: Json
+          created_at: string
+          conversation_title: string | null
         }[]
       }
       get_peer_comparison: {
