@@ -227,8 +227,8 @@ export default function HowItWorks() {
                   { icon: TrendingUp, label: 'Variety-Specific Signatures', desc: 'Disease resistance & stress traits' },
                   { icon: Cloud, label: 'Weather Correlation Patterns', desc: 'Symptom triggers from climate data' },
                   { icon: Layers, label: 'Conservation Practice Impact', desc: 'Soil health improvement tracking' },
-                  { icon: Network, label: 'Community Success Patterns', desc: 'Proven interventions from peers' },
-                  { icon: Brain, label: 'Predictive Analytics Feed', desc: 'Yield trajectories & risk forecasts' }
+                  { icon: Network, label: 'Community Success Patterns', desc: 'Peer-shared treatment notes when available' },
+                  { icon: Brain, label: 'Predictive Analytics Feed', desc: 'Planning outlooks when enough history exists' }
                 ].map((item, idx) => (
                   <div key={idx} className="text-center p-4 bg-background/50 rounded-lg border">
                     <item.icon className="h-8 w-8 mx-auto mb-3 text-primary" aria-hidden="true" />
@@ -250,7 +250,7 @@ export default function HowItWorks() {
             </Badge>
             <h2 className="text-4xl font-heading font-bold">Enhanced Gemini Vision</h2>
             <p className="text-lg text-muted-foreground">
-              Every crop photo analysis is enriched with comprehensive field intelligence
+              Crop photo analysis can include available field context when that data exists
             </p>
           </div>
 

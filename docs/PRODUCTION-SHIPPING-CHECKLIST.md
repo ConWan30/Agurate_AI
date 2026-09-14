@@ -99,6 +99,7 @@ Last updated: 2026-09-14
 - [x] Critical alerts do not invent acreage; normalize string disease/pest payloads
 - [x] Lock `subscription_status` from client self-writes (`20260914170000`)
 - [x] Soften Home unlimited-beta + tutorial “Diagnosis” framing
+- [x] Analytics/phase4/unified-AI omit invented weather & score defaults; soften forecast marketing copy
 
 ## Platform gates (external)
 

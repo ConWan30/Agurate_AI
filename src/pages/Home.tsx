@@ -67,7 +67,7 @@ export default function Home() {
     {
       icon: TrendingUp,
       title: "Predictive Analytics",
-      description: "7-14 day stress forecasts powered by weather AI. Comprehensive predictions for water stress, disease risk, and yield optimization.",
+      description: "Optional 7-14 day stress outlooks when weather and field history are available — decision support, not a guarantee.",
       color: "gradient-sky"
     },
     {
@@ -122,7 +122,7 @@ export default function Home() {
 
   const benefits = [
     "Phone-camera crop health reads for Delta crops",
-    "7-14 day predictive analytics for proactive decisions",
+    "Optional stress outlooks when weather and field history are available",
     "Water stress monitoring with link to MSU DIRT",
     "Insights informed by LSU AgCenter research framing",
     "Conservation practice tracking and ROI analysis",

@@ -76,4 +76,14 @@ describe('Phase 4 predictive question fallbacks', () => {
 
     expect(questions[0]).toContain('Morehouse Parish');
   });
+
+
+  it('uses general monitoring prompts when healthScore is missing', () => {
+    const questions = generateFallbackPredictiveQuestions({
+      hasRecentAssessment: true,
+      cropType: 'soybean',
+    });
+    expect(questions[0]).toMatch(/monitor/i);
+    expect(questions.some((q) => /stress/i.test(q))).toBe(false);
+  });
 });

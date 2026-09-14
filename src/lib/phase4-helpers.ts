@@ -62,7 +62,16 @@ export function generateFallbackPredictiveQuestions(input: {
     ];
   }
 
-  const healthScore = input.healthScore ?? 100;
+  // Missing health score → general monitoring prompts (do not assume 100/healthy)
+  if (input.healthScore == null || Number.isNaN(Number(input.healthScore))) {
+    return [
+      `What should I monitor in my ${cropType} this week?`,
+      'Any upcoming weather concerns?',
+      'Best practices for maintaining crop health?',
+      'When should I schedule the next field check?',
+    ];
+  }
+  const healthScore = Number(input.healthScore);
   if (healthScore < 70) {
     return [
       `What's causing the stress in my ${cropType}?`,

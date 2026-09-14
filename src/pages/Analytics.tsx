@@ -106,14 +106,14 @@ export default function Analytics() {
           
           if (existing) {
             existing.health_score = (existing.health_score + assessment.health_score) / 2;
-            existing.temp_f = assessment.weather_temp_f || existing.temp_f;
-            existing.precipitation = assessment.weather_precipitation_mm || existing.precipitation;
+            existing.temp_f = assessment.weather_temp_f ?? existing.temp_f;
+            existing.precipitation = assessment.weather_precipitation_mm ?? existing.precipitation;
           } else {
             acc.push({
               date,
               health_score: assessment.health_score,
-              temp_f: assessment.weather_temp_f || 75,
-              precipitation: assessment.weather_precipitation_mm || 0
+              temp_f: assessment.weather_temp_f ?? null,
+              precipitation: assessment.weather_precipitation_mm ?? null
             });
           }
           return acc;

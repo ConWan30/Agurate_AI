@@ -74,7 +74,9 @@ export async function enrichUnifiedContext(fieldId: string, analysisData: Analys
     const patterns = {
       image_analysis_patterns: {
         symptom_progression: analysisData.visionAnalysis?.symptoms || [],
-        health_score_trend: [analysisData.visionAnalysis?.health_score || 0],
+        health_score_trend: analysisData.visionAnalysis?.health_score != null
+          ? [analysisData.visionAnalysis.health_score]
+          : [],
         visual_patterns: analysisData.visionAnalysis?.visual_patterns || []
       },
       variety_intelligence: {
@@ -103,10 +105,10 @@ export async function enrichUnifiedContext(fieldId: string, analysisData: Analys
         intervention_windows: analysisData.predictions?.windows || []
       },
       confidence_scores: {
-        vision_analysis: analysisData.visionAnalysis?.confidence_score || 0,
-        water_stress: analysisData.waterStress?.confidence || 0,
-        variety_match: analysisData.variety?.confidence || 0,
-        community_alignment: analysisData.community?.confidence || 0
+        vision_analysis: analysisData.visionAnalysis?.confidence_score ?? null,
+        water_stress: analysisData.waterStress?.confidence ?? null,
+        variety_match: analysisData.variety?.confidence ?? null,
+        community_alignment: analysisData.community?.confidence ?? null
       }
     };
 

@@ -162,7 +162,7 @@ export default function Predictions() {
       target: 'predictions-header',
       id: 'header',
       title: 'Step 1: 7-Day Predictions',
-      content: 'Get AI-powered stress predictions for the next 7 days based on weather and historical data.',
+      content: 'Review model-assisted stress outlooks for the next 7 days when weather and history are available.',
       position: 'bottom' as const,
     },
     {
@@ -191,7 +191,7 @@ export default function Predictions() {
           icon={TrendingUp}
           badge={{ icon: Sparkles, text: "Unified AI Intelligence" }}
           title="Predictive Analytics"
-          description="AI-powered forecasts combining crop analysis, weather patterns, conservation practices, and community intelligence for 7-30 day predictions"
+          description="Model-assisted outlooks that may combine crop analysis, weather, conservation notes, and community signals when those inputs are available — for planning, not certainty"
           gradient="delta"
         />
       </div>
