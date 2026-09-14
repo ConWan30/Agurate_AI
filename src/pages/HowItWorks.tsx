@@ -67,30 +67,30 @@ export default function HowItWorks() {
     {
       icon: Zap,
       title: 'Early Disease Detection',
-      scenario: 'Detect cotton blight 10+ days before visible to naked eye',
-      impact: 'Save entire crop by treating early',
-      savings: '$500-2000/acre'
+      scenario: 'Flag cotton blight risk earlier than visual scouting alone',
+      impact: 'Act sooner with a research-framed treatment plan',
+      savings: 'Earlier intervention window'
     },
     {
       icon: Cloud,
       title: 'Weather Stress Prevention',
       scenario: 'Predict heat stress 5-7 days ahead during Louisiana summers',
       impact: 'Adjust irrigation before damage occurs',
-      savings: '15-30% yield protection'
+      savings: 'Proactive irrigation cues'
     },
     {
       icon: MapPin,
       title: 'Drone-Powered Field Mapping',
       scenario: 'Upload drone video to identify stressed zones across entire 50-acre field in one analysis',
       impact: 'Comprehensive aerial view shows patterns invisible from ground level',
-      savings: '60% faster field assessment'
+      savings: 'Broader field coverage'
     },
     {
       icon: TrendingUp,
       title: 'Seasonal Planning',
       scenario: 'Historical analysis shows optimal planting window for your specific field',
       impact: 'Plant at peak time for soil/weather conditions',
-      savings: '10-20% yield increase'
+      savings: 'Better timing decisions'
     }
   ];
 
@@ -99,56 +99,56 @@ export default function HowItWorks() {
       icon: DollarSign,
       title: 'Automated ROI Calculator',
       description: 'AI calculates real-time return on investment for every recommendation, factoring in treatment costs, yield protection, and market prices',
-      benefit: '$8K-20K annual savings documented',
+      benefit: 'Cost/benefit estimates',
       color: 'bg-health-good/10 text-health-good border-health-good/20'
     },
     {
       icon: Brain,
       title: 'Daily AI Briefing',
       description: 'Wake up to personalized field intelligence: overnight weather impacts, urgent actions needed, and 7-day stress forecasts delivered to your dashboard',
-      benefit: '10 minutes saved daily',
+      benefit: 'Daily action focus',
       color: 'bg-secondary/10 text-secondary border-secondary/20'
     },
     {
       icon: FileText,
       title: 'Conversational Forms',
       description: 'Just talk to your phone—AI extracts field data, planting dates, and crop varieties from natural conversation. Voice-to-data in seconds',
-      benefit: '80% faster data entry',
+      benefit: 'Faster form completion',
       color: 'bg-purple-500/10 text-purple-700 border-purple-500/20'
     },
     {
       icon: Cloud,
       title: 'Water Stress Intelligence',
       description: 'Predictive irrigation alerts using soil moisture patterns, weather forecasts, and crop-specific water needs. Prevent stress before it starts',
-      benefit: '25% water savings',
+      benefit: 'Stress prevention focus',
       color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20'
     },
     {
       icon: TrendingUp,
       title: 'Variety Performance Tracking',
-      description: 'Compare rice, soybean, cotton, and corn varieties against LSU recommendations. AI matches your soil type and climate to top-performing cultivars',
-      benefit: '12-18% yield increase',
+      description: 'Compare rice, soybean, cotton, and corn varieties against published LSU guidance. Match soil type and climate to researched cultivars',
+      benefit: 'Research-informed picks',
       color: 'bg-orange-500/10 text-orange-700 border-orange-500/20'
     },
     {
       icon: Network,
       title: 'Community Intelligence',
       description: 'Anonymous farmer network shares disease outbreaks, treatment successes, and yield trends. Early warnings when pests hit neighboring farms',
-      benefit: '3-7 day early alerts',
+      benefit: 'Neighbor early warnings',
       color: 'bg-pink-500/10 text-pink-700 border-pink-500/20'
     },
     {
       icon: Layers,
       title: 'Conservation Practice ROI',
       description: 'Track cover crops, no-till, and precision fertilization impact on soil health, input costs, and yield. AI predicts long-term financial benefits',
-      benefit: '$40-120/acre savings',
+      benefit: 'Practice cost tracking',
       color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'
     },
     {
       icon: MapPin,
-      title: 'LSU Researcher Access',
-      description: 'AI matches your crop issue to the right LSU AgCenter specialist. Direct contact info for pathologists, soil scientists, and extension agents',
-      benefit: 'Expert help in <24hrs',
+      title: 'LSU Researcher Directory',
+      description: 'Browse a public directory of LSU AgCenter specialists. Contact pathologists, soil scientists, and extension agents through official LSU channels',
+      benefit: 'Public specialist links',
       color: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20'
     }
   ];

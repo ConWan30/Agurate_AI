@@ -7,11 +7,17 @@ Use this as the remaining gate list for AgurateAI production-complete readiness.
 ## Code gates (repo)
 
 - [x] Honest closed-beta marketing copy (no fabricated accuracy/validation/partner claims)
+- [x] Soften unverified ROI/timing benefit claims on How It Works
 - [x] SEO/Open Graph/JSON-LD closed-beta metadata
 - [x] View `security_invoker` migration committed
-- [x] PeerComparisonCard aligned to current `get_peer_comparison` RPC + real `fieldId`
+- [x] PeerComparisonCard aligned to current RPC + real `fieldId`
 - [x] Debug `console.log` gated behind `import.meta.env.DEV`
 - [x] Phase 4 helper unit tests + honesty regression tests
+- [x] Env fail-fast for required Supabase vars
+- [x] Real React `ErrorBoundary` around app routes
+- [x] Auth password rules: ≥8 chars + letter + number (aligned UI + Zod)
+- [x] `robots.txt` + `sitemap.xml` + `health.json` + `_headers` CSP baseline
+- [x] GitHub Actions CI (`lint`/`test`/`build`)
 - [x] Production build (`npm run build`) passes
 
 ## Platform gates (external)

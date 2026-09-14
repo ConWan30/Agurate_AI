@@ -12,6 +12,7 @@ import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import NetworkStatus from "./components/NetworkStatus";
 import { analytics } from "@/lib/analytics";
 import { errorTracker } from "@/lib/error-tracking";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Lazy load pages for better performance
 const Home = lazy(() => import("./pages/Home"));
@@ -69,10 +70,9 @@ const AnalyticsWrapper = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Error boundary wrapper
+// Global window error listeners + React error boundary
 const ErrorBoundaryWrapper = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
-    // Global error handlers
     const handleError = (event: ErrorEvent) => {
       errorTracker.captureError(event.error, {
         feature: 'global_error_handler',
@@ -103,7 +103,7 @@ const ErrorBoundaryWrapper = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  return <>{children}</>;
+  return <ErrorBoundary>{children}</ErrorBoundary>;
 };
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

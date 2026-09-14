@@ -61,7 +61,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
 
       toast({
         title: "🏆 Success story saved!",
-        description: "Thank you for sharing your experience. This helps other farmers and strengthens our LSU partnership.",
+        description: "Thank you for sharing your experience. This helps other farmers and improves the closed beta.",
       });
       onClose();
     } catch (error: unknown) {
@@ -85,7 +85,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
             Share Your Success Story
           </DialogTitle>
           <DialogDescription>
-            Your experience helps other Louisiana farmers and strengthens our partnership with LSU AgCenter
+            Your experience helps other Louisiana farmers and improves this closed beta
           </DialogDescription>
         </DialogHeader>
 
@@ -182,7 +182,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
                   htmlFor="public"
                   className="text-sm cursor-pointer leading-tight"
                 >
-                  Allow AgurateAI to share this story publicly (website, presentations, LSU partnership materials)
+                  Allow AgurateAI to share this story publicly (website, presentations, closed-beta materials)
                 </label>
               </div>
               {allowPublicUse && (
@@ -211,7 +211,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Your story will help other Louisiana farmers and strengthen our LSU AgCenter partnership. 
+              Your story will help other Louisiana farmers during this closed beta. 
               You can remain anonymous if preferred.
             </p>
           </div>

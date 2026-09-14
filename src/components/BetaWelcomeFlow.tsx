@@ -176,7 +176,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             </p>
             <p className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Beta ends when we reach 100 farmers or secure LSU partnership</span>
+              <span>Beta ends when we reach 100 farmers or graduate to a public launch</span>
             </p>
           </CardContent>
         </Card>

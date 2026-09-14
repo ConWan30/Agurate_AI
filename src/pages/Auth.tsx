@@ -24,7 +24,9 @@ const signUpSchema = z.object({
   email: z.string().email("Invalid email address").max(255, "Email too long"),
   password: z.string()
     .min(8, "Password must be at least 8 characters")
-    .max(72, "Password too long"),
+    .max(72, "Password too long")
+    .regex(/[A-Za-z]/, "Password must include a letter")
+    .regex(/[0-9]/, "Password must include a number"),
   fullName: z.string()
     .min(1, "Full name is required")
     .max(100, "Name too long")
@@ -479,10 +481,10 @@ export default function Auth() {
                         }
                         className="h-11 border-2 focus:border-primary transition-colors"
                         required
-                        minLength={6}
+                        minLength={8}
                       />
                       <p className="text-xs text-muted-foreground">
-                        Must be at least 6 characters long
+                        At least 8 characters with a letter and a number
                       </p>
                     </div>
 

@@ -49,7 +49,7 @@ export default function DeltaIntelligence() {
   // Show welcome message only for new conversations
   const displayMessages = messages.length === 0 ? [{
     role: 'assistant' as const,
-    content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor, trained on LSU AgCenter research and decades of Louisiana Delta agriculture data.\n\n💡 **Try asking me:**\n- Crop-specific advice for rice, soybeans, cotton, or corn\n- Pest & disease identification\n- Soil management strategies\n- Weather-based planting guidance\n\nWhat can I help you with today?"
+    content: "👋 **Welcome to Delta Intelligence!**\n\nI'm your AI farming advisor, framed around publicly available LSU AgCenter research and Louisiana Delta agronomy context.\n\n💡 **Try asking me:**\n- Crop-specific advice for rice, soybeans, cotton, or corn\n- Pest & disease identification\n- Soil management strategies\n- Weather-based planting guidance\n\nWhat can I help you with today?"
   }] : messages;
 
   // Smooth scroll only when messages length changes (new message added), not during streaming updates
@@ -294,7 +294,7 @@ export default function DeltaIntelligence() {
       target: 'delta-header',
       id: 'header',
       title: 'Step 1: Your AI Advisor',
-      content: 'Delta Intelligence is your 24/7 Louisiana farming expert powered by LSU AgCenter research.',
+      content: 'Delta Intelligence is your 24/7 Louisiana farming assistant framed around publicly available LSU AgCenter research.',
       position: 'bottom' as const,
     },
     {
@@ -308,7 +308,7 @@ export default function DeltaIntelligence() {
       target: 'chat-input',
       id: 'chat',
       title: 'Step 3: Ask Anything',
-      content: 'Type your farming questions and get LSU-backed recommendations tailored to Louisiana Delta!',
+      content: 'Type your farming questions and get research-informed recommendations tailored to Louisiana Delta conditions!',
       position: 'top' as const,
     },
     {

@@ -81,7 +81,7 @@ export default function LSUResearchers() {
               <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </div>
             <Badge variant="secondary" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-              LSU AgCenter Partnership
+              LSU AgCenter research directory
             </Badge>
           </div>
           <h1 className="text-3xl md:text-4xl font-heading font-bold mb-3">

@@ -262,8 +262,8 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
             <p className="text-sm font-medium mb-2">🎯 LSU Research Integration:</p>
             <p className="text-sm text-muted-foreground">
-              AI trained on LSU historical data: <span className="font-bold">Soybeans + potassium deficiency + 
-              Louisiana heat = 72% yield loss risk.</span> Farmers act before damage is visible.
+              AI framed around public LSU research patterns: <span className="font-bold">Soybeans + potassium deficiency + 
+              Louisiana heat = elevated yield-loss risk.</span> Farmers act before damage is visible.
             </p>
           </div>
         </div>
@@ -389,8 +389,8 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
     },
     {
       icon: CheckCircle2,
-      title: 'The LSU AgCenter Partnership',
-      description: 'Transforming Louisiana agriculture together',
+      title: 'Research-informed Delta guidance',
+      description: 'Framed around public LSU AgCenter research — not an official partnership',
       content: (
         <div className="space-y-4">
           <p className="text-lg font-medium">James's story repeats across Louisiana Delta farms:</p>
@@ -407,9 +407,9 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
 
             <Card className="border-primary/20 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
               <CardContent className="p-4">
-                <p className="font-semibold mb-1">🎓 For LSU AgCenter</p>
+                <p className="font-semibold mb-1">🎓 Research framing</p>
                 <p className="text-sm text-muted-foreground">
-                  1000x reach multiplier • Live research feedback • Real Delta data
+                  Public LSU AgCenter guidance cited as context — not an official endorsement or data-sharing partnership
                 </p>
               </CardContent>
             </Card>

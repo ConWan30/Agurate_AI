@@ -122,7 +122,7 @@ serve(async (req) => {
       .filter(a => a.symptoms)
       .flatMap(a => Array.isArray(a.symptoms) ? a.symptoms : []);
 
-    const aiPrompt = `You are AgurateAI's variety recommendation engine, trained on LSU AgCenter breeding research.
+    const aiPrompt = `You are AgurateAI's variety recommendation engine, framed around publicly available LSU AgCenter breeding research.
 
 UNIFIED INTELLIGENCE CONTEXT:
 

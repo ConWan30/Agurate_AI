@@ -3,5 +3,6 @@
 - [x] Remove fabricated testimonials, ratings, accuracy, validation, partnership, and user-count claims
 - [x] Verify preview and security hardening (view SECURITY INVOKER migration; build + public-page honesty checks)
 - [x] Fix PeerComparison RPC/UI mismatch and expand Phase 4 unit coverage
+- [x] Add production fail-safes (env validation, ErrorBoundary, auth password rules, CI, SEO/security headers)
 - [ ] Apply Supabase migrations + enable leaked-password protection
 - [ ] Publish updated app (Lovable / production deploy)

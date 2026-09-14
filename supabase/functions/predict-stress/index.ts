@@ -178,7 +178,7 @@ UNIFIED INTELLIGENCE CONTEXT:
 - Water stress intelligence and irrigation data
 - Community-wide patterns and early warnings
 - Regional weather event correlations
-- LSU AgCenter validated stress thresholds
+- LSU AgCenter research-informed stress thresholds (public guidance; not an official validation)
 
 Analyze all available data streams to predict crop stress for the next ${days} days.
 Consider: heat stress (>90°F), water stress, disease patterns, Louisiana's climate, and community intelligence.

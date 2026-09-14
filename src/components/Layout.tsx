@@ -290,7 +290,7 @@ export const Layout = ({ children }: LayoutProps) => {
               </Link>
               <Link to="/lsu-researchers">
                 <Button variant="ghost" size="sm">
-                  LSU Partnership
+                  LSU Research
                 </Button>
               </Link>
             </div>
