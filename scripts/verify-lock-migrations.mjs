@@ -204,6 +204,20 @@ const required = [
       'NEW.accuracy_achieved := OLD.accuracy_achieved',
     ],
   },
+  {
+    id: '20260914370000_lock_coop_alert_coop_match_money_caps_ai_update_dirt',
+    needles: [
+      'f.cooperative_id = cooperative_alerts.cooperative_id',
+      'success_stories_estimated_savings_upper_check',
+      'peer_treatment_outcomes_cost_usd_upper_check',
+      'NEW.assessment_id := OLD.assessment_id',
+      'protect_analytics_insight_ai_columns',
+      'protect_ai_intelligence_pool_columns',
+      'protect_conservation_prediction_ai_columns',
+      'protect_variety_recommendation_ai_columns',
+      'app.allow_dirt_referral_insert',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -224,11 +238,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091436') &&
-  tip < '20260914360000_lock_coop_member_update_field_coop_predictive_outcomes'
+  !tip.startsWith('2026091437') &&
+  tip < '20260914370000_lock_coop_alert_coop_match_money_caps_ai_update_dirt'
 ) {
   fail(
-    `tip migration ${tip} should include coop-member-update/field-coop/predictive-outcomes invent lock (20260914360000+)`
+    `tip migration ${tip} should include coop-alert-coop-match/money-caps/ai-update/dirt invent lock (20260914370000+)`
   );
 }
 
