@@ -61,7 +61,7 @@ export default function Home() {
     {
       icon: Scan,
       title: "AI Crop Scanner",
-      description: "Phone-camera crop health reads in seconds. Surfaces possible stress, disease, and nutrient signals as a decision aid.",
+      description: "Phone-camera crop health reads as a decision aid. Surfaces possible stress, disease, and nutrient signals for grower review.",
       color: "gradient-delta"
     },
     {

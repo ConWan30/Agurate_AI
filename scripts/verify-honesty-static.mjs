@@ -46,6 +46,10 @@ const FORBIDDEN = [
   { name: 'unsourced $15-30/acre claim', re: /\$15-30\/acre/i },
   { name: 'instant AI health analysis claim', re: /instant AI health analysis/i },
   { name: 'instant field-specific advice claim', re: /instant field-specific advice/i },
+  { name: 'results in seconds claim', re: /(?:delivers results|reads|diagnosis|analysis)\s+in seconds/i },
+  { name: 'fabricated tutorial 87% confidence', re: /87%\s*confidence/i },
+  { name: 'fabricated tutorial health 68%→92%', re: /Health Score 68%\s*→\s*92%/i },
+  { name: 'default USDA source without estimate label', re: /source:\s*priceData\.source\s*\|\|\s*'USDA'/ },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

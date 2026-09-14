@@ -167,7 +167,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
                     <CardContent className="p-4 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Health Score</span>
-                        <Badge className="bg-warning text-warning-foreground">68%</Badge>
+                        <Badge className="bg-warning text-warning-foreground">Example</Badge>
                       </div>
                       <Progress value={68} className="h-2" />
                       <p className="text-xs text-muted-foreground">Moderate Stress Detected</p>
@@ -203,7 +203,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <p className="text-sm font-semibold mb-1">Why This Matters</p>
               <p className="text-xs text-muted-foreground">
                 Traditional diagnosis takes 3-7 days waiting for extension agent. 
-                <span className="font-semibold text-foreground"> AgurateAI delivers results in seconds</span>, 
+                <span className="font-semibold text-foreground"> AgurateAI walks through an illustrative scan flow</span>, 
                 enabling immediate action before damage spreads.
               </p>
             </div>
@@ -337,15 +337,15 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
-                  <span>Pre-storm baseline: 23 photos, Health Score 68% → 92%</span>
+                  <span>Illustrative pre-storm baseline photos and health trend</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
-                  <span>Post-storm damage: 18 photos, Health Score 41%, GPS-tagged</span>
+                  <span>Illustrative post-storm damage photos with location tags</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />
-                  <span>AI damage assessment: Severe (87% confidence)</span>
+                  <span>Illustrative AI damage assessment (example confidence only)</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-health-good mt-0.5" />

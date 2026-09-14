@@ -31,10 +31,11 @@ export async function checkRateLimit(
     .gte('created_at', windowStart.toISOString());
 
   if (error) {
-    console.error('[rateLimiter] Error checking rate limit:', error);
+    // Fail closed for abuse-sensitive paths: deny when the limiter cannot read state.
+    console.error('[rateLimiter] Error checking rate limit (fail closed):', error);
     return {
-      allowed: true,
-      remaining: config.maxRequests - 1,
+      allowed: false,
+      remaining: 0,
       resetTime: Date.now() + config.windowMs,
       limit: config.maxRequests,
     };

@@ -37,10 +37,16 @@ Last updated: 2026-09-14
 - [x] get_conversation_memory ownership check + usable cross-conversation signature
 - [x] acknowledge_cooperative_alert requires cooperative membership
 - [x] Beta/demo profile + field upserts mapped to live schema columns
+- [x] Peer/researcher RPC auth + drop legacy unsecured overloads
+- [x] Cooperative helper param-shadowing fix + creator/invite join policies
+- [x] Peer/expert/coop Jan→Nov schema reconcile migration
+- [x] Shared rate limiter fails closed on DB errors
+- [x] Cooperatives create/join uses `cooperative_members.role` (no phantom roles table)
+- [x] Playwright honesty smoke installed in CI
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (view security invoker + RLS lock-down + testimonial unapprove + critical_alerts reconcile + secure RPCs)
+- [ ] Apply pending Supabase migrations (view invoker + RLS lock-down + testimonials + critical_alerts reconcile + secure RPCs + coop auth fix + peer/expert/coop reconcile)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

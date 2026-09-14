@@ -12,8 +12,9 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 
 ## Still open (platform / external)
 
-1. Apply pending Supabase migrations (view security invoker, RLS lock-down,
-   testimonial unapprove, critical_alerts reconcile, secure RPCs)
+1. Apply pending Supabase migrations (view invoker, RLS lock-down,
+   testimonial unapprove, critical_alerts reconcile, secure RPCs,
+   cooperative auth helper fix, peer/expert/coop schema reconcile)
 2. Enable Auth **Leaked Password Protection**
 3. Deploy updated edge functions
 4. Set `DEMO_SETUP_SECRET` (or leave unset to keep demo setup disabled)
@@ -29,6 +30,11 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 - Conversation memory + cooperative acknowledge RPC ownership checks
 - Beta/demo profile upserts mapped to live `profiles` columns
 - Expert escalation insert mapped to live `expert_consultations` columns
+- Peer/researcher DEFINER RPCs require auth; legacy overloads dropped
+- `is_cooperative_member` / `is_cooperative_admin` param shadowing fixed
+- Cooperatives creator bootstrap + invite join RLS; no `cooperative_roles`
+- Peer/expert/coop Jan→Nov column reconcile migration
+- Rate limiter fail-closed; Playwright honesty smoke in CI
 
 ## Obsolete guidance
 

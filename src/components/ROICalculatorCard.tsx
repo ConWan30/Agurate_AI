@@ -78,7 +78,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
         setMarketPrice({
           price,
           unit,
-          source: priceData.source || 'USDA',
+          source: priceData.source || 'Estimate',
           last_updated: priceData.last_updated || new Date().toISOString(),
         });
       }

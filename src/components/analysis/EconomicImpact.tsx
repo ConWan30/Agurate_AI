@@ -19,7 +19,7 @@ export function EconomicImpact({
   treatmentCost,
   potentialSavings
 }: EconomicImpactProps) {
-  // Estimated crop values per acre (Louisiana averages)
+  // Illustrative crop values per acre for decision-aid math (not live market quotes)
   const cropValues: Record<string, number> = {
     rice: 850,
     soybeans: 400,

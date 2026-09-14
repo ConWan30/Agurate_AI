@@ -112,7 +112,7 @@ export default function HowItWorks() {
     {
       icon: FileText,
       title: 'Conversational Forms',
-      description: 'Just talk to your phone—AI extracts field data, planting dates, and crop varieties from natural conversation. Voice-to-data in seconds',
+      description: 'Just talk to your phone—AI extracts field data, planting dates, and crop varieties from natural conversation. Voice-to-data as a decision aid',
       benefit: 'Faster form completion',
       color: 'bg-purple-500/10 text-purple-700 border-purple-500/20'
     },

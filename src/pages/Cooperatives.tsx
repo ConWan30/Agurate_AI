@@ -74,16 +74,10 @@ export default function Cooperatives() {
       
       if (memberError) throw memberError;
 
-      const { data: roles, error: roleError } = await supabase
-        .from('cooperative_roles' as any)
-        .select('cooperative_id, role')
-        .eq('user_id', user?.id || '');
-      
-      if (roleError) throw roleError;
-
+      // Role lives on cooperative_members (no separate cooperative_roles table)
       return memberships?.map(m => ({
         ...m,
-        role: (roles as any)?.find((r: any) => r.cooperative_id === m.cooperative_id)?.role || 'member'
+        role: m.role || 'member'
       }));
     },
     enabled: !!user
@@ -107,20 +101,11 @@ export default function Cooperatives() {
         .from('cooperative_members')
         .insert([{
           cooperative_id: coop.id,
-          user_id: user?.id || ''
-        }]);
-      
-      if (memberError) throw memberError;
-
-      const { error: roleError } = await supabase
-        .from('cooperative_roles' as any)
-        .insert([{
-          cooperative_id: coop.id,
           user_id: user?.id || '',
           role: 'admin'
         }]);
       
-      if (roleError) throw roleError;
+      if (memberError) throw memberError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cooperatives'] });

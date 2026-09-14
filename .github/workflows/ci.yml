@@ -35,6 +35,13 @@ jobs:
           deno-version: v2.x
       - name: Edge functions typecheck
         run: npm run check:edge
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Public honesty Playwright smoke
+        run: npm run test:e2e:honesty
+        env:
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
       - name: Production build
         run: npm run build
         env:

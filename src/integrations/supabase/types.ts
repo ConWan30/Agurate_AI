@@ -2330,6 +2330,10 @@ export type Database = {
         Args: { coop_id: string; user_id: string }
         Returns: boolean
       }
+      resolve_cooperative_alert: {
+        Args: { p_alert_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
