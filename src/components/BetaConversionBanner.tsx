@@ -100,7 +100,7 @@ export function BetaConversionBanner() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                Lock in your lifetime 50% discount before beta ends on{' '}
+                Keep 50% off the published plan rate before beta ends on{' '}
                 <span className="font-semibold text-foreground">
                   {betaEndDate?.toLocaleDateString('en-US', { 
                     month: 'long', 
@@ -115,7 +115,7 @@ export function BetaConversionBanner() {
               <div className="flex items-start gap-2 text-sm">
                 <DollarSign className="h-4 w-4 text-primary mt-0.5" />
                 <div>
-                  <p className="font-medium">Lifetime 50% Discount</p>
+                  <p className="font-medium">50% off published rate</p>
                   <p className="text-xs text-muted-foreground">50% off the published plan rate, for life</p>
                 </div>
               </div>

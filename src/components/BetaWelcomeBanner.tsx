@@ -64,7 +64,7 @@ export function BetaWelcomeBanner() {
           <p className="text-xs text-muted-foreground">
             You're one of the first 100 Louisiana farmers with FREE unlimited access. 
             Your feedback shapes the future of precision agriculture. Plus, you've locked in a 
-            <span className="font-semibold text-primary"> lifetime 50% discount</span> when we launch paid plans.
+            <span className="font-semibold text-primary"> 50% off the published plan rate</span> when we launch paid plans.
           </p>
         </div>
         <Button

@@ -189,7 +189,7 @@ export default function FieldMap() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {fields.map((field, idx) => {
             const assessment = assessments.find(a => a.field_id === field.id);
-            const healthScore = assessment?.health_score || 0.5;
+            const healthScore = assessment?.health_score ?? 50;
 
             return (
               <AnimatedCard key={field.id} delay={idx * 50} hover>
@@ -201,7 +201,7 @@ export default function FieldMap() {
                         {field.crop_type} • {field.acreage || 'N/A'} acres
                       </p>
                     </div>
-                    <div className={`w-6 h-6 rounded-full ${getHealthColor(healthScore)} border-2 border-white shadow-md`} aria-label={`Health indicator: ${(healthScore * 100).toFixed(0)}%`} />
+                    <div className={`w-6 h-6 rounded-full ${getHealthColor(healthScore)} border-2 border-white shadow-md`} aria-label={`Health indicator: ${toHealthPercent(healthScore).toFixed(0)}%`} />
                   </div>
 
                   {assessment && (
@@ -209,7 +209,7 @@ export default function FieldMap() {
                       <div className="flex items-center gap-2">
                         <Activity className="h-4 w-4" aria-hidden="true" />
                         <span className="font-mono font-semibold">
-                          Health: {(healthScore * 100).toFixed(0)}%
+                          Health: {toHealthPercent(healthScore).toFixed(0)}%
                         </span>
                       </div>
                       <AgriculturalBadge type={

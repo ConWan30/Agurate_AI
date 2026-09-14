@@ -185,7 +185,7 @@ export default function Home() {
           <div className="max-w-3xl">
             {/* Beta Badge */}
             <Badge className="mb-6 text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white border-none shadow-glow animate-fade-in">
-              🌱 FREE BETA - Limited to First 100 Louisiana Delta Farmers
+              🌱 FREE CLOSED BETA — Louisiana Delta farmers
             </Badge>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-primary-foreground mb-6 leading-tight">

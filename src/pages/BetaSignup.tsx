@@ -183,12 +183,12 @@ export default function BetaSignup() {
             {isCritical && (
               <p className="text-destructive font-semibold flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
-                Only {spotsRemaining} spots remaining! Join now to secure your lifetime discount.
+                Closed beta seats are limited. Join to keep 50% off the published plan rate after launch.
               </p>
             )}
             {showUrgency && !isCritical && (
               <p className="text-primary font-semibold">
-                🔔 {spotsRemaining} spots remaining - Join the beta program soon!
+                🔔 Closed beta enrollment is limited — join while seats remain.
               </p>
             )}
           </div>

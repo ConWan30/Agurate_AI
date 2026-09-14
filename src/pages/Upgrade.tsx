@@ -71,7 +71,7 @@ export default function Upgrade() {
             🌟 Beta Farmer Exclusive Offer
           </Badge>
           <h2 className="text-3xl font-bold">
-            Lock in Your Lifetime 50% Discount
+            Lock in Your Beta Pricing Benefit
           </h2>
           <p className="text-lg text-muted-foreground">
             As a beta farmer, you've helped us build AgurateAI. Secure your lifetime discount before the beta program ends.
@@ -170,7 +170,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Beta farmers who convert to paid plans will receive a lifetime 50% discount. Your data and fields will remain intact, and you'll continue to have full access to all features.
+                  Beta farmers who convert keep 50% off the published plan rate. Your data and fields remain intact with continued feature access.
                 </p>
               </CardContent>
             </Card>
@@ -181,7 +181,7 @@ export default function Upgrade() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Yes! You can upgrade or downgrade at any time. Beta farmers keep their 50% discount across all plan changes.
+                  Yes! You can upgrade or downgrade at any time. Beta farmers keep 50% off the published rate across plan changes.
                 </p>
               </CardContent>
             </Card>

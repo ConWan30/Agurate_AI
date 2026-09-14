@@ -74,7 +74,7 @@ export function TrustIndicators({ variant = "full", className = "" }: TrustIndic
         </div>
         <div>
           <p className="font-semibold text-sm">Closed beta</p>
-          <p className="text-xs text-muted-foreground">First 100 Delta farmers</p>
+          <p className="text-xs text-muted-foreground">Closed-beta Delta farmers</p>
         </div>
       </div>
 

@@ -123,7 +123,7 @@ export function BetaCountdown() {
                   Spots Filling Fast!
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Only {spotsRemaining} spots remaining. Sign up now to secure your lifetime 50% discount.
+                  Closed beta enrollment is limited. Join to keep 50% off the published plan rate after launch.
                 </p>
               </div>
             </div>
@@ -135,7 +135,7 @@ export function BetaCountdown() {
               <p className="font-medium text-foreground">Beta Benefits:</p>
               <ul className="list-disc list-inside space-y-0.5 ml-2">
                 <li>FREE unlimited access during beta</li>
-                <li>Lifetime 50% discount when we launch</li>
+                <li>50% off published rate when paid plans launch</li>
                 <li>Direct founder support</li>
               </ul>
             </div>

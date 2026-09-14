@@ -125,7 +125,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             <div className="flex items-start gap-3">
               <TrendingDown className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <div>
-                <p className="font-semibold text-foreground">Lifetime 50% Discount</p>
+                <p className="font-semibold text-foreground">50% off published rate</p>
                 <p className="text-sm text-muted-foreground">
                   Lock in 50% off the published plan rate for life after beta
                 </p>

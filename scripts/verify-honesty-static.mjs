@@ -61,6 +61,8 @@ const FORBIDDEN = [
   { name: 'first 100 farmers lifetime 50% claim', re: /Free for First 100.*Lifetime 50%/i },
   { name: 'real-time AI + DIRT integration claim', re: /Real-time AI \+ DIRT integration/i },
   { name: 'instant smartphone analysis claim', re: /Instant smartphone analysis/i },
+  { name: 'lifetime 50% discount claim', re: /lifetime 50% discount/i },
+  { name: 'first 100 louisiana delta farmers claim', re: /Limited to First 100 Louisiana Delta Farmers/i },
   { name: 'direct DIRT integration claim', re: /direct integration to MSU DIRT/i },
 ];
 

@@ -312,8 +312,8 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
                   <p className="text-muted-foreground">All features, no limits, no credit card required</p>
                 </div>
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <p className="font-medium mb-1">💰 Lifetime 50% Discount</p>
-                  <p className="text-muted-foreground">When we launch paid plans, you lock in 50% off forever</p>
+                  <p className="font-medium mb-1">💰 Beta pricing: 50% off published rate</p>
+                  <p className="text-muted-foreground">When paid plans launch, you keep 50% off the published rate</p>
                 </div>
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                   <p className="font-medium mb-1">🎯 Direct Founder Support</p>
