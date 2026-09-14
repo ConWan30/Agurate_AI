@@ -138,7 +138,7 @@ export const generateInsurancePDF = (claim: ClaimData): jsPDF => {
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(22, 163, 74);
-    doc.text('AI-Verified Assessment Data', 15, yPos);
+    doc.text('AI Assessment Data (decision aid)', 15, yPos);
     
     // Highlight box for AI data
     doc.setFillColor(240, 253, 244); // Light green
@@ -148,9 +148,13 @@ export const generateInsurancePDF = (claim: ClaimData): jsPDF => {
     doc.rect(15, yPos + 5, pageWidth - 30, 55, 'S');
     
     yPos += 15;
+    const healthLabel =
+      claim.assessment.health_score != null && Number.isFinite(Number(claim.assessment.health_score))
+        ? `${claim.assessment.health_score}/100`
+        : 'Not recorded';
     const assessmentInfo = [
-      ['Health Score', `${claim.assessment.health_score}/100`],
-      ['Stress Level', claim.assessment.stress_level.toUpperCase()],
+      ['Health Score', healthLabel],
+      ['Stress Level', (claim.assessment.stress_level || 'not recorded').toUpperCase()],
       ['Analysis Date', new Date(claim.assessment.analyzed_at).toLocaleDateString('en-US', { 
         year: 'numeric', 
         month: 'long', 

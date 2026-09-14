@@ -448,7 +448,7 @@ export default function History() {
                         : selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ||
                           selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ||
                           selectedAssessment.nutrient_deficiencies?.potassium?.detected
-                        ? "mild"
+                        ? "unknown"
                         : "none"
                     }
                     criticalIssue={

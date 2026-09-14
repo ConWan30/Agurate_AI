@@ -350,7 +350,7 @@ Respond with JSON:
     \"overall_severity\": \"none\"|\"low\"|\"moderate\"|\"high\"|\"severe\"
   },
   \"field_uniformity_score\": <float 0.0-1.0, 1.0 = perfectly uniform>,
-  \"estimated_yield_impact_percent\": <float 0-100, estimated % yield loss or negative for gain>,
+  \"estimated_yield_impact_percent\": <float 0-100 estimated % yield loss, OR null when not visually estimable — never invent>,
   \"canopy_coverage_percent\": <float 0-100, % ground covered by crop>,
   \"plant_density_assessment\": \"very_low\"|\"low\"|\"optimal\"|\"high\"|\"very_high\",
   \"root_health_indicators\": [<array of visible signs suggesting root health/issues>],
@@ -424,26 +424,26 @@ Respond with JSON:
 
 Generate actionable recommendations informed by publicly available LSU AgCenter guidance for Louisiana Delta farmers.
 
-**PUBLIC LSU AGCENTER RESEARCH REFERENCES (cite when applicable; not an official partnership):**
+**PUBLIC LSU AGCENTER RESEARCH REFERENCES (cite published ranges when applicable; not farm-specific guarantees or an official partnership):**
 - Fertilizer: LSU AgCenter Publication Pub. 2945, "Fertilizer Recommendations for Field Crops in Louisiana: N-P-K-S" (2024)
-  - Rice: 120-150 lbs N/acre in split applications (60% preflood, 40% mid-season)
+  - Rice: published N ranges often cited around 120-150 lbs N/acre in split applications — confirm against the publication and field conditions
   - Soybeans: Minimal N (legume fixation), focus on K and P
 - Rice Disease: LSU AgCenter Rice Research Station, "Rice Varieties and Management Tips 2025" (2024)
-  - Blast-resistant varieties reduce fungicide needs by 40%
+  - Blast-resistant varieties may reduce fungicide needs in published trial contexts — do not assert a farm-specific % without visible evidence
   - Source: https://www.lsuagcenter.com/profiles/astrahan/articles/page1701362113346
 - Water Management: LSU Rice Research Station, "Water Management for Louisiana Rice Production" (2024)
-  - Water stress during reproductive stages causes 20-40% yield reduction
+  - Published guidance discusses yield risk from water stress in reproductive stages — cite ranges only when relevant; do not invent farm loss %
 - Soybean Disease: LSU AgCenter Plant Pathology, "Louisiana Plant Disease Management Guide - Soybeans" (2024)
-  - Frogeye-resistant varieties are most cost-effective control method
+  - Frogeye-resistant varieties are often described as cost-effective control options in published guidance
 
-**DECISION RULES:**
-1. If stress_score < 0.3 → Urgent action within 24-48 hours
-2. Disease symptoms → Recommend specific fungicide/treatment + cite LSU research
-3. Nitrogen deficiency → Recommend 30-50 lbs N/acre (cite Pub. 2945 for rice)
-4. Precipitation < 0.5" AND temp > 90°F → Urgent irrigation (cite LSU water management)
-5. Precipitation > 2" in 7 days → Delay fertilizer (runoff risk per LSU guidelines)
+**DECISION RULES (planning aid — cite pub ranges; do not invent farm-specific rates):**
+1. If stress_score < 0.3 → Flag for urgent farmer review within 24-48 hours
+2. Disease symptoms → Suggest treatment categories + cite LSU research framing
+3. Nitrogen deficiency → Reference Pub. 2945 ranges for rice; ask for farmer-recorded rates before asserting lbs/acre
+4. Precipitation < 0.5" AND temp > 90°F → Flag irrigation review (cite LSU water management)
+5. Precipitation > 2" in 7 days → Flag fertilizer timing/runoff risk per LSU guidelines
 
-Use clear, farmer-friendly language. Cite specific public LSU AgCenter publications when applicable. Never claim an official LSU partnership or validation.
+Use clear, farmer-friendly language. Cite specific public LSU AgCenter publications when applicable. Never claim an official LSU partnership or validation. Never invent farm-specific yield %, dollar savings, or prescription rates without visible evidence or farmer inputs.
 
 Respond ONLY in JSON format.`
           },

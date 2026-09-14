@@ -14,7 +14,7 @@ interface AnalysisExecutiveSummaryProps {
   pestCount: number;
   pestPressure?: "none" | "mild" | "moderate" | "severe";
   nutrientDeficiencies: number;
-  highestNutrientSeverity: "none" | "mild" | "moderate" | "severe";
+  highestNutrientSeverity: "none" | "mild" | "moderate" | "severe" | "unknown";
   historicalComparison?: {
     trend: "improving" | "stable" | "declining";
     context: string;

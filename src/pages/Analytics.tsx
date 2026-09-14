@@ -161,7 +161,7 @@ export default function Analytics() {
           { id: "welcome", title: "Your Farming Dashboard", content: "Track performance across all fields with comprehensive analytics", position: "bottom" },
           { id: "comparison", title: "Field Comparison", content: "Identify which fields perform best and which need attention", position: "bottom" },
           { id: "treatment", title: "Treatment Effectiveness", content: "Measure ROI on your interventions and optimize spending", position: "bottom" },
-          { id: "export", title: "Export Reports", content: "Download data for insurance claims or USDA compliance", position: "bottom" }
+          { id: "export", title: "Export Reports", content: "Download data for insurance claims or your USDA records (not a compliance guarantee)", position: "bottom" }
         ]}
         storageKey="tutorial-analytics-shown"
       />

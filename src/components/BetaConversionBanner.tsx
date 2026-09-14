@@ -107,6 +107,7 @@ export function BetaConversionBanner() {
                     year: 'numeric' 
                   })}
                 </span>
+                {' '}— not guaranteed; confirm in-app.
               </p>
             </div>
 
@@ -115,7 +116,7 @@ export function BetaConversionBanner() {
                 <DollarSign className="h-4 w-4 text-primary mt-0.5" />
                 <div>
                   <p className="font-medium">Possible discount off published rate</p>
-                  <p className="text-xs text-muted-foreground">Possible 50% off the published plan rate after paid plans launch</p>
+                  <p className="text-xs text-muted-foreground">Possible 50% off the published plan rate after paid plans launch — not guaranteed; confirm in-app</p>
                 </div>
               </div>
 

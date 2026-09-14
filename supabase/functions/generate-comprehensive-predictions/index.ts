@@ -88,22 +88,35 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
+    const scoredAssessments = (assessments || []).filter(
+      (a: { health_score?: number | null }) =>
+        a.health_score != null && Number.isFinite(Number(a.health_score))
+    );
+
     const aiPrompt = `You are AgurateAI's comprehensive predictive analytics engine for Louisiana Delta farming.
 
 Field Data:
 - Crop: ${cropType}
-- Acreage: ${field?.acreage}
-- Historical Assessments: ${JSON.stringify(assessments)}
+- Acreage: ${field?.acreage ?? 'not recorded'}
+- Scored Assessments (health only when recorded): ${JSON.stringify(scoredAssessments)}
 - Weather Forecast: ${JSON.stringify(weatherForecast)}
 
-Generate comprehensive predictions for next 30 days:
-1. Yield Predictions: Estimate bushels/acre based on health trends
-2. Disease Risk: Calculate disease outbreak probability (0-1 scale)
-3. Weather Impact: Predict stress events from forecast
-4. Economic Forecast: Estimate profitability trajectory
-5. Recommended Actions: Specific interventions with optimal timing
+HONESTY RULES:
+- Do NOT invent bushels/acre yield numbers or dollar profitability.
+- Do NOT invent economic_forecast, revenue, or cost figures — farmer cost/price inputs were not provided.
+- yield_outlook and disease_risk must be relative planning INDEX scores from 0–100 (not measured farm outcomes).
+- weather_impact must be a short qualitative risk note or null — not invented stress percentages.
+- If scored assessment history is insufficient (<3), lower confidence and say so in recommendations.
 
-Return JSON with complete predictive analysis including confidence scores.`;
+Generate planning forecasts for next 30 days:
+1. yield_outlook: relative planning index 0–100 (not bushels)
+2. disease_risk: outbreak risk index 0–1
+3. weather_impact: qualitative stress note or null
+4. recommendations: actionable monitoring/treatment questions (no invented $/acre rates)
+5. confidence_score: 0–1 based on data quality
+
+Return JSON with: yield_outlook, disease_risk, weather_impact, recommendations, confidence_score.
+Do NOT include economic_forecast, yield_prediction bushels, or currency fields.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -138,6 +151,20 @@ Return JSON with complete predictive analysis including confidence scores.`;
       throw new Error('Comprehensive prediction omitted confidence_score');
     }
 
+    // Strip invented yield/$ fields if the model still emits them
+    const {
+      economic_forecast: _economic,
+      yield_prediction: _yieldBu,
+      profitability: _profit,
+      ...safePrediction
+    } = predictionData as Record<string, unknown>;
+
+    const yieldOutlook = Number(safePrediction.yield_outlook);
+    if (!Number.isFinite(yieldOutlook) || yieldOutlook < 0 || yieldOutlook > 100) {
+      throw new Error('Comprehensive prediction yield_outlook must be a 0–100 planning index');
+    }
+    safePrediction.yield_outlook = yieldOutlook;
+
     // Save predictive model
     const { data, error } = await supabase
       .from('predictive_models')
@@ -146,7 +173,7 @@ Return JSON with complete predictive analysis including confidence scores.`;
         field_id: fieldId,
         prediction_horizon: 30,
         confidence_score: toHealthPercent(predictionData.confidence_score),
-        prediction_data: predictionData,
+        prediction_data: safePrediction,
         lsu_validation: false,
       })
       .select()

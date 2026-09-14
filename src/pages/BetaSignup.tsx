@@ -221,7 +221,7 @@ export default function BetaSignup() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Possible 50% off the published plan rate when paid plans launch
+                  Possible 50% off the published plan rate when paid plans launch — not guaranteed; confirm in-app
                 </p>
               </CardContent>
             </Card>

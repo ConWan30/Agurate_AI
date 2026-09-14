@@ -59,6 +59,23 @@ serve(async (req) => {
 
     if (insightsError) throw insightsError;
 
+    const rows = insights || [];
+    const reportedSavings = rows
+      .map((r: { savings_achieved?: number | null }) => Number(r.savings_achieved))
+      .filter((n: number) => Number.isFinite(n) && n > 0);
+
+    if (rows.length < 3) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          analysis: null,
+          reason: 'insufficient_community_data',
+          message: 'Need more community reports before generating practice insights.',
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
@@ -70,16 +87,27 @@ Aggregate Community Data (anonymous):
 - Crop: ${cropType}
 - Practice Type: ${practiceType}
 - Region: Louisiana Delta
-- Successful Results: ${JSON.stringify(insights)}
+- Report count: ${rows.length}
+- Self-reported savings samples (finite > 0 only): ${JSON.stringify(reportedSavings)}
+- Outcomes/ratings (no invented dollars): ${JSON.stringify(rows.map((r: { practice?: string; outcome?: string; community_rating?: number }) => ({
+      practice: r.practice,
+      outcome: r.outcome,
+      community_rating: r.community_rating,
+    })))}
+
+HONESTY RULES:
+- Do NOT invent average_savings or dollar figures. If fewer than 3 finite savings samples exist, set average_savings to null.
+- Success rates must be derived only from provided ratings/outcomes — never invent adoption counts.
+- Frame LSU AgCenter references as public guidance only — not official validation.
 
 Analyze community data:
-1. Identify most successful practices (top 25% performers)
-2. Extract common patterns among successful farmers
-3. Calculate average savings and success rate
-4. Generate actionable recommendations
-5. Validate against LSU AgCenter research principles
+1. Identify patterns among higher-rated reports
+2. Extract common practices (qualitative)
+3. average_savings: null unless computed from provided finite savings samples
+4. Generate cautious recommendations labeled as community-reported
+5. Cite public LSU AgCenter framing when relevant
 
-Return JSON with community insights and best practices.`;
+Return JSON with: patterns, recommendations, average_savings (number|null), success_rate (0-1|null), sample_size.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

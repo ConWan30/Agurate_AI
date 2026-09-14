@@ -174,9 +174,13 @@ serve(async (req) => {
       }
 
       if (recentAssessments && recentAssessments.length > 0) {
-        contextPrompt += `\n\nRecent Crop Health Assessments:\n${recentAssessments.map((a: any) =>
-          `- ${a.field?.name} (${a.field?.crop_type}): Health ${a.health_score}/100, ${a.stress_level} stress${a.symptoms ? `, symptoms: ${a.symptoms.join(', ')}` : ''}`
-        ).join('\n')}`;
+        contextPrompt += `\n\nRecent Crop Health Assessments:\n${recentAssessments.map((a: any) => {
+          const health =
+            a.health_score != null && Number.isFinite(Number(a.health_score))
+              ? `Health ${a.health_score}/100`
+              : 'Health not recorded';
+          return `- ${a.field?.name} (${a.field?.crop_type}): ${health}, ${a.stress_level ?? 'stress not recorded'}${a.symptoms ? `, symptoms: ${a.symptoms.join(', ')}` : ''}`;
+        }).join('\n')}`;
       }
 
       // ✅ CONVERSATION MEMORY: Load recent conversation history
