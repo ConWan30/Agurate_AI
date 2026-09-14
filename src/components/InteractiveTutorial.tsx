@@ -81,25 +81,25 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <TrendingUp className="h-8 w-8 text-secondary mb-2 group-hover:scale-110 transition-transform" />
-              <p className="text-sm font-semibold mb-1">Predictions</p>
-              <p className="text-xs text-muted-foreground">7-day stress forecasting</p>
+              <p className="text-sm font-semibold mb-1">Weather Timeline</p>
+              <p className="text-xs text-muted-foreground">Parish weather beside field history</p>
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <Brain className="h-8 w-8 text-accent mb-2 group-hover:scale-110 transition-transform" />
               <p className="text-sm font-semibold mb-1">Delta AI</p>
-              <p className="text-xs text-muted-foreground">Research-backed advisor</p>
+              <p className="text-xs text-muted-foreground">Research-framed advisor</p>
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <FileText className="h-8 w-8 text-success mb-2 group-hover:scale-110 transition-transform" />
-              <p className="text-sm font-semibold mb-1">Insurance</p>
-              <p className="text-xs text-muted-foreground">Field notes for claims</p>
+              <p className="text-sm font-semibold mb-1">Field Notes</p>
+              <p className="text-xs text-muted-foreground">Scan history for your soybean fields</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 p-4 rounded-lg bg-primary/5 border border-primary/20">
             <Target className="h-5 w-5 text-primary shrink-0" />
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Follow James's journey</span> – an illustrative Louisiana Delta scenario showing how a grower might use AI on a multi-field operation
+              <span className="font-semibold text-foreground">Follow James's journey</span> – an illustrative Morehouse Parish soybean scenario showing how a grower might use the pilot tools
             </p>
           </div>
         </div>
@@ -210,17 +210,16 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </div>
         </div>
       ),
-      action: 'Next: Predictions →'
+      action: 'Next →'
     },
     {
       icon: TrendingUp,
-      title: 'Core Feature #2: Predictive Analytics',
+      title: 'Example (deferred): Planning outlooks',
       description: '6:40 AM - James checks the 7-day forecast',
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground leading-relaxed">
-            James taps "Predictions." The AI combines his field history, current assessment, and 
-            weather forecasts to generate optional stress planning outlooks for the next 7 days when enough field history exists — not a guaranteed forecast.
+            Example only for this closed beta: planning outlooks stay deferred until the Morehouse soybean wedge is field-validated. Live pilot tools are scan, fields, weather timeline, history, and Delta chat as a research aid.
           </p>
 
           <div className="space-y-2">
@@ -286,7 +285,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               <div className="bg-card/50 p-3 rounded-lg">
                 <p className="text-sm font-medium mb-1">James asks:</p>
                 <p className="text-sm text-muted-foreground italic">
-                  "Best potassium treatment for soybeans in Louisiana before a heat wave?"
+                  "Best potassium notes for soybeans in Louisiana before a heat wave?"
                 </p>
               </div>
 

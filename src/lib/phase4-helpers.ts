@@ -67,10 +67,10 @@ export function generateFallbackPredictiveQuestions(input: {
 
   if (!input.hasRecentAssessment) {
     return [
-      'What rice varieties work best in the Louisiana Delta?',
-      'How do I identify soybean rust early?',
-      'Best cotton planting practices for Delta soils?',
-      'When should I apply nitrogen to corn fields?',
+      'Which soybean traits matter most for Morehouse Parish soils?',
+      'How do I spot early frogeye leaf spot on soybeans?',
+      'What humidity patterns raise soybean foliar disease pressure?',
+      'When should I schedule the next soybean field scouting walk?',
     ];
   }
 

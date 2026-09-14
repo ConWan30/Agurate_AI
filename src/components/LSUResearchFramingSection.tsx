@@ -90,12 +90,12 @@ export function LSUResearchFramingSection() {
               <p className="text-sm text-muted-foreground mb-4">
                 A directory of public LSU AgCenter researcher profiles. Contact them through official LSU channels — we do not broker introductions.
               </p>
-              <Link to="/lsu-researchers">
+              <a href="https://www.lsuagcenter.com" target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="sm" className="w-full gap-2">
-                  View LSU Researchers
+                  LSU AgCenter (public site)
                   <ExternalLink className="h-4 w-4" />
                 </Button>
-              </Link>
+              </a>
             </CardContent>
           </Card>
         </div>

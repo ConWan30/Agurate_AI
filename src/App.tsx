@@ -44,6 +44,7 @@ const IntegrationTest = lazy(() => import("./pages/IntegrationTest"));
 const BetaSignup = lazy(() => import("./pages/BetaSignup"));
 const Tutorials = lazy(() => import("./pages/Tutorials"));
 const Upgrade = lazy(() => import("./pages/Upgrade"));
+const PilotDeferred = lazy(() => import("./pages/PilotDeferred"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -198,29 +199,30 @@ const App = () => (
             <Route path="/reset-password" element={<main id="main-content"><ResetPassword /></main>} />
             <Route path="/onboarding" element={<ProtectedRoute><main id="main-content"><Onboarding /></main></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
-          <Route path="/beta-metrics" element={<ProtectedRoute><Layout><BetaMetrics /></Layout></ProtectedRoute>} />
+          <Route path="/beta-metrics" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Layout><Upload /></Layout></ProtectedRoute>} />
           <Route path="/scanner" element={<ProtectedRoute><Layout><Scanner /></Layout></ProtectedRoute>} />
           <Route path="/field-map" element={<ProtectedRoute><Layout><FieldMap /></Layout></ProtectedRoute>} />
           <Route path="/weather-timeline" element={<ProtectedRoute><Layout><WeatherTimeline /></Layout></ProtectedRoute>} />
           <Route path="/fields" element={<ProtectedRoute><Layout><Fields /></Layout></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute><Layout><History /></Layout></ProtectedRoute>} />
-          <Route path="/predictions" element={<ProtectedRoute><Layout><Predictions /></Layout></ProtectedRoute>} />
+          <Route path="/predictions" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           <Route path="/how-it-works" element={<main id="main-content"><HowItWorks /></main>} />
-          <Route path="/insurance" element={<ProtectedRoute><Layout><Insurance /></Layout></ProtectedRoute>} />
-          <Route path="/cooperatives" element={<ProtectedRoute><Layout><Cooperatives /></Layout></ProtectedRoute>} />
-          <Route path="/cooperatives/join/:code" element={<ProtectedRoute><CooperativeJoin /></ProtectedRoute>} />
+          <Route path="/pilot-deferred" element={<main id="main-content"><PilotDeferred /></main>} />
+          <Route path="/insurance" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
+          <Route path="/cooperatives" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
+          <Route path="/cooperatives/join/:code" element={<ProtectedRoute><PilotDeferred /></ProtectedRoute>} />
           <Route path="/delta" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
           <Route path="/delta-intelligence" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
-          <Route path="/analytics" element={<ProtectedRoute><Layout><Analytics /></Layout></ProtectedRoute>} />
-          <Route path="/lsu-researchers" element={<ProtectedRoute><Layout><LSUResearchers /></Layout></ProtectedRoute>} />
-          <Route path="/conservation-practices" element={<ProtectedRoute><Layout><ConservationPractices /></Layout></ProtectedRoute>} />
-          <Route path="/conversational-forms-analytics" element={<ProtectedRoute><Layout><ConversationalFormsAnalytics /></Layout></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
+          <Route path="/lsu-researchers" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
+          <Route path="/conservation-practices" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
+          <Route path="/conversational-forms-analytics" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           {import.meta.env.DEV && (
             <Route path="/integration-test" element={<ProtectedRoute><Layout><IntegrationTest /></Layout></ProtectedRoute>} />
           )}
           <Route path="/tutorials" element={<ProtectedRoute><Layout><Tutorials /></Layout></ProtectedRoute>} />
-          <Route path="/upgrade" element={<ProtectedRoute><Layout><Upgrade /></Layout></ProtectedRoute>} />
+          <Route path="/upgrade" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
           {/* Demo routes bypass auth — development / screenshot tooling only */}
           {import.meta.env.DEV && (

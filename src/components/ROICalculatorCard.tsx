@@ -315,10 +315,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                     <SelectValue placeholder="Select crop" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="rice">Rice</SelectItem>
-                    <SelectItem value="soybean">Soybeans</SelectItem>
-                    <SelectItem value="cotton">Cotton</SelectItem>
-                    <SelectItem value="corn">Corn</SelectItem>
+                    <SelectItem value="soybean">Soybeans (Morehouse pilot)</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">Required — no default crop assumed.</p>

@@ -12,10 +12,10 @@ export const ComparisonSection = memo(function ComparisonSection() {
       description: "Smartphone photo analysis vs. waiting on lab samples"
     },
     {
-      feature: "Predictive Analytics",
+      feature: "Weather + Field History",
       agurate: true,
       traditional: false,
-      description: "Optional 7–14 day planning outlooks vs. reactive-only response"
+      description: "Morehouse weather beside your soybean scans vs. memory-only notes"
     },
     {
       feature: "LSU Research Framing",
@@ -30,22 +30,22 @@ export const ComparisonSection = memo(function ComparisonSection() {
       description: "Delta Intelligence chat vs. office hours"
     },
     {
-      feature: "Water Stress Detection",
+      feature: "Honest Pilot Scope",
       agurate: true,
       traditional: false,
-      description: "AI water-stress cues + link out to MSU DIRT"
+      description: "Soybean + Morehouse only; unvalidated suite modules stay deferred"
     },
     {
-      feature: "Variety Recommendations",
+      feature: "Soybean Variety Context",
       agurate: true,
       traditional: "Generic",
-      description: "Field-specific AI analysis"
+      description: "Morehouse soybean variety context from public LSU materials"
     },
     {
-      feature: "Community Intelligence",
+      feature: "Field History Ledger",
       agurate: true,
       traditional: false,
-      description: "Anonymous cooperative insights"
+      description: "Your soybean scans stay attributable — no invented peer outcomes in pilot"
     },
     {
       feature: "Mobile-First Design",

@@ -21,7 +21,35 @@ import { CooperativeAlertsManager } from "@/components/CooperativeAlertsManager"
 import { BetaEngagementCard } from "@/components/BetaEngagementCard";
 import { BetaValueTracker } from "@/components/BetaValueTracker";
 import { LiveCommunityActivity } from "@/components/LiveCommunityActivity";
-import { Upload, MapPin, TrendingUp, AlertCircle, CheckCircle2, AlertTriangle, Lightbulb, Wheat, Sprout, Leaf, Brain, Users, FileText, ChevronDown, ChevronUp, Scan, Cloud, Map, History as HistoryIcon, BarChart3, Droplets, GraduationCap, Network, Microscope } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  BarChart3,
+  BookOpen,
+  Brain,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Cloud,
+  Droplets,
+  FileText,
+  GraduationCap,
+  History,
+  History as HistoryIcon,
+  Leaf,
+  Lightbulb,
+  Map,
+  MapPin,
+  Microscope,
+  Network,
+  Scan,
+  Sprout,
+  TrendingUp,
+  Upload,
+  User,
+  Users,
+  Wheat
+} from "lucide-react";
 import { WeatherAlerts } from "@/components/WeatherAlerts";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
@@ -244,16 +272,16 @@ export default function Dashboard() {
               </AnimatedCard>
             </Link>
 
-            {/* 2. Predictive Analytics */}
-            <Link to="/predictions" className="group focus-ring rounded-xl">
+            {/* 2. Weather Timeline (pilot core) */}
+            <Link to="/weather-timeline" className="group focus-ring rounded-xl">
               <AnimatedCard hover className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-sky shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <TrendingUp className="h-6 w-6 text-white" aria-hidden="true" />
+                    <Cloud className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Predictive Analytics</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Weather Timeline</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Optional 7–14 day planning outlooks when data exists — not guarantees
+                    Morehouse weather context for soybean field history
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
@@ -276,82 +304,82 @@ export default function Dashboard() {
               </AnimatedCard>
             </Link>
 
-            {/* 4. Water Stress Intelligence */}
-            <Link to="/predictions" className="group focus-ring rounded-xl">
+            {/* 4. Fields (pilot core) */}
+            <Link to="/fields" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={100} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Droplets className="h-6 w-6 text-white" aria-hidden="true" />
+                    <MapPin className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Water Stress</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">My Fields</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Water stress monitoring + DIRT link
+                    Register Morehouse soybean fields
                   </p>
-                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
               </AnimatedCard>
             </Link>
 
-            {/* 5. Conservation Tracking */}
-            <Link to="/predictions" className="group focus-ring rounded-xl">
+            {/* 5. Scan History (pilot core) */}
+            <Link to="/history" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={150} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-sky shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Leaf className="h-6 w-6 text-white" aria-hidden="true" />
+                    <History className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Conservation</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Scan History</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Track practices & ROI analysis
+                    Review prior soybean assessments
                   </p>
-                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
               </AnimatedCard>
             </Link>
 
-            {/* 6. Variety Recommendations */}
-            <Link to="/predictions" className="group focus-ring rounded-xl">
+            {/* 6. Tutorials (pilot core) */}
+            <Link to="/tutorials" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={200} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-harvest shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Microscope className="h-6 w-6 text-white" aria-hidden="true" />
+                    <BookOpen className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Variety Selection</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Tutorials</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    AI rice & soybean recommendations
+                    How to capture useful soybean field photos
                   </p>
-                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
               </AnimatedCard>
             </Link>
 
-            {/* 7. LSU researcher directory */}
-            <Link to="/lsu-researchers" className="group focus-ring rounded-xl">
+            {/* 7. Pilot scope */}
+            <Link to="/pilot-deferred" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={250} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <GraduationCap className="h-6 w-6 text-white" aria-hidden="true" />
+                    <Sprout className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">LSU Directory</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Pilot Scope</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Public LSU AgCenter directory
+                    Morehouse soybeans only — what is deferred
                   </p>
-                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
               </AnimatedCard>
             </Link>
 
-            {/* 8. Community Intelligence */}
-            <Link to="/cooperatives" className="group focus-ring rounded-xl">
+            {/* 8. Upload (pilot core) */}
+            <Link to="/upload" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={300} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-sky shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Network className="h-6 w-6 text-white" aria-hidden="true" />
+                    <Upload className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Cooperatives & Community</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Upload Photos</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Anonymous cooperative intelligence
+                    Upload soybean canopy photos for analysis
                   </p>
-                  <AgriculturalBadge type="moderate" className="text-xs">Enhanced</AgriculturalBadge>
+                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
               </AnimatedCard>
             </Link>
@@ -372,16 +400,16 @@ export default function Dashboard() {
               </AnimatedCard>
             </Link>
 
-            {/* 10. Insurance Documentation */}
-            <Link to="/insurance" className="group focus-ring rounded-xl">
+            {/* 10. How It Works */}
+            <Link to="/how-it-works" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={400} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-delta shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <FileText className="h-6 w-6 text-white" aria-hidden="true" />
+                    <Lightbulb className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Insurance Claims</h3>
+                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">How It Works</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    AI-assisted field documentation
+                    Research aid framing for this closed beta
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
@@ -401,17 +429,17 @@ export default function Dashboard() {
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Link to="/analytics" className="group">
+                <Link to="/profile" className="group">
                   <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                          <BarChart3 className="h-6 w-6 text-primary" />
+                          <User className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Advanced Analytics</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Profile</h3>
                       <p className="text-sm text-muted-foreground">
-                        Deep insights and performance metrics
+                        Account settings for the Morehouse soybean pilot
                       </p>
                     </CardContent>
                   </Card>
@@ -465,17 +493,17 @@ export default function Dashboard() {
                   </Card>
                 </Link>
 
-                <Link to="/cooperatives" className="group">
+                <Link to="/delta" className="group">
                   <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                          <Users className="h-6 w-6 text-primary" />
+                          <Brain className="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Cooperatives</h3>
+                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Delta AI</h3>
                       <p className="text-sm text-muted-foreground">
-                        Join and share data with farming cooperatives
+                        Ask research-framed soybean questions (not a diagnosis)
                       </p>
                     </CardContent>
                   </Card>

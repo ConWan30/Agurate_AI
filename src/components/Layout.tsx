@@ -9,10 +9,7 @@ import {
   User, 
   LogOut,
   Sprout,
-  TrendingUp,
   Lightbulb,
-  FileText,
-  Users,
   Brain,
   Scan,
   Cloud
@@ -22,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import MobileFloatingActions from "./MobileFloatingActions";
 import MobileDrawerNav from "./MobileDrawerNav";
 import { KeyboardShortcutsHelp } from "./KeyboardShortcutsHelp";
+import { isPilotDeferredPath, PILOT_TAGLINE } from "@/lib/pilot-scope";
 
 interface LayoutProps {
   children: ReactNode;
@@ -53,18 +51,13 @@ export const Layout = ({ children }: LayoutProps) => {
     { icon: Scan, label: "Field Scanner", path: "/scanner", accentIcon: Sprout, gradient: "from-green-500/10 to-emerald-600/10" },
     { icon: MapPin, label: "Field Map", path: "/field-map", accentIcon: Sprout, gradient: "from-blue-500/10 to-sky-600/10" },
     { icon: Cloud, label: "Weather Timeline", path: "/weather-timeline", accentIcon: Cloud, gradient: "from-cyan-500/10 to-blue-600/10" },
-    { icon: TrendingUp, label: "Predictions", path: "/predictions", accentIcon: TrendingUp, gradient: "from-purple-500/10 to-indigo-600/10" },
-  ];
+  ].filter((item) => !isPilotDeferredPath(item.path));
 
   const businessItems = [
-    { icon: FileText, label: "Insurance", path: "/insurance", accentIcon: FileText, gradient: "from-red-500/10 to-rose-600/10" },
-    { icon: Users, label: "Cooperatives & Community", path: "/cooperatives", accentIcon: Users, gradient: "from-amber-500/10 to-orange-600/10" },
     { icon: Brain, label: "Delta AI", path: "/delta", accentIcon: Brain, gradient: "from-violet-500/10 to-purple-600/10" },
-  ];
+  ].filter((item) => !isPilotDeferredPath(item.path));
 
-  const enhancedItems = [
-    { icon: TrendingUp, label: "LSU Researchers", path: "/lsu-researchers", accentIcon: Lightbulb, gradient: "from-green-500/10 to-emerald-600/10" },
-  ];
+  const enhancedItems: typeof businessItems = [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,7 +73,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 <h1 className="text-2xl font-display font-bold text-foreground">
                   Agurate<span className="font-bold text-green-600">AI</span>
                 </h1>
-                <p className="text-xs text-muted-foreground">Louisiana Delta · Closed beta</p>
+                <p className="text-xs text-muted-foreground">{PILOT_TAGLINE}</p>
               </div>
             </Link>
             
@@ -115,7 +108,7 @@ export const Layout = ({ children }: LayoutProps) => {
             <nav className="space-y-2 sticky top-24">
               <div className="mb-6 pb-6 border-b border-border">
                 <h2 className="text-sm font-bold text-muted-foreground mb-1">FARM MANAGEMENT</h2>
-                <p className="text-xs text-muted-foreground">Delta Code Cultivation System™</p>
+                <p className="text-xs text-muted-foreground">Morehouse Parish · Soybean pilot</p>
               </div>
               
               {navItems.map((item) => {
@@ -225,7 +218,8 @@ export const Layout = ({ children }: LayoutProps) => {
                 </div>
               </div>
 
-              {/* Enhanced Features Section */}
+              {/* Enhanced Features Section — empty during Morehouse soybean pilot */}
+              {enhancedItems.length > 0 && (
               <div className="mt-8 pt-6 border-t border-border">
                 <h2 className="text-sm font-bold text-muted-foreground mb-4">🧠 AI ENHANCED FEATURES</h2>
                 <div className="space-y-2">
@@ -258,6 +252,7 @@ export const Layout = ({ children }: LayoutProps) => {
                   })}
                 </div>
               </div>
+              )}
             </nav>
           </aside>
 
@@ -288,9 +283,9 @@ export const Layout = ({ children }: LayoutProps) => {
                   How It Works
                 </Button>
               </Link>
-              <Link to="/lsu-researchers">
+              <Link to="/pilot-deferred">
                 <Button variant="ghost" size="sm">
-                  LSU Research
+                  Pilot scope
                 </Button>
               </Link>
             </div>

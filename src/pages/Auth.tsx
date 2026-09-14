@@ -219,8 +219,8 @@ export default function Auth() {
           </h2>
           
               <p className="text-lg opacity-90 mb-8 leading-relaxed">
-            Crop health assessments for rice, soybean, cotton, and corn. 
-            Guidance framed around publicly available LSU AgCenter research.
+            Closed beta for Morehouse Parish soybeans.
+            Guidance framed around publicly available LSU AgCenter research — not a diagnosis.
           </p>
 
           {/* Feature list with icons */}

@@ -1,5 +1,9 @@
 # Operator platform handoff
 
+## Pilot wedge (in-repo)
+
+Closed beta product scope is **Morehouse Parish × soybeans**. See `docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md`. Unvalidated suite modules route to `PilotDeferred`.
+
 ## Status (in-repo vs production-complete)
 
 | Gate | Status | Evidence |

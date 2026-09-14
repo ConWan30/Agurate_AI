@@ -92,7 +92,7 @@ describe('Phase 4 predictive question fallbacks', () => {
       hasRecentAssessment: false,
     });
 
-    expect(questions[0]).toContain('Louisiana Delta');
+    expect(questions[0]).toContain('Morehouse Parish');
   });
 
 

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  Closed beta · Research-framed decision aid · Built for rice, soybean, cotton &amp; corn growers
+  Closed beta · Morehouse Parish soybeans · Research-framed decision aid (not a diagnosis)
 </p>
 
 <p align="center">
@@ -36,9 +36,13 @@
 
 ---
 
+## Pilot scope
+
+Current closed beta is intentionally narrow: **Morehouse Parish, Louisiana × soybeans**. See [`docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md`](docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md).
+
 ## What is AgurateAI?
 
-**AgurateAI** is a web application that helps Louisiana Delta farmers assess crop health, organize field history, and explore research-oriented insights for rice, soybean, cotton, and corn.
+**AgurateAI** is a web application that helps Louisiana Delta farmers assess crop health, organize field history, and explore research-oriented insights. The current closed beta is scoped to **Morehouse Parish soybeans**.
 
 Growers can photograph plants in the field, get AI-assisted analysis framed as a research decision aid (not a validated diagnosis), track observations over time, explore conservation and water-stress context, and connect with LSU AgCenter researcher directory information.
 
@@ -88,7 +92,7 @@ Supporting product surfaces include dashboard history, upload flows, PWA install
 
 ## Who it's for
 
-- **Louisiana Delta growers** evaluating rice, soybean, cotton, or corn stands
+- **Morehouse Parish soybean growers** evaluating stands with phone photos (closed beta)
 - **Closed-beta invitees** validating field workflows before wider release
 - **Operators / co-ops** exploring multi-user access paths (cooperative plan inquiries via support)
 

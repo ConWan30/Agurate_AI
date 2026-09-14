@@ -37,7 +37,7 @@ describe('PeerComparisonCard', () => {
       <PeerComparisonCard
         fieldId="11111111-1111-1111-1111-111111111111"
         treatmentType="fungicide"
-        cropType="rice"
+        cropType="soybean"
         currentHealthScore={61}
       />
     );
@@ -48,7 +48,7 @@ describe('PeerComparisonCard', () => {
 
     expect(rpc).toHaveBeenCalledWith('get_peer_comparison', {
       p_field_id: '11111111-1111-1111-1111-111111111111',
-      p_crop_type: 'rice',
+      p_crop_type: 'soybean',
       p_problem: 'fungicide',
     });
     // formatPeerMetric rounds non-integer rates for display honesty
@@ -62,7 +62,7 @@ describe('PeerComparisonCard', () => {
       <PeerComparisonCard
         fieldId=""
         treatmentType="fungicide"
-        cropType="rice"
+        cropType="soybean"
       />
     );
 
