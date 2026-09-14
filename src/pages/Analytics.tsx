@@ -107,14 +107,21 @@ export default function Analytics() {
           const date = format(new Date(assessment.analyzed_at), "MMM dd");
           const existing = acc.find(d => d.date === date);
           
+          const hasScore = assessment.health_score != null && !Number.isNaN(Number(assessment.health_score));
           if (existing) {
-            existing.health_score = (existing.health_score + assessment.health_score) / 2;
+            if (hasScore) {
+              if (existing.health_score == null) {
+                existing.health_score = Number(assessment.health_score);
+              } else {
+                existing.health_score = (Number(existing.health_score) + Number(assessment.health_score)) / 2;
+              }
+            }
             existing.temp_f = assessment.weather_temp_f ?? existing.temp_f;
             existing.precipitation = assessment.weather_precipitation_mm ?? existing.precipitation;
           } else {
             acc.push({
               date,
-              health_score: assessment.health_score,
+              health_score: hasScore ? Number(assessment.health_score) : null,
               temp_f: assessment.weather_temp_f ?? null,
               precipitation: assessment.weather_precipitation_mm ?? null
             });
@@ -277,7 +284,7 @@ export default function Analytics() {
                     </div>
                   </div>
                   <div className="pt-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground">Based on AI analysis of current health, weather patterns, and historical data</p>
+                    <p className="text-sm text-muted-foreground">Health averages use recorded assessment scores only — yield is not estimated from health</p>
                   </div>
                 </CardContent>
               </AnimatedCard>

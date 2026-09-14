@@ -234,6 +234,9 @@ export default function Upload() {
         cropType, 
         location, 
         mediaType,
+        fieldId,
+        latitude: fields.find((f) => f.id === fieldId)?.location_lat ?? undefined,
+        longitude: fields.find((f) => f.id === fieldId)?.location_lng ?? undefined,
         unifiedContext // Include intelligence pool data
       }
     });

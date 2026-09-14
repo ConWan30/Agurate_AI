@@ -132,19 +132,28 @@ serve(async (req) => {
       }
     });
 
-    contextPrompt += `\nTASK: Generate a concise, actionable daily briefing with:\n`;
-    contextPrompt += `1. Top 3 priorities (urgent/monitor/routine) with specific actions\n`;
-    contextPrompt += `2. Weather-based recommendations (spray windows, irrigation needs, etc.)\n`;
-    contextPrompt += `3. Time-specific guidance (e.g., "Spray between 7-11 AM before heat")`;
+        contextPrompt += `\nTASK: Generate a concise, actionable daily briefing.\n`;
+    contextPrompt += `1. Top 3 priorities (urgent/monitor/routine) with specific actions based only on provided field status\n`;
+    if (weather) {
+      contextPrompt += `2. Weather-based recommendations grounded in the weather data above\n`;
+      contextPrompt += `3. Optional sprayWindow only if weather data supports it\n`;
+    } else {
+      contextPrompt += `2. Do NOT invent weather, spray windows, or parish-default conditions — weather data is unavailable\n`;
+      contextPrompt += `3. Set weatherRecommendation and sprayWindow to null\n`;
+    }
     contextPrompt += `\n\nFormat as JSON:\n`;
     contextPrompt += `{\n`;
     contextPrompt += `  "priorities": [\n`;
-    contextPrompt += `    {"fieldName": "Field 3", "issue": "Rice blast detected", "urgency": "high", "action": "Scout today for spread. If lesions increased, spray azoxystrobin by evening."},\n`;
-    contextPrompt += `    {"fieldName": "Field 5", "issue": "Heat stress predicted", "urgency": "medium", "action": "Check at 3 PM for leaf wilting. Increase irrigation if severe."}\n`;
+    contextPrompt += `    {"fieldName": "Field 3", "issue": "Rice blast detected", "urgency": "high", "action": "Scout today for spread. If lesions increased, spray azoxystrobin by evening."}\n`;
     contextPrompt += `  ],\n`;
-    contextPrompt += `  "weatherRecommendation": "Warm and dry conditions. Consider irrigation for stressed fields.",\n`;
-    contextPrompt += `  "sprayWindow": "7 AM - 11 AM (before heat + wind pickup)",\n`;
-    contextPrompt += `  "achievements": ["3 fields in excellent health", "No critical issues detected"]\n`;
+    if (weather) {
+      contextPrompt += `  "weatherRecommendation": "string grounded in provided weather",\n`;
+      contextPrompt += `  "sprayWindow": "string or null",\n`;
+    } else {
+      contextPrompt += `  "weatherRecommendation": null,\n`;
+      contextPrompt += `  "sprayWindow": null,\n`;
+    }
+    contextPrompt += `  "achievements": ["only list if supported by field status"]\n`;
     contextPrompt += `}\n\n`;
     contextPrompt += `Return ONLY valid JSON, no other text.`;
 
@@ -202,10 +211,13 @@ serve(async (req) => {
       );
     }
 
-    // Only surface spray guidance when the model provided it
+    // Only surface weather/spray guidance when we had real weather inputs AND the model provided text
     const responseBody = {
       ...briefingData,
-      sprayWindow: typeof briefingData.sprayWindow === 'string' && briefingData.sprayWindow.trim()
+      weatherRecommendation: weather && typeof briefingData.weatherRecommendation === 'string' && briefingData.weatherRecommendation.trim()
+        ? briefingData.weatherRecommendation.trim()
+        : null,
+      sprayWindow: weather && typeof briefingData.sprayWindow === 'string' && briefingData.sprayWindow.trim()
         ? briefingData.sprayWindow.trim()
         : null,
       weather: weather || null,

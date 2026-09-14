@@ -50,6 +50,8 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
       ? String(assessmentData.estimatedYieldImpact)
       : ''
   );
+  const [avgYieldInput, setAvgYieldInput] = useState('');
+  const [yieldProtectionPercent, setYieldProtectionPercent] = useState('15');
 
 
   // Fallback prices (used if market price API fails)
@@ -135,23 +137,29 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
     assessmentData?.healthScore != null && !Number.isNaN(Number(assessmentData.healthScore));
   const hasYieldAtRisk =
     yieldAtRiskPercent !== '' && Number.isFinite(Number(yieldAtRiskPercent)) && Number(yieldAtRiskPercent) >= 0;
+  const hasAvgYield =
+    avgYieldInput !== '' && Number.isFinite(Number(avgYieldInput)) && Number(avgYieldInput) > 0;
+  const hasProtection =
+    yieldProtectionPercent !== '' && Number.isFinite(Number(yieldProtectionPercent)) && Number(yieldProtectionPercent) >= 0;
 
   const calculateROI = () => {
-    if (!hasAssessmentHealth || !hasYieldAtRisk) {
+    if (!hasAssessmentHealth || !hasYieldAtRisk || !hasAvgYield || !hasProtection) {
       setRoi(null);
       return;
     }
     const acreage = parseFloat(acres) || 100;
     const crop = cropPrices[cropType] || cropPrices.rice;
     const treatment = treatmentCosts[treatmentType] || treatmentCosts.fungicide;
+    const avgYield = Number(avgYieldInput);
 
-    // Yield-at-risk must be explicit (assessment or user) — never invented from health score
+    // Yield-at-risk and protection must be explicit — never invented from health score alone
     const yieldImpactPercent = Number(yieldAtRiskPercent);
-    if (!Number.isFinite(yieldImpactPercent) || yieldImpactPercent < 0) {
+    const protectionFraction = Number(yieldProtectionPercent) / 100;
+    if (!Number.isFinite(yieldImpactPercent) || yieldImpactPercent < 0 || !Number.isFinite(protectionFraction)) {
       setRoi(null);
       return;
     }
-    const yieldAtRisk = crop.avgYield * (yieldImpactPercent / 100);
+    const yieldAtRisk = avgYield * (yieldImpactPercent / 100);
 
     // Calculate potential loss without treatment
     const potentialLossPerAcre = yieldAtRisk * crop.price;
@@ -161,8 +169,8 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
     const treatmentCostPerAcre = treatment.cost;
     const totalTreatmentCost = treatmentCostPerAcre * acreage;
 
-    // Calculate yield protection from treatment
-    const yieldProtected = yieldAtRisk * treatment.yieldProtection;
+    // Calculate yield protection from treatment (user-supplied assumption)
+    const yieldProtected = yieldAtRisk * protectionFraction;
     const revenueProtected = yieldProtected * crop.price * acreage;
 
     // Net benefit = Revenue protected - Treatment cost
@@ -200,15 +208,15 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
           color: 'text-primary',
           bgColor: 'bg-primary/10 border-primary/20',
           icon: CheckCircle2,
-          text: 'Highly Recommended',
-          description: 'Strong economic case for immediate treatment',
+          text: 'Favorable (illustrative)',
+          description: 'Illustrative planning estimate — strong case under your inputs',
         };
       case 'recommended':
         return {
           color: 'text-secondary',
           bgColor: 'bg-secondary/10 border-secondary/20',
           icon: TrendingUp,
-          text: 'Recommended',
+          text: 'Favorable (illustrative)',
           description: 'Positive ROI justifies treatment',
         };
       case 'marginal':
@@ -307,6 +315,37 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                 </p>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="avg-yield">Typical yield (units/acre)</Label>
+                <Input
+                  id="avg-yield"
+                  type="number"
+                  min={0}
+                  value={avgYieldInput}
+                  onChange={(e) => setAvgYieldInput(e.target.value)}
+                  placeholder="Enter your typical yield"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Required. Use your field average — defaults are not assumed.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="yield-protection">Assumed treatment yield protection (%)</Label>
+                <Input
+                  id="yield-protection"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={yieldProtectionPercent}
+                  onChange={(e) => setYieldProtectionPercent(e.target.value)}
+                  placeholder="e.g. 15"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Planning assumption you control — not a measured efficacy claim.
+                </p>
+              </div>
+
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="treatment">Treatment Type</Label>
                 <Select value={treatmentType} onValueChange={setTreatmentType}>
@@ -329,7 +368,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                 ROI needs a real assessment health score and an explicit yield-at-risk % (from the assessment or entered below).
               </p>
             )}
-            <Button onClick={calculateROI} className="w-full" disabled={!hasAssessmentHealth || !hasYieldAtRisk}>
+            <Button onClick={calculateROI} className="w-full" disabled={!hasAssessmentHealth || !hasYieldAtRisk || !hasAvgYield || !hasProtection}>
               <Calculator className="h-4 w-4 mr-2" />
               Calculate ROI
             </Button>

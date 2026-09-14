@@ -111,6 +111,10 @@ Last updated: 2026-09-14
 - [x] Daily briefing omits invented 0% health / parish-default weather when data missing
 - [x] Predictive-question fallbacks refuse stress narratives without a real health score
 - [x] Analytics/variety recs do not treat null health as 0 or invent yield from health×factor
+- [x] analyze-crop weather uses field/photo coordinates only (no Morehouse hardcode)
+- [x] Daily briefing omits spray/weather guidance when weather inputs are missing
+- [x] ROI calculator requires user yield + protection assumptions (no silent defaults in math)
+- [x] Soften residual "locked in / keep 50%" beta marketing to contingent language
 
 ## Platform gates (external)
 

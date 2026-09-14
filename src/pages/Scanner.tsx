@@ -221,6 +221,8 @@ export default function Scanner() {
           imageUrl: signedImageUrl,
           cropType: selectedField.crop_type,
           fieldId: selectedFieldId,
+          latitude: gpsCoords?.lat ?? selectedField.location_lat ?? undefined,
+          longitude: gpsCoords?.lng ?? selectedField.location_lng ?? undefined,
           unifiedContext // Include intelligence pool data
         }
       });

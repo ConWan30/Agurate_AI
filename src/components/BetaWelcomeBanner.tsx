@@ -63,8 +63,7 @@ export function BetaWelcomeBanner() {
           </p>
           <p className="text-xs text-muted-foreground">
             You're in the Louisiana closed beta with free access during the beta period. 
-            Your feedback shapes the future of precision agriculture. Plus, you've locked in a 
-            <span className="font-semibold text-primary"> 50% off the published plan rate</span> when we launch paid plans.
+            Your feedback shapes the future of precision agriculture. Plus, when paid plans launch, beta farmers may keep <span className="font-semibold text-primary">50% off the published plan rate</span>.
           </p>
         </div>
         <Button

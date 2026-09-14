@@ -11,7 +11,9 @@ const analyzeCropSchema = z.object({
   cropType: z.enum(['rice', 'soybean', 'cotton', 'corn']),
   fieldId: z.string().uuid().optional(),
   location: z.string().max(200).optional(),
-  mediaType: z.enum(['image', 'video']).default('image')
+  mediaType: z.enum(['image', 'video']).default('image'),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
 });
 
 // Validate image URL has proper file extension
@@ -73,7 +75,7 @@ serve(async (req) => {
       );
     }
 
-    const { imageUrl, cropType, fieldId, location, mediaType } = validation.data;
+    const { imageUrl, cropType, fieldId, location, mediaType, latitude, longitude } = validation.data;
     
     // Validate image/video file format
     if (!validateImageUrl(imageUrl, mediaType)) {
@@ -94,7 +96,7 @@ serve(async (req) => {
     if (fieldId) {
       const { data: field, error: fieldError } = await supabaseAuth
         .from('fields')
-        .select('user_id')
+        .select('user_id, location_lat, location_lng')
         .eq('id', fieldId)
         .single();
 
@@ -196,23 +198,39 @@ Use ALL historical context above to:
       console.log('✅ Unified context gathered for field:', fieldId);
     }
 
-    // STEP 1: Fetch current weather data for Louisiana (Morehouse Parish coordinates)
+    // STEP 1: Fetch weather only for real field/photo coordinates — never invent parish defaults
     let weatherData = null;
+    let weatherLat: number | null = latitude ?? null;
+    let weatherLng: number | null = longitude ?? null;
+    if ((weatherLat == null || weatherLng == null) && fieldId) {
+      const { data: fieldCoords } = await supabaseAuth
+        .from('fields')
+        .select('location_lat, location_lng')
+        .eq('id', fieldId)
+        .maybeSingle();
+      if (fieldCoords?.location_lat != null && fieldCoords?.location_lng != null) {
+        weatherLat = Number(fieldCoords.location_lat);
+        weatherLng = Number(fieldCoords.location_lng);
+      }
+    }
     try {
-      // Open-Meteo API for Morehouse Parish, LA (32.73°N, -91.76°W)
-      const weatherResponse = await fetch(
-        'https://api.open-meteo.com/v1/forecast?latitude=32.73&longitude=-91.76&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=7&timezone=America/Chicago'
-      );
-      if (weatherResponse.ok) {
-        const weather = await weatherResponse.json();
-        const precipSum = weather.daily.precipitation_sum.reduce((a: number, b: number) => a + b, 0);
-        weatherData = {
-          temp_f: weather.current_weather.temperature,
-          precipitation_7day: precipSum,
-          temp_max: Math.max(...weather.daily.temperature_2m_max),
-          temp_min: Math.min(...weather.daily.temperature_2m_min)
-        };
-        console.log('Weather data fetched for Morehouse Parish:', weatherData);
+      if (weatherLat != null && weatherLng != null) {
+        const weatherResponse = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${weatherLat}&longitude=${weatherLng}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=7&timezone=America/Chicago`
+        );
+        if (weatherResponse.ok) {
+          const weather = await weatherResponse.json();
+          const precipSum = weather.daily.precipitation_sum.reduce((a: number, b: number) => a + b, 0);
+          weatherData = {
+            temp_f: weather.current_weather.temperature,
+            precipitation_7day: precipSum,
+            temp_max: Math.max(...weather.daily.temperature_2m_max),
+            temp_min: Math.min(...weather.daily.temperature_2m_min)
+          };
+          console.log('Weather data fetched for field coordinates:', weatherLat, weatherLng, weatherData);
+        }
+      } else {
+        console.log('Skipping weather fetch — no field/photo coordinates available');
       }
     } catch (err) {
       console.warn('Weather fetch failed, continuing without it:', err);
@@ -236,7 +254,7 @@ Use ALL historical context above to:
             content: `You are an expert agricultural AI for Louisiana Delta farmers with access to comprehensive field intelligence history.
 
 CONTEXT:
-- Location: Morehouse Parish, Louisiana (subtropical climate, high disease pressure)
+- Region: Louisiana Delta (subtropical climate, high disease pressure); use provided coordinates/location when present — do not invent a parish
 - Soils: Alluvial/claypan soils typical of Mississippi Delta
 - Climate: Warm, humid with high rainfall
 
@@ -255,7 +273,7 @@ Respond ONLY in JSON format with precise observations.`
                 type: 'text',
                 text: `${unifiedContext}
 
-Analyze this ${cropType} field ${mediaType === 'video' ? 'drone video' : 'image'} from ${location || 'Morehouse Parish, Louisiana'}.
+Analyze this ${cropType} field ${mediaType === 'video' ? 'drone video' : 'image'}${location ? ` from ${location}` : ' (location not provided — do not invent a parish)'}.
 
 ${mediaType === 'video' ? `**DRONE VIDEO ANALYSIS:**
 Examine the footage across multiple frames to identify:
@@ -431,7 +449,7 @@ Respond ONLY in JSON format.`
 - Symptoms: ${imageAnalysis.symptoms?.join(', ')}
 - Confidence: ${imageAnalysis.confidence_score.toFixed(2)}
 
-${weatherData ? `**CURRENT WEATHER (Morehouse Parish, LA):**
+${weatherData ? `**CURRENT WEATHER (at field coordinates):**
 - Current Temp: ${weatherData.temp_f}°F
 - 7-Day Rainfall: ${weatherData.precipitation_7day.toFixed(2)} inches
 - High: ${weatherData.temp_max}°F | Low: ${weatherData.temp_min}°F` : '**WEATHER:** Data unavailable'}

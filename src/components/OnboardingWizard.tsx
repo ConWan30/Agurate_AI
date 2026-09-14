@@ -310,8 +310,8 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
                   <p className="text-muted-foreground">Core features available during beta without a paid plan</p>
                 </div>
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <p className="font-medium mb-1">💰 Beta pricing: 50% off published rate</p>
-                  <p className="text-muted-foreground">When paid plans launch, you keep 50% off the published rate</p>
+                  <p className="font-medium mb-1">💰 Beta pricing: possible 50% off published rate</p>
+                  <p className="text-muted-foreground">When paid plans launch, beta farmers may keep 50% off the published rate</p>
                 </div>
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                   <p className="font-medium mb-1">🎯 Direct Founder Support</p>
