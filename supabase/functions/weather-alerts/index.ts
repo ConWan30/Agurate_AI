@@ -167,14 +167,15 @@ serve(async (req) => {
     if (agAlerts.length > 0) {
       const supabase = getServiceClient();
       for (const alert of agAlerts) {
+        // Do not write owned-field GPS into the shared weather_events catalog.
         await supabase.from("weather_events").insert({
           event_type: alert.type,
           event_date: new Date(alert.start_time).toISOString().split("T")[0],
           description: alert.description,
           temperature_f: null,
           precipitation_inches: null,
-          location_lat: latitude,
-          location_lng: longitude
+          location_lat: null,
+          location_lng: null,
         });
       }
     }

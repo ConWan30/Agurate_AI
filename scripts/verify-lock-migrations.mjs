@@ -300,6 +300,14 @@ const required = [
         'AVG(pto.effectiveness_score) FILTER (WHERE pto.effectiveness_score IS NOT NULL)',
       ],
     },
+    {
+      id: '20260914460000_scrub_weather_events_gps_catalog',
+      needles: [
+        'location_lat = NULL',
+        'location_lng = NULL',
+        'strip_weather_events_gps',
+      ],
+    },
   ];
 
   for (const req of required) {
@@ -319,9 +327,11 @@ const required = [
 
   const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
   pass(`tip migration ${tip}`);
-  if (!tip.startsWith('2026091445')) {
+  // Tip must be at/after the latest required lock id (lexicographic timestamp prefix).
+  const minTip = '20260914460000';
+  if (tip < minTip) {
     fail(
-      `tip migration ${tip} should include peer effectiveness history scrub (20260914450000+)`
+      `tip migration ${tip} must be >= ${minTip} (weather_events GPS catalog scrub)`
     );
   }
 

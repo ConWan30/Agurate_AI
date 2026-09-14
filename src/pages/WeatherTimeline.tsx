@@ -102,7 +102,12 @@ export default function WeatherTimeline() {
           ? toHealthPercent(assessment.health_score)
           : null,
         temperature: assessment.weather_temp_f,
-        precipitation: assessment.weather_precipitation_mm ? assessment.weather_precipitation_mm / 25.4 : null, // mm to inches
+        // Preserve recorded 0" precip — do not treat falsy 0 as "missing".
+        precipitation:
+          assessment.weather_precipitation_mm != null &&
+          Number.isFinite(Number(assessment.weather_precipitation_mm))
+            ? Number(assessment.weather_precipitation_mm) / 25.4
+            : null,
         events: (eventsData || []).filter(e => 
           new Date(e.event_date).toDateString() === new Date(assessment.analyzed_at).toDateString()
         )
@@ -118,8 +123,8 @@ export default function WeatherTimeline() {
         steps={[
           { id: "welcome", title: "Weather Timeline", content: "Visualize how weather impacts crop health over 30 days", position: "bottom" },
           { id: "chart", title: "Health & Weather Chart", content: "Green line = crop health, Blue/Red = temperature and rainfall trends", position: "bottom" },
-          { id: "events", title: "Weather Events", content: "See correlations between weather events and health drops", position: "bottom" },
-          { id: "assessments", title: "Recent Assessments", content: "Quick access to your scan history with GPS tags", position: "bottom" }
+          { id: "events", title: "Weather Events", content: "Review recorded weather events alongside health scores when both exist", position: "bottom" },
+          { id: "assessments", title: "Recent Assessments", content: "Quick access to your recent scan history", position: "bottom" }
         ]}
         storageKey="tutorial-weather-timeline-shown"
       />
@@ -134,10 +139,10 @@ export default function WeatherTimeline() {
       >
         <div className="max-w-7xl mx-auto px-4 text-center space-y-4 relative z-10">
           <h1 className="text-5xl font-heading font-bold text-white drop-shadow-lg">
-            Weather-Correlated Health Timeline
+            Weather & Health Timeline
           </h1>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Visualize how weather events impact crop health over time with data-driven insights
+            Compare recorded weather events with your scan health scores over the last 30 days
           </p>
         </div>
       </div>
@@ -251,11 +256,13 @@ export default function WeatherTimeline() {
                         <p className="text-sm">{event.description}</p>
                       )}
                       <div className="flex gap-4 text-xs text-muted-foreground">
-                        {event.temperature_f && (
-                          <span>🌡️ {event.temperature_f}°F</span>
+                        {event.temperature_f != null &&
+                          Number.isFinite(Number(event.temperature_f)) && (
+                          <span>{event.temperature_f}°F</span>
                         )}
-                        {event.precipitation_inches && (
-                          <span>🌧️ {event.precipitation_inches}" rain</span>
+                        {event.precipitation_inches != null &&
+                          Number.isFinite(Number(event.precipitation_inches)) && (
+                          <span>{event.precipitation_inches}" rain</span>
                         )}
                       </div>
                     </div>
@@ -296,7 +303,8 @@ export default function WeatherTimeline() {
                             ? `${toHealthPercent(assessment.health_score).toFixed(0)}%`
                             : 'No score'}
                         </p>
-                        {assessment.weather_temp_f && (
+                        {assessment.weather_temp_f != null &&
+                          Number.isFinite(Number(assessment.weather_temp_f)) && (
                           <p className="text-xs text-muted-foreground">
                             {assessment.weather_temp_f}°F
                           </p>

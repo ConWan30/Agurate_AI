@@ -29,16 +29,15 @@ interface CooperativeAlert {
   resolved_at: string | null;
 }
 
-function AcknowledgeButton({ alert, onAcknowledge }: { alert: CooperativeAlert; onAcknowledge: (id: string) => void }) {
-  const [userId, setUserId] = useState<string | null>(null);
+function AcknowledgeButton({
+  alert,
+  onAcknowledge,
+}: {
+  alert: CooperativeAlert;
+  onAcknowledge: (id: string) => Promise<boolean>;
+}) {
   const [loading, setLoading] = useState(false);
   const [acknowledged, setAcknowledged] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUserId(user?.id || null);
-    });
-  }, []);
 
   if (acknowledged) {
     return (
@@ -54,9 +53,12 @@ function AcknowledgeButton({ alert, onAcknowledge }: { alert: CooperativeAlert; 
       size="sm"
       onClick={async () => {
         setLoading(true);
-        await onAcknowledge(alert.id);
-        setAcknowledged(true);
-        setLoading(false);
+        try {
+          const ok = await onAcknowledge(alert.id);
+          if (ok) setAcknowledged(true);
+        } finally {
+          setLoading(false);
+        }
       }}
       disabled={loading}
     >
@@ -95,10 +97,13 @@ export function CooperativeAlertsManager() {
     }
   };
 
-  const acknowledgeAlert = async (alertId: string) => {
+  const acknowledgeAlert = async (alertId: string): Promise<boolean> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        toast.error('Sign in required to acknowledge alerts');
+        return false;
+      }
 
       const { error } = await supabase.rpc('acknowledge_cooperative_alert', {
         alert_id: alertId,
@@ -108,9 +113,11 @@ export function CooperativeAlertsManager() {
 
       toast.success('Alert acknowledged');
       fetchAlerts();
+      return true;
     } catch (error) {
       console.error('Error acknowledging alert:', error);
       toast.error('Failed to acknowledge alert');
+      return false;
     }
   };
 

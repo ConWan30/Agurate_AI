@@ -93,6 +93,10 @@ const FORBIDDEN = [
   { name: 'Predict heat stress 5-7 days claim', re: /Predict heat stress 5-7 days ahead/i },
   { name: 'LSU AgCenter-aligned advisor claim', re: /LSU AgCenter-aligned/i },
   { name: 'decades of LSU research access claim', re: /Access to Louisiana State University Agricultural Center's decades of research/i },
+  { name: 'LSU AgCenter-trained product claim', re: /LSU AgCenter-trained/i },
+  { name: 'public demo auth bypass claim', re: /\/demo\/\*\s+paths that bypass authentication/i },
+  { name: 'LSU AgCenter Partnership Team invent', re: /Contact LSU AgCenter Partnership Team/i },
+  { name: 'LSU AgCenter-backed recommendations invent', re: /LSU AgCenter-backed recommendations/i },
 ];
 
 /** Positive partnership claims only (negations / disclaimers are allowed). */

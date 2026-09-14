@@ -93,51 +93,78 @@ export function InsuranceClaimDetail({ claimId, open, onClose }: ClaimDetailProp
 
   const linkAssessment = useMutation({
     mutationFn: async (assessmentId: string) => {
-      const { error } = await supabase.from('claim_assessments').insert({
-        claim_id: claimId,
-        assessment_id: assessmentId
-      });
+      const { data, error } = await supabase
+        .from('claim_assessments')
+        .insert({
+          claim_id: claimId,
+          assessment_id: assessmentId,
+        })
+        .select('id')
+        .maybeSingle();
       if (error) throw error;
+      if (!data) {
+        throw new Error('Assessment was not linked (no row returned)');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['insurance-claim', claimId] });
       toast.success('Assessment linked to claim');
-    }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to link assessment');
+    },
   });
 
   const unlinkAssessment = useMutation({
     mutationFn: async (assessmentId: string) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('claim_assessments')
         .delete()
         .eq('claim_id', claimId)
-        .eq('assessment_id', assessmentId);
+        .eq('assessment_id', assessmentId)
+        .select('id');
       if (error) throw error;
+      if (!data?.length) {
+        throw new Error('Assessment was not unlinked (no matching row)');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['insurance-claim', claimId] });
       toast.success('Assessment unlinked');
-    }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to unlink assessment');
+    },
   });
 
   const submitClaim = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('insurance_claims')
         .update({
           status: 'submitted',
           submitted_at: new Date().toISOString(),
-          notes: notes || claim?.notes
+          notes: notes || claim?.notes,
         })
-        .eq('id', claimId);
+        .eq('id', claimId)
+        .select('id')
+        .maybeSingle();
       if (error) throw error;
+      if (!data) {
+        throw new Error(
+          'Claim was not submitted (no matching draft row or update not permitted)'
+        );
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
       queryClient.invalidateQueries({ queryKey: ['insurance-claim', claimId] });
       toast.success('Claim submitted successfully');
       onClose();
-    }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to submit claim');
+    },
   });
 
   const linkedAssessmentIds = claim?.linked_assessments?.map((la: any) => la.assessment?.id) || [];
