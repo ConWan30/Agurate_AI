@@ -212,54 +212,68 @@ CRITICAL: Analyze this image considering all historical context above.`;
   }
 }
 
-async function analyzeWaterStress(apiKey: string, { visionAnalysis, context }: any) {
-  return { stress_score: 0.3, severity: 'mild', confidence: 0.8, dirt_recommendation: false };
+async function analyzeWaterStress(_apiKey: string, _args: any) {
+  // Enrichment models are not shipped yet — do not invent stress/confidence.
+  return { available: false, reason: 'water_stress_enrichment_not_configured' };
 }
 
-async function analyzeConservation(apiKey: string, { visionAnalysis, context }: any) {
-  return { soil_health_indicator: 85, practice_impacts: {}, confidence: 0.85 };
+async function analyzeConservation(_apiKey: string, _args: any) {
+  return { available: false, reason: 'conservation_enrichment_not_configured' };
 }
 
-async function analyzeVariety(apiKey: string, { visionAnalysis, context }: any) {
-  return { recommendation: null, confidence: 0.8 };
+async function analyzeVariety(_apiKey: string, _args: any) {
+  return { available: false, reason: 'variety_enrichment_not_configured' };
 }
 
-async function analyzeCommunity(apiKey: string, { visionAnalysis, context }: any) {
-  return { similar_fields: [], trending_issues: [], confidence: 0.75 };
+async function analyzeCommunity(_apiKey: string, _args: any) {
+  return { available: false, reason: 'community_enrichment_not_configured' };
 }
 
-async function generatePredictions(apiKey: string, { visionAnalysis, context }: any) {
-  return { yield_forecast: {}, disease_risk: [], confidence: 0.8 };
+async function generatePredictions(_apiKey: string, _args: any) {
+  return { available: false, reason: 'prediction_enrichment_not_configured' };
 }
 
 async function updateIntelligencePool(supabase: any, fieldId: string, data: any) {
   await supabase.from('ai_intelligence_pool').insert({
     field_id: fieldId,
-    image_analysis_patterns: { symptoms: data.visionAnalysis.symptoms },
+    image_analysis_patterns: { symptoms: data.visionAnalysis?.symptoms ?? [] },
     variety_intelligence: {},
     conservation_effectiveness: {},
     weather_correlations: {},
     community_patterns: {},
     predictive_insights: {},
     confidence_scores: {
-      vision_analysis: data.visionAnalysis.confidence_score || 0,
-      water_stress: data.waterStress.confidence || 0,
-      variety_match: data.variety.confidence || 0,
-      community_alignment: data.community.confidence || 0
-    }
+      vision_analysis: data.visionAnalysis?.confidence_score ?? null,
+      water_stress: data.waterStress?.available === false ? null : data.waterStress?.confidence ?? null,
+      variety_match: data.variety?.available === false ? null : data.variety?.confidence ?? null,
+      community_alignment: data.community?.available === false ? null : data.community?.confidence ?? null,
+    },
   });
 }
 
-async function generateUnifiedRecommendations(apiKey: string, data: any) {
+async function generateUnifiedRecommendations(_apiKey: string, data: any) {
+  const visionScore = data.vision?.confidence_score ?? data.visionAnalysis?.confidence_score;
+  const health = data.vision?.health_score ?? data.visionAnalysis?.health_score;
   return {
     prioritized: [
       {
-        title: 'Monitor Health Trend',
-        recommendation: 'Continue monitoring based on current health score',
+        title: 'Review latest vision result',
+        recommendation:
+          health == null
+            ? 'Vision enrichment completed without a health score — re-run analysis if needed.'
+            : `Latest vision health score is available for this field. Treat it as a decision aid, not a validated diagnosis.`,
         urgency: 'routine',
-        contributing_systems: ['vision', 'historical'],
-        lsu_research_basis: 'LSU AgCenter monitoring guidelines'
-      }
-    ]
+        contributing_systems: ['vision'],
+        enrichment_status: {
+          water_stress: data.waterStress?.available === false ? 'not_configured' : 'present',
+          conservation: data.conservation?.available === false ? 'not_configured' : 'present',
+          variety: data.variety?.available === false ? 'not_configured' : 'present',
+          community: data.community?.available === false ? 'not_configured' : 'present',
+          predictions: data.predictions?.available === false ? 'not_configured' : 'present',
+        },
+        research_framing: 'Informed by publicly available agronomic guidance — not an official LSU partnership or validation',
+        vision_confidence: visionScore ?? null,
+      },
+    ],
   };
 }

@@ -85,6 +85,8 @@ Last updated: 2026-09-14
 - [x] Soften BetaValueTracker / HowItWorks residual forecast claims
 - [x] Shared requireHealthScore helper + tests
 - [x] AR analyze + prediction edges fail closed (no invented scores)
+- [x] unified-ai enrichment stubs mark unavailable (no invented confidence)
+- [x] predict-water-stress fail closed on unparseable AI JSON
 
 ## Platform gates (external)
 

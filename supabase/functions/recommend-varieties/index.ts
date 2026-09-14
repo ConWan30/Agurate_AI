@@ -174,13 +174,10 @@ Return JSON with: recommended_variety, expected_improvement (decimal), risk_asse
     try {
       recommendationData = JSON.parse(aiResponse);
     } catch {
-      // Default recommendation if parsing fails
-      recommendationData = {
-        recommended_variety: lsuVarieties[0] || 'Contact LSU AgCenter',
-        expected_improvement: 0.15,
-        risk_assessment: 'low',
-        lsu_research_basis: ['Publicly available LSU AgCenter variety guidance'],
-      };
+      throw new Error('Variety recommendation AI returned unparseable JSON — refusing to invent recommendations');
+    }
+    if (!recommendationData.recommended_variety) {
+      throw new Error('Variety recommendation omitted recommended_variety');
     }
 
     // Save to database (use regular client, RLS allows user to insert their own data)

@@ -111,13 +111,13 @@ Return JSON with daily predictions and DIRT recommendation.`;
     try {
       predictionData = JSON.parse(aiResponse);
     } catch {
-      predictionData = {
-        stress_score: healthScore < 70 ? 0.7 : 0.3,
-        severity: healthScore < 60 ? 'severe' : healthScore < 75 ? 'moderate' : 'mild',
-        confidence: 0.8,
-        dirt_recommendation: healthScore < 70,
-        symptoms_detected: symptoms,
-      };
+      throw new Error('Water-stress prediction AI returned unparseable JSON — refusing to invent scores');
+    }
+    if (predictionData.confidence == null || Number.isNaN(Number(predictionData.confidence))) {
+      throw new Error('Water-stress prediction omitted confidence');
+    }
+    if (predictionData.stress_score == null || Number.isNaN(Number(predictionData.stress_score))) {
+      throw new Error('Water-stress prediction omitted stress_score');
     }
 
     // Save to database (use regular client, RLS allows user to insert their own data)
