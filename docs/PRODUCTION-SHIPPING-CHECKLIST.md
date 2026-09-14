@@ -101,8 +101,11 @@ Last updated: 2026-09-14
 - [x] Soften Home unlimited-beta + tutorial “Diagnosis” framing
 - [x] Analytics/phase4/unified-AI omit invented weather & score defaults; soften forecast marketing copy
 - [x] ROI requires explicit yield-at-risk % (no invent from health); executive summary shows “Not estimated”; beta_metrics counts only approved stories (`20260914180000`)
+- [x] `npm run verify:local-gates` orchestrates typecheck + unit + honesty static + edge check + build; operator handoff doc for platform steps
 
 ## Platform gates (external)
+
+See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
 - [ ] Apply pending Supabase migrations (through `20260914180000` (includes entitlement clamps; researcher PII is `20260914100000`), plus prior RLS/RPC/storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
@@ -113,7 +116,7 @@ Last updated: 2026-09-14
 
 ## Evidence expected before production-complete
 
-1. Green CI/local typecheck + unit tests + honesty static + edge check + build
-2. Migration applied confirmation in Supabase (including critical_alerts reconcile)
+1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build)
+2. Migration applied confirmation in Supabase (including critical_alerts reconcile through tip)
 3. Live production URL showing honest closed-beta copy
 4. Auth + one authenticated scan path working on production

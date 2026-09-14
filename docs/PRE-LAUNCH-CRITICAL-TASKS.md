@@ -8,7 +8,7 @@ In-repo production hardening for closed beta is largely complete on branch
 `cursor/launch-readiness-honesty-38b2`. Remaining blockers are **platform**
 actions (credentials required), not dashboard code edits.
 
-See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
+See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HANDOFF.md`
 
 
 - [x] ROI calculator refuses invented health scores
@@ -21,6 +21,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 - [x] Soften Home unlimited-beta + tutorial “Diagnosis” framing
 - [x] Analytics/phase4/unified-AI omit invented weather & score defaults; soften forecast marketing copy
 - [x] ROI requires explicit yield-at-risk % (no invent from health); executive summary shows “Not estimated”; beta_metrics counts only approved stories (`20260914180000`)
+- [x] `npm run verify:local-gates` + `docs/OPERATOR-PLATFORM-HANDOFF.md` for credentialed shipping steps
 
 ## Still open (platform / external)
 
