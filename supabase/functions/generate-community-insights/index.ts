@@ -132,12 +132,24 @@ Return JSON with: patterns, recommendations, average_savings (number|null), succ
     const aiData = await response.json();
     const aiResponse = aiData.choices[0].message.content;
     
-    let analysisData;
+    let analysisData: Record<string, unknown>;
     try {
       analysisData = JSON.parse(aiResponse);
     } catch {
       throw new Error('Community insights AI returned unparseable JSON — refusing to invent insights');
     }
+
+    // Server-owned metrics — never trust model money/rate invent over computed samples.
+    // Rows are already filtered to community_rating >= 3.5, so a "success rate" from
+    // that set would be tautological invent — leave success_rate null.
+    const sampleSize = rows.length;
+    const averageSavings = reportedSavings.length >= 3
+      ? reportedSavings.reduce((a: number, b: number) => a + b, 0) / reportedSavings.length
+      : null;
+
+    analysisData.sample_size = sampleSize;
+    analysisData.average_savings = averageSavings;
+    analysisData.success_rate = null;
 
     return new Response(
       JSON.stringify({ success: true, analysis: analysisData }),

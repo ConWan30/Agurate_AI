@@ -135,7 +135,13 @@ Disease Pressure Patterns:
 ${diseaseSymptoms.length > 0 ? diseaseSymptoms.slice(0, 10).join(', ') : 'No significant disease pressure'}
 
 Community Intelligence (Best Performing Varieties):
-${communityInsights.map(c => `- ${c.practice_name}: ${c.success_rate != null && Number.isFinite(Number(c.success_rate)) ? `${c.success_rate}% success` : 'success not recorded'}, ${c.adoption_count} farmers`).join('\n')}
+${communityInsights.map(c => {
+  const rate = Number(c.success_rate);
+  const rateLabel = Number.isFinite(rate) && rate >= 0 && rate <= 1
+    ? `${Math.round(rate * 100)}% success`
+    : 'success not recorded';
+  return `- ${c.practice_name}: ${rateLabel}, ${c.adoption_count} farmers`;
+}).join('\n')}
 
 Conservation Context:
 ${conservationData.length > 0 ? `Soil health trending ${conservationData[0].soil_health_improvement > 0.5 ? 'upward' : 'stable'}` : 'No conservation data'}

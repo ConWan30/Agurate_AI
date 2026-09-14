@@ -9,7 +9,7 @@ import { format } from "date-fns";
 
 interface WeatherAlert {
   type: "frost" | "drought" | "severe_weather" | "excessive_rain";
-  severity: "warning" | "watch" | "advisory";
+  severity: "warning" | "watch" | "advisory" | "unknown";
   title: string;
   description: string;
   start_time: string;

@@ -4,14 +4,6 @@ import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_s
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
-function toHealthPercent(score: number | null | undefined): number {
-  if (score == null || Number.isNaN(Number(score))) return 0;
-  const n = Number(score);
-  if (n <= 1) return Math.round(n * 1000) / 10;
-  return Math.min(100, Math.max(0, Math.round(n * 10) / 10));
-}
-
-
 const comprehensivePredictionSchema = z.object({
   fieldId: z.string().uuid(),
   cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), z.enum(['rice', 'soybean', 'cotton', 'corn'])),
@@ -184,7 +176,8 @@ Do NOT include economic_forecast, yield_prediction bushels, or currency fields.`
         model_type: 'comprehensive',
         field_id: fieldId,
         prediction_horizon: 30,
-        confidence_score: toHealthPercent(confidenceScore),
+        // DB CHECK requires 0–1; do not convert to 0–100 health percent.
+        confidence_score: confidenceScore,
         prediction_data: safePrediction,
         lsu_validation: false,
       })

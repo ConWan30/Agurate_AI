@@ -218,6 +218,22 @@ const required = [
       'app.allow_dirt_referral_insert',
     ],
   },
+  {
+    id: '20260914380000_lock_catalog_community_variety_money_caps',
+    needles: [
+      'critical_alerts_estimated_loss_usd_upper_check',
+      'community_insights_savings_achieved_upper_check',
+      'reject_client_insert_best_practices_network_trg',
+      'protect_best_practices_network_columns',
+      'protect_conservation_adoption_metrics_columns',
+      'protect_lsu_publication_columns',
+      'NEW.savings_achieved := OLD.savings_achieved',
+      'protect_variety_performance_metrics_columns',
+      'protect_success_story_money_columns',
+      'NEW.roi_achieved := OLD.roi_achieved',
+      'protect_peer_treatment_outcome_metrics',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -238,11 +254,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091437') &&
-  tip < '20260914370000_lock_coop_alert_coop_match_money_caps_ai_update_dirt'
+  !tip.startsWith('2026091438') &&
+  tip < '20260914380000_lock_catalog_community_variety_money_caps'
 ) {
   fail(
-    `tip migration ${tip} should include coop-alert-coop-match/money-caps/ai-update/dirt invent lock (20260914370000+)`
+    `tip migration ${tip} should include catalog/community/variety/money-cap invent lock (20260914380000+)`
   );
 }
 

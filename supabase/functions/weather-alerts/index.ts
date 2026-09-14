@@ -29,7 +29,7 @@ const weatherAlertsSchema = z.object({
 
 interface WeatherAlert {
   type: "frost" | "drought" | "high_wind" | "heavy_rain" | "heat_wave";
-  severity: "warning" | "watch" | "advisory";
+  severity: "warning" | "watch" | "advisory" | "unknown";
   title: string;
   description: string;
   start_time: string;
@@ -118,7 +118,8 @@ serve(async (req) => {
 
       return {
         type,
-        severity: props.severity?.toLowerCase() || "advisory",
+        // Fail closed — missing NWS severity is unknown, not an invented advisory.
+        severity: props.severity?.toLowerCase() || "unknown",
         title: props.event || "Weather Alert",
         description: props.headline || props.description || "Weather alert in your area",
         start_time: props.onset || new Date().toISOString(),

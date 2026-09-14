@@ -102,13 +102,11 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
                 {formatFractionPercent(prediction.soil_health_improvement)}
               </span>
             </div>
-            <Progress
-              value={(() => {
-                const n = Number(prediction.soil_health_improvement);
-                return Number.isFinite(n) && n >= 0 && n <= 1 ? n * 100 : 0;
-              })()}
-              className="h-2"
-            />
+            {(() => {
+              const n = Number(prediction.soil_health_improvement);
+              if (!Number.isFinite(n) || n < 0 || n > 1) return null;
+              return <Progress value={n * 100} className="h-2" />;
+            })()}
           </div>
 
           <div className="space-y-2">
@@ -121,13 +119,11 @@ export function ConservationPredictionCard({ prediction }: ConservationPredictio
                 {formatFractionPercent(prediction.climate_factor)}
               </span>
             </div>
-            <Progress
-              value={(() => {
-                const n = Number(prediction.climate_factor);
-                return Number.isFinite(n) && n >= 0 && n <= 1 ? n * 100 : 0;
-              })()}
-              className="h-2"
-            />
+            {(() => {
+              const n = Number(prediction.climate_factor);
+              if (!Number.isFinite(n) || n < 0 || n > 1) return null;
+              return <Progress value={n * 100} className="h-2" />;
+            })()}
           </div>
         </div>
 
