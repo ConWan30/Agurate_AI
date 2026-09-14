@@ -85,7 +85,7 @@ export function generateFallbackPredictiveQuestions(input: {
     return [
       `What's causing the stress in my ${cropType}?`,
       'Should I treat immediately or wait?',
-      'How much will treatment cost vs. potential loss?',
+      'What scouting signs should I check before treating?',
       'Will weather affect my treatment timing?',
     ];
   }

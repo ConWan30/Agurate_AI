@@ -179,14 +179,29 @@ Return your analysis as a JSON object with:
       );
     }
 
+    const scoresRecorded = health1 != null && health2 != null;
+    // Soft-invent lock: recovery/effectiveness timelines only when scores show improvement.
+    const projectedRecovery =
+      healthTrend === 'improving' && typeof parsedAnalysis.projected_recovery === 'string'
+        ? parsedAnalysis.projected_recovery
+        : null;
+    const treatmentEffectiveness =
+      healthTrend === 'improving' && typeof parsedAnalysis.treatment_effectiveness === 'string'
+        ? parsedAnalysis.treatment_effectiveness
+        : null;
+
     const result = {
       health_trend: healthTrend,
       health_change: healthChange,
-      health_scores_recorded: health1 != null && health2 != null,
-      symptom_progression: parsedAnalysis.symptom_progression || [],
-      visual_changes: parsedAnalysis.visual_changes || [],
-      treatment_effectiveness: parsedAnalysis.treatment_effectiveness || null,
-      projected_recovery: parsedAnalysis.projected_recovery || null,
+      health_scores_recorded: scoresRecorded,
+      symptom_progression: Array.isArray(parsedAnalysis.symptom_progression)
+        ? parsedAnalysis.symptom_progression
+        : [],
+      visual_changes: Array.isArray(parsedAnalysis.visual_changes)
+        ? parsedAnalysis.visual_changes
+        : [],
+      treatment_effectiveness: treatmentEffectiveness,
+      projected_recovery: projectedRecovery,
     };
 
     return new Response(JSON.stringify(result), {

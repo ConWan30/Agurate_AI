@@ -164,6 +164,9 @@ Do NOT include economic_forecast, yield_prediction bushels, or currency fields.`
       ...safePrediction
     } = predictionData as Record<string, unknown>;
 
+    // No forecast was loaded — never persist model-invented weather impact.
+    safePrediction.weather_impact = null;
+
     const yieldOutlook = Number(safePrediction.yield_outlook);
     if (!Number.isFinite(yieldOutlook) || yieldOutlook < 0 || yieldOutlook > 100) {
       throw new Error('Comprehensive prediction yield_outlook must be a 0–100 planning index');

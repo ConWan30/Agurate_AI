@@ -22,12 +22,13 @@ interface Assessment {
 }
 
 interface ComparisonResult {
-  health_trend: 'improving' | 'declining' | 'stable';
-  health_change: number;
+  health_trend: 'improving' | 'declining' | 'stable' | 'unknown';
+  health_change: number | null;
+  health_scores_recorded?: boolean;
   symptom_progression: string[];
   visual_changes: string[];
-  treatment_effectiveness?: string;
-  projected_recovery?: string;
+  treatment_effectiveness?: string | null;
+  projected_recovery?: string | null;
 }
 
 interface ImageHistoryComparisonProps {
@@ -343,7 +344,11 @@ export function ImageHistoryComparison({ fieldId, currentAssessmentId, onClose }
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Health score changed by {comparisonResult.health_change > 0 ? '+' : ''}{comparisonResult.health_change}%
+                  {comparisonResult.health_change != null &&
+                  Number.isFinite(comparisonResult.health_change) &&
+                  comparisonResult.health_scores_recorded !== false
+                    ? `Health score changed by ${comparisonResult.health_change > 0 ? '+' : ''}${comparisonResult.health_change}%`
+                    : 'Health score change not available — one or both assessments lack a recorded score.'}
                 </p>
               </div>
 

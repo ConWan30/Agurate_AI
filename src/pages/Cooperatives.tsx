@@ -136,7 +136,13 @@ export default function Cooperatives() {
             .order('analyzed_at', { ascending: false })
             .limit(50);
 
-          const totalAcreage = fields?.reduce((sum, f) => sum + (Number(f.acreage) || 0), 0) || 0;
+          // Sum only recorded acreages — null/invalid acreage is omitted, not invented as 0.
+          const recordedAcreages = (fields || [])
+            .map((f) => Number(f.acreage))
+            .filter((n) => Number.isFinite(n) && n >= 0);
+          const totalAcreage = recordedAcreages.length
+            ? recordedAcreages.reduce((sum, n) => sum + n, 0)
+            : null;
           const scored = (assessments || [])
             .filter((a) => hasHealthScore(a.health_score))
             .map((a) => toHealthPercent(a.health_score));
@@ -421,7 +427,11 @@ export default function Cooperatives() {
                             <div className="p-4 bg-muted/50 rounded-lg text-center">
                               <div className="flex items-center justify-center gap-2 mb-1">
                                 <Building2 className="h-4 w-4 text-primary" />
-                                <span className="text-2xl font-bold">{Math.round(stats.total_acreage)}</span>
+                                <span className="text-2xl font-bold">
+                                  {stats.total_acreage == null
+                                    ? "—"
+                                    : Math.round(stats.total_acreage)}
+                                </span>
                               </div>
                               <p className="text-xs text-muted-foreground">Total Acres</p>
                             </div>

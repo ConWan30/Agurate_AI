@@ -128,7 +128,8 @@ serve(async (req) => {
     contextPrompt += `\n- Use natural, conversational language`;
     contextPrompt += `\n- Each question should be concise (max 15 words)`;
     contextPrompt += `\n- Prioritize urgent issues if health score is low`;
-    contextPrompt += `\n\nReturn ONLY a JSON array of question strings, no other text. Example: ["Should I apply fungicide now?", "What's causing the yellowing in my rice?", "How much will treatment cost?"]`;
+    contextPrompt += `\n- Do NOT ask dollar/ROI/cost questions unless the farmer already provided cost inputs (they did not).`;
+    contextPrompt += `\n\nReturn ONLY a JSON array of question strings, no other text. Example: ["Should I apply fungicide now?", "What's causing the yellowing in my rice?", "When should I scout this field next?"]`;
 
     // Call AI Gateway
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

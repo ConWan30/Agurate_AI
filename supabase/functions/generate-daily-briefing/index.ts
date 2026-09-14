@@ -7,7 +7,7 @@ import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 const getWeatherData = async (latitude: number, longitude: number) => {
   try {
     const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=America/Chicago&forecast_days=1`
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America/Chicago&forecast_days=1`
     );
     
     if (!response.ok) {
