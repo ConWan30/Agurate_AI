@@ -54,6 +54,23 @@ describe('Phase 4 treatment outcome helpers', () => {
         healthScoreAfter: 61,
       }).success
     ).toBe(false);
+
+    const missingBefore = computeTreatmentSuccess({
+      outcome: 'partial',
+      healthScoreBefore: null,
+      healthScoreAfter: 80,
+    });
+    expect(missingBefore.success).toBe(false);
+    expect(missingBefore.improvement).toBeNull();
+    expect(missingBefore.improvementPercentage).toBeNull();
+
+    expect(
+      computeTreatmentSuccess({
+        outcome: 'success',
+        healthScoreBefore: undefined,
+        healthScoreAfter: 80,
+      }).success
+    ).toBe(true);
   });
 });
 

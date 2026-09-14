@@ -5,7 +5,7 @@ import { HealthScoreGauge } from "./HealthScoreGauge";
 import { QuickInsightCard } from "./QuickInsightCard";
 
 interface AnalysisExecutiveSummaryProps {
-  healthScore: number;
+  healthScore: number | null;
   stressLevel: string;
   condition: string;
   yieldImpact?: number;
@@ -38,7 +38,8 @@ export function AnalysisExecutiveSummary({
   criticalIssue,
   topRecommendation
 }: AnalysisExecutiveSummaryProps) {
-  const showCriticalAlert = (Number.isFinite(healthScore) && healthScore < 50) || diseasePressure === "severe" || pestPressure === "severe";
+  const hasScore = healthScore != null && Number.isFinite(healthScore);
+  const showCriticalAlert = (hasScore && healthScore < 50) || diseasePressure === "severe" || pestPressure === "severe";
 
   const TrendIndicator = () => {
     if (!historicalComparison) return null;
@@ -80,15 +81,24 @@ export function AnalysisExecutiveSummary({
             <div className="flex-1">
               <p className="text-sm text-muted-foreground mb-2 font-medium">Crop Health Score</p>
               <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-6xl font-bold text-primary">{Math.round(healthScore)}</span>
-                <span className="text-2xl text-muted-foreground">/100</span>
+                <span className="text-6xl font-bold text-primary">
+                  {hasScore ? Math.round(healthScore) : '—'}
+                </span>
+                {hasScore && <span className="text-2xl text-muted-foreground">/100</span>}
                 {historicalComparison && <TrendIndicator />}
               </div>
               <p className="text-lg font-semibold capitalize">
-                {stressLevel} - {condition}
+                {stressLevel || 'Stress not recorded'}
+                {condition ? ` - ${condition}` : ''}
               </p>
             </div>
-            <HealthScoreGauge score={healthScore} size="lg" />
+            {hasScore ? (
+              <HealthScoreGauge score={healthScore} size="lg" />
+            ) : (
+              <p className="text-sm text-muted-foreground max-w-[8rem] text-right">
+                Health score not available
+              </p>
+            )}
           </div>
           
           {historicalComparison && (

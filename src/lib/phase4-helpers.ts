@@ -31,17 +31,24 @@ export function extractTreatmentName(text: string): string {
 
 export function computeTreatmentSuccess(params: {
   outcome: 'success' | 'partial' | 'failure';
-  healthScoreBefore: number;
+  healthScoreBefore?: number | null;
   healthScoreAfter: number;
-}): { improvement: number; improvementPercentage: number; success: boolean } {
-  const improvement = params.healthScoreAfter - params.healthScoreBefore;
-  const improvementPercentage = params.healthScoreBefore > 0
-    ? (improvement / params.healthScoreBefore) * 100
-    : 0;
+}): { improvement: number | null; improvementPercentage: number | null; success: boolean } {
+  const before =
+    params.healthScoreBefore != null && Number.isFinite(params.healthScoreBefore)
+      ? params.healthScoreBefore
+      : null;
+  const improvement = before != null ? params.healthScoreAfter - before : null;
+  const improvementPercentage =
+    before != null && before > 0 && improvement != null
+      ? (improvement / before) * 100
+      : null;
 
   const success =
     params.outcome === 'success' ||
-    (params.outcome === 'partial' && improvementPercentage > 5);
+    (params.outcome === 'partial' &&
+      improvementPercentage != null &&
+      improvementPercentage > 5);
 
   return { improvement, improvementPercentage, success };
 }

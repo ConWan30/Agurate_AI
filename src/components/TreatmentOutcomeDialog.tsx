@@ -27,7 +27,7 @@ interface TreatmentOutcomeDialogProps {
   fieldId: string;
   fieldName: string;
   cropType: string;
-  healthScoreBefore: number; // 0-100
+  healthScoreBefore?: number; // 0-100 when known — never invent 0
   stressLevel?: string;
   symptoms?: string[];
 }
@@ -209,7 +209,9 @@ export function TreatmentOutcomeDialog({
               placeholder="e.g., 85"
             />
             <p className="text-xs text-muted-foreground">
-              Current health score: {healthScoreBefore.toFixed(0)}%
+              {healthScoreBefore != null && Number.isFinite(healthScoreBefore)
+                ? `Current health score: ${healthScoreBefore.toFixed(0)}%`
+                : 'Current health score: not recorded'}
             </p>
           </div>
 

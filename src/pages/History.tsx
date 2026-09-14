@@ -346,7 +346,9 @@ export default function History() {
                                   body: JSON.stringify({
                                     image_url: selectedAssessment.image_url,
                                     analysis_context: {
-                                      health_score: toHealthPercent(selectedAssessment.health_score),
+                                      health_score: hasHealthScore(selectedAssessment.health_score)
+                                        ? toHealthPercent(selectedAssessment.health_score)
+                                        : null,
                                       stress_level: selectedAssessment.stress_level,
                                       symptoms: selectedAssessment.symptoms,
                                       diseases: selectedAssessment.disease_identified,
@@ -402,7 +404,11 @@ export default function History() {
 
                   {/* Executive Summary */}
                   <AnalysisExecutiveSummary
-                    healthScore={toHealthPercent(selectedAssessment.health_score)}
+                    healthScore={
+                      hasHealthScore(selectedAssessment.health_score)
+                        ? toHealthPercent(selectedAssessment.health_score)
+                        : null
+                    }
                     stressLevel={selectedAssessment.stress_level}
                     condition={selectedAssessment.stress_level}
                     yieldImpact={selectedAssessment.estimated_yield_impact_percent != null && Number.isFinite(Number(selectedAssessment.estimated_yield_impact_percent)) ? Number(selectedAssessment.estimated_yield_impact_percent) : undefined}
@@ -468,7 +474,11 @@ export default function History() {
                         fieldId={selectedAssessment.field.id}
                         fieldName={selectedAssessment.field.name}
                         cropType={selectedAssessment.field.crop_type}
-                        healthScoreBefore={toHealthPercent(selectedAssessment.health_score)}
+                        healthScoreBefore={
+                          hasHealthScore(selectedAssessment.health_score)
+                            ? toHealthPercent(selectedAssessment.health_score)
+                            : undefined
+                        }
                         stressLevel={selectedAssessment.stress_level}
                         symptoms={selectedAssessment.symptoms || []}
                         onSetReminder={(rec) => {
@@ -504,7 +514,11 @@ export default function History() {
                           }
                           cropType={selectedAssessment.field.crop_type}
                           stressLevel={selectedAssessment.stress_level}
-                          currentHealthScore={toHealthPercent(selectedAssessment.health_score)}
+                          currentHealthScore={
+                            hasHealthScore(selectedAssessment.health_score)
+                              ? toHealthPercent(selectedAssessment.health_score)
+                              : undefined
+                          }
                         />
                       )}
                     </>
@@ -522,7 +536,9 @@ export default function History() {
                       }
                       issueDescription={
                         selectedAssessment.detailed_visual_analysis ||
-                        `Health score: ${toHealthPercent(selectedAssessment.health_score)}%, Stress: ${selectedAssessment.stress_level}`
+                        (hasHealthScore(selectedAssessment.health_score)
+                          ? `Health score: ${toHealthPercent(selectedAssessment.health_score)}%, Stress: ${selectedAssessment.stress_level || 'not recorded'}`
+                          : `Health score not available. Stress: ${selectedAssessment.stress_level || 'not recorded'}`)
                       }
                       confidenceScore={hasHealthScore(selectedAssessment.confidence_score) ? toHealthPercent(selectedAssessment.confidence_score) : undefined}
                       fieldId={selectedAssessment.field.id}
@@ -562,7 +578,11 @@ export default function History() {
 
                   {/* Detailed Analysis Tabs */}
                   <DetailedAnalysisTabs
-                    healthScore={toHealthPercent(selectedAssessment.health_score)}
+                    healthScore={
+                      hasHealthScore(selectedAssessment.health_score)
+                        ? toHealthPercent(selectedAssessment.health_score)
+                        : null
+                    }
                     stressLevel={selectedAssessment.stress_level}
                     growthStage={selectedAssessment.growth_stage}
                     canopyCoverage={selectedAssessment.canopy_coverage_percent}

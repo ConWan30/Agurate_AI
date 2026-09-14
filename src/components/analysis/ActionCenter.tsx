@@ -41,7 +41,7 @@ export function ActionCenter({
   fieldId,
   fieldName,
   cropType,
-  healthScoreBefore = 0,
+  healthScoreBefore,
   stressLevel,
   symptoms = []
 }: ActionCenterProps) {

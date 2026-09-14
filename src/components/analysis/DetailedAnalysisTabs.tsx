@@ -11,7 +11,7 @@ interface NutrientDeficiency {
 }
 
 interface DetailedAnalysisTabsProps {
-  healthScore: number;
+  healthScore: number | null;
   stressLevel: string;
   visualCues?: string;
   growthStage?: string;
@@ -80,9 +80,17 @@ export function DetailedAnalysisTabs({
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium">Overall Health Score</span>
-                <span className="text-sm font-bold">{Math.round(healthScore)}%</span>
+                <span className="text-sm font-bold">
+                  {healthScore != null && Number.isFinite(healthScore)
+                    ? `${Math.round(healthScore)}%`
+                    : '—'}
+                </span>
               </div>
-              <Progress value={healthScore} className="h-3" />
+              {healthScore != null && Number.isFinite(healthScore) ? (
+                <Progress value={healthScore} className="h-3" />
+              ) : (
+                <p className="text-sm text-muted-foreground">Health score not recorded for this assessment.</p>
+              )}
             </div>
             
             <div className="p-4 bg-muted rounded-lg">
