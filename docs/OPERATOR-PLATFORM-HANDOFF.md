@@ -77,7 +77,7 @@ Candidate production host observed in-repo metadata: `https://agurateai.lovable.
 
 **Current live evidence (pre-publish):** that host returns HTTP 200 for public routes but:
 - `/health.json` → **404** (tip stamp not published — decisive tip-identity failure)
-- Homepage shell/JS may not still embed the older “95%+ / LSU Validated / fabricated testimonial” strings; tip publish is still required so live `/health.json` matches HEAD and honesty gates stay enforceable
+- Homepage shell/JS may not still embed older fabricated accuracy / LSU-validation-badge / testimonial strings; tip publish is still required so live `/health.json` matches HEAD and honesty gates stay enforceable
 
 Until Publish ships this tip, production smoke remains failed.
 
