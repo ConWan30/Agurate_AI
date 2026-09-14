@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 import { handleError, handleRateLimitError } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
@@ -316,27 +317,15 @@ serve(async (req) => {
     
     const sanitizedMessage = sanitizeInput(message);
 
-    // Rate limiting: Check request frequency (20 requests per minute for forms)
-    const { data: recentRequests } = await supabaseClient
-      .from('request_logs')
-      .select('created_at')
-      .eq('user_id', user.id)
-      .eq('function_name', 'conversational-form')
-      .gte('created_at', new Date(Date.now() - 60000).toISOString());
-
-    if (recentRequests && recentRequests.length >= 20) {
+    
+    const rateLimit = await enforceRateLimit(supabaseClient, user.id, {
+      functionName: 'conversational-form',
+      maxRequests: RATE_LIMITS['conversational-form'].maxRequests,
+      windowMs: RATE_LIMITS['conversational-form'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
       return handleRateLimitError(corsHeaders);
     }
-
-    // Log this request
-    await supabaseClient
-      .from('request_logs')
-      .insert({
-        user_id: user.id,
-        function_name: 'conversational-form',
-        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
-        user_agent: req.headers.get('user-agent') || 'unknown'
-      });
 
     // Get session
     const { data: session, error: sessionError } = await supabaseClient

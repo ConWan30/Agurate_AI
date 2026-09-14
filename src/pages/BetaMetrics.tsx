@@ -17,7 +17,8 @@ export default function BetaMetrics() {
         return acc;
       }, {});
 
-      const { count: totalUsers } = await supabase.from('profiles').select('id', { count: 'exact', head: true });
+      const { data: betaCount } = await supabase.rpc('get_beta_farmer_count');
+      const totalUsers = typeof betaCount === 'number' ? betaCount : 0;
       const { count: scannerUsers } = await supabase.from('assessments').select('id', { count: 'exact', head: true });
       const { data: feedback } = await supabase.from('tutorial_feedback').select('rating');
       const avgRating = feedback?.length ? (feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / feedback.length).toFixed(1) : 0;
@@ -41,10 +42,10 @@ export default function BetaMetrics() {
       <EnhancedPageHeader title="Beta Program Metrics" description="Track tutorial completion and engagement" icon={BarChart3} badge={{ icon: Target, text: "Analytics" }} />
       <div className="container max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Total Beta Farmers</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.totalUsers || 0}</div></CardContent></Card>
+          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Beta Farmers (platform)</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.totalUsers || 0}</div></CardContent></Card>
           <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Tutorial Completion</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.tutorialStats?.completed ? Math.round((metrics.tutorialStats.completed / (metrics.tutorialStats.started || 1)) * 100) : 0}%</div></CardContent></Card>
           <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Avg Rating</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.avgRating || 0} ⭐</div></CardContent></Card>
-          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Weekly Scans</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.weeklyScans || 0}</div></CardContent></Card>
+          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Your Weekly Scans</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.weeklyScans || 0}</div></CardContent></Card>
         </div>
         <Card><CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary" />Tutorial Funnel</CardTitle></CardHeader><CardContent><ResponsiveContainer width="100%" height={300}><BarChart data={funnelData}><CartesianGrid strokeDasharray="3 3" opacity={0.1} /><XAxis dataKey="stage" /><YAxis /><Tooltip /><Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer></CardContent></Card>
       </div>

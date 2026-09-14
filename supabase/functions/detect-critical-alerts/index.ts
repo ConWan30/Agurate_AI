@@ -5,7 +5,7 @@ import {
   handleRateLimitError,
 } from '../_shared/errorHandler.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
-import { checkRateLimit, logRequest, RATE_LIMITS } from '../_shared/rateLimiter.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 interface CriticalAlertInput {
   assessment_id: string;
@@ -40,21 +40,14 @@ serve(async (req) => {
     const { user, authHeader } = auth;
     const supabaseClient = getAnonClient(authHeader);
 
-    const rateLimit = await checkRateLimit(supabaseClient, user.id, {
+    const rateLimit = await enforceRateLimit(supabaseClient, user.id, {
       functionName: 'detect-critical-alerts',
       maxRequests: RATE_LIMITS['detect-critical-alerts'].maxRequests,
       windowMs: RATE_LIMITS['detect-critical-alerts'].windowMs,
-    });
+    }, req);
     if (!rateLimit.allowed) {
       return handleRateLimitError(corsHeaders);
     }
-    await logRequest(
-      supabaseClient,
-      user.id,
-      'detect-critical-alerts',
-      req.headers.get('x-forwarded-for'),
-      req.headers.get('user-agent')
-    );
 
     const {
       assessment_id,

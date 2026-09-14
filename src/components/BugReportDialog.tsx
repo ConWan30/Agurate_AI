@@ -78,7 +78,8 @@ export function BugReportDialog({ open, onClose }: BugReportDialogProps) {
 
       // Upload screenshot if available
       if (screenshot) {
-        const fileName = `bug-reports/${user.id}/${Date.now()}.png`;
+        // Owner-prefixed path required by crop-images storage RLS
+        const fileName = `${user.id}/bug-reports/${Date.now()}.png`;
         const { error: uploadError } = await supabase.storage
           .from('crop-images')
           .upload(fileName, screenshot);

@@ -5,7 +5,7 @@
 
 // Health status types
 export type HealthStatus = 'healthy' | 'moderate' | 'severe' | 'unknown';
-export type CropType = 'rice' | 'soybeans' | 'cotton' | 'corn';
+export type CropType = 'rice' | 'soybean' | 'cotton' | 'corn';
 
 /**
  * Get health status badge classes using semantic health colors
@@ -135,8 +135,8 @@ export function formatCurrency(amount: number): string {
 export function getCropValuePerAcre(cropType: string): number {
   const values: Record<string, number> = {
     rice: 850,
-    soybeans: 400,
     soybean: 400,
+    soybeans: 400,
     cotton: 750,
     corn: 600
   };

@@ -65,9 +65,13 @@ export const DeltaChatInput = ({ onTextMessage, onImageMessage, disabled }: Delt
   };
 
   const uploadImage = async (file: File): Promise<string> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `chat-images/${fileName}`;
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+    // Owner-prefixed path required by crop-images storage RLS
+    const filePath = `${user.id}/chat-images/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('crop-images')

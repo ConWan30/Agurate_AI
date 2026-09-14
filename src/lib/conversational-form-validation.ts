@@ -15,7 +15,7 @@ export const fieldRegistrationSchema = z.object({
   
   crop_type: z.union([
     z.literal('rice'),
-    z.literal('soybeans'),
+    z.literal('soybean'),
     z.literal('cotton'),
     z.literal('corn')
   ]),
@@ -139,7 +139,7 @@ export const onboardingSchema = z.object({
   
   primary_crops: z.array(z.union([
     z.literal('rice'),
-    z.literal('soybeans'),
+    z.literal('soybean'),
     z.literal('cotton'),
     z.literal('corn')
   ]))

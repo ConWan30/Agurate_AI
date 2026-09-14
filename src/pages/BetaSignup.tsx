@@ -379,7 +379,7 @@ export default function BetaSignup() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="rice">🌾 Rice</SelectItem>
-                            <SelectItem value="soybeans">🟢 Soybeans</SelectItem>
+                            <SelectItem value="soybean">🟢 Soybeans</SelectItem>
                             <SelectItem value="cotton">⚪ Cotton</SelectItem>
                             <SelectItem value="corn">🌽 Corn</SelectItem>
                             <SelectItem value="multiple">Multiple crops</SelectItem>

@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -99,30 +100,17 @@ serve(async (req) => {
       }
     }
 
-    // Rate limiting: Check request frequency (10 analyses per minute)
-    const { data: recentRequests } = await supabaseAuth
-      .from('request_logs')
-      .select('created_at')
-      .eq('user_id', user.id)
-      .eq('function_name', 'analyze-crop')
-      .gte('created_at', new Date(Date.now() - 60000).toISOString());
-
-    if (recentRequests && recentRequests.length >= 10) {
+    const rateLimit = await enforceRateLimit(supabaseAuth, user.id, {
+      functionName: 'analyze-crop',
+      maxRequests: RATE_LIMITS['analyze-crop'].maxRequests,
+      windowMs: RATE_LIMITS['analyze-crop'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
       return new Response(
         JSON.stringify({ error: 'Rate limit exceeded. Please wait before analyzing more images.' }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    // Log this request
-    await supabaseAuth
-      .from('request_logs')
-      .insert({
-        user_id: user.id,
-        function_name: 'analyze-crop',
-        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
-        user_agent: req.headers.get('user-agent') || 'unknown'
-      });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {

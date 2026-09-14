@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const comprehensivePredictionSchema = z.object({
   fieldId: z.string().uuid(),
-  cropType: z.enum(['rice', 'soybeans', 'cotton', 'corn']),
+  cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), z.enum(['rice', 'soybean', 'cotton', 'corn'])),
   weatherForecast: z.any().optional()
 });
 

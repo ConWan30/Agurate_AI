@@ -43,10 +43,14 @@ Last updated: 2026-09-14
 - [x] Shared rate limiter fails closed on DB errors
 - [x] Cooperatives create/join uses `cooperative_members.role` (no phantom roles table)
 - [x] Playwright honesty smoke installed in CI
+- [x] crop-images storage ownership policies (uid-prefixed paths)
+- [x] Shared edge rate limiter fail-closed on read/write errors; migrate high-traffic AI funcs
+- [x] Normalize soybean crop_type (DB CHECK singular) across client + edges
+- [x] Community/beta metrics use get_beta_farmer_count + honest own-assessment labels
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (view invoker + RLS lock-down + testimonials + critical_alerts reconcile + secure RPCs + coop auth fix + peer/expert/coop reconcile)
+- [ ] Apply pending Supabase migrations (view invoker + RLS lock-down + testimonials + critical_alerts reconcile + secure RPCs + coop auth fix + peer/expert/coop reconcile + crop-images storage)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)

@@ -14,7 +14,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 
 1. Apply pending Supabase migrations (view invoker, RLS lock-down,
    testimonial unapprove, critical_alerts reconcile, secure RPCs,
-   cooperative auth helper fix, peer/expert/coop schema reconcile)
+   cooperative auth helper fix, peer/expert/coop schema reconcile, crop-images storage ownership)
 2. Enable Auth **Leaked Password Protection**
 3. Deploy updated edge functions
 4. Set `DEMO_SETUP_SECRET` (or leave unset to keep demo setup disabled)
@@ -35,6 +35,10 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md`
 - Cooperatives creator bootstrap + invite join RLS; no `cooperative_roles`
 - Peer/expert/coop Jan→Nov column reconcile migration
 - Rate limiter fail-closed; Playwright honesty smoke in CI
+- crop-images storage ownership policies + uid-prefixed upload paths
+- Fail-closed shared rate limiter on high-traffic AI edge functions
+- Soybean crop_type normalization to match fields CHECK
+- Community/beta metrics honesty (RPC count + own-scoped assessment labels)
 
 ## Obsolete guidance
 

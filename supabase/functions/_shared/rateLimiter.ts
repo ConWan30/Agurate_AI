@@ -1,5 +1,6 @@
 /**
  * Shared rate limiter for edge functions (Deno-compatible).
+ * Fail-closed: deny when rate-limit state cannot be read or written.
  */
 
 export interface RateLimitConfig {
@@ -31,7 +32,6 @@ export async function checkRateLimit(
     .gte('created_at', windowStart.toISOString());
 
   if (error) {
-    // Fail closed for abuse-sensitive paths: deny when the limiter cannot read state.
     console.error('[rateLimiter] Error checking rate limit (fail closed):', error);
     return {
       allowed: false,
@@ -50,6 +50,7 @@ export async function checkRateLimit(
   };
 }
 
+/** Returns false when the write fails so callers can fail closed. */
 export async function logRequest(
   // deno-lint-ignore no-explicit-any
   supabaseClient: any,
@@ -57,17 +58,56 @@ export async function logRequest(
   functionName: string,
   ipAddress?: string | null,
   userAgent?: string | null
-): Promise<void> {
+): Promise<boolean> {
   try {
-    await supabaseClient.from('request_logs').insert({
+    const { error } = await supabaseClient.from('request_logs').insert({
       user_id: userId,
       function_name: functionName,
       ip_address: ipAddress || 'unknown',
       user_agent: userAgent || 'unknown',
     });
+    if (error) {
+      console.error('[rateLimiter] Error logging request (fail closed):', error);
+      return false;
+    }
+    return true;
   } catch (error) {
-    console.error('[rateLimiter] Error logging request:', error);
+    console.error('[rateLimiter] Error logging request (fail closed):', error);
+    return false;
   }
+}
+
+/**
+ * Check limit then record the request. Deny if either step fails.
+ */
+export async function enforceRateLimit(
+  // deno-lint-ignore no-explicit-any
+  supabaseClient: any,
+  userId: string,
+  config: RateLimitConfig,
+  req?: Request
+): Promise<RateLimitResult> {
+  const result = await checkRateLimit(supabaseClient, userId, config);
+  if (!result.allowed) return result;
+
+  const logged = await logRequest(
+    supabaseClient,
+    userId,
+    config.functionName,
+    req?.headers.get('x-forwarded-for'),
+    req?.headers.get('user-agent')
+  );
+
+  if (!logged) {
+    return {
+      allowed: false,
+      remaining: 0,
+      resetTime: result.resetTime,
+      limit: result.limit,
+    };
+  }
+
+  return result;
 }
 
 export function getRateLimitHeaders(result: RateLimitResult): Record<string, string> {
@@ -85,4 +125,8 @@ export const RATE_LIMITS = {
   'predict-stress': { maxRequests: 5, windowMs: 60_000 },
   'generate-community-insights': { maxRequests: 5, windowMs: 60_000 },
   'detect-critical-alerts': { maxRequests: 20, windowMs: 60_000 },
+  'ar-analyze': { maxRequests: 10, windowMs: 60_000 },
+  'unified-ai-analysis': { maxRequests: 10, windowMs: 60_000 },
+  'generate-daily-briefing': { maxRequests: 5, windowMs: 60_000 },
+  'get-market-prices': { maxRequests: 20, windowMs: 60_000 },
 } as const;

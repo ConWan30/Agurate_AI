@@ -248,11 +248,14 @@ export default function Fields() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Map the extracted data to field schema
+      // Map the extracted data to field schema (DB CHECK expects singular soybean)
+      const rawCrop = String(extractedData.crop_type || extractedData.cropType || '');
+      const cropType = rawCrop === 'soybeans' ? 'soybean' : rawCrop;
+
       const fieldData = {
         user_id: user.id,
         name: extractedData.name || extractedData.fieldName,
-        crop_type: extractedData.crop_type || extractedData.cropType,
+        crop_type: cropType,
         acreage: parseFloat(String(extractedData.acreage)),
         location_lat: extractedData.location_lat ? parseFloat(String(extractedData.location_lat)) : null,
         location_lng: extractedData.location_lng ? parseFloat(String(extractedData.location_lng)) : null,

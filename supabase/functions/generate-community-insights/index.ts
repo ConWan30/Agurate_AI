@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const communityInsightsSchema = z.object({
-  cropType: z.enum(['rice', 'soybeans', 'cotton', 'corn']),
+  cropType: z.preprocess((v) => (v === 'soybeans' ? 'soybean' : v), z.enum(['rice', 'soybean', 'cotton', 'corn'])),
   practiceType: z.string().min(1).max(100),
   region: z.string().max(100).optional()
 });

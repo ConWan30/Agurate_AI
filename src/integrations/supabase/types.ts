@@ -2281,7 +2281,7 @@ export type Database = {
         Returns: undefined
       }
       can_view_invitation: {
-        Args: { inv_id: string; user_id: string }
+        Args: { p_inv_id: string; p_user_id: string }
         Returns: boolean
       }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
@@ -2323,11 +2323,11 @@ export type Database = {
         }[]
       }
       is_cooperative_admin: {
-        Args: { coop_id: string; user_id: string }
+        Args: { p_coop_id: string; p_user_id: string }
         Returns: boolean
       }
       is_cooperative_member: {
-        Args: { coop_id: string; user_id: string }
+        Args: { p_coop_id: string; p_user_id: string }
         Returns: boolean
       }
       resolve_cooperative_alert: {

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 import { handleError, handleRateLimitError } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
@@ -37,27 +38,15 @@ serve(async (req) => {
     
     console.log('[predict-stress] User authenticated:', user.id);
 
-    // Rate limiting: Check request frequency (5 predictions per minute)
-    const { data: recentRequests } = await supabaseClient
-      .from('request_logs')
-      .select('created_at')
-      .eq('user_id', user.id)
-      .eq('function_name', 'predict-stress')
-      .gte('created_at', new Date(Date.now() - 60000).toISOString());
-
-    if (recentRequests && recentRequests.length >= 5) {
+    
+    const rateLimit = await enforceRateLimit(supabaseClient, user.id, {
+      functionName: 'predict-stress',
+      maxRequests: RATE_LIMITS['predict-stress'].maxRequests,
+      windowMs: RATE_LIMITS['predict-stress'].windowMs,
+    }, req);
+    if (!rateLimit.allowed) {
       return handleRateLimitError(corsHeaders);
     }
-
-    // Log this request
-    await supabaseClient
-      .from('request_logs')
-      .insert({
-        user_id: user.id,
-        function_name: 'predict-stress',
-        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
-        user_agent: req.headers.get('user-agent') || 'unknown'
-      });
 
     // Gather comprehensive context data
     const [assessments, weatherEvents, waterStress, communityInsights] = await Promise.all([
