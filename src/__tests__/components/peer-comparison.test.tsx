@@ -27,6 +27,7 @@ describe('PeerComparisonCard', () => {
           success_rate: 82.5,
           avg_effectiveness: 74,
           sample_size: 12,
+          farmer_count: 4,
         },
       ],
       error: null,
@@ -42,7 +43,7 @@ describe('PeerComparisonCard', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Most Successful Treatment/i)).toBeInTheDocument();
+      expect(screen.getByText(/Highest self-reported success rate/i)).toBeInTheDocument();
     });
 
     expect(rpc).toHaveBeenCalledWith('get_peer_comparison', {
@@ -52,6 +53,7 @@ describe('PeerComparisonCard', () => {
     });
     // formatPeerMetric rounds non-integer rates for display honesty
     expect(screen.getByText(/83% Success/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/4 farmers/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/12 outcomes?/i).length).toBeGreaterThan(0);
   });
 
