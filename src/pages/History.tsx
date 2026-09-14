@@ -400,9 +400,23 @@ export default function History() {
                     condition={selectedAssessment.stress_level}
                     yieldImpact={selectedAssessment.estimated_yield_impact_percent != null && Number.isFinite(Number(selectedAssessment.estimated_yield_impact_percent)) ? Number(selectedAssessment.estimated_yield_impact_percent) : undefined}
                     diseaseCount={selectedAssessment.disease_identified?.length || 0}
-                    diseasePressure={(selectedAssessment.severity_ratings?.disease_pressure as any) || "none"}
+                    diseasePressure={
+                      selectedAssessment.severity_ratings?.disease_pressure === "none" ||
+                      selectedAssessment.severity_ratings?.disease_pressure === "mild" ||
+                      selectedAssessment.severity_ratings?.disease_pressure === "moderate" ||
+                      selectedAssessment.severity_ratings?.disease_pressure === "severe"
+                        ? selectedAssessment.severity_ratings.disease_pressure
+                        : undefined
+                    }
                     pestCount={selectedAssessment.pest_identified?.length || 0}
-                    pestPressure={(selectedAssessment.severity_ratings?.pest_pressure as any) || "none"}
+                    pestPressure={
+                      selectedAssessment.severity_ratings?.pest_pressure === "none" ||
+                      selectedAssessment.severity_ratings?.pest_pressure === "mild" ||
+                      selectedAssessment.severity_ratings?.pest_pressure === "moderate" ||
+                      selectedAssessment.severity_ratings?.pest_pressure === "severe"
+                        ? selectedAssessment.severity_ratings.pest_pressure
+                        : undefined
+                    }
                     nutrientDeficiencies={
                       (selectedAssessment.nutrient_deficiencies?.nitrogen?.detected ? 1 : 0) +
                       (selectedAssessment.nutrient_deficiencies?.phosphorus?.detected ? 1 : 0) +
@@ -425,6 +439,7 @@ export default function History() {
                         : "none"
                     }
                     criticalIssue={
+                      hasHealthScore(selectedAssessment.health_score) &&
                       toHealthPercent(selectedAssessment.health_score) < 50
                         ? "Severe crop stress"
                         : (selectedAssessment.severity_ratings?.disease_pressure === "severe" ||

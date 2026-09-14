@@ -147,3 +147,6 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 - [x] History EconomicImpact requires finite yield-at-risk (null ≠ +0%)
 - [x] Conversational-form beta discount copy is contingent (not guaranteed)
 - [x] Critical alerts omit USD loss unless yield impact is recorded; UI labeled illustrative
+- [x] ROI requires explicit acres + protection % (no silent 100-acre / 15% defaults)
+- [x] History executive summary does not invent "none" pressure or critical stress from null health
+- [x] Conversational-form insurance prompts fail closed on invented weather events / USD loss

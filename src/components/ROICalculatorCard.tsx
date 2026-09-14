@@ -39,7 +39,7 @@ interface ROICalculatorCardProps {
 
 export function ROICalculatorCard({ assessmentData, fieldData, className }: ROICalculatorCardProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [acres, setAcres] = useState(fieldData?.acreage?.toString() || '100');
+  const [acres, setAcres] = useState(fieldData?.acreage != null ? String(fieldData.acreage) : '');
   const [cropType, setCropType] = useState(fieldData?.cropType || 'rice');
   const [treatmentType, setTreatmentType] = useState('fungicide');
   const [roi, setRoi] = useState<ROICalculation | null>(null);
@@ -51,7 +51,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
       : ''
   );
   const [avgYieldInput, setAvgYieldInput] = useState('');
-  const [yieldProtectionPercent, setYieldProtectionPercent] = useState('15');
+  const [yieldProtectionPercent, setYieldProtectionPercent] = useState('');
 
 
   // Fallback prices (used if market price API fails)
@@ -141,13 +141,15 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
     avgYieldInput !== '' && Number.isFinite(Number(avgYieldInput)) && Number(avgYieldInput) > 0;
   const hasProtection =
     yieldProtectionPercent !== '' && Number.isFinite(Number(yieldProtectionPercent)) && Number(yieldProtectionPercent) >= 0;
+  const hasAcres =
+    acres !== '' && Number.isFinite(Number(acres)) && Number(acres) > 0;
 
   const calculateROI = () => {
-    if (!hasAssessmentHealth || !hasYieldAtRisk || !hasAvgYield || !hasProtection) {
+    if (!hasAssessmentHealth || !hasYieldAtRisk || !hasAvgYield || !hasProtection || !hasAcres) {
       setRoi(null);
       return;
     }
-    const acreage = parseFloat(acres) || 100;
+    const acreage = Number(acres);
     const crop = cropPrices[cropType] || cropPrices.rice;
     const treatment = treatmentCosts[treatmentType] || treatmentCosts.fungicide;
     const avgYield = Number(avgYieldInput);
@@ -279,7 +281,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                   type="number"
                   value={acres}
                   onChange={(e) => setAcres(e.target.value)}
-                  placeholder="100"
+                  placeholder="Enter field acres"
                 />
               </div>
 
@@ -368,7 +370,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
                 ROI needs a real assessment health score and an explicit yield-at-risk % (from the assessment or entered below).
               </p>
             )}
-            <Button onClick={calculateROI} className="w-full" disabled={!hasAssessmentHealth || !hasYieldAtRisk || !hasAvgYield || !hasProtection}>
+            <Button onClick={calculateROI} className="w-full" disabled={!hasAssessmentHealth || !hasYieldAtRisk || !hasAvgYield || !hasProtection || !hasAcres}>
               <Calculator className="h-4 w-4 mr-2" />
               Calculate ROI
             </Button>

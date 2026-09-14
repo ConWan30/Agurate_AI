@@ -10,9 +10,9 @@ interface AnalysisExecutiveSummaryProps {
   condition: string;
   yieldImpact?: number;
   diseaseCount: number;
-  diseasePressure: "none" | "mild" | "moderate" | "severe";
+  diseasePressure?: "none" | "mild" | "moderate" | "severe";
   pestCount: number;
-  pestPressure: "none" | "mild" | "moderate" | "severe";
+  pestPressure?: "none" | "mild" | "moderate" | "severe";
   nutrientDeficiencies: number;
   highestNutrientSeverity: "none" | "mild" | "moderate" | "severe";
   historicalComparison?: {
@@ -38,7 +38,7 @@ export function AnalysisExecutiveSummary({
   criticalIssue,
   topRecommendation
 }: AnalysisExecutiveSummaryProps) {
-  const showCriticalAlert = healthScore < 50 || diseasePressure === "severe" || pestPressure === "severe";
+  const showCriticalAlert = (Number.isFinite(healthScore) && healthScore < 50) || diseasePressure === "severe" || pestPressure === "severe";
 
   const TrendIndicator = () => {
     if (!historicalComparison) return null;
@@ -63,7 +63,7 @@ export function AnalysisExecutiveSummary({
           <AlertTitle className="text-lg font-bold">🚨 Immediate Action Required</AlertTitle>
           <AlertDescription className="text-base">
             {criticalIssue} detected. 
-            {yieldImpact > 0 && ` Estimated yield impact: ${Math.abs(yieldImpact)}%.`}
+            {yieldImpact != null && Number.isFinite(yieldImpact) && yieldImpact !== 0 && ` Estimated yield impact: ${Math.abs(yieldImpact)}%.`}
             {topRecommendation && (
               <span className="block mt-2 font-semibold">
                 Recommended action: {topRecommendation}
