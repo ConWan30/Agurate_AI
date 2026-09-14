@@ -211,8 +211,10 @@ export default function ConversationalFormsAnalytics() {
                         labelLine={false}
                         label={(props: any) => {
                           const { name, value, percent } = props;
-                          const pct = typeof percent === 'number' ? (percent * 100).toFixed(0) : '0';
-                          return `${name}: ${value} (${pct}%)`;
+                          if (typeof percent !== 'number' || !Number.isFinite(percent)) {
+                            return `${name}: ${value ?? '—'}`;
+                          }
+                          return `${name}: ${value} (${(percent * 100).toFixed(0)}%)`;
                         }}
                         outerRadius={120}
                         fill="#8884d8"
@@ -228,7 +230,7 @@ export default function ConversationalFormsAnalytics() {
                 </div>
                 <div className="mt-4 text-center">
                   <p className="text-sm text-muted-foreground">
-                    Total responses: {feedbackMetrics?.feedback_count || 0}
+                    Total responses: {feedbackMetrics?.feedback_count != null ? feedbackMetrics.feedback_count : '—'}
                   </p>
                 </div>
               </CardContent>

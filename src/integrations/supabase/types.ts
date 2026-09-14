@@ -2331,6 +2331,7 @@ export type Database = {
         Args: { p_crop_type: string; p_field_id: string; p_problem: string }
         Returns: {
           avg_effectiveness: number
+          farmer_count: number
           sample_size: number
           success_rate: number
           treatment_type: string

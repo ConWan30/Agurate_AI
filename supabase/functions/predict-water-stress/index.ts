@@ -6,9 +6,11 @@ import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 
 const waterStressSchema = z.object({
   fieldId: z.string().uuid(),
-  assessmentId: z.string().uuid().optional(),
-  healthScore: z.number().min(0).max(100),
-  symptoms: z.array(z.string()).max(50),
+  assessmentId: z.string().uuid(),
+  /** @deprecated Ignored — health is loaded from the owned assessment. */
+  healthScore: z.number().min(0).max(100).optional(),
+  /** @deprecated Ignored — symptoms are loaded from the owned assessment. */
+  symptoms: z.array(z.string()).max(50).optional(),
   weatherData: z.any().optional()
 });
 
@@ -48,7 +50,7 @@ serve(async (req) => {
       });
     }
 
-    const { fieldId, assessmentId, healthScore, symptoms, weatherData } = validation.data;
+    const { fieldId, assessmentId, weatherData } = validation.data;
 
     // Verify field ownership
     const { data: field, error: fieldError } = await supabase
@@ -63,6 +65,44 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+
+    // Trust persisted assessment only — never client healthScore/symptoms invent.
+    const { data: assessment, error: assessmentError } = await supabase
+      .from('assessments')
+      .select('id, field_id, health_score, disease_identified, pest_identified, stress_level')
+      .eq('id', assessmentId)
+      .eq('field_id', fieldId)
+      .maybeSingle();
+
+    if (assessmentError || !assessment) {
+      return new Response(JSON.stringify({ error: 'Assessment not found for field' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const healthScore =
+      assessment.health_score != null && Number.isFinite(Number(assessment.health_score))
+        ? Number(assessment.health_score)
+        : null;
+    const labelThreat = (item: unknown): string | null => {
+      if (typeof item === 'string' && item.trim()) return item.trim();
+      if (item && typeof item === 'object') {
+        const o = item as Record<string, unknown>;
+        const name = o.name ?? o.disease ?? o.pest;
+        return typeof name === 'string' && name.trim() ? name.trim() : null;
+      }
+      return null;
+    };
+    const symptoms = [
+      ...(Array.isArray(assessment.disease_identified)
+        ? assessment.disease_identified.map(labelThreat).filter((s): s is string => !!s)
+        : []),
+      ...(Array.isArray(assessment.pest_identified)
+        ? assessment.pest_identified.map(labelThreat).filter((s): s is string => !!s)
+        : []),
+      ...(assessment.stress_level ? [String(assessment.stress_level)] : []),
+    ];
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -72,9 +112,9 @@ serve(async (req) => {
     const aiPrompt = `You are AgurateAI's water stress prediction engine for Louisiana Delta crops.
 
 Current Assessment:
-- Health Score: ${healthScore}%
-- Symptoms: ${symptoms.join(', ')}
-- Weather: ${JSON.stringify(weatherData)}
+- Health Score: ${healthScore != null ? `${healthScore}%` : 'not recorded'}
+- Symptoms: ${symptoms.length ? symptoms.join(', ') : 'not recorded'}
+- Weather: ${weatherData != null ? JSON.stringify(weatherData) : 'not provided'}
 
 Analyze water stress risk for next 7 days:
 1. Calculate stress probability per day (0-1 scale)

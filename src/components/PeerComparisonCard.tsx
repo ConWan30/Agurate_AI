@@ -10,6 +10,7 @@ interface PeerComparisonData {
   success_rate: number;
   avg_effectiveness: number;
   sample_size: number;
+  farmer_count: number;
 }
 
 interface PeerComparisonCardProps {
@@ -112,7 +113,10 @@ export function PeerComparisonCard({
   const topTreatment = comparisonData[0];
   const sampleSize = Number.isFinite(Number(topTreatment.sample_size))
     ? Number(topTreatment.sample_size)
-    : 0;
+    : null;
+  const farmerCount = Number.isFinite(Number(topTreatment.farmer_count))
+    ? Number(topTreatment.farmer_count)
+    : null;
 
   return (
     <Card className={className}>
@@ -122,8 +126,9 @@ export function PeerComparisonCard({
           Community Treatment Comparison
         </CardTitle>
         <CardDescription>
-          Self-reported anonymous outcomes from {sampleSize} record
-          {sampleSize !== 1 ? 's' : ''} for similar {cropType} cases
+          {farmerCount != null && sampleSize != null
+            ? `Self-reported anonymous outcomes from ${farmerCount} farmer${farmerCount !== 1 ? 's' : ''} (${sampleSize} outcome${sampleSize !== 1 ? 's' : ''}) for similar ${cropType} cases`
+            : `Self-reported anonymous outcomes for similar ${cropType} cases`}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -132,7 +137,7 @@ export function PeerComparisonCard({
             <div>
               <h4 className="font-semibold flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-success" />
-                Most Successful Treatment
+                Highest self-reported success rate
               </h4>
               <p className="text-sm text-muted-foreground mt-1">
                 {topTreatment.treatment_type || treatmentType}
@@ -152,9 +157,10 @@ export function PeerComparisonCard({
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Sample Size</p>
+              <p className="text-xs text-muted-foreground">Sample</p>
               <p className="text-lg font-bold">
-                {sampleSize} outcomes
+                {farmerCount != null ? `${farmerCount} farmers` : '—'}
+                {sampleSize != null ? ` / ${sampleSize} outcomes` : ''}
               </p>
             </div>
           </div>
@@ -179,7 +185,14 @@ export function PeerComparisonCard({
                       )}
                     </div>
                     <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                      <span>{formatPeerMetric(treatment.sample_size)} outcomes</span>
+                      <span>
+                        {Number.isFinite(Number(treatment.farmer_count))
+                          ? `${treatment.farmer_count} farmers`
+                          : '—'}
+                        {Number.isFinite(Number(treatment.sample_size))
+                          ? ` / ${treatment.sample_size} outcomes`
+                          : ''}
+                      </span>
                       <span>{formatPeerMetric(treatment.success_rate, '%')} success</span>
                       <span>{formatPeerMetric(treatment.avg_effectiveness, '/100')} effectiveness</span>
                     </div>

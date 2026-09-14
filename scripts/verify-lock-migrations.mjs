@@ -247,6 +247,18 @@ const required = [
       'reject_client_insert_weather_events_trg',
     ],
   },
+  {
+    id: '20260914400000_lock_peer_insert_beta_metrics_coop_dirt',
+    needles: [
+      'peer_treatment_outcomes.recommendation_id is required',
+      'peer_treatment_outcomes.recommendation_id must belong to the same owned field',
+      'COUNT(DISTINCT pto.farmer_id) AS farmer_count',
+      'CREATE OR REPLACE VIEW public.beta_metrics',
+      'NEW.status := \'active\'',
+      'NEW.water_savings := NULL',
+      'app.allow_dirt_referral_insert',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -267,11 +279,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091439') &&
-  tip < '20260914390000_lock_peer_sample_success_insert_weather_money'
+  !tip.startsWith('2026091440') &&
+  tip < '20260914400000_lock_peer_insert_beta_metrics_coop_dirt'
 ) {
   fail(
-    `tip migration ${tip} should include peer-sample/success-insert/weather invent lock (20260914390000+)`
+    `tip migration ${tip} should include peer-insert/beta-metrics/coop/dirt invent lock (20260914400000+)`
   );
 }
 

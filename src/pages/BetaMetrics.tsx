@@ -18,36 +18,48 @@ export default function BetaMetrics() {
       }, {});
 
       const { data: betaCount } = await supabase.rpc('get_beta_farmer_count');
-      const totalUsers = typeof betaCount === 'number' ? betaCount : 0;
+      const totalUsers = typeof betaCount === 'number' ? betaCount : null;
       const { count: scannerUsers } = await supabase.from('assessments').select('id', { count: 'exact', head: true });
       const { data: feedback } = await supabase.from('tutorial_feedback').select('rating');
-      const avgRating = feedback?.length ? (feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / feedback.length).toFixed(1) : 0;
+      const rated = (feedback ?? []).filter((f) => typeof f.rating === 'number' && Number.isFinite(f.rating));
+      const avgRating = rated.length
+        ? (rated.reduce((sum, f) => sum + (f.rating as number), 0) / rated.length).toFixed(1)
+        : null;
 
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
       const { count: weeklyScans } = await supabase.from('assessments').select('id', { count: 'exact', head: true }).gte('analyzed_at', oneWeekAgo.toISOString());
 
-      return { tutorialStats, totalUsers: totalUsers || 0, scannerUsers: scannerUsers || 0, avgRating, weeklyScans: weeklyScans || 0 };
+      return {
+        tutorialStats,
+        totalUsers,
+        scannerUsers: typeof scannerUsers === 'number' ? scannerUsers : null,
+        avgRating,
+        weeklyScans: typeof weeklyScans === 'number' ? weeklyScans : null,
+      };
     }
   });
 
   const funnelData = [
-    { stage: 'Started', count: metrics?.tutorialStats?.started || 0 },
-    { stage: 'Completed', count: metrics?.tutorialStats?.completed || 0 },
-    { stage: 'Skipped', count: metrics?.tutorialStats?.skipped || 0 }
+    { stage: 'Started', count: metrics?.tutorialStats?.started ?? null },
+    { stage: 'Completed', count: metrics?.tutorialStats?.completed ?? null },
+    { stage: 'Skipped', count: metrics?.tutorialStats?.skipped ?? null }
   ];
+
+  const formatMetric = (value: number | string | null | undefined) =>
+    value == null || value === '' ? '—' : String(value);
 
   return (
     <div className="min-h-screen bg-background">
       <EnhancedPageHeader title="Your Beta Progress" description="Your tutorial and scan activity (not platform-wide cohort metrics)" icon={BarChart3} badge={{ icon: Target, text: "Personal" }} />
       <div className="container max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Beta Farmers (platform)</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.totalUsers || 0}</div></CardContent></Card>
-          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Your Tutorial Completion</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.tutorialStats?.completed ? Math.round((metrics.tutorialStats.completed / (metrics.tutorialStats.started || 1)) * 100) : 0}%</div></CardContent></Card>
-          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Your Avg Rating</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.avgRating || 0} ⭐</div></CardContent></Card>
-          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Your Weekly Scans</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.weeklyScans || 0}</div></CardContent></Card>
+          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Beta Farmers (platform)</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{formatMetric(metrics?.totalUsers)}</div></CardContent></Card>
+          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Your Tutorial Completion</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.tutorialStats?.completed != null && metrics?.tutorialStats?.started ? `${Math.round((metrics.tutorialStats.completed / metrics.tutorialStats.started) * 100)}%` : '—'}</div></CardContent></Card>
+          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Your Avg Rating</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{metrics?.avgRating != null ? `${metrics.avgRating} ⭐` : '—'}</div></CardContent></Card>
+          <Card><CardHeader className="pb-3"><CardTitle className="text-sm font-medium text-muted-foreground">Your Weekly Scans</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{formatMetric(metrics?.weeklyScans)}</div></CardContent></Card>
         </div>
-        <Card><CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary" />Your Tutorial Funnel</CardTitle></CardHeader><CardContent><ResponsiveContainer width="100%" height={300}><BarChart data={funnelData}><CartesianGrid strokeDasharray="3 3" opacity={0.1} /><XAxis dataKey="stage" /><YAxis /><Tooltip /><Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer></CardContent></Card>
+        <Card><CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary" />Your Tutorial Funnel</CardTitle></CardHeader><CardContent><ResponsiveContainer width="100%" height={300}><BarChart data={funnelData.map((d) => ({ ...d, count: d.count ?? 0 }))}><CartesianGrid strokeDasharray="3 3" opacity={0.1} /><XAxis dataKey="stage" /><YAxis /><Tooltip /><Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer></CardContent></Card>
       </div>
     </div>
   );

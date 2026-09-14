@@ -15,13 +15,17 @@ interface CriticalAlertInput {
   health_score?: number;
   /** @deprecated Ignored — scores are loaded from the persisted assessment. */
   stress_level?: string;
+  /** @deprecated Ignored — threats are loaded from the persisted assessment. */
   diseases?: unknown;
+  /** @deprecated Ignored — threats are loaded from the persisted assessment. */
   pests?: unknown;
   /** @deprecated Ignored — yield impact is loaded from the persisted assessment. */
   estimated_yield_impact_percent?: number;
+  /** @deprecated Ignored — acreage is loaded from the owned field. */
   field_acreage?: number;
+  /** @deprecated Ignored — crop type is loaded from the owned field. */
   crop_type?: string;
-  /** Optional $/acre from caller — USD loss omitted when not provided. */
+  /** @deprecated Ignored — USD loss is not invented from caller-supplied crop value. */
   crop_value_per_acre?: number;
 }
 
@@ -93,11 +97,6 @@ serve(async (req) => {
     const {
       assessment_id,
       field_id,
-      diseases,
-      pests,
-      field_acreage,
-      crop_type,
-      crop_value_per_acre,
     }: CriticalAlertInput = await req.json();
 
     if (!field_id || !assessment_id) {
@@ -142,12 +141,9 @@ serve(async (req) => {
     const stress_level = assessment.stress_level ?? 'unknown';
     const estimated_yield_impact_percent = assessment.estimated_yield_impact_percent;
 
-    const normalizedDiseases = normalizeThreatList(
-      Array.isArray(diseases) && diseases.length > 0 ? diseases : assessment.disease_identified
-    );
-    const normalizedPests = normalizeThreatList(
-      Array.isArray(pests) && pests.length > 0 ? pests : assessment.pest_identified
-    );
+    // Trust persisted assessment threats only — ignore client diseases/pests payloads.
+    const normalizedDiseases = normalizeThreatList(assessment.disease_identified);
+    const normalizedPests = normalizeThreatList(assessment.pest_identified);
 
     const finiteHealth =
       typeof health_score === 'number' && Number.isFinite(health_score) ? health_score : null;
@@ -155,13 +151,12 @@ serve(async (req) => {
       estimated_yield_impact_percent != null && Number.isFinite(Number(estimated_yield_impact_percent))
         ? Number(estimated_yield_impact_percent)
         : null;
+    // Acreage from owned field only — never invent from client field_acreage.
     const finiteAcreage =
-      field_acreage != null && Number.isFinite(Number(field_acreage))
-        ? Number(field_acreage)
-        : field.acreage != null && Number.isFinite(Number(field.acreage))
-          ? Number(field.acreage)
-          : null;
-    const resolvedCropType = crop_type || field.crop_type || 'crop';
+      field.acreage != null && Number.isFinite(Number(field.acreage))
+        ? Number(field.acreage)
+        : null;
+    const resolvedCropType = field.crop_type || 'crop';
 
     const urgencyScore = calculateUrgencyScore({
       healthScore: finiteHealth,
@@ -172,7 +167,8 @@ serve(async (req) => {
         normalizedPests.reduce((max, p) => Math.max(max, threatSeverityWeight(p.severity, p.confidence)), 0),
       yieldImpact: finiteYield,
       fieldSize: finiteAcreage,
-      cropValue: resolveCropValuePerAcre(crop_value_per_acre),
+      // Do not invent USD loss from caller-supplied crop value.
+      cropValue: null,
     });
 
     if (urgencyScore < 60) {
@@ -195,7 +191,7 @@ serve(async (req) => {
       pests: normalizedPests,
       yieldImpact: finiteYield,
       acreage: finiteAcreage,
-      cropValue: resolveCropValuePerAcre(crop_value_per_acre),
+      cropValue: null,
     });
 
     const { data: alert, error: alertError } = await admin
@@ -338,10 +334,4 @@ function generateAlertContent(params: {
     message: `A high-urgency health signal was flagged for your ${cropType} field. Review the assessment details.${lossSuffix}`,
     estimatedLoss,
   };
-}
-
-/** Only use caller-provided crop $/acre — never invent commodity defaults. */
-function resolveCropValuePerAcre(raw: unknown): number | null {
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
 }
