@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { hasHealthScore, toHealthPercent } from '@/lib/health-score';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -136,11 +137,11 @@ export default function Cooperatives() {
             .limit(50);
 
           const totalAcreage = fields?.reduce((sum, f) => sum + (Number(f.acreage) || 0), 0) || 0;
-          const scored = (assessments || []).filter(
-            (a) => a.health_score != null && !Number.isNaN(Number(a.health_score))
-          );
+          const scored = (assessments || [])
+            .filter((a) => hasHealthScore(a.health_score))
+            .map((a) => toHealthPercent(a.health_score));
           const avgHealth = scored.length
-            ? scored.reduce((sum, a) => sum + Number(a.health_score), 0) / scored.length
+            ? scored.reduce((sum, n) => sum + n, 0) / scored.length
             : null;
 
           return {

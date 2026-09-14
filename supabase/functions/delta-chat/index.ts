@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
+import { getAnonClient, getServiceClient, requireAuthenticatedUser } from '../_shared/auth.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 import { handleError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
@@ -120,6 +120,51 @@ serve(async (req) => {
 
     // Validate input
     const rawBody = await req.json();
+
+    // Persist assistant messages (service-role) — clients cannot INSERT role=assistant
+    if (rawBody?.action === 'persist_assistant') {
+      const conversationId = rawBody.conversationId;
+      const content = typeof rawBody.content === 'string' ? rawBody.content.trim() : '';
+      const contextSnapshot = rawBody.contextSnapshot && typeof rawBody.contextSnapshot === 'object'
+        ? rawBody.contextSnapshot
+        : {};
+      if (!conversationId || !content) {
+        return new Response(JSON.stringify({ error: 'conversationId and content required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const { data: owned, error: ownErr } = await supabaseClient
+        .from('delta_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (ownErr || !owned) {
+        return new Response(JSON.stringify({ error: 'Conversation not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const serviceClient = getServiceClient();
+      const { error: insertErr } = await serviceClient.from('delta_messages').insert({
+        conversation_id: conversationId,
+        role: 'assistant',
+        content,
+        context_snapshot: contextSnapshot,
+      });
+      if (insertErr) {
+        console.error('[delta-chat] persist_assistant failed', insertErr);
+        return new Response(JSON.stringify({ error: 'Failed to persist assistant message' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const validation = deltaChatSchema.safeParse(rawBody);
     
     if (!validation.success) {

@@ -96,18 +96,29 @@ export function useDeltaConversations() {
     contextSnapshot?: Record<string, unknown>
   ) => {
     try {
-      const { error } = await supabase
-        .from('delta_messages')
-        .insert({ 
-          conversation_id: conversationId, 
-          role, 
-          content,
-          context_snapshot: contextSnapshot || {}
+      if (role === 'assistant') {
+        // Assistant rows are service-role only (20260914260000). Persist via edge.
+        const { error } = await supabase.functions.invoke('delta-chat', {
+          body: {
+            action: 'persist_assistant',
+            conversationId,
+            content,
+            contextSnapshot: contextSnapshot || {},
+          },
         });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('delta_messages')
+          .insert({ 
+            conversation_id: conversationId, 
+            role: 'user', 
+            content,
+            context_snapshot: contextSnapshot || {}
+          });
+        if (error) throw error;
+      }
 
-      if (error) throw error;
-
-      // Update conversation timestamp
       await supabase
         .from('delta_conversations')
         .update({ updated_at: new Date().toISOString() })

@@ -137,7 +137,7 @@ Last updated: 2026-09-14
 
 See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
-- [ ] Apply pending Supabase migrations (through `20260914250000` critical-alert UPDATE freeze + claim↔assessment field match; prior `20260914230000` peer effectiveness CHECK; `20260914220000` AI metric invent lock; `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
+- [ ] Apply pending Supabase migrations (through `20260914260000` critical-alert UPDATE freeze + claim↔assessment field match; prior `20260914230000` peer effectiveness CHECK; `20260914220000` AI metric invent lock; `20260914190000` claim UPDATE/invitation freeze; `20260914180000` beta metrics; entitlement clamps; researcher PII is `20260914100000`)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
@@ -147,7 +147,7 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 ## Evidence expected before production-complete
 
 1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
-2. Migration applied confirmation in Supabase through `20260914250000_lock_conversational_form_and_request_logs` — **pending credentials**
+2. Migration applied confirmation in Supabase through `20260914260000_lock_delta_peer_expert_invent` — **pending credentials**
 3. Live production URL showing honest closed-beta copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
 
