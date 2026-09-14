@@ -40,7 +40,7 @@ export const PostFormFeedback = ({ sessionId, formType, onComplete }: PostFormFe
       if (!user) throw new Error('Not authenticated');
 
       // Save feedback
-      const { error } = await supabase
+      const { data: saved, error } = await supabase
         .from('beta_feedback')
         .insert({
           user_id: user.id,
@@ -53,9 +53,14 @@ export const PostFormFeedback = ({ sessionId, formType, onComplete }: PostFormFe
             preferredMethod,
             timestamp: new Date().toISOString()
           })
-        });
+        })
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!saved) {
+        throw new Error('Feedback was not saved (insert returned no row or not permitted)');
+      }
 
       toast.success('Thank you for your feedback! 🎉');
       onComplete();

@@ -152,7 +152,7 @@ export function ROICalculatorCard({ assessmentData, fieldData, className }: ROIC
     yieldProtectionPercent !== '' &&
     Number.isFinite(Number(yieldProtectionPercent)) &&
     Number(yieldProtectionPercent) >= 0;
-  const hasAcres = acres !== '' && Number.isFinite(Number(acres)) && Number(acres) > 0;
+  const hasAcres = acres !== '' && Number.isFinite(Number(acres)) && Number(acres) >= 0;
   const hasTreatmentCost =
     treatmentCostPerAcre !== '' &&
     Number.isFinite(Number(treatmentCostPerAcre)) &&

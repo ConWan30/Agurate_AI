@@ -28,15 +28,18 @@ export function FeedbackWidget({ featureContext, onClose, compact = false }: Fee
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase.from('beta_feedback').insert({
+      const { data: saved, error } = await supabase.from('beta_feedback').insert({
         user_id: user.id,
         rating: isPositive ? 5 : 2,
         category: 'general',
         message: isPositive ? 'Positive feedback' : 'Negative feedback',
         feature_context: featureContext,
-      });
+      }).select('id').maybeSingle();
 
       if (error) throw error;
+      if (!saved) {
+        throw new Error('Feedback was not saved (insert returned no row or not permitted)');
+      }
 
       toast({
         title: "Thanks for your feedback!",
@@ -71,15 +74,18 @@ export function FeedbackWidget({ featureContext, onClose, compact = false }: Fee
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase.from('beta_feedback').insert({
+      const { data: saved, error } = await supabase.from('beta_feedback').insert({
         user_id: user.id,
         rating,
         category,
         message: message.trim(),
         feature_context: featureContext,
-      });
+      }).select('id').maybeSingle();
 
       if (error) throw error;
+      if (!saved) {
+        throw new Error('Feedback was not saved (insert returned no row or not permitted)');
+      }
 
       toast({
         title: "✅ Feedback submitted!",
