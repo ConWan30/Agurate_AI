@@ -34,10 +34,13 @@ Last updated: 2026-09-14
 - [x] Beta pricing shown as discount-off-published-rate (no hardcoded $39.50 / $49)
 - [x] critical_alerts Jan/Nov schema reconcile migration + owned acknowledge RPC
 - [x] weather_events insert types mapped to CHECK-allowed values
+- [x] get_conversation_memory ownership check + usable cross-conversation signature
+- [x] acknowledge_cooperative_alert requires cooperative membership
+- [x] Beta/demo profile + field upserts mapped to live schema columns
 
 ## Platform gates (external)
 
-- [ ] Apply pending Supabase migrations (view security invoker + RLS lock-down + testimonial unapprove + critical_alerts reconcile)
+- [ ] Apply pending Supabase migrations (view security invoker + RLS lock-down + testimonial unapprove + critical_alerts reconcile + secure RPCs)
 - [ ] Enable Supabase Auth **Leaked Password Protection**
 - [ ] Deploy updated edge functions
 - [ ] Set `DEMO_SETUP_SECRET` in function secrets (or leave unset to keep demo setup disabled)
