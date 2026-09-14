@@ -169,6 +169,17 @@ const required = [
       'NEW.outcome_improvement := OLD.outcome_improvement',
     ],
   },
+  {
+    id: '20260914340000_lock_coop_member_insert_and_insight_metrics',
+    needles: [
+      'Admins can insert members',
+      'protect_cooperative_member_insert',
+      'cooperative_members.user_id must equal the authenticated user',
+      'community_insights_savings_achieved_check',
+      'community_insights_community_rating_check',
+      'NEW.lsu_validation := OLD.lsu_validation',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -189,11 +200,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091433') &&
-  tip < '20260914330000_lock_claim_story_peer_link_metrics'
+  !tip.startsWith('2026091434') &&
+  tip < '20260914340000_lock_coop_member_insert_and_insight_metrics'
 ) {
   fail(
-    `tip migration ${tip} should include claim/story/peer-link/metrics invent lock (20260914330000+)`
+    `tip migration ${tip} should include coop-member/insight-metrics invent lock (20260914340000+)`
   );
 }
 
