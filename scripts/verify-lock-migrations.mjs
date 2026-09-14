@@ -180,6 +180,18 @@ const required = [
       'NEW.lsu_validation := OLD.lsu_validation',
     ],
   },
+  {
+    id: '20260914350000_lock_coop_alert_field_expert_link_money_metrics',
+    needles: [
+      'Cooperative admins can create alerts for owned fields',
+      'a.field_id = expert_consultations.field_id',
+      'dirt_referral_metrics_water_stress_score_check',
+      'NEW.lsu_validation := OLD.lsu_validation',
+      'critical_alerts_estimated_loss_usd_check',
+      'best_practices_network_average_savings_check',
+      'farmer_testimonials_roi_achieved_check',
+    ],
+  },
 ];
 
 for (const req of required) {
@@ -200,11 +212,11 @@ for (const req of required) {
 const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
 pass(`tip migration ${tip}`);
 if (
-  !tip.startsWith('2026091434') &&
-  tip < '20260914340000_lock_coop_member_insert_and_insight_metrics'
+  !tip.startsWith('2026091435') &&
+  tip < '20260914350000_lock_coop_alert_field_expert_link_money_metrics'
 ) {
   fail(
-    `tip migration ${tip} should include coop-member/insight-metrics invent lock (20260914340000+)`
+    `tip migration ${tip} should include coop-alert/expert-link/money-metrics invent lock (20260914350000+)`
   );
 }
 
