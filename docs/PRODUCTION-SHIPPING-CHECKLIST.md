@@ -146,7 +146,7 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
 ## Evidence expected before production-complete
 
-1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build) — **PASS on tip `53014f5`**
+1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
 2. Migration applied confirmation in Supabase through `20260914180000_beta_metrics_require_approved_stories` — **pending credentials**
 3. Live production URL showing honest closed-beta copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
