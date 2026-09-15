@@ -26,7 +26,8 @@
     "verify:lock-migrations": "node scripts/verify-lock-migrations.mjs",
     "verify:health-stamp": "node scripts/verify-health-stamp.mjs",
     "verify:production-smoke": "node scripts/verify-production-smoke.mjs",
-    "check:edge": "bash scripts/check-edge-functions.sh"
+    "check:edge": "bash scripts/check-edge-functions.sh",
+    "platform:cutover": "bash scripts/platform-cutover.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

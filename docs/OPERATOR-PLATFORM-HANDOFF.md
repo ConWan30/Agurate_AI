@@ -8,16 +8,16 @@ Closed beta product scope is **Morehouse Parish × soybeans**. See `docs/PILOT-S
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| In-repo honesty, security, quality | **Complete for tip invent locks** | Tip on `cursor/launch-readiness-honesty-38b2` (verify with `git rev-parse HEAD`). Re-confirm with `npm run verify:local-gates` + tip CI after each push. High-impact invent/security residuals continue to close in-repo (null health scores no longer invent 0%, tutorial Example labeling, fail-closed welcome/tutorial writes); remaining production-complete blockers are platform-only. |
-| Apply Supabase migrations through tip | **Blocked** | Needs project DB credentials (`supabase db push` or Dashboard SQL) |
-| Auth Leaked Password Protection | **Blocked** | Needs Supabase Dashboard access |
-| Deploy edge functions | **Blocked** | Needs Supabase CLI linked project + secrets |
-| `DEMO_SETUP_SECRET` policy | **Blocked** | Needs function secrets access |
-| Publish app + live `/health.json` | **Blocked** | Needs Lovable Publish / host credentials. Candidate host `https://agurateai.lovable.app` currently **404s `/health.json`** (tip stamp not published). Public routes return 200; shell/JS phrase scan may not show older marketing strings, but tip identity is unverified until `/health.json` matches HEAD. |
-| Production smoke | **Blocked** | `PRODUCTION_URL=https://agurateai.lovable.app EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke` currently **FAILS** on missing `/health.json` tip stamp. Re-run after Publish. |
+| In-repo honesty, security, quality | **Complete for tip invent locks** | Re-confirm with `npm run verify:local-gates` + tip CI after each push. Pilot wedge: Morehouse Parish × soybeans. |
+| Apply Supabase migrations through tip | **Blocked (credentials)** | Lovable cutover stalled mid-apply; live DB still exposes `public.__tmp_apply_migration(p_sql)` (anon gets permission denied). Tip migration `20260914470000_…` drops it. Run `scripts/platform-cutover.sh` once `SUPABASE_ACCESS_TOKEN` + `SUPABASE_DB_PASSWORD` are available. |
+| Auth Leaked Password Protection | **Blocked (Dashboard)** | Needs Supabase Dashboard toggle. |
+| Deploy edge functions | **Blocked (credentials)** | Same cutover script deploys functions after `db push`. |
+| `DEMO_SETUP_SECRET` policy | **OK if unset** | Leave unset so `setup-demo-account` stays fail-closed (Lovable left it unset). |
+| Publish app + live `/health.json` | **Partial** | `https://agurateai.lovable.app/health.json` returns 200 for published commit `465ab48`, but git tip is ahead. Lovable credits exhausted — Publish tip or deploy SPA to an alternate host. |
+| Production smoke vs live stamp | **PASS at `465ab48`** | `EXPECTED_COMMIT=465ab48… npm run verify:production-smoke` PASSes. Smoke vs **git tip** still FAILS until Publish catches tip. |
 
-**Production-complete is not achieved until every row above is evidenced.**  
-The coding agent cannot complete platform rows without service-role / Dashboard / publish credentials.
+**Production-complete is not achieved until every row above is evidenced against git tip.**  
+Without Supabase DB/access-token secrets and a Publish path, the coding agent cannot finish platform rows.
 
 Verify local gates anytime:
 
@@ -79,11 +79,13 @@ branch/build that includes the current tip of `cursor/launch-readiness-honesty-3
 
 Candidate production host observed in-repo metadata: `https://agurateai.lovable.app`.
 
-**Current live evidence (pre-publish):** that host returns HTTP 200 for public routes but:
-- `/health.json` → **404** (tip stamp not published — decisive tip-identity failure)
-- Homepage shell/JS may not still embed older fabricated accuracy / LSU-validation-badge / testimonial strings; tip publish is still required so live `/health.json` matches HEAD and honesty gates stay enforceable
+**Current live evidence (2026-09-15):**
+- `/health.json` → **200** with `commit=465ab485e3b8e72524a4e3d2b2c7ee09bccbe70b`, `stage=closed-beta`
+- Public honesty phrase smoke **PASSes** against that stamp
+- Git tip is still ahead of live; Publish (or alternate host) must stamp tip SHA
+- Live DB still has `__tmp_apply_migration` — apply tip migrations (incl. `20260914470000`) before trusting production DB invent locks
 
-Until Publish ships this tip, production smoke remains failed.
+Until live `/health.json` matches **git tip**, tip-identity smoke remains failed.
 
 ```bash
 # After publish — confirm tip identity + live honesty
