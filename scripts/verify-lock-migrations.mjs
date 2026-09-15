@@ -308,6 +308,12 @@ const required = [
         'strip_weather_events_gps',
       ],
     },
+    {
+      id: '20260914470000_drop_tmp_apply_migration_helper',
+      needles: [
+        'DROP FUNCTION IF EXISTS public.__tmp_apply_migration(text)',
+      ],
+    },
   ];
 
   for (const req of required) {
@@ -328,10 +334,10 @@ const required = [
   const tip = files.at(-1)?.replace(/\.sql$/, '') ?? '(none)';
   pass(`tip migration ${tip}`);
   // Tip must be at/after the latest required lock id (lexicographic timestamp prefix).
-  const minTip = '20260914460000';
+  const minTip = '20260914470000';
   if (tip < minTip) {
     fail(
-      `tip migration ${tip} must be >= ${minTip} (weather_events GPS catalog scrub)`
+      `tip migration ${tip} must be >= ${minTip} (drop tmp apply-migration helper)`
     );
   }
 
