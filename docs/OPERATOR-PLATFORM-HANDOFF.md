@@ -13,11 +13,11 @@ Closed beta product scope is **Morehouse Parish × soybeans**. See `docs/PILOT-S
 | Auth Leaked Password Protection | **Blocked (Dashboard)** | Needs Supabase Dashboard toggle. |
 | Deploy edge functions | **Blocked (credentials)** | Same cutover script deploys functions after `db push`. |
 | `DEMO_SETUP_SECRET` policy | **OK if unset** | Leave unset so `setup-demo-account` stays fail-closed (Lovable left it unset). |
-| Publish app + live `/health.json` | **Partial** | `https://agurateai.lovable.app/health.json` returns 200 for published commit `465ab48`, but git tip is ahead. Lovable credits exhausted — Publish tip or deploy SPA to an alternate host. |
-| Production smoke vs live stamp | **PASS at `465ab48`** | `EXPECTED_COMMIT=465ab48… npm run verify:production-smoke` PASSes. Smoke vs **git tip** still FAILS until Publish catches tip. |
+| Publish app + live `/health.json` | **Partial (tip proven off-Lovable)** | Lovable host still stamps `465ab48`. Tip SPA was built + smoke-verified at tip commit with `/health.json` match (local + ephemeral public tunnel). Durable path: `.github/workflows/deploy-pages.yml` (enable Pages → GitHub Actions) or Lovable top-up Publish. |
+| Production smoke vs live stamp | **PASS at tip (alternate host); Lovable host lagging** | Tip smoke PASS with `EXPECTED_COMMIT=$(git rev-parse HEAD)`. Lovable URL still only matches `465ab48`. |
 
-**Production-complete is not achieved until every row above is evidenced against git tip.**  
-Without Supabase DB/access-token secrets and a Publish path, the coding agent cannot finish platform rows.
+**Production-complete is not achieved until every row above is evidenced against git tip on a durable production URL, with migrations + leaked-password + edge deploy + authenticated Morehouse soybean scan.**  
+Blocked only on Supabase credentials (and Pages enable / durable host if Lovable stays credit-dead).
 
 Verify local gates anytime:
 
@@ -74,18 +74,19 @@ supabase secrets set DEMO_SETUP_SECRET="$(openssl rand -hex 32)"
 
 ## 5. Publish the app
 
-Use Lovable **Publish** (or your production host) so the live URL serves the
-branch/build that includes the current tip of `cursor/launch-readiness-honesty-38b2` (`git rev-parse HEAD`).
+Lovable credits are exhausted. Prefer one of:
 
-Candidate production host observed in-repo metadata: `https://agurateai.lovable.app`.
+1. **GitHub Pages** — enable Settings → Pages → Source = GitHub Actions. Workflow: `.github/workflows/deploy-pages.yml` builds tip with public Supabase anon env and stamps `/health.json`.
+2. **Lovable Publish** after credit top-up to `https://agurateai.lovable.app`.
+3. Any static host serving `dist/` from tip `npm run build`.
 
-**Current live evidence (2026-09-15):**
-- `/health.json` → **200** with `commit=465ab485e3b8e72524a4e3d2b2c7ee09bccbe70b`, `stage=closed-beta`
-- Public honesty phrase smoke **PASSes** against that stamp
-- Git tip is still ahead of live; Publish (or alternate host) must stamp tip SHA
+**Evidence (2026-09-15):**
+- Lovable host `/health.json` → **200** at lagging commit `465ab485e3b8e72524a4e3d2b2c7ee09bccbe70b`
+- Tip SPA built at `2130cd592ea3166126229179dd6cf66374f6ae9d` with matching `/health.json`
+- `PRODUCTION_URL` pointing at tip static host → `npm run verify:production-smoke` **PASS** (routes + honesty)
 - Live DB still has `__tmp_apply_migration` — apply tip migrations (incl. `20260914470000`) before trusting production DB invent locks
 
-Until live `/health.json` matches **git tip**, tip-identity smoke remains failed.
+Production-complete needs tip `/health.json` on a **durable** production URL (Pages/Lovable/other), not only an ephemeral tunnel.
 
 ```bash
 # After publish — confirm tip identity + live honesty

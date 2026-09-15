@@ -1,0 +1,54 @@
+name: Deploy tip SPA (GitHub Pages)
+
+# Durable alternate publish path when Lovable credits are exhausted.
+# Enable: Repo Settings → Pages → Source = GitHub Actions.
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - name: Build tip SPA
+        run: npm run build
+        env:
+          # Public anon values only — safe for Vite client bundle.
+          VITE_SUPABASE_URL: https://rkfvefhjyuyhjmcljzev.supabase.co
+          # Public anon/publishable key (already present in production client bundles).
+          VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrZnZlZmhqeXV5aGptY2xqemV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MjI1MjIsImV4cCI6MjA3NjI5ODUyMn0.JsbFUDVbgjjuPi99QCwcF7udD_tLtfJmyQsUvpTPPZE
+          VITE_SUPABASE_PROJECT_ID: rkfvefhjyuyhjmcljzev
+      - name: Assert health.json tip stamp
+        run: npm run verify:health-stamp
+        env:
+          EXPECTED_COMMIT: ${{ github.sha }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
