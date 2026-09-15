@@ -110,6 +110,15 @@ PRODUCTION_URL=https://agurateai.lovable.app EXPECTED_COMMIT=$(git rev-parse HEA
 Also: one authenticated scan/upload path returns a real health score or a clear
 error — never a silent invented score.
 
+Automated helper (requires pilot test user secrets):
+
+```bash
+AGURATE_PILOT_TEST_EMAIL=... AGURATE_PILOT_TEST_PASSWORD=... npm run verify:auth-morehouse-scan
+```
+
+Tip public host (ephemeral unless claimed/Pages-enabled) was last smoke-verified at tip `7cb2d31f47f41a65bba816eb4493f1eca0320462`.
+
+
 **Evidence receipt:** `verify:production-smoke` PASS + note of authenticated scan result.
 
 ## Credentials required (why the coding agent stops here)
