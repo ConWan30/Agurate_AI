@@ -152,6 +152,7 @@ GRANT EXECUTE ON FUNCTION public.acknowledge_critical_alert(UUID) TO authenticat
 -- View: include expiry filter; invoker security when supported
 -- ---------------------------------------------------------------------------
 
+DROP VIEW IF EXISTS public.unacknowledged_critical_alerts;
 CREATE OR REPLACE VIEW public.unacknowledged_critical_alerts AS
 SELECT
   ca.*,
