@@ -8,7 +8,9 @@
 -- ---------------------------------------------------------------------------
 
 -- CREATE OR REPLACE keeps dependent RLS policies intact (DROP would fail).
-CREATE OR REPLACE FUNCTION public.is_cooperative_member(p_coop_id UUID, p_user_id UUID)
+-- Parameter names kept as (coop_id, user_id) so CREATE OR REPLACE succeeds and
+-- dependent RLS policies survive; body uses $1/$2 to avoid column/param shadowing.
+CREATE OR REPLACE FUNCTION public.is_cooperative_member(coop_id UUID, user_id UUID)
 RETURNS BOOLEAN
 LANGUAGE SQL
 STABLE
@@ -18,12 +20,12 @@ AS $$
   SELECT EXISTS (
     SELECT 1
     FROM public.cooperative_members cm
-    WHERE cm.cooperative_id = p_coop_id
-      AND cm.user_id = p_user_id
+    WHERE cm.cooperative_id = $1
+      AND cm.user_id = $2
   );
 $$;
 
-CREATE OR REPLACE FUNCTION public.is_cooperative_admin(p_coop_id UUID, p_user_id UUID)
+CREATE OR REPLACE FUNCTION public.is_cooperative_admin(coop_id UUID, user_id UUID)
 RETURNS BOOLEAN
 LANGUAGE SQL
 STABLE
@@ -33,8 +35,8 @@ AS $$
   SELECT EXISTS (
     SELECT 1
     FROM public.cooperative_members cm
-    WHERE cm.cooperative_id = p_coop_id
-      AND cm.user_id = p_user_id
+    WHERE cm.cooperative_id = $1
+      AND cm.user_id = $2
       AND cm.role = 'admin'
   );
 $$;
