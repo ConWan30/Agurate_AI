@@ -27,7 +27,8 @@
     "verify:health-stamp": "node scripts/verify-health-stamp.mjs",
     "verify:production-smoke": "node scripts/verify-production-smoke.mjs",
     "check:edge": "bash scripts/check-edge-functions.sh",
-    "platform:cutover": "bash scripts/platform-cutover.sh"
+    "platform:cutover": "bash scripts/platform-cutover.sh",
+    "verify:tip-smoke:cookie": "node scripts/smoke-tip-with-cookie.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

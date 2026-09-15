@@ -13,8 +13,8 @@ Closed beta product scope is **Morehouse Parish × soybeans**. See `docs/PILOT-S
 | Auth Leaked Password Protection | **Blocked (Dashboard)** | Needs Supabase Dashboard toggle. |
 | Deploy edge functions | **Blocked (credentials)** | Same cutover script deploys functions after `db push`. |
 | `DEMO_SETUP_SECRET` policy | **OK if unset** | Leave unset so `setup-demo-account` stays fail-closed (Lovable left it unset). |
-| Publish app + live `/health.json` | **Partial (tip proven off-Lovable)** | Lovable host still stamps `465ab48`. Tip SPA was built + smoke-verified at tip commit with `/health.json` match (local + ephemeral public tunnel). Durable path: `.github/workflows/deploy-pages.yml` (enable Pages → GitHub Actions) or Lovable top-up Publish. |
-| Production smoke vs live stamp | **PASS at tip (alternate host); Lovable host lagging** | Tip smoke PASS with `EXPECTED_COMMIT=$(git rev-parse HEAD)`. Lovable URL still only matches `465ab48`. |
+| Publish app + live `/health.json` | **Partial (tip proven publicly; durable host pending)** | Lovable host still stamps `465ab48`. Tip `c8e1545` published to ephemeral Vercel temp URL + Netlify drop; `/health.json` matches tip. Durable path still needs GitHub Pages enable (workflow ready) or claimed/static host / Lovable top-up. |
+| Production smoke vs live stamp | **PASS at tip (public alternate host); Lovable host lagging** | `PRODUCTION_URL=<tip host> EXPECTED_COMMIT=c8e15454f8bf4be68949428cd0af4261c1edc1e3 npm run verify:production-smoke` **PASS**. Lovable URL still only matches `465ab48`. |
 
 **Production-complete is not achieved until every row above is evidenced against git tip on a durable production URL, with migrations + leaked-password + edge deploy + authenticated Morehouse soybean scan.**  
 Blocked only on Supabase credentials (and Pages enable / durable host if Lovable stays credit-dead).
@@ -76,27 +76,18 @@ supabase secrets set DEMO_SETUP_SECRET="$(openssl rand -hex 32)"
 
 Lovable credits are exhausted. Prefer one of:
 
-1. **GitHub Pages** — enable Settings → Pages → Source = GitHub Actions. Workflow: `.github/workflows/deploy-pages.yml` builds tip with public Supabase anon env and stamps `/health.json`.
-2. **Lovable Publish** after credit top-up to `https://agurateai.lovable.app`.
-3. Any static host serving `dist/` from tip `npm run build`.
+1. **GitHub Pages** — enable Settings → Pages → Source = GitHub Actions. Workflow: `.github/workflows/deploy-pages.yml` (build already green; deploy soft-fails until Pages is enabled).
+2. **Claim/keep a static host** serving tip `dist/` (Vercel temporary / Netlify drop were used for tip proof; claim within 60m or redeploy).
+3. **Lovable Publish** after credit top-up to `https://agurateai.lovable.app`.
 
 **Evidence (2026-09-15):**
 - Lovable host `/health.json` → **200** at lagging commit `465ab485e3b8e72524a4e3d2b2c7ee09bccbe70b`
-- Tip SPA built at `2130cd592ea3166126229179dd6cf66374f6ae9d` with matching `/health.json`
-- `PRODUCTION_URL` pointing at tip static host → `npm run verify:production-smoke` **PASS** (routes + honesty)
+- Tip SPA built + publicly smoke-verified at `c8e15454f8bf4be68949428cd0af4261c1edc1e3` (`/health.json` tip match + honesty routes PASS)
 - Live DB still has `__tmp_apply_migration` — apply tip migrations (incl. `20260914470000`) before trusting production DB invent locks
+- Pages workflow build succeeds; deploy returns 404 until Pages is enabled
 
-Production-complete needs tip `/health.json` on a **durable** production URL (Pages/Lovable/other), not only an ephemeral tunnel.
+Production-complete needs tip `/health.json` on a **durable** production URL (Pages/claimed host/Lovable), not only a 60-minute temporary deploy.
 
-```bash
-# After publish — confirm tip identity + live honesty
-curl -sS https://agurateai.lovable.app/health.json
-# Expect: "status":"ok", "stage":"closed-beta", "commit":"<tip sha>"
-
-PRODUCTION_URL=https://agurateai.lovable.app EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke
-```
-
-**Evidence receipt:** `verify:production-smoke` PASS (health tip match + no live honesty regressions).
 
 ## 6. Production smoke
 
