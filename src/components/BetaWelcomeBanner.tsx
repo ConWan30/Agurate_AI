@@ -66,11 +66,10 @@ export function BetaWelcomeBanner() {
       <AlertDescription className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <p className="font-medium text-sm">
-            🎉 Welcome to the AgurateAI Beta Program!
+            Welcome to AgurateAI
           </p>
           <p className="text-xs text-muted-foreground">
-            You're in the Louisiana closed beta with free access during the beta period.
-            Your feedback shapes the future of precision agriculture. A possible discount off the published plan rate may be offered when paid plans launch — not guaranteed; confirm in-app.
+            AgurateAI is publicly accessible as an agricultural decision aid. Your feedback helps improve the product, but crop observations are not diagnoses or guaranteed outcomes.
           </p>
         </div>
         <Button

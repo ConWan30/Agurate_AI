@@ -19,12 +19,11 @@ test.describe('Critical User Flows - Phase 1 Verification', () => {
     await expect(page.getByRole('heading', { name: /Welcome to Your Farm Dashboard/i })).toBeVisible({ timeout: 10000 });
   });
 
-  test('Delta Intelligence page loads', async ({ page }) => {
+  test('Retired assistant route is deferred from the active product', async ({ page }) => {
     await page.goto('/demo/delta');
     await expect(page).toHaveURL(/.*demo\/delta/);
-    
-    // Check for Delta Intelligence UI - use specific heading
-    await expect(page.getByRole('heading', { name: /Delta Intelligence AI/i })).toBeVisible({ timeout: 10000 });
+
+    await expect(page.getByRole('heading', { name: /Not in the active public toolset/i })).toBeVisible({ timeout: 10000 });
   });
 
   test('Upload page is accessible', async ({ page }) => {

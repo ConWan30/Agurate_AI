@@ -77,7 +77,7 @@ await check('/health.json', (res, text, url) => {
   }
   const status = json.status ?? json.state;
   if (status !== 'ok') throw new Error(`status=${status} (expected ok)`);
-  if (json.stage !== 'closed-beta') throw new Error(`stage=${json.stage} (expected closed-beta)`);
+  if (json.stage !== 'public') throw new Error(`stage=${json.stage} (expected public)`);
   if (!json.commit || json.commit === 'unknown') {
     throw new Error(`commit missing/unknown (got ${json.commit})`);
   }

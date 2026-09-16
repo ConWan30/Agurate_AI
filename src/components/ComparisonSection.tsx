@@ -24,10 +24,10 @@ export const ComparisonSection = memo(function ComparisonSection() {
       description: "Guidance framed around public LSU AgCenter research (not an official partnership)"
     },
     {
-      feature: "On-demand AI Advisor",
+      feature: "Evidence-Bound Scope",
       agurate: true,
       traditional: false,
-      description: "Delta Intelligence chat vs. office hours"
+      description: "Retired chatbot surfaces stay deferred instead of promoted as active product"
     },
     {
       feature: "Honest Pilot Scope",
@@ -54,10 +54,10 @@ export const ComparisonSection = memo(function ComparisonSection() {
       description: "Works in the field, not just office"
     },
     {
-      feature: "Cost",
-      agurate: "Free Beta",
+      feature: "Access",
+      agurate: "Public",
       traditional: "$$$",
-      description: "Free closed-beta access during beta"
+      description: "Account access through normal authentication"
     }
   ];
 

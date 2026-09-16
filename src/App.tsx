@@ -32,7 +32,6 @@ const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const Insurance = lazy(() => import("./pages/Insurance"));
 const Cooperatives = lazy(() => import("./pages/Cooperatives"));
 const CooperativeJoin = lazy(() => import("./pages/CooperativeJoin"));
-const DeltaIntelligence = lazy(() => import("./pages/DeltaIntelligence"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Install = lazy(() => import("./pages/Install"));
 const Analytics = lazy(() => import("./pages/Analytics"));
@@ -212,8 +211,8 @@ const App = () => (
           <Route path="/insurance" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           <Route path="/cooperatives" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           <Route path="/cooperatives/join/:code" element={<ProtectedRoute><PilotDeferred /></ProtectedRoute>} />
-          <Route path="/delta" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
-          <Route path="/delta-intelligence" element={<ProtectedRoute><Layout><DeltaIntelligence /></Layout></ProtectedRoute>} />
+          <Route path="/delta" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
+          <Route path="/delta-intelligence" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           <Route path="/lsu-researchers" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
           <Route path="/conservation-practices" element={<ProtectedRoute><Layout><PilotDeferred /></Layout></ProtectedRoute>} />
@@ -239,11 +238,11 @@ const App = () => (
               <Route path="/demo/how-it-works" element={<Layout><HowItWorks /></Layout>} />
               <Route path="/demo/insurance" element={<Layout><Insurance /></Layout>} />
               <Route path="/demo/cooperatives" element={<Layout><Cooperatives /></Layout>} />
-              <Route path="/demo/delta" element={<Layout><DeltaIntelligence /></Layout>} />
-              <Route path="/demo/delta-intelligence" element={<Layout><DeltaIntelligence /></Layout>} />
-              <Route path="/demo/delta-ai" element={<Layout><DeltaIntelligence /></Layout>} />
-              <Route path="/demo/chat" element={<Layout><DeltaIntelligence /></Layout>} />
-              <Route path="/demo/ai-chat" element={<Layout><DeltaIntelligence /></Layout>} />
+              <Route path="/demo/delta" element={<Layout><PilotDeferred /></Layout>} />
+              <Route path="/demo/delta-intelligence" element={<Layout><PilotDeferred /></Layout>} />
+              <Route path="/demo/delta-ai" element={<Layout><PilotDeferred /></Layout>} />
+              <Route path="/demo/chat" element={<Layout><PilotDeferred /></Layout>} />
+              <Route path="/demo/ai-chat" element={<Layout><PilotDeferred /></Layout>} />
               <Route path="/demo/predict" element={<Layout><Predictions /></Layout>} />
               <Route path="/demo/stress-predictions" element={<Layout><Predictions /></Layout>} />
               <Route path="/demo/analytics" element={<Layout><Analytics /></Layout>} />

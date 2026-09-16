@@ -179,7 +179,7 @@ export default function Insurance() {
       
       queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
       toast.success('🎉 Insurance claim created successfully!', {
-        description: 'Delta Intelligence made it easy for you.'
+        description: 'The assistant made documentation easier.'
       });
       setConversationalOpen(false);
     } catch (error: unknown) {
@@ -242,7 +242,7 @@ export default function Insurance() {
               <DialogTrigger asChild>
                 <Button variant="default" size="lg" className="gap-2 hidden md:flex">
                   <Sparkles className="h-4 w-4" />
-                  Create Claim with Delta AI
+                  Create Claim with Assistant
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] p-0" hideCloseButton>
@@ -261,7 +261,7 @@ export default function Insurance() {
         <div className="md:hidden">
           <Button onClick={() => setConversationalOpen(true)} className="w-full gap-2" size="lg">
             <Sparkles className="h-4 w-4" />
-            Create Claim with Delta AI
+            Create Claim with Assistant
           </Button>
         </div>
 

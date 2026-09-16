@@ -8,7 +8,7 @@ const pages = [
   },
   {
     path: '/beta-signup',
-    mustInclude: [/Closed beta|Louisiana Delta|research framing/i],
+    mustInclude: [/Research-informed|LSU AgCenter research|Create an account/i],
     mustExclude: [/95% AI Accuracy/i, /Trusted by Louisiana Farmers/i],
   },
   {
@@ -25,7 +25,7 @@ const pages = [
 
 test.describe('Public honesty smoke', () => {
   for (const pageCheck of pages) {
-    test(`${pageCheck.path} keeps closed-beta honesty copy`, async ({ page }) => {
+    test(`${pageCheck.path} keeps public decision-aid honesty copy`, async ({ page }) => {
       await page.goto(pageCheck.path);
       await page.waitForLoadState('networkidle');
       const text = await page.locator('body').innerText();
@@ -48,7 +48,7 @@ test.describe('Public honesty smoke', () => {
     const health = await request.get('/health.json');
     const body = await health.json();
     expect(body.status).toBe('ok');
-    expect(body.stage).toBe('closed-beta');
+    expect(body.stage).toBe('public');
     expect(typeof body.commit).toBe('string');
     expect(body.commit.length).toBeGreaterThan(6);
   });

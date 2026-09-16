@@ -9,7 +9,7 @@ import {
 import { Sprout } from 'lucide-react';
 
 /**
- * Honest holding page for modules parked during the Morehouse soybean pilot.
+ * Honest holding page for modules outside the public evidence-bound core.
  * Keeps routes from looking like a full precision-ag suite before validation.
  */
 export default function PilotDeferred() {
@@ -20,16 +20,17 @@ export default function PilotDeferred() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
             <Sprout className="h-6 w-6 text-primary" aria-hidden="true" />
           </div>
-          <CardTitle className="text-2xl font-display">Parked for the pilot</CardTitle>
+          <CardTitle className="text-2xl font-display">Not in the active public toolset</CardTitle>
           <CardDescription className="text-base text-foreground/80">
             {PILOT_SCOPE_SUMMARY}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            This screen is deferred while we validate {PILOT_CROP_LABEL.toLowerCase()} scans in{' '}
-            {PILOT_PARISH_LABEL}. Core pilot tools remain: photo upload/scanner, fields, map,
-            weather timeline, history, and Delta chat as a research aid — not a diagnosis.
+            This screen is deferred while AgurateAI keeps crop-analysis claims bounded by evidence.
+            Public access does not mean every crop, geography, feature, or outcome has been validated.
+            Current analysis evidence remains strongest for {PILOT_CROP_LABEL.toLowerCase()} observations in{' '}
+            {PILOT_PARISH_LABEL}; use AgurateAI as a decision aid, not a diagnosis.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild>

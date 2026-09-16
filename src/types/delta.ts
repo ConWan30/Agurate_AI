@@ -1,6 +1,6 @@
 /**
  * Delta Intelligence Type Definitions
- * Types for Delta Intelligence AI chat and conversations
+ * Legacy assistant chat and conversation types
  */
 
 export interface DeltaMessage {

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('TypeScript Type Safety Verification', () => {
-  test('Unified AI Intelligence functions work without errors', async ({ page }) => {
+  test('Retired Delta route renders deferred page without type errors', async ({ page }) => {
     const errors: string[] = [];
     
     page.on('console', (msg) => {
@@ -34,13 +34,12 @@ test.describe('TypeScript Type Safety Verification', () => {
     expect(typeErrors.length).toBe(0);
   });
 
-  test('Delta Intelligence chat interface is functional', async ({ page }) => {
+  test('Retired assistant chat interface is not active', async ({ page }) => {
     await page.goto('/demo/delta');
     await page.waitForLoadState('networkidle', { timeout: 30000 });
 
-    // Check if chat input exists
-    const chatInput = page.locator('textarea, input[type="text"]').first();
-    await expect(chatInput).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /Not in the active public toolset/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('textarea')).toHaveCount(0);
   });
 
   test('No runtime type errors on dashboard', async ({ page }) => {

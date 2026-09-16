@@ -370,7 +370,7 @@ export default function Fields() {
             <DialogTrigger asChild>
               <Button variant="default" size="lg" className="gap-2 hidden md:flex">
                 <Sparkles className="h-4 w-4" />
-                Add Field with Delta AI
+                Add Field with Assistant
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] p-0" hideCloseButton>
@@ -415,7 +415,7 @@ export default function Fields() {
           <DialogTrigger asChild>
             <Button className="w-full gap-2" size="lg">
               <Sparkles className="h-4 w-4" />
-              Add Field with Delta AI
+              Add Field with Assistant
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-full max-h-[90vh] p-0 m-4" hideCloseButton>

@@ -150,7 +150,7 @@ export default function ConservationPractices() {
       <TutorialTooltip
         steps={[
           { id: "welcome", title: "Conservation Practices", content: "Document conservation practices as a USDA records aid (not a compliance guarantee) and track ROI notes", position: "bottom" },
-          { id: "delta-ai", title: "Delta AI Assistant", content: "Use conversational form for easy documentation of your practices", position: "bottom" },
+          { id: "field-assistant", title: "Field Assistant", content: "Use conversational form for easy documentation of your practices", position: "bottom" },
           { id: "predictions", title: "Predictive Analytics", content: "Review planning indexes and environmental notes for conservation — not guaranteed dollar forecasts", position: "bottom" },
           { id: "field-tracking", title: "Field-by-Field", content: "Monitor practices and performance for each field independently", position: "bottom" }
         ]}
@@ -174,7 +174,7 @@ export default function ConservationPractices() {
             aria-label="Document conservation practices with AI assistant"
           >
             <Sprout className="mr-2 h-5 w-5" aria-hidden="true" />
-            Document Practices with Delta AI
+            Document Practices with Assistant
           </Button>
         </div>
       </div>

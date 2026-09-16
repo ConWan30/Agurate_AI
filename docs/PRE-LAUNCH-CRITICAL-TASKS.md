@@ -4,7 +4,7 @@ Last updated: 2026-09-14
 
 ## Current status
 
-In-repo production hardening for closed beta is largely complete on branch
+In-repo production hardening for public access is largely complete on branch
 `cursor/launch-readiness-honesty-38b2`. Remaining blockers are **platform**
 actions (credentials required), not dashboard code edits.
 
@@ -56,7 +56,7 @@ See also: `docs/PRODUCTION-SHIPPING-CHECKLIST.md` and `docs/OPERATOR-PLATFORM-HA
 
 ## Recently closed in-repo (do not re-open as dashboard edits)
 
-- Honest closed-beta marketing + static honesty CI gate
+- Honest public-access marketing + static honesty CI gate
 - Shared edge auth (`requireAuthenticatedUser`) + Deno `check:edge`
 - Open `System can … WITH CHECK (true)` write policies locked down
 - `critical_alerts` Jan/Nov schema reconcile + owned acknowledge RPC

@@ -17,7 +17,7 @@ function healthPayload() {
   return {
     status: "ok",
     service: "agurateai",
-    stage: "closed-beta",
+    stage: "public",
     commit: git("git rev-parse HEAD") ?? process.env.GITHUB_SHA ?? "unknown",
     commitShort:
       git("git rev-parse --short HEAD") ??
