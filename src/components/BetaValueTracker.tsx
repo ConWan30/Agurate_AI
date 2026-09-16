@@ -38,7 +38,7 @@ export function BetaValueTracker() {
           Your AgurateAI Activity
         </CardTitle>
         <CardDescription>
-          Usage counts during closed beta — not dollar savings
+          Usage counts for your account — not dollar savings
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

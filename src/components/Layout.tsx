@@ -10,7 +10,6 @@ import {
   LogOut,
   Sprout,
   Lightbulb,
-  Brain,
   Scan,
   Cloud
 } from "lucide-react";
@@ -53,9 +52,7 @@ export const Layout = ({ children }: LayoutProps) => {
     { icon: Cloud, label: "Weather Timeline", path: "/weather-timeline", accentIcon: Cloud, gradient: "from-cyan-500/10 to-blue-600/10" },
   ].filter((item) => !isPilotDeferredPath(item.path));
 
-  const businessItems = [
-    { icon: Brain, label: "Delta AI", path: "/delta", accentIcon: Brain, gradient: "from-violet-500/10 to-purple-600/10" },
-  ].filter((item) => !isPilotDeferredPath(item.path));
+  const businessItems: typeof commandCenterItems = [];
 
   const enhancedItems: typeof businessItems = [];
 
@@ -108,7 +105,7 @@ export const Layout = ({ children }: LayoutProps) => {
             <nav className="space-y-2 sticky top-24">
               <div className="mb-6 pb-6 border-b border-border">
                 <h2 className="text-sm font-bold text-muted-foreground mb-1">FARM MANAGEMENT</h2>
-                <p className="text-xs text-muted-foreground">Morehouse Parish · Soybean pilot</p>
+                <p className="text-xs text-muted-foreground">Public access · Morehouse soybean evidence bound</p>
               </div>
               
               {navItems.map((item) => {
@@ -183,6 +180,7 @@ export const Layout = ({ children }: LayoutProps) => {
               </div>
 
               {/* Business Tools Section */}
+              {businessItems.length > 0 && (
               <div className="mt-8 pt-6 border-t border-border">
                 <h2 className="text-sm font-bold text-muted-foreground mb-4">BUSINESS TOOLS</h2>
                 <div className="space-y-2">
@@ -217,6 +215,7 @@ export const Layout = ({ children }: LayoutProps) => {
                   })}
                 </div>
               </div>
+              )}
 
               {/* Enhanced Features Section — empty during Morehouse soybean pilot */}
               {enhancedItems.length > 0 && (
@@ -275,7 +274,7 @@ export const Layout = ({ children }: LayoutProps) => {
             <div className="flex flex-wrap justify-center gap-4">
               <Link to="/beta-signup">
                 <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
-                  🌾 Join Beta Program
+                  Create account
                 </Button>
               </Link>
               <Link to="/how-it-works">

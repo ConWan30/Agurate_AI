@@ -102,10 +102,10 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             <Sparkles className="h-10 w-10" />
           </div>
           <h2 className="text-4xl font-heading font-bold text-foreground mb-2">
-            Welcome to AgurateAI Beta! 🎉
+            Welcome to AgurateAI
           </h2>
           <p className="text-xl text-muted-foreground">
-            You're Beta Farmer #{betaCount}
+            Account access is open
           </p>
         </div>
 
@@ -121,9 +121,9 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             <div className="flex items-start gap-3">
               <CheckCircle className="h-6 w-6 text-health-good flex-shrink-0 mt-1" />
               <div>
-                <p className="font-semibold text-foreground">Closed-beta free access</p>
+                <p className="font-semibold text-foreground">Public account access</p>
                 <p className="text-sm text-muted-foreground">
-                  Core features available at no charge while closed beta is open
+                  Core decision-aid features are available without beta enrollment
                 </p>
               </div>
             </div>
@@ -160,7 +160,7 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
         {/* Expectations */}
         <Card className="mb-6 border-primary/20">
           <CardHeader>
-            <CardTitle className="text-lg">What to Expect During Beta</CardTitle>
+          <CardTitle className="text-lg">What to Expect</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="flex items-start gap-2">
@@ -173,11 +173,11 @@ export function BetaWelcomeFlow({ userId, onComplete }: BetaWelcomeFlowProps) {
             </p>
             <p className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>New features may be added during beta</span>
+              <span>New features may be added as evidence and operations mature</span>
             </p>
             <p className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Beta ends when we reach 100 farmers or graduate to a public launch</span>
+              <span>Public access does not mean universal field validation</span>
             </p>
           </CardContent>
         </Card>

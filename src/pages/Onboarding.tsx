@@ -230,7 +230,7 @@ export default function Onboarding() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Have a conversation with Delta Intelligence to set up your farm profile. 
+                    Have a conversation with the field assistant to set up your farm profile.
                     Fast, natural, and personalized.
                   </p>
                   <ul className="space-y-2 text-sm">
@@ -295,7 +295,7 @@ export default function Onboarding() {
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center p-4">
         <div className="w-full max-w-4xl">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2">Quick Setup with Delta Intelligence 🌾</h1>
+            <h1 className="text-4xl font-bold mb-2">Quick Setup with Field Assistant</h1>
             <p className="text-lg text-muted-foreground">
               Let's have a conversation to set up your farm profile
             </p>

@@ -86,7 +86,7 @@ export default function MobileDrawerNav({ navItems, commandCenterItems, business
                 Agurate<span className="text-green-600">AI</span>
               </div>
               <div className="text-xs text-muted-foreground font-normal">
-                Louisiana Delta · Closed beta
+                Public agricultural decision aid
               </div>
             </div>
           </SheetTitle>

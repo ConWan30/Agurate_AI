@@ -8,11 +8,11 @@ import { CommunityInsightsCard } from '@/components/CommunityInsightsCard';
 import { BestPractice } from '@/types/enhanced-features';
 
 describe('launch honesty copy', () => {
-  it('shows closed-beta trust framing without fabricated validation claims', () => {
+  it('shows public decision-aid trust framing without fabricated validation claims', () => {
     render(<TrustIndicators variant="compact" />);
 
     expect(screen.getByText(/Informed by LSU AgCenter research/i)).toBeInTheDocument();
-    expect(screen.getByText(/Seeking first 100 beta partners/i)).toBeInTheDocument();
+    expect(screen.getByText(/Public agricultural decision aid/i)).toBeInTheDocument();
     expect(screen.queryByText(/LSU Validated/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/95%/i)).not.toBeInTheDocument();
   });

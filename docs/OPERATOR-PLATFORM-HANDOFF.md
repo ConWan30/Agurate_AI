@@ -2,7 +2,7 @@
 
 ## Pilot wedge (in-repo)
 
-Closed beta product scope is **Morehouse Parish × soybeans**. See `docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md`. Unvalidated suite modules route to `PilotDeferred`.
+Public product access is open, while crop-analysis evidence remains bounded to **Morehouse Parish x soybeans**. See docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md. Unvalidated suite modules route to PilotDeferred.
 
 ## Status (in-repo vs production-complete)
 
@@ -88,7 +88,7 @@ Until Publish ships this tip, production smoke remains failed.
 ```bash
 # After publish — confirm tip identity + live honesty
 curl -sS https://agurateai.lovable.app/health.json
-# Expect: "status":"ok", "stage":"closed-beta", "commit":"<tip sha>"
+# Expect: "status":"ok", "stage":"public", "commit":"<tip sha>"
 
 PRODUCTION_URL=https://agurateai.lovable.app EXPECTED_COMMIT=$(git rev-parse HEAD) npm run verify:production-smoke
 ```
@@ -101,11 +101,11 @@ On the live URL, confirm:
 
 | Route | Expect |
 |-------|--------|
-| `/` | Closed-beta framing; no fabricated accuracy / fake LSU partnership |
-| `/beta-signup` | Signup form loads |
+| / | Public decision-aid framing; no fabricated accuracy / fake LSU partnership |
+| /beta-signup | Redirects to normal account access |
 | `/auth` | Auth loads |
 | `/how-it-works` | Honest capability copy |
-| `/health.json` | `status=ok`, `stage=closed-beta`, `commit` equals published tip SHA |
+| /health.json | status=ok, stage=public, commit equals published tip SHA |
 
 Automated helper (public routes + health tip match + live honesty phrase checks):
 

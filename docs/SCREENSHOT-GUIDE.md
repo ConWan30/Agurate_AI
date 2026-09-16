@@ -163,7 +163,7 @@ All pages are accessible via `/demo/[page-name]` routes without authentication, 
 
 ---
 
-### 12. Delta Intelligence - `/demo/delta-intelligence`
+### 12. Retired Assistant Route - `/demo/delta-intelligence`
 **What it shows:**
 - AI chat assistant interface
 - Expert agricultural advice
@@ -246,7 +246,7 @@ docs/screenshots/
 2. **History** - Demonstrates AI diagnostic accuracy and variety
 3. **Field Map** - Shows scale and geographic coverage
 4. **Upload** - Emphasizes ease of use for farmers
-5. **Delta Intelligence** - Highlights cutting-edge AI assistance
+5. **Retired Assistant Route** - Verifies deferred product framing
 
 ## Best Practices
 

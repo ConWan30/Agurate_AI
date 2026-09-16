@@ -4,9 +4,9 @@ Last updated: 2026-09-14
 
 ## Code gates (repo)
 
-- [x] Honest closed-beta marketing copy
+- [x] Honest public decision-aid copy
 - [x] Soften unverified ROI / offline / instant-diagnosis claims
-- [x] SEO/Open Graph/JSON-LD closed-beta metadata
+- [x] SEO/Open Graph/JSON-LD public-access metadata
 - [x] View `security_invoker` migration committed
 - [x] PeerComparisonCard aligned to current RPC + real `fieldId`
 - [x] Env fail-fast for required Supabase vars
@@ -107,7 +107,7 @@ Last updated: 2026-09-14
 - [x] Persist durable `crop-images` storage paths (not ephemeral signed URLs) on assessments
 - [x] Image history comparison fail-closed (no invented visual comparison on edge failure)
 - [x] Daily briefing fail-closed (no invented spray windows / soft priorities)
-- [x] Bug reports + Delta chat persist storage paths (not 1h signed URLs)
+- [x] Bug reports + retired chatbot persist storage paths (not 1h signed URLs)
 - [x] Daily briefing omits invented 0% health / parish-default weather when data missing
 - [x] Predictive-question fallbacks refuse stress narratives without a real health score
 - [x] Analytics/variety recs do not treat null health as 0 or invent yield from health×factor
@@ -148,7 +148,7 @@ See `docs/OPERATOR-PLATFORM-HANDOFF.md` for exact commands.
 
 1. Green CI/local `npm run verify:local-gates` (typecheck + unit tests + honesty static + edge check + build + honesty e2e) — **PASS on tip of `cursor/launch-readiness-honesty-38b2`** (confirm SHA with `git rev-parse HEAD` / live `/health.json`)
 2. Migration applied confirmation in Supabase through `20260914460000_scrub_weather_events_gps_catalog` — **pending credentials**
-3. Live production URL showing honest closed-beta copy — **pending publish**
+3. Live production URL showing honest public decision-aid copy — **pending publish**
 4. Auth + one authenticated scan path working on production — **pending publish**
 
 In-repo honesty/security residuals closed on this tip batch (weather_events GPS scrub + silent-write fail-closed on claim/coop ack; APPLICATION-PAGES demo/LSU invent scrub; WeatherTimeline 0" precip honesty; recommend-varieties binds variety from field columns; conservation ignores client history/weather; predict-stress uses real water_stress_events + community_insights; unified vision fail-closes score validation before pool write; success/peer cost CHECKs, recommendation UPDATE freeze, Predictions unknown-risk honesty, local honesty e2e gate, yield/canopy CHECKs, feedback assessment RLS, event_type allowlist, bug_report status freeze, acreage CHECK, claim loss CHECK, expert priority freeze, form completed@100%, field_uniformity scale honesty, alert-ack ownership lock, conversation_memory INSERT drop, unknown stress no longer invents severe, critical-alert UPDATE freeze, claim↔assessment field match, peer effectiveness CHECK, claim INSERT status lock, coop-alert member INSERT drop, claim UPDATE/invitation freeze, disease/pest empty≠unknown, nutrient null≠none, NaN loss guards, SMS badge removed, health.json tip-stamp CI/local assert). Production-complete remains blocked on platform gates above (see `docs/OPERATOR-PLATFORM-HANDOFF.md`).

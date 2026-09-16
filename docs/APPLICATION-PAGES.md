@@ -2,7 +2,7 @@
 
 ## Overview
 
-AgurateAI is a closed-beta precision agriculture decision aid for Louisiana Delta farmers. The application features a responsive web interface with mobile-first design and AI analysis framed around publicly available LSU AgCenter research — AgurateAI is not an official LSU partner.
+AgurateAI is a public-access precision agriculture decision aid for Louisiana Delta farmers. The application features a responsive web interface with mobile-first design and AI analysis framed around publicly available LSU AgCenter research — AgurateAI is not an official LSU partner.
 
 **Navigation Structure:**
 - Bottom navigation bar (mobile)
@@ -29,7 +29,7 @@ Local screenshot tooling may use these routes with whatever data the signed-in o
 - `/demo/history` - Assessment history
 - `/demo/predictions` - Stress forecasts (when recorded)
 - `/demo/weather-timeline` - Weather and health timeline
-- `/demo/delta` - Delta Intelligence AI chatbot
+- `/demo/delta` - retired assistant route, deferred from the active product
 - `/demo/insurance` - Insurance claims management
 - `/demo/cooperatives` - Cooperative management system
 - `/demo/profile` - User profile settings
@@ -39,7 +39,7 @@ Local screenshot tooling may use these routes with whatever data the signed-in o
 - **Dashboard**: Quick Actions, Business Tools, field overview, recent assessments
 - **Fields**: Field cards with crop type and acreage when recorded
 - **History**: Health scores when recorded (never invent missing scores)
-- **Delta AI**: Farming advisor chatbot framed around public LSU AgCenter research (not an official LSU-trained product)
+- **Field assistant**: Farming advisor chatbot framed around public LSU AgCenter research (not an official LSU-trained product)
 - **Scanner**: Mobile camera interface
 - **How It Works**: AI pipeline overview
 
@@ -449,9 +449,9 @@ AI-powered predictive analytics for crop stress forecasting over next 7 days.
 
 ## Protected Pages - AI Intelligence
 
-### Delta Intelligence
+### Retired Assistant Route
 **Route:** `/delta`  
-**Component:** `src/pages/DeltaIntelligence.tsx`
+**Component:** `src/pages/DeltaIntelligence.tsx` (legacy code; public routes defer from active product)
 
 **Purpose:**  
 AI-powered farming advisor framed around publicly available LSU AgCenter research and Louisiana Delta context. Not an official LSU product or partnership.
@@ -806,7 +806,7 @@ Platform tutorial and feature explanation page for new users.
 **Business Tools:**
 - Insurance
 - Cooperatives
-- Delta Intelligence
+- Retired assistant route
 
 **User:**
 - Profile
@@ -1002,4 +1002,4 @@ Quick access to primary actions on mobile devices.
 **Document Version:** 1.1  
 **Last Updated:** 2026  
 **Maintained By:** AgurateAI Development Team  
-**For Questions:** Contact the AgurateAI closed-beta operators (not an LSU partnership desk)
+**For Questions:** Contact the AgurateAI public-access operators (not an LSU partnership desk)

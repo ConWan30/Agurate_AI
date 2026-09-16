@@ -199,7 +199,7 @@ export default function Profile() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>
-              AgurateAI helps Louisiana Delta farmers monitor crop health using AI-powered image analysis (closed beta).
+              AgurateAI helps Louisiana Delta farmers review crop observations with AI-assisted image analysis as a public decision aid, not a diagnosis.
             </p>
             <p className="pt-2">
               <strong>Supported Crops:</strong> Rice, Soybean, Cotton, Corn

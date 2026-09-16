@@ -51,7 +51,7 @@ export default function Tutorials() {
     },
     {
       id: 'delta-chat',
-      title: "Delta Intelligence Chat",
+      title: "Field Assistant",
       description: "Get the most from your AI agricultural advisor",
       duration: "4 minutes",
       category: "Core Features",

@@ -6,30 +6,19 @@ test.describe('Phase 3 Features - Verification', () => {
   });
 
   test.describe('Simplified Language Mode', () => {
-    test('Language toggle appears in Delta Intelligence', async ({ page }) => {
+    test('Retired Delta route renders deferred page', async ({ page }) => {
       await page.goto('/demo/delta');
       await page.waitForLoadState('networkidle');
-      
-      // Look for language toggle button
-      const languageButton = page.locator('button[title*="language" i]').or(page.locator('button:has(svg)')).first();
-      const buttonExists = await languageButton.isVisible({ timeout: 5000 }).catch(() => false);
-      
-      // Test passes if page loads - button may or may not be visible depending on implementation
-      expect(true).toBe(true);
+
+      await expect(page.getByRole('heading', { name: /Not in the active public toolset/i })).toBeVisible({ timeout: 10000 });
     });
 
-    test('Delta Intelligence chat loads with new features', async ({ page }) => {
+    test('Retired assistant route stays inactive', async ({ page }) => {
       await page.goto('/demo/delta');
       await page.waitForLoadState('networkidle');
-      
-      // Check if URL is correct
-      const urlMatches = page.url().includes('/delta');
-      
-      // Check for any content on the page
-      const hasContent = await page.locator('body').count().then(count => count > 0).catch(() => false);
-      
-      // Test passes if we navigated to the delta page
-      expect(urlMatches || hasContent).toBe(true);
+
+      await expect(page).toHaveURL(/.*demo\/delta/);
+      await expect(page.locator('textarea')).toHaveCount(0);
     });
   });
 
@@ -126,16 +115,11 @@ test.describe('Phase 3 Features - Verification', () => {
   });
 
   test.describe('Voice Response Mode', () => {
-    test('Voice controls appear in Delta Intelligence', async ({ page }) => {
+    test('Voice controls are not exposed on retired Delta route', async ({ page }) => {
       await page.goto('/demo/delta');
       await page.waitForLoadState('networkidle');
-      
-      // Look for voice-related buttons (may not be visible if TTS not supported)
-      const voiceButton = page.locator('button[title*="voice" i]').or(page.locator('button[title*="speak" i]')).first();
-      const buttonExists = await voiceButton.isVisible({ timeout: 5000 }).catch(() => false);
-      
-      // Test passes if page loads - voice controls may only show if TTS is supported
-      expect(true).toBe(true);
+
+      await expect(page.getByRole('heading', { name: /Not in the active public toolset/i })).toBeVisible({ timeout: 10000 });
     });
   });
 
@@ -184,7 +168,7 @@ test.describe('Phase 3 Features - Verification', () => {
       await page.goto('/demo/dashboard');
       await page.waitForLoadState('networkidle');
       
-      // Navigate to Delta Intelligence
+      // Navigate to retired Delta route
       await page.goto('/demo/delta');
       await expect(page).toHaveURL(/.*demo\/delta/, { timeout: 10000 });
       await page.waitForLoadState('networkidle');

@@ -143,7 +143,7 @@ export function BetaConversionBanner() {
             </div>
 
             <p className="text-xs text-muted-foreground">
-              💚 Thanks for being one of our first 100 beta farmers!
+              Thanks for helping improve AgurateAI as a public decision aid.
             </p>
           </div>
         </div>

@@ -114,7 +114,7 @@ export const PostFormFeedback = ({ sessionId, formType, onComplete }: PostFormFe
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="conversational" id="conversational" />
               <Label htmlFor="conversational" className="cursor-pointer">
-                Conversational (Delta AI) - More intuitive and helpful
+                Conversational assistant - More intuitive and helpful
               </Label>
             </div>
             <div className="flex items-center space-x-2">

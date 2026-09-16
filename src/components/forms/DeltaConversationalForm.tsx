@@ -198,7 +198,7 @@ export const DeltaConversationalForm = ({
             </div>
             <div>
               <CardTitle className="text-lg">{getFormTitle()}</CardTitle>
-              <p className="text-sm text-muted-foreground">Powered by Delta Intelligence</p>
+              <p className="text-sm text-muted-foreground">Powered by the AgurateAI field assistant</p>
             </div>
           </div>
           <Button
@@ -261,7 +261,7 @@ export const DeltaConversationalForm = ({
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
-                  <span className="text-sm">Delta Intelligence is thinking...</span>
+                  <span className="text-sm">The field assistant is thinking...</span>
                 </div>
               </div>
             </div>

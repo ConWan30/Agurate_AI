@@ -348,7 +348,7 @@ export default function HowItWorks() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Status:</span>
-                  <span className="font-semibold">Closed beta</span>
+                  <span className="font-semibold">Public</span>
                 </div>
               </CardContent>
             </Card>
@@ -385,7 +385,7 @@ export default function HowItWorks() {
             </Badge>
             <h2 className="text-4xl font-display font-bold">8 Game-Changing Features</h2>
             <p className="text-lg text-muted-foreground">
-              Every feature designed to save Louisiana Delta farmers time, money, and stress
+              Features are framed for practical field review without diagnosis or guaranteed savings claims
             </p>
           </div>
 

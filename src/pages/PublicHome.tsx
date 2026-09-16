@@ -13,8 +13,8 @@ const capabilities = [
   },
   {
     icon: Brain,
-    title: "Delta Intelligence",
-    description: "Explore field-aware questions with research-informed AI guidance while keeping uncertainty and source context visible.",
+    title: "Research-Framed Guidance",
+    description: "Review field-aware observations with uncertainty and source context visible.",
   },
   {
     icon: MapPin,

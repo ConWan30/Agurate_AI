@@ -20,7 +20,7 @@ export function TrustIndicators({ variant = "full", className = "" }: TrustIndic
         </Badge>
         <Badge variant="outline" className="text-xs glass">
           <Users className="h-3 w-3 mr-1 text-primary" />
-          Seeking first 100 beta partners
+          Public agricultural decision aid
         </Badge>
       </div>
     );
@@ -73,8 +73,8 @@ export function TrustIndicators({ variant = "full", className = "" }: TrustIndic
           <Users className="h-6 w-6 text-primary-foreground" />
         </div>
         <div>
-          <p className="font-semibold text-sm">Closed beta</p>
-          <p className="text-xs text-muted-foreground">Closed-beta Delta farmers</p>
+          <p className="font-semibold text-sm">Public access</p>
+          <p className="text-xs text-muted-foreground">Evidence bounds stay visible</p>
         </div>
       </div>
 

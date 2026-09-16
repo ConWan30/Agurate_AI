@@ -320,7 +320,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
                   <p className="text-muted-foreground">Know what's coming before it damages your crops</p>
                 </div>
                 <div className="p-4 border rounded-lg">
-                  <p className="font-medium mb-1">💬 Delta Intelligence Chat</p>
+                  <p className="font-medium mb-1">Field assistant</p>
                   <p className="text-muted-foreground">On-demand Louisiana-specific agricultural advisor</p>
                 </div>
                 <div className="p-4 border rounded-lg">
