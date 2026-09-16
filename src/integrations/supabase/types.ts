@@ -269,6 +269,13 @@ export type Database = {
             referencedRelation: "lsu_researchers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "best_practices_network_lsu_researcher_id_fkey"
+            columns: ["lsu_researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       beta_feedback: {
@@ -992,7 +999,35 @@ export type Database = {
             referencedRelation: "lsu_researchers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dirt_referral_metrics_lsu_researcher_id_fkey"
+            columns: ["lsu_researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers_directory"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      edge_ip_rate_limits: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: number
+          ip_hash: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: number
+          ip_hash?: string
+        }
+        Relationships: []
       }
       expert_consultations: {
         Row: {
@@ -1070,6 +1105,13 @@ export type Database = {
             referencedRelation: "lsu_researchers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "expert_consultations_researcher_id_fkey"
+            columns: ["researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       farmer_researcher_interactions: {
@@ -1109,6 +1151,13 @@ export type Database = {
             columns: ["researcher_id"]
             isOneToOne: false
             referencedRelation: "lsu_researchers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "farmer_researcher_interactions_researcher_id_fkey"
+            columns: ["researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -1440,6 +1489,13 @@ export type Database = {
             referencedRelation: "lsu_researchers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lsu_publications_researcher_id_fkey"
+            columns: ["researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       lsu_researchers: {
@@ -1592,7 +1648,7 @@ export type Database = {
       predictive_models: {
         Row: {
           accuracy_score: number | null
-          confidence_score: number
+          confidence_score: number | null
           created_at: string | null
           field_id: string
           id: string
@@ -1603,7 +1659,7 @@ export type Database = {
         }
         Insert: {
           accuracy_score?: number | null
-          confidence_score: number
+          confidence_score?: number | null
           created_at?: string | null
           field_id: string
           id?: string
@@ -1614,7 +1670,7 @@ export type Database = {
         }
         Update: {
           accuracy_score?: number | null
-          confidence_score?: number
+          confidence_score?: number | null
           created_at?: string | null
           field_id?: string
           id?: string
@@ -1785,6 +1841,7 @@ export type Database = {
           allow_farm_name: boolean | null
           allow_name: boolean | null
           allow_public_use: boolean | null
+          approved: boolean
           assessment_id: string | null
           created_at: string | null
           estimated_savings: number | null
@@ -1800,6 +1857,7 @@ export type Database = {
           allow_farm_name?: boolean | null
           allow_name?: boolean | null
           allow_public_use?: boolean | null
+          approved?: boolean
           assessment_id?: string | null
           created_at?: string | null
           estimated_savings?: number | null
@@ -1815,6 +1873,7 @@ export type Database = {
           allow_farm_name?: boolean | null
           allow_name?: boolean | null
           allow_public_use?: boolean | null
+          approved?: boolean
           assessment_id?: string | null
           created_at?: string | null
           estimated_savings?: number | null
@@ -1960,13 +2019,20 @@ export type Database = {
             referencedRelation: "lsu_researchers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "variety_performance_metrics_lsu_researcher_id_fkey"
+            columns: ["lsu_researcher_id"]
+            isOneToOne: false
+            referencedRelation: "lsu_researchers_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       variety_recommendations: {
         Row: {
           created_at: string | null
           current_variety: string | null
-          expected_improvement: number
+          expected_improvement: number | null
           field_id: string
           id: string
           lsu_research_basis: string[]
@@ -1976,7 +2042,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           current_variety?: string | null
-          expected_improvement: number
+          expected_improvement?: number | null
           field_id: string
           id?: string
           lsu_research_basis: string[]
@@ -1986,7 +2052,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           current_variety?: string | null
-          expected_improvement?: number
+          expected_improvement?: number | null
           field_id?: string
           id?: string
           lsu_research_basis?: string[]
@@ -2129,7 +2195,6 @@ export type Database = {
           created_by_name: string | null
           crop_type: string | null
           field_id: string | null
-          field_name: string | null
           id: string | null
           message: string | null
           recommended_action: string | null
@@ -2198,6 +2263,36 @@ export type Database = {
           public_success_stories: number | null
           total_assessments: number | null
           total_signups: number | null
+        }
+        Relationships: []
+      }
+      lsu_researchers_directory: {
+        Row: {
+          availability: string | null
+          created_at: string | null
+          department: string | null
+          expertise: string[] | null
+          id: string | null
+          name: string | null
+          research_areas: string[] | null
+        }
+        Insert: {
+          availability?: string | null
+          created_at?: string | null
+          department?: string | null
+          expertise?: string[] | null
+          id?: string | null
+          name?: string | null
+          research_areas?: string[] | null
+        }
+        Update: {
+          availability?: string | null
+          created_at?: string | null
+          department?: string | null
+          expertise?: string[] | null
+          id?: string | null
+          name?: string | null
+          research_areas?: string[] | null
         }
         Relationships: []
       }
@@ -2272,7 +2367,6 @@ export type Database = {
       }
     }
     Functions: {
-      __tmp_apply_migration: { Args: { p_sql: string }; Returns: undefined }
       acknowledge_cooperative_alert: {
         Args: { alert_id: string }
         Returns: undefined
@@ -2282,7 +2376,7 @@ export type Database = {
         Returns: undefined
       }
       can_view_invitation: {
-        Args: { inv_id: string; user_id: string }
+        Args: { p_inv_id: string; p_user_id: string }
         Returns: boolean
       }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
@@ -2291,7 +2385,6 @@ export type Database = {
         Returns: {
           availability: string
           department: string
-          email: string
           expertise: string[]
           id: string
           name: string
@@ -2318,6 +2411,7 @@ export type Database = {
         Args: { p_crop_type: string; p_field_id: string; p_problem: string }
         Returns: {
           avg_effectiveness: number
+          farmer_count: number
           sample_size: number
           success_rate: number
           treatment_type: string
@@ -2330,6 +2424,14 @@ export type Database = {
       is_cooperative_member: {
         Args: { coop_id: string; user_id: string }
         Returns: boolean
+      }
+      mark_water_stress_dirt_clicked: {
+        Args: { event_id: string }
+        Returns: undefined
+      }
+      resolve_cooperative_alert: {
+        Args: { p_alert_id: string }
+        Returns: undefined
       }
     }
     Enums: {

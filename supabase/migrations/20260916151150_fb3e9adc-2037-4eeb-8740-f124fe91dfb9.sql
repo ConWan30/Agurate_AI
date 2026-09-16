@@ -1,0 +1,1 @@
+ALTER VIEW public.lsu_researchers_directory SET (security_invoker = true);
