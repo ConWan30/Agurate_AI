@@ -138,15 +138,9 @@ export default function Onboarding() {
         }
         if (extractedData.field_notes) fieldData.notes = String(extractedData.field_notes);
         
-        // Add variety based on crop type
-        if (normalizedCropType === 'rice' && extractedData.rice_variety) {
-          fieldData.rice_variety = String(extractedData.rice_variety);
-        } else if (normalizedCropType === 'soybean' && extractedData.soybean_variety) {
+        // This pilot accepts soybeans only.
+        if (extractedData.soybean_variety) {
           fieldData.soybean_variety = String(extractedData.soybean_variety);
-        } else if (normalizedCropType === 'cotton' && extractedData.cotton_variety) {
-          fieldData.cotton_variety = String(extractedData.cotton_variety);
-        } else if (normalizedCropType === 'corn' && extractedData.corn_hybrid) {
-          fieldData.corn_hybrid = String(extractedData.corn_hybrid);
         }
 
         const { data: newField, error: fieldError } = await supabase

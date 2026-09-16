@@ -1,0 +1,55 @@
+name: Deploy Supabase from GitHub
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Apply pending migrations and deploy functions (false previews migrations only)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-production
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    uses: ./.github/workflows/ci.yml
+
+  backend:
+    needs: quality
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Check deployment configuration
+        shell: bash
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo 'Missing SUPABASE_ACCESS_TOKEN'; exit 1; }
+          test -n "$SUPABASE_DB_PASSWORD" || { echo 'Missing SUPABASE_DB_PASSWORD'; exit 1; }
+          test -n "$SUPABASE_PROJECT_REF" || { echo 'Missing SUPABASE_PROJECT_REF'; exit 1; }
+      - name: Link existing project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Preview pending migrations
+        run: supabase db push --dry-run --include-all
+      - name: Apply pending migrations
+        if: inputs.apply
+        run: supabase db push --include-all --yes
+      - name: Record migration history
+        run: supabase migration list
+      - name: Deploy all functions
+        if: inputs.apply
+        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Record remaining gates
+        run: echo 'Review migration/deployment logs. Verify Auth leaked-password protection and disabled demo seeding, then publish the frontend and run live smoke plus an authenticated soybean photo scan. This job alone does not certify production readiness.' >> "$GITHUB_STEP_SUMMARY"

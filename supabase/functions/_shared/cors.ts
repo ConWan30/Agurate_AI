@@ -22,6 +22,14 @@ const ALLOW_HEADERS =
 export function isAllowedOrigin(origin: string): boolean {
   if (!origin) return false;
   if (STATIC_ALLOWED.has(origin)) return true;
+  // Exact HTTPS origins for independently hosted frontends; no host wildcards.
+  const configured = (Deno.env.get('APP_ALLOWED_ORIGINS') ?? '').split(',').map((value) => value.trim());
+  if (configured.some((value) => {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' && url.origin === value && value === origin;
+    } catch { return false; }
+  })) return true;
   return ALLOWED_ORIGIN_PATTERNS.some((re) => re.test(origin));
 }
 

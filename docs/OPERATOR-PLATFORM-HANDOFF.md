@@ -1,5 +1,10 @@
 # Operator platform handoff
 
+> Current GitHub-based procedure: [GITHUB-RELEASE-HANDOFF.md](GITHUB-RELEASE-HANDOFF.md).
+> The launch-readiness branch was squashed into `main` at `0152640`. Historical
+> status below is not fresh production evidence. The new helper cleanup is
+> `20260916160000`; inspect live migration history before applying pending changes.
+
 ## Pilot wedge (in-repo)
 
 Closed beta product scope is **Morehouse Parish × soybeans**. See `docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md`. Unvalidated suite modules route to `PilotDeferred`.

@@ -1,3 +1,4 @@
+import { fetchAI, getAIKey } from '../_shared/ai.ts';
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
@@ -132,10 +133,10 @@ serve(async (req) => {
     contextPrompt += `\n\nReturn ONLY a JSON array of question strings, no other text. Example: ["Should I apply fungicide now?", "What's causing the yellowing in my rice?", "When should I scout this field next?"]`;
 
     // Call AI Gateway
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const aiResponse = await fetchAI({
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
+        'Authorization': `Bearer ${getAIKey()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

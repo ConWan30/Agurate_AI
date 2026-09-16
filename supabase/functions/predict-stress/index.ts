@@ -1,3 +1,4 @@
+import { fetchAI, getAIKey } from '../_shared/ai.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
@@ -99,9 +100,9 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    const AI_API_KEY = getAIKey();
+    if (!AI_API_KEY) {
+      throw new Error('AI_API_KEY not configured');
     }
 
     // Prepare enhanced data summary for AI with unified context
@@ -137,10 +138,10 @@ serve(async (req) => {
     }));
 
     // Generate predictions using Lovable AI
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetchAI({
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${AI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

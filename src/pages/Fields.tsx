@@ -97,7 +97,7 @@ export default function Fields() {
 
   const [formData, setFormData] = useState({
     name: "",
-    crop_type: PILOT_CROP,
+    crop_type: PILOT_CROP as string,
     acreage: "",
     location_lat: "",
     location_lng: "",
@@ -252,7 +252,7 @@ export default function Fields() {
   const resetForm = () => {
     setFormData({
       name: "",
-      crop_type: PILOT_CROP,
+      crop_type: PILOT_CROP as string,
       acreage: "",
       location_lat: "",
       location_lng: "",

@@ -1,10 +1,11 @@
+import { fetchAI, getAIKey } from '../_shared/ai.ts';
 import { serve } from 'https://deno.land/std@0.178.0/http/server.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 import { corsHeaders, handleError } from '../_shared/errorHandler.ts';
 
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+const AI_API_KEY = getAIKey();
 
 interface AnnotationRequest {
   assessment_id: string;
@@ -137,10 +138,10 @@ Each annotation object:
 Return ONLY a JSON array (no markdown). Schema example (do not copy these labels):
 [{"type":"circle","x":0,"y":0,"radius":1,"label":"string","severity":"warning"}]`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetchAI({
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${AI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

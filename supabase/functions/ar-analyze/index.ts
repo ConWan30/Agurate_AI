@@ -1,3 +1,4 @@
+import { fetchAI, getAIKey } from '../_shared/ai.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireAuthenticatedUser, getAnonClient } from "../_shared/auth.ts";
 import { getCorsHeaders } from '../_shared/cors.ts';
@@ -31,17 +32,17 @@ serve(async (req) => {
     }
 
     const { imageData } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const AI_API_KEY = getAIKey();
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    if (!AI_API_KEY) {
+      throw new Error('AI_API_KEY not configured');
     }
 
     // Quick AR analysis for real-time overlay — fail closed on invent/uncertain scores.
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetchAI({
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${AI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

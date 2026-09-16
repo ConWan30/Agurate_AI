@@ -1,3 +1,4 @@
+import { fetchAI, getAIKey } from '../_shared/ai.ts';
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
@@ -78,25 +79,25 @@ serve(async (req) => {
     // STEP 1: Gather unified context from all systems
     const context = await gatherUnifiedContext(supabaseAdmin, fieldId);
     
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    const AI_API_KEY = getAIKey();
+    if (!AI_API_KEY) {
+      throw new Error('AI_API_KEY not configured');
     }
 
     // STEP 2: Enhanced Gemini Vision Analysis with full context
     const visionAnalysis = await enhancedVisionAnalysis(
-      LOVABLE_API_KEY,
+      AI_API_KEY,
       imageUrl,
       context
     );
 
     // STEP 3: Parallel AI operations with shared context
     const [waterStress, conservation, variety, community, predictions] = await Promise.all([
-      analyzeWaterStress(LOVABLE_API_KEY, { visionAnalysis, context }),
-      analyzeConservation(LOVABLE_API_KEY, { visionAnalysis, context }),
-      analyzeVariety(LOVABLE_API_KEY, { visionAnalysis, context }),
-      analyzeCommunity(LOVABLE_API_KEY, { visionAnalysis, context }),
-      generatePredictions(LOVABLE_API_KEY, { visionAnalysis, context })
+      analyzeWaterStress(AI_API_KEY, { visionAnalysis, context }),
+      analyzeConservation(AI_API_KEY, { visionAnalysis, context }),
+      analyzeVariety(AI_API_KEY, { visionAnalysis, context }),
+      analyzeCommunity(AI_API_KEY, { visionAnalysis, context }),
+      generatePredictions(AI_API_KEY, { visionAnalysis, context })
     ]);
 
     // STEP 4: Update AI intelligence pool
@@ -110,7 +111,7 @@ serve(async (req) => {
     });
 
     // STEP 5: Generate unified recommendations
-    const recommendations = await generateUnifiedRecommendations(LOVABLE_API_KEY, {
+    const recommendations = await generateUnifiedRecommendations(AI_API_KEY, {
       vision: visionAnalysis,
       waterStress,
       conservation,
@@ -210,7 +211,7 @@ UNIFIED FIELD CONTEXT:
 CRITICAL: Analyze this image considering all historical context above.
 Do not invent health_score, stress_level, or confidence_score — omit the field if uncertain.`;
 
-  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+  const response = await fetchAI({
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
@@ -220,12 +221,16 @@ Do not invent health_score, stress_level, or confidence_score — omit the field
       model: 'google/gemini-2.5-flash',
       messages: [
         { role: 'system', content: 'You are an expert crop pathologist with access to comprehensive field history. Fail closed: never invent numeric scores.' },
-        { role: 'user', content: contextPrompt + '\n\nAnalyze crop health from image and return JSON with: health_score (0-100), stress_level (healthy|moderate|severe), symptoms (array), confidence_score (0-1), historical_comparison (string or null)' }
+        { role: 'user', content: [
+          { type: 'text', text: contextPrompt + '\n\nAnalyze crop health from image and return JSON with: health_score (0-100), stress_level (healthy|moderate|severe), symptoms (array), confidence_score (0-1), historical_comparison (string or null)' },
+          { type: 'image_url', image_url: { url: imageUrl } },
+        ] }
       ],
       temperature: 0.3,
     }),
   });
 
+  if (!response.ok) throw new Error(`AI analysis failed (HTTP ${response.status})`);
   const data = await response.json();
   const content = data.choices[0].message.content;
   

@@ -1,0 +1,45 @@
+name: Prepare release without Lovable
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    uses: ./.github/workflows/ci.yml
+
+  frontend:
+    needs: quality
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_SUPABASE_PROJECT_ID: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Require production public configuration
+        shell: bash
+        run: |
+          test -n "$VITE_SUPABASE_URL" || { echo 'Missing VITE_SUPABASE_URL variable'; exit 1; }
+          test -n "$VITE_SUPABASE_PUBLISHABLE_KEY" || { echo 'Missing VITE_SUPABASE_PUBLISHABLE_KEY variable'; exit 1; }
+          test "$VITE_SUPABASE_URL" != 'https://example.supabase.co' || exit 1
+      - run: npm ci --legacy-peer-deps
+      - run: npm run build
+      - run: npm run verify:health-stamp
+        env:
+          EXPECTED_COMMIT: ${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agurateai-web-${{ github.sha }}
+          path: dist
+          if-no-files-found: error
+          retention-days: 14
+      - name: Record release scope
+        run: echo 'Frontend artifact prepared. Hosting, database, functions, auth settings and live smoke are separate gates.' >> "$GITHUB_STEP_SUMMARY"

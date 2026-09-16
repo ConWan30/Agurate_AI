@@ -3,12 +3,10 @@
  * Configures test environment, mocks, and utilities
  */
 
-import { expect, afterEach, vi } from 'vitest';
+import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import * as matchers from '@testing-library/jest-dom/matchers';
+import '@testing-library/jest-dom/vitest';
 
-// Extend Vitest's expect with jest-dom matchers
-expect.extend(matchers);
 
 // Default public env stubs so fail-fast env works without a local .env
 vi.stubEnv('VITE_SUPABASE_URL', process.env.VITE_SUPABASE_URL || 'https://example.supabase.co');
