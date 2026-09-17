@@ -19,7 +19,6 @@ const Home = lazy(() => import("./pages/Home"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const BetaMetrics = lazy(() => import("./pages/BetaMetrics"));
 const Upload = lazy(() => import("./pages/Upload"));
 const Scanner = lazy(() => import("./pages/Scanner"));
 const FieldMap = lazy(() => import("./pages/FieldMap"));
