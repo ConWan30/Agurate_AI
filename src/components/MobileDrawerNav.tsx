@@ -2,7 +2,6 @@ import { Menu, Sprout } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
 import { BrandEmblem } from './BrandEmblem';
@@ -29,16 +28,19 @@ export default function MobileDrawerNav({ navItems, commandCenterItems, business
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild><Button size="icon" className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 md:hidden" aria-label="Open navigation menu"><Menu className="h-6 w-6" /></Button></SheetTrigger>
-      <SheetContent side="left" className="flex h-[100dvh] w-80 flex-col overflow-hidden p-0">
+      <SheetContent side="left" className="flex h-[100dvh] max-h-[100dvh] w-80 flex-col overflow-hidden p-0">
         <SheetHeader className="shrink-0 p-6 pb-4"><SheetTitle className="flex items-center gap-3"><BrandEmblem className="h-10 w-10 shadow-glow" /><div><div className="text-lg font-bold">Agurate<span className="text-green-600">AI</span></div><div className="text-xs text-muted-foreground font-normal">Public agricultural decision aid</div></div></SheetTitle></SheetHeader><Separator className="shrink-0" />
-        <ScrollArea className="min-h-0 flex-1">
-          <div className="space-y-6 px-4 py-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+        <nav
+          className="min-h-0 flex-1 touch-pan-y overflow-x-hidden overflow-y-auto overscroll-contain px-4 py-4 [-webkit-overflow-scrolling:touch]"
+          aria-label="Mobile navigation"
+        >
+          <div className="space-y-6 pb-[calc(6rem+env(safe-area-inset-bottom))]">
             <NavSection items={navItems} />
             {commandCenterItems.length > 0 && <><Separator /><NavSection title="Field Tools" items={commandCenterItems} /></>}
             {businessItems.length > 0 && <><Separator /><NavSection title="Business Tools" items={businessItems} /></>}
             {enhancedItems && enhancedItems.length > 0 && <><Separator /><NavSection title="Enhanced Features" items={enhancedItems} /></>}
           </div>
-        </ScrollArea>
+        </nav>
       </SheetContent>
     </Sheet>
   );
