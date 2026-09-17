@@ -34,6 +34,7 @@ import { resolveCropImageUrls } from '@/lib/crop-image';
 
 interface Assessment {
   id: string;
+  field_id?: string | null;
   health_score: number;
   stress_level: string;
   symptoms: string[];
@@ -61,6 +62,7 @@ interface Assessment {
   recommendations: {
     id: string;
     recommendation_text: string;
+    reasoning?: string | null;
     priority: string;
     category: string;
   }[];

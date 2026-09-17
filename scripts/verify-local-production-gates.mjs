@@ -11,6 +11,8 @@ const ROOT = process.cwd();
 
 const GATES = [
   { name: 'public routes', cmd: 'npm', args: ['run', 'verify:public-routes'] },
+  { name: 'lint', cmd: 'npm', args: ['run', 'lint', '--', '--max-warnings=110'] },
+  { name: 'AI transport', cmd: 'npm', args: ['run', 'test:edge'] },
   { name: 'typecheck', cmd: 'npm', args: ['run', 'typecheck'] },
   { name: 'unit tests', cmd: 'npm', args: ['run', 'test:ci'] },
   { name: 'honesty static', cmd: 'npm', args: ['run', 'verify:honesty:static'] },

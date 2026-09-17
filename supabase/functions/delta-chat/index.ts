@@ -1,3 +1,4 @@
+import { fetchAI, getAIKey } from '../_shared/ai.ts';
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
@@ -6,7 +7,7 @@ import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
 import { handleError, handleRateLimitError, addRateLimitHeaders } from '../_shared/errorHandler.ts';
 
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+const AI_API_KEY = getAIKey();
 
 // Input validation schema
 const deltaChatSchema = z.object({
@@ -322,10 +323,10 @@ serve(async (req) => {
       return msg;
     });
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetchAI({
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${AI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

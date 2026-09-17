@@ -163,6 +163,10 @@ export const messageInputSchema = z.object({
 /**
  * Validates extracted data against form schema
  */
+export function validateExtractedData(formType: 'field-registration', data: unknown): z.infer<typeof fieldRegistrationSchema>;
+export function validateExtractedData(formType: 'insurance-claim', data: unknown): z.infer<typeof insuranceClaimSchema>;
+export function validateExtractedData(formType: 'conservation-practices', data: unknown): z.infer<typeof conservationPracticesSchema>;
+export function validateExtractedData(formType: 'onboarding', data: unknown): z.infer<typeof onboardingSchema>;
 export function validateExtractedData(formType: string, data: unknown) {
   try {
     switch (formType) {

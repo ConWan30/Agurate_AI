@@ -8,7 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "preview": "vite preview",
     "test": "vitest",
     "test:ci": "vitest run",
@@ -26,7 +26,8 @@
     "verify:lock-migrations": "node scripts/verify-lock-migrations.mjs",
     "verify:health-stamp": "node scripts/verify-health-stamp.mjs",
     "verify:production-smoke": "node scripts/verify-production-smoke.mjs",
-    "check:edge": "bash scripts/check-edge-functions.sh"
+    "check:edge": "bash scripts/check-edge-functions.sh",
+    "test:edge": "deno test supabase/functions/_shared/ai_test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

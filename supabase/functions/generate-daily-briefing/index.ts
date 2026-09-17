@@ -1,3 +1,4 @@
+import { fetchAI, getAIKey } from '../_shared/ai.ts';
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { requireAuthenticatedUser, getAnonClient } from '../_shared/auth.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
@@ -163,10 +164,10 @@ serve(async (req) => {
     contextPrompt += `Return ONLY valid JSON, no other text.`;
 
     // Call AI Gateway
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const aiResponse = await fetchAI({
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
+        'Authorization': `Bearer ${getAIKey()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

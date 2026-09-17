@@ -1,10 +1,15 @@
 name: CI
 
 on:
+  workflow_call:
+  workflow_dispatch:
   push:
-    branches: [main, "cursor/**"]
+    branches: [main, "cursor/**", "codex/**"]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   build-and-test:
@@ -36,6 +41,8 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+      - name: AI transport tests
+        run: npm run test:edge
       - name: Edge functions typecheck
         run: npm run check:edge
       - name: Install Playwright Chromium

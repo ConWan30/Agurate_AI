@@ -106,7 +106,7 @@ Supporting product surfaces include dashboard history, upload flows, PWA install
 | Backend | Supabase (Auth, Postgres + RLS, Edge Functions, Storage) |
 | Maps / media | Interactive field maps, crop image storage, PDF generation |
 | Quality | Vitest, Playwright honesty smoke, static honesty scanner, Deno edge typecheck |
-| Hosting / edit | [Lovable](https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f) + this GitHub repository |
+| Development / release | GitHub branches + Codex; [independent release workflow](docs/GITHUB-RELEASE-HANDOFF.md) |
 
 ---
 
@@ -123,7 +123,7 @@ Supporting product surfaces include dashboard history, upload flows, PWA install
 ```sh
 git clone https://github.com/ConWan30/Agurate_AI.git
 cd Agurate_AI
-npm install
+npm ci --legacy-peer-deps
 cp .env.example .env
 ```
 
@@ -147,7 +147,7 @@ App defaults to **http://localhost:8080**.
 
 | Command | Purpose |
 |---------|---------|
-| `npm run typecheck` | TypeScript (`tsc --noEmit`) |
+| `npm run typecheck` | TypeScript app and build configuration checks |
 | `npm run test:ci` | Unit tests (Vitest) |
 | `npm run verify:honesty:static` | Static banned-claim scan (`src` + edge functions) |
 | `npm run verify:public-routes` | App ↔ robots.txt ↔ sitemap public route alignment |
@@ -173,13 +173,14 @@ CI runs these gates on pull requests (see `.github/workflows/ci.yml`). For migra
 | Support | [support@agurateai.com](mailto:support@agurateai.com) |
 | Product site (referenced in-app) | https://agurateai.com |
 
-### Edit with Lovable
+### Develop through GitHub
 
-Open the [Lovable project](https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f), prompt changes, and sync back to this repo via GitHub.
+Clone, install, configure `.env`, and run `npm run dev`. Codex can work on a branch,
+run the quality gates, and open a pull request. Lovable is optional for editing.
 
-### Edit locally
-
-Clone, install, configure `.env`, then `npm run dev` as above. Commit and push; Lovable can pull from GitHub when connected.
+See [GitHub release handoff](docs/GITHUB-RELEASE-HANDOFF.md) for frontend artifacts,
+Supabase deployment, AI provider configuration, and the remaining live checks.
+GitHub sync does not itself publish a site or apply database migrations.
 
 ---
 
