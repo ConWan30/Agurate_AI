@@ -9,24 +9,18 @@ import { supabase } from "@/integrations/supabase/client"
 import { formatAcreage } from "@/lib/agricultural-utils";
 import { Link } from "react-router-dom";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
-import { BetaWelcomeBanner } from "@/components/BetaWelcomeBanner";
-import { BetaWelcomeFlow } from "@/components/BetaWelcomeFlow";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { SuccessStoryPrompt } from "@/components/SuccessStoryPrompt";
-import { BetaConversionBanner } from "@/components/BetaConversionBanner";
 import { DailyBriefingCard } from "@/components/DailyBriefingCard";
 import { ROICalculatorCard } from "@/components/ROICalculatorCard";
 import { CriticalAlertsManager } from "@/components/CriticalAlertsManager";
 import { CooperativeAlertsManager } from "@/components/CooperativeAlertsManager";
-import { BetaEngagementCard } from "@/components/BetaEngagementCard";
-import { BetaValueTracker } from "@/components/BetaValueTracker";
 import { LiveCommunityActivity } from "@/components/LiveCommunityActivity";
 import {
   AlertCircle,
   AlertTriangle,
   BarChart3,
   BookOpen,
-  Brain,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
@@ -90,7 +84,6 @@ export default function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showSuccessStory, setShowSuccessStory] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   
   // Enable keyboard shortcuts
   useGlobalKeyboardShortcuts();
@@ -128,8 +121,6 @@ export default function Dashboard() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      setUserId(user.id);
 
       // Fetch fields
       const { data: fieldsData } = await supabase
@@ -186,9 +177,6 @@ export default function Dashboard() {
       
       <PullToRefresh onRefresh={fetchDashboardData}>
         <div className="space-y-8">
-        {userId && <BetaWelcomeFlow userId={userId} />}
-        <BetaWelcomeBanner />
-        <BetaConversionBanner />
         {/* Header - Louisiana Agricultural Theme with Background */}
         <div 
           className="relative overflow-hidden rounded-2xl p-8 md:p-12 shadow-glow"
@@ -202,7 +190,7 @@ export default function Dashboard() {
           <div className="relative z-10 flex items-start justify-between">
             <div>
               <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                🌾 Louisiana Delta Closed Beta
+                Public agricultural decision aid
               </Badge>
               <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3 drop-shadow-lg">
                 Welcome to Your Farm Dashboard
@@ -228,10 +216,8 @@ export default function Dashboard() {
           <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }} aria-hidden="true"></div>
         </div>
 
-        {/* Beta Farmer Engagement & Value Tracking */}
+        {/* Public activity snapshot */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <BetaEngagementCard />
-          <BetaValueTracker />
           <LiveCommunityActivity />
         </div>
 
@@ -288,23 +274,7 @@ export default function Dashboard() {
               </AnimatedCard>
             </Link>
 
-            {/* 3. Delta Intelligence Chat */}
-            <Link to="/delta" className="group focus-ring rounded-xl">
-              <AnimatedCard hover className="cursor-pointer border-2 h-full">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-center h-12 w-12 rounded-2xl gradient-harvest shadow-glow mb-3 group-hover:scale-110 transition-transform">
-                    <Brain className="h-6 w-6 text-white" aria-hidden="true" />
-                  </div>
-                  <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Delta Intelligence</h3>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    On-demand research-informed AI advisor
-                  </p>
-                  <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
-                </CardContent>
-              </AnimatedCard>
-            </Link>
-
-            {/* 4. Fields (pilot core) */}
+            {/* 3. Fields (public evidence-bound core) */}
             <Link to="/fields" className="group focus-ring rounded-xl">
               <AnimatedCard hover delay={100} className="cursor-pointer border-2 h-full">
                 <CardContent className="p-5">
@@ -361,7 +331,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">Pilot Scope</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Morehouse soybeans only — what is deferred
+                    Public access with Morehouse soybean evidence bounds
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
@@ -409,7 +379,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-heading font-bold text-base mb-1 group-hover:text-primary transition-colors">How It Works</h3>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Research aid framing for this closed beta
+                    Research aid framing for public access
                   </p>
                   <AgriculturalBadge type="healthy" className="text-xs">Core</AgriculturalBadge>
                 </CardContent>
@@ -488,22 +458,6 @@ export default function Dashboard() {
                       <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Weather Timeline</h3>
                       <p className="text-sm text-muted-foreground">
                         Historical and forecast weather data
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-                <Link to="/delta" className="group">
-                  <Card glass className="cursor-pointer border-2 h-full transition-all duration-300 hover:border-primary/50 hover:shadow-card hover:-translate-y-1">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                          <Brain className="h-6 w-6 text-primary" />
-                        </div>
-                      </div>
-                      <h3 className="font-display font-bold text-lg mb-2 group-hover:text-primary transition-colors">Delta AI</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Ask research-framed soybean questions (not a diagnosis)
                       </p>
                     </CardContent>
                   </Card>

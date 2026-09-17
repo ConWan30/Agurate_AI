@@ -8,25 +8,25 @@ const checks = [
   {
     name: 'home',
     path: '/',
-    mustInclude: ['FREE BETA', 'decision aid', 'Be one of the first voices', 'Framed around LSU AgCenter research'],
+    mustInclude: ['Public access', 'decision support', 'Open access, clear limits'],
     mustExclude: ['95%+ accurate', 'Trusted by Louisiana Farmers', 'LSU-Validated'],
   },
   {
-    name: 'beta-signup',
+    name: 'retired-beta-signup',
     path: '/beta-signup',
-    mustInclude: ['Closed beta for Louisiana Delta farmers', 'Research framing only', 'Not scientifically validated'],
+    mustInclude: ['Welcome Back', 'Create Account', 'Research-informed'],
     mustExclude: ['95% AI Accuracy', 'Trusted by Louisiana Farmers'],
   },
   {
     name: 'how-it-works',
     path: '/how-it-works',
-    mustInclude: ['Confidence-aware', 'Closed beta'],
+    mustInclude: ['Confidence-aware', 'Public', 'decision support'],
     mustExclude: ['85-95%', '80-90%'],
   },
   {
     name: 'auth',
     path: '/auth',
-    mustInclude: ['Research-informed', 'Framed around public LSU AgCenter research'],
+    mustInclude: ['Research-informed', 'Open Access', 'Create Account'],
     mustExclude: ['Built on 130+ years of research'],
   },
 ];

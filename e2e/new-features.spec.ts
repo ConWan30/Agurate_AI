@@ -53,34 +53,22 @@ test.describe('New Features - Phase 1 & 2 Verification', () => {
     });
   });
 
-  test.describe('Conversation Memory', () => {
-    test('Delta Intelligence chat loads without errors', async ({ page }) => {
+  test.describe('Retired Delta Route', () => {
+    test('Delta route loads deferred page without errors', async ({ page }) => {
       await page.goto('/demo/delta');
       await page.waitForLoadState('networkidle');
-      
-      // Check if URL is correct
-      const urlMatches = page.url().includes('/delta');
-      
-      // Check for any content on the page
-      const hasContent = await page.locator('body').count().then(count => count > 0).catch(() => false);
-      
-      // Test passes if we navigated to the delta page
-      expect(urlMatches || hasContent).toBe(true);
+
+      await expect(page.getByRole('heading', { name: /Not in the active public toolset/i })).toBeVisible({ timeout: 10000 });
     });
 
-    test('Conversation history persists across page reloads', async ({ page }) => {
+    test('Conversation history is not exposed on retired route', async ({ page }) => {
       await page.goto('/demo/delta');
       await page.waitForLoadState('networkidle');
-      
-      // Check if conversation history panel exists
-      const historyButton = page.locator('button:has-text("History")').or(page.locator('[aria-label*="history" i]'));
-      const historyExists = await historyButton.isVisible().catch(() => false);
-      
-      // Test passes if page loads - history functionality is backend-dependent
-      expect(true).toBe(true);
+
+      await expect(page.locator('button:has-text("History")')).toHaveCount(0);
     });
 
-    test('No TypeScript errors in Delta Intelligence page', async ({ page }) => {
+    test('No TypeScript errors on retired Delta route', async ({ page }) => {
       const errors: string[] = [];
       page.on('console', (msg) => {
         if (msg.type() === 'error') {
@@ -104,16 +92,11 @@ test.describe('New Features - Phase 1 & 2 Verification', () => {
       expect(typeErrors.length).toBe(0);
     });
 
-    test('Image upload in chat works', async ({ page }) => {
+    test('Image upload chat controls are not active', async ({ page }) => {
       await page.goto('/demo/delta');
       await page.waitForLoadState('networkidle');
-      
-      // Look for image upload button
-      const imageButton = page.locator('button[aria-label*="image" i]').or(page.locator('button:has(svg)')).first();
-      const imageButtonExists = await imageButton.isVisible().catch(() => false);
-      
-      // Test passes if chat interface loads
-      expect(true).toBe(true);
+
+      await expect(page.locator('textarea')).toHaveCount(0);
     });
   });
 
@@ -251,7 +234,7 @@ test.describe('New Features - Phase 1 & 2 Verification', () => {
       await page.goto('/demo/dashboard');
       await page.waitForLoadState('networkidle');
       
-      // Navigate to Delta Intelligence
+      // Navigate to retired Delta route
       await page.goto('/demo/delta');
       await expect(page).toHaveURL(/.*demo\/delta/, { timeout: 10000 });
       await page.waitForLoadState('networkidle');

@@ -113,7 +113,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
             Share Your Success Story
           </DialogTitle>
           <DialogDescription>
-            Your experience helps other Louisiana farmers and improves this closed beta
+            Your experience helps other Louisiana farmers improve this public decision aid
           </DialogDescription>
         </DialogHeader>
 
@@ -215,7 +215,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
                   htmlFor="public"
                   className="text-sm cursor-pointer leading-tight"
                 >
-                  Allow AgurateAI to share this story publicly (website, presentations, closed-beta materials)
+                  Allow AgurateAI to share this story publicly (website, presentations, and product materials)
                 </label>
               </div>
               {allowPublicUse && (
@@ -244,7 +244,7 @@ export function SuccessStoryPrompt({ open, onClose, assessmentId }: SuccessStory
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Your story will help other Louisiana farmers during this closed beta. 
+              Your story will help other Louisiana farmers understand AgurateAI as a decision aid.
               You can remain anonymous if preferred.
             </p>
           </div>

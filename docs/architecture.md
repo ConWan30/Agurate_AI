@@ -1,6 +1,6 @@
 # AgurateAI System Architecture
 
-**Version:** 0.1 (Morehouse soybean closed beta)
+**Version:** 0.1 (Morehouse soybean public access)
 **Last Updated:** 2026-09-14
 **Status:** Pilot wedge — fail-closed invent locks; live publish/migrate still operator-gated
 

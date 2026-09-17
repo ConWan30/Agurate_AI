@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  Closed beta · Morehouse Parish soybeans · Research-framed decision aid (not a diagnosis)
+  Public access - Morehouse Parish soybean evidence bound - Research-framed decision aid (not a diagnosis)
 </p>
 
 <p align="center">
@@ -38,15 +38,15 @@
 
 ## Pilot scope
 
-Current closed beta is intentionally narrow: **Morehouse Parish, Louisiana × soybeans**. See [`docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md`](docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md).
+Current crop-analysis evidence is intentionally narrow: **Morehouse Parish, Louisiana x soybeans**. See [docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md](docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md).
 
 ## What is AgurateAI?
 
-**AgurateAI** is a web application that helps Louisiana Delta farmers assess crop health, organize field history, and explore research-oriented insights. The current closed beta is scoped to **Morehouse Parish soybeans**.
+**AgurateAI** is a web application that helps Louisiana Delta farmers assess crop health, organize field history, and explore research-oriented insights. Public access is open, while current validation evidence remains strongest for **Morehouse Parish soybeans**.
 
 Growers can photograph plants in the field, get AI-assisted analysis framed as a research decision aid (not a validated diagnosis), track observations over time, explore conservation and water-stress context, and connect with LSU AgCenter researcher directory information.
 
-The product is currently in **closed beta**. Access is invite- or signup-gated while we harden security, authenticity of claims, and production operations.
+The product is a **public agricultural decision aid**. Public access does not mean universal field validation, diagnosis, LSU partnership, or guaranteed yield outcomes.
 
 ### Purpose
 
@@ -71,29 +71,29 @@ The product is currently in **closed beta**. Access is invite- or signup-gated w
 
 ## Features
 
-Core capabilities available in the closed-beta experience:
+Core capabilities available in the public decision-aid experience:
 
 | Feature | Description |
 |---------|-------------|
 | **AI Crop Scanner** | Photograph plants in the field and receive AI-assisted health scoring with observations |
 | **Predictive Analytics** | Explore scenario-style questions about conditions and management choices |
-| **Delta Intelligence Chat** | Ask Louisiana Delta–focused crop and conservation questions |
+| **Research-framed guidance** | Review crop observations with visible uncertainty and source context |
 | **Water Stress & DIRT** | Deep-dive views for water-stress context and DIRT-related exploration |
 | **Conservation Tracking** | Log and review conservation-oriented field activity |
 | **Variety Recommendations** | Browse variety context aligned to Delta crop systems |
 | **LSU Researcher Directory** | Find AgCenter researcher directory entries (privacy-conscious listings) |
-| **Community Intelligence** | Share and learn from regional grower signal (beta-scoped) |
+| **Community Intelligence** | Share and learn from regional grower signal when validated and enabled |
 | **Interactive Field Maps** | Map fields and relate scans to locations |
 | **Insurance Documentation** | Generate documentation-oriented exports for records |
 
-Supporting product surfaces include dashboard history, upload flows, PWA install support, and beta signup / invitation join paths.
+Supporting product surfaces include dashboard history, upload flows, PWA install support, and normal account access. Legacy beta signup paths redirect to `/auth`.
 
 ---
 
 ## Who it's for
 
-- **Morehouse Parish soybean growers** evaluating stands with phone photos (closed beta)
-- **Closed-beta invitees** validating field workflows before wider release
+- **Morehouse Parish soybean growers** evaluating stands with phone photos under the current evidence bound
+- **Public users** exploring decision-aid workflows with clear limits
 - **Operators / co-ops** exploring multi-user access paths (cooperative plan inquiries via support)
 
 ---
@@ -213,7 +213,7 @@ See the shipping checklist for production steps that still require dashboard cre
 
 ## Status
 
-**Closed beta — launch-readiness work in progress.**
+**Public access - launch-readiness work in progress.**
 
 In-repo quality gates (typecheck, unit tests, honesty static scan, edge check, Playwright honesty, production build) are maintained on this branch. Remote production cutover (apply migrations, deploy functions, publish, live URL smoke) still depends on operator credentials outside this repository.
 

@@ -7,7 +7,7 @@ export function LiveCommunityActivity() {
   const { data: stats } = useQuery({
     queryKey: ['community-stats'],
     queryFn: async () => {
-      // Platform-wide beta count via SECURITY DEFINER aggregate RPC (not raw profiles under RLS).
+      // Legacy entitlement count via SECURITY DEFINER aggregate RPC (not raw profiles under RLS).
       const { data: betaCount, error: betaError } = await supabase.rpc('get_beta_farmer_count');
       if (betaError) throw betaError;
 
@@ -25,7 +25,7 @@ export function LiveCommunityActivity() {
         .gte('analyzed_at', oneWeekAgo.toISOString());
 
       return {
-        betaFarmers: typeof betaCount === 'number' ? betaCount : 0,
+        accountCount: typeof betaCount === 'number' ? betaCount : 0,
         totalAssessments: totalAssessments || 0,
         weeklyAssessments: weeklyAssessments || 0,
       };
@@ -46,9 +46,9 @@ export function LiveCommunityActivity() {
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
               <Users className="h-4 w-4 opacity-80" />
-              <p className="text-3xl font-bold">{stats?.betaFarmers || 0}</p>
+              <p className="text-3xl font-bold">{stats?.accountCount || 0}</p>
             </div>
-            <p className="text-sm text-primary-foreground/80">Beta Farmers</p>
+            <p className="text-sm text-primary-foreground/80">Public Accounts</p>
           </div>
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
@@ -64,8 +64,8 @@ export function LiveCommunityActivity() {
             <span className="inline-block h-2 w-2 rounded-full bg-green-400 animate-pulse" />
             {stats?.weeklyAssessments || 0} of your scans this week
           </p>
-          <p>Closed beta for Louisiana Delta farms — savings claims not yet validated</p>
-          <p>Focus region: Louisiana Delta (parish set by each farmer)</p>
+          <p>Public decision aid — not a diagnosis or guaranteed yield outcome</p>
+          <p>Evidence bound: Morehouse Parish soybean observations remain the validation focus</p>
         </div>
       </CardContent>
     </Card>

@@ -86,7 +86,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
               <Brain className="h-8 w-8 text-accent mb-2 group-hover:scale-110 transition-transform" />
-              <p className="text-sm font-semibold mb-1">Delta AI</p>
+              <p className="text-sm font-semibold mb-1">Field assistant</p>
               <p className="text-xs text-muted-foreground">Research-framed advisor</p>
             </div>
             <div className="p-4 rounded-lg glass-strong hover-lift cursor-pointer transition-all group">
@@ -219,7 +219,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground leading-relaxed">
-            Example only for this closed beta: planning outlooks stay deferred until the Morehouse soybean wedge is field-validated. Live pilot tools are scan, fields, weather timeline, history, and Delta chat as a research aid.
+            Example only: planning outlooks stay deferred until the Morehouse soybean evidence base supports broader use. Active public tools focus on scan, fields, weather timeline, and history as decision aids.
           </p>
 
           <div className="space-y-2">
@@ -267,18 +267,18 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
           </div>
         </div>
       ),
-      action: 'Next: Delta AI'
+      action: 'Next: research framing'
     },
     {
       icon: Brain,
-      title: 'Core Feature #3: Delta Intelligence AI',
+      title: 'Research-Framed Decision Aid',
       description: '6:45 AM - James asks the AI advisor',
       content: (
         <div className="space-y-4">
           <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-lg p-4">
             <div className="flex items-center gap-3 mb-3">
               <Brain className="h-6 w-6 text-purple-600" />
-              <span className="font-semibold">Delta Intelligence Chat</span>
+              <span className="font-semibold">Research-framed guidance</span>
             </div>
             
             <div className="space-y-3">
@@ -290,7 +290,7 @@ export function InteractiveTutorial({ open, onOpenChange }: InteractiveTutorialP
               </div>
 
               <div className="bg-primary/10 p-3 rounded-lg">
-                <p className="text-sm font-medium mb-2">Delta AI (illustrative demo reply):</p>
+                <p className="text-sm font-medium mb-2">Illustrative decision-aid reply:</p>
                 <p className="text-sm text-muted-foreground">
                   "For soybeans heading into a forecast heat stretch in the Delta, publicly available LSU AgCenter nutrient guidance often discusses potassium management. In the live product, any rates or timing should come from your recorded soil tests and local AgCenter guidance — this demo does not invent a prescription.
                 </p>

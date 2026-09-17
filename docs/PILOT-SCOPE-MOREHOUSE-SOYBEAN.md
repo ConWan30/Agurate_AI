@@ -1,6 +1,6 @@
 # Pilot scope: Morehouse Parish × Soybeans
 
-**Status:** Active closed-beta wedge (in-repo)  
+**Status:** Active public evidence bound (in-repo)
 **Tip policy:** One parish, one crop until field validation exists.
 
 ## Choice
@@ -16,7 +16,7 @@ Rice, cotton, and corn remain in the codebase and schema for later seasons. Farm
 
 - Dashboard, Upload, Scanner, Fields, Field Map, Weather Timeline, History
 - How It Works, Profile, Tutorials
-- Delta chat (research aid framing only)
+- Retired chatbot routes stay deferred; active tools avoid chatbot enrollment framing
 
 ## Deferred (honest holding page)
 

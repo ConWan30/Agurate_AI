@@ -1,12 +1,14 @@
 # GitHub release handoff
 
-AgurateAI remains the existing Morehouse Parish soybean closed beta. GitHub is the
+AgurateAI remains the existing Morehouse Parish soybean application with public access. GitHub is the
 source of truth; Lovable is optional as an editor. No live deployment is implied
 by a successful build or a synchronized repository.
 
 ## Reconciled code state
 
 Work starts from main `05e08ae746a5fa459501242d536c8f8ee54ca8e8`.
+The release branch was subsequently reconciled with main `d499e58`, retaining
+the public-access rollout, login fixes, and retirement of Delta Intelligence.
 The launch-readiness branch's tree equals the squashed main commit `0152640`;
 do not merge that old divergent branch over newer pilot and database fixes.
 The alternate cutover branch contains useful work, but its Pages workflow deploys
