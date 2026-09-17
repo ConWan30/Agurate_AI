@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Upload, MapPin, History as HistoryIcon, User, LogOut, Sprout, Lightbulb, Scan, Cloud } from "lucide-react";
+import { LayoutDashboard, Upload, MapPin, History as HistoryIcon, User, LogOut, Sprout, Lightbulb, Scan, Cloud, BookOpen, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import MobileFloatingActions from "./MobileFloatingActions";
@@ -40,8 +40,13 @@ export const Layout = ({ children }: LayoutProps) => {
     { icon: MapPin, label: "Field Map", path: "/field-map", accentIcon: Sprout, gradient: "from-blue-500/10 to-sky-600/10" },
     { icon: Cloud, label: "Weather Timeline", path: "/weather-timeline", accentIcon: Cloud, gradient: "from-cyan-500/10 to-blue-600/10" },
   ];
+  // Only expose destinations that are implemented and supported in the current public product.
+  // Deferred/retired routes remain routable to their evidence-scope page but are not promoted as active tools.
   const businessItems: typeof commandCenterItems = [];
-  const enhancedItems: typeof businessItems = [];
+  const enhancedItems: typeof commandCenterItems = [
+    { icon: BookOpen, label: "Tutorials", path: "/tutorials", accentIcon: Sprout, gradient: "from-emerald-500/10 to-green-600/10" },
+    { icon: ShieldCheck, label: "Evidence Scope", path: "/pilot-deferred", accentIcon: Sprout, gradient: "from-slate-500/10 to-zinc-600/10" },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
