@@ -13,6 +13,8 @@
 </p>
 
 <p align="center">
+  <strong><a href="https://agurateai.lovable.app">Open the live AgurateAI website</a></strong>
+  ·
   <a href="https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f">Lovable Project</a>
   ·
   <a href="docs/PRODUCTION-SHIPPING-CHECKLIST.md">Shipping Checklist</a>
@@ -20,9 +22,15 @@
   <a href="docs/PRE-LAUNCH-CRITICAL-TASKS.md">Pre-Launch Tasks</a>
   ·
   <a href="docs/OPERATOR-PLATFORM-HANDOFF.md">Operator Handoff</a>
-  ·
-  <a href="mailto:support@agurateai.com">support@agurateai.com</a>
 </p>
+
+---
+
+## Live website
+
+**Production:** https://agurateai.lovable.app
+
+The production website is publicly accessible through the Lovable-hosted URL above. Public access does not imply universal crop or geographic validation; current crop-analysis evidence remains intentionally bounded.
 
 ---
 
@@ -164,14 +172,13 @@ CI runs these gates on pull requests (see `.github/workflows/ci.yml`). For migra
 
 | Resource | Link |
 |----------|------|
+| **Live production website** | **https://agurateai.lovable.app** |
 | Repository | https://github.com/ConWan30/Agurate_AI |
 | Lovable editor / project | https://lovable.dev/projects/c684f21a-ff17-4d6d-a950-d5d66668838f |
 | Production shipping checklist | [docs/PRODUCTION-SHIPPING-CHECKLIST.md](docs/PRODUCTION-SHIPPING-CHECKLIST.md) |
 | Pre-launch critical tasks | [docs/PRE-LAUNCH-CRITICAL-TASKS.md](docs/PRE-LAUNCH-CRITICAL-TASKS.md) |
 | Operator platform handoff | [docs/OPERATOR-PLATFORM-HANDOFF.md](docs/OPERATOR-PLATFORM-HANDOFF.md) |
 | Environment template | [.env.example](.env.example) |
-| Support | [support@agurateai.com](mailto:support@agurateai.com) |
-| Product site (referenced in-app) | https://agurateai.com |
 
 ### Develop through GitHub
 
