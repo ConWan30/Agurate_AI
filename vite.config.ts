@@ -65,6 +65,13 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg}'],
+        // Stale precaches were serving an old index.html that pointed at deleted
+        // hashed chunks after a deploy, which blanked the screen on navigation.
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/health\.json$/, /^\/assets\//],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.(supabase\.co|lovable\.cloud)\/.*/i,
@@ -78,27 +85,15 @@ export default defineConfig({
             }
           },
           {
-            urlPattern: /\/assets\/.*\.js$/i,
-            handler: 'CacheFirst',
+            // Hashed build assets: revalidate so a new deploy is never blocked
+            // by a long-lived cached copy of a previous build.
+            urlPattern: /\/assets\/.*\.(js|css)$/i,
+            handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'js-cache',
+              cacheName: 'build-assets-cache',
               expiration: {
-                maxEntries: 60,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            urlPattern: /\/assets\/.*\.css$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'css-cache',
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                maxEntries: 80,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
               },
               cacheableResponse: {
                 statuses: [0, 200]
