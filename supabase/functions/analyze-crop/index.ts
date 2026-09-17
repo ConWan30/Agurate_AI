@@ -1,10 +1,16 @@
-import { fetchAI, getAIKey } from '../_shared/ai.ts';
+import { fetchAI, getAIKey, resolveAIConfig } from '../_shared/ai.ts';
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
+import {
+  buildVisionObservation,
+  getConfiguredSpecialistDetector,
+  getServerVisionProvider,
+  type SpecialistVisionResult,
+} from '../_shared/visionObservation.ts';
 
 // Input validation schema
 const analyzeCropSchema = z
@@ -201,6 +207,15 @@ serve(async (req) => {
       });
     }
     cropType = resolvedCropType;
+    if (cropType !== 'soybean') {
+      return new Response(
+        JSON.stringify({
+          error: 'Current crop image observations are scoped to Morehouse Parish soybeans only.',
+          details: 'Other crops are deferred until supporting evidence and validation are available.',
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
 
     console.log('Analyzing crop media with unified context:', { imageUrl, cropType, fieldId, location, mediaType });
@@ -345,8 +360,9 @@ Prefer the current media as ground truth. Use recorded history only when it clea
     }
 
     // STEP 2: Analyze crop media (image or video)
-    // Use gemini-2.5-pro for video analysis
-    const model = mediaType === 'video' ? 'google/gemini-2.5-pro' : 'google/gemini-2.5-flash';
+    // Provider and model are resolved server-side only; clients cannot choose or see secrets.
+    const aiConfig = resolveAIConfig(mediaType === 'video');
+    const providerName = getServerVisionProvider((name) => Deno.env.get(name)?.trim(), aiConfig.url);
     
     const analysisResponse = await fetchAI({
       method: 'POST',
@@ -355,24 +371,25 @@ Prefer the current media as ground truth. Use recorded history only when it clea
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
+        model: aiConfig.model,
         messages: [
           {
             role: 'system',
-            content: `You are an expert agricultural AI for Louisiana Delta farmers with access to comprehensive field intelligence history.
+            content: `You are an agricultural vision observation assistant for Louisiana Delta farmers with access to comprehensive field intelligence history.
 
 CONTEXT:
+- Scope: Morehouse Parish, Louisiana soybean observations only. This is a decision aid, not a diagnosis or validation claim.
 - Region: Louisiana Delta (subtropical climate, high disease pressure); use provided coordinates/location when present — do not invent a parish
 - Soils: Alluvial/claypan soils typical of Mississippi Delta
 - Climate: Warm, humid with high rainfall
 
-${unifiedContext ? 'You have unified field intelligence history. Use it only as supporting context — never invent scores, diseases, or yield impact not visible in the current media.' : ''}
+${unifiedContext ? 'You have unified field intelligence history. Use it only as supporting context — never invent scores, diseases, diagnoses, or yield impact not visible in the current media.' : ''}
 
 ${mediaType === 'video' 
   ? 'Analyze drone video footage of crop fields, examining patterns across multiple frames for comprehensive field assessment.'
-  : 'Analyze crop field images for stress indicators using Louisiana-specific disease and deficiency patterns.'}
+  : 'Analyze crop field images for visible stress indicators. Separate visible findings from interpretations.'}
 
-Respond ONLY in JSON format with precise observations.`
+Respond ONLY in JSON format with precise observations. Fail closed with low confidence when the image does not support interpretation.`
           },
           {
             role: 'user',
@@ -392,7 +409,17 @@ Examine the footage across multiple frames to identify:
 - Any concerning patterns that emerge over the video duration` : ''}
 
 
-**CROP-SPECIFIC INDICATORS:**
+**VISIBLE-FINDINGS ONTOLOGY (use these exact tags in visible_findings):**
+- healthy_uncertain_tissue
+- foliar_discoloration
+- lesions_spots
+- defoliation
+- insect_feeding_damage
+- lodging_stem_abnormalities
+- canopy_stress
+- image_quality_problem
+
+**CROP-SPECIFIC INDICATORS (interpretations only when visible evidence supports them):**
 
 ${cropType.toLowerCase().includes('rice') ? `**RICE:** Look for:
 - Leaf rolling (water stress)
@@ -422,7 +449,7 @@ ${cropType.toLowerCase().includes('corn') ? `**CORN:** Look for:
 - 0.0-0.3 = Severe stress when clear visual evidence warrants it
 - 0.3-0.6 = Moderate stress when symptoms are present but limited
 - 0.6-1.0 = Healthy when the crop appears vigorous with no clear stress cues
-- If the image is unclear or not a crop, keep confidence low and say so in visual_cues — do not invent disease names or yield %
+- If the image is unclear, not a soybean crop, too distant, blurred, or missing leaf/canopy detail, keep confidence below 0.45, add image_quality_problem, and do not invent diseases, pests, health score, or yield %
 
 Respond with JSON:
 {
@@ -434,9 +461,12 @@ Respond with JSON:
   \"health_score\": <float 0.0-1.0, inverse of stress>,
   \"confidence_score\": <float 0.0-1.0, your confidence in this assessment>,
   \"analysis_summary\": \"<plain-language insight for Louisiana farmer>\",
+  \"visible_findings\": [
+    {\"tag\": \"healthy_uncertain_tissue\" | \"foliar_discoloration\" | \"lesions_spots\" | \"defoliation\" | \"insect_feeding_damage\" | \"lodging_stem_abnormalities\" | \"canopy_stress\" | \"image_quality_problem\", \"description\": \"<what is visibly present>\", \"confidence\": <float 0.0-1.0>, \"evidence\": [\"<specific pixel/scene cue>\"]}
+  ],
   \"growth_stage\": \"<specific growth stage: e.g., V6, R3, tillering, flowering, grain fill>\",
-  \"disease_identified\": [<array of specific disease names if detected, empty if none>],
-  \"pest_identified\": [<array of specific pest names if detected, empty if none>],
+  \"disease_identified\": [<array of possible disease interpretations only if visible evidence supports them; empty if none or uncertain>],
+  \"pest_identified\": [<array of possible pest interpretations only if visible evidence supports them; empty if none or uncertain>],
   \"nutrient_deficiencies\": {
     \"nitrogen\": {\"detected\": <boolean>, \"severity\": \"none\"|\"mild\"|\"moderate\"|\"severe\"},
     \"phosphorus\": {\"detected\": <boolean>, \"severity\": \"none\"|\"mild\"|\"moderate\"|\"severe\"},
@@ -507,6 +537,43 @@ Respond with JSON:
     const analysisData = await analysisResponse.json();
     const imageAnalysis = JSON.parse(analysisData.choices[0].message.content);
     console.log('Image analysis complete:', imageAnalysis);
+
+    let specialistResult: SpecialistVisionResult | null = null;
+    const specialistDetector = getConfiguredSpecialistDetector();
+    if (specialistDetector && mediaType === 'image') {
+      specialistResult = await specialistDetector.analyze({
+        imageUrl,
+        imageReference: storagePath ?? imageUrl,
+        cropType,
+        growthStage: typeof imageAnalysis.growth_stage === 'string' ? imageAnalysis.growth_stage : null,
+        context: { fieldId, location, weatherData },
+      });
+    }
+
+    const visionObservation = buildVisionObservation({
+      imageReference: storagePath ?? imageUrl,
+      cropType,
+      fieldId,
+      location: location ?? null,
+      weatherAvailable: Boolean(weatherData),
+      modelConfig: {
+        provider: providerName,
+        model: aiConfig.model,
+        modelVersion: Deno.env.get('AI_MODEL_VERSION') ?? Deno.env.get('DENO_DEPLOYMENT_ID') ?? null,
+      },
+      imageAnalysis,
+      specialistResult,
+    });
+
+    if (visionObservation.status === 'insufficient_evidence') {
+      return new Response(
+        JSON.stringify({
+          error: 'Insufficient evidence for crop-health interpretation',
+          vision_observation: visionObservation,
+        }),
+        { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // STEP 3: Generate recommendations based on analysis + weather
     const recommendationsResponse = await fetchAI({
@@ -636,6 +703,7 @@ Respond with JSON:
       plant_density_assessment: imageAnalysis.plant_density_assessment,
       root_health_indicators: imageAnalysis.root_health_indicators,
       detailed_visual_analysis: imageAnalysis.detailed_visual_analysis,
+      vision_observation: visionObservation,
       
       // From recommendations
       recommendations: recommendationList,
@@ -680,6 +748,7 @@ Respond with JSON:
           plant_density_assessment: imageAnalysis.plant_density_assessment ?? null,
           root_health_indicators: imageAnalysis.root_health_indicators ?? null,
           detailed_visual_analysis: imageAnalysis.detailed_visual_analysis ?? null,
+          vision_observation: visionObservation,
           photo_location_lat: photoLocationLat ?? latitude ?? null,
           photo_location_lng: photoLocationLng ?? longitude ?? null,
           gps_accuracy_meters: gpsAccuracyMeters ?? null,

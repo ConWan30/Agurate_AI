@@ -13,6 +13,11 @@ import { useDemoData } from "@/contexts/DemoDataContext";
 import bgCottonField from "@/assets/bg-cotton-field.jpg";
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
 import { requireHealthScore } from '@/lib/health-score';
+import {
+  insufficientEvidenceMessage,
+  isInsufficientEvidenceResult,
+  readFunctionErrorPayload,
+} from '@/lib/vision-observation';
 
 interface Field {
   id: string;
@@ -246,8 +251,17 @@ export default function Upload() {
       }
     });
 
-    if (aiError) throw aiError;
+    if (aiError) {
+      const payload = await readFunctionErrorPayload(aiError);
+      if (isInsufficientEvidenceResult(payload)) {
+        throw new Error(insufficientEvidenceMessage(payload));
+      }
+      throw aiError;
+    }
     if (!aiResult) throw new Error('No analysis results received');
+    if (isInsufficientEvidenceResult(aiResult)) {
+      throw new Error(insufficientEvidenceMessage(aiResult));
+    }
     requireHealthScore(aiResult.health_score);
     if (!aiResult.assessment_id) {
       throw new Error('Analysis did not persist an assessment');
@@ -320,7 +334,7 @@ export default function Upload() {
             Upload Crop Image
           </h1>
           <p className="text-white/90 text-base md:text-lg max-w-2xl">
-            AI-powered crop health analysis using Google Gemini 2.5 Pro
+            Evidence-oriented soybean observations for field review
           </p>
         </div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
@@ -452,6 +466,7 @@ export default function Upload() {
                   <p className="text-sm text-center">
                     AI is analyzing your crop {fileType === 'video' ? 'video' : 'image'}. 
                     {fileType === 'video' && ' Video analysis may take longer...'}
+                    {' '}Findings are decision aids and may fail closed when the media is unclear.
                   </p>
                 </div>
               )}
