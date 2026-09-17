@@ -110,11 +110,10 @@ export function useDeltaConversations() {
       } else {
         const { data: savedUserMsg, error } = await supabase
           .from('delta_messages')
-          .insert({ 
-            conversation_id: conversationId, 
-            role: 'user', 
+          .insert({
+            conversation_id: conversationId,
+            role: 'user',
             content,
-            context_snapshot: contextSnapshot || {}
           })
           .select('id')
           .maybeSingle();
