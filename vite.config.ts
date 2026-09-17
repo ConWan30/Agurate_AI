@@ -16,7 +16,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['favicon.ico', 'robots.txt', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['favicon.png', 'robots.txt', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'AgurateAI - Crop Health Monitoring',
         short_name: 'AgurateAI',

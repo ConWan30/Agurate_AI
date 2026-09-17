@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Brain, CheckCircle2, FileText, MapPin, Scan, Sprout } from "lucide-react";
+import { ArrowRight, Brain, CheckCircle2, FileText, MapPin, Scan } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import heroFields from "@/assets/hero-fields.jpg";
+import { BrandEmblem } from "@/components/BrandEmblem";
 
 const capabilities = [
   {
@@ -34,7 +35,7 @@ export default function PublicHome() {
       <nav className="border-b glass-strong sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Sprout className="h-8 w-8 text-primary" aria-hidden="true" />
+            <BrandEmblem className="h-10 w-10" />
             <span className="text-2xl font-heading font-bold">Agurate<span className="text-primary">AI</span></span>
           </Link>
           <div className="flex items-center gap-3">
