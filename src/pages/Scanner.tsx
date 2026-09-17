@@ -16,6 +16,11 @@ import { useGlobalKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { gatherUnifiedContext, enrichUnifiedContext } from '@/lib/unified-ai-intelligence';
 import { hasHealthScore, formatHealthPercent, requireHealthScore, toHealthPercent } from '@/lib/health-score';
 import { formatStressLabel, normalizeStressLevel, stressBadgeType } from '@/lib/stress-level';
+import {
+  insufficientEvidenceMessage,
+  isInsufficientEvidenceResult,
+  readFunctionErrorPayload,
+} from '@/lib/vision-observation';
 
 interface Field {
   id: string;
@@ -232,7 +237,16 @@ export default function Scanner() {
         }
       });
 
-      if (aiError) throw aiError;
+      if (aiError) {
+        const payload = await readFunctionErrorPayload(aiError);
+        if (isInsufficientEvidenceResult(payload)) {
+          throw new Error(insufficientEvidenceMessage(payload));
+        }
+        throw aiError;
+      }
+      if (isInsufficientEvidenceResult(aiResult)) {
+        throw new Error(insufficientEvidenceMessage(aiResult));
+      }
 
       // Edge should also refuse missing scores; keep client fail-closed as defense in depth.
       requireHealthScore(aiResult.health_score);
@@ -254,8 +268,11 @@ export default function Scanner() {
       console.error('Analysis failed:', error);
       triggerHaptic('error');
 
+      const message = error instanceof Error ? error.message : null;
       if (!isOnline) {
         toast.error('You appear offline. Analysis was not saved — reconnect and try again.');
+      } else if (message?.toLowerCase().includes('evidence')) {
+        toast.error(message);
       } else {
         toast.error('Analysis failed. Please try again.');
       }
@@ -292,7 +309,7 @@ export default function Scanner() {
     {
       id: 'analyze',
       title: 'Step 3: Analyze',
-      content: 'Press "Analyze Crop Health" and our AI will detect stress, diseases, and provide recommendations!',
+      content: 'Press "Analyze Crop Health" to review visible soybean stress cues and evidence-based next steps.',
       position: 'bottom' as const,
     },
   ];
