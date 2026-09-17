@@ -8,6 +8,7 @@ import MobileFloatingActions from "./MobileFloatingActions";
 import MobileDrawerNav from "./MobileDrawerNav";
 import { KeyboardShortcutsHelp } from "./KeyboardShortcutsHelp";
 import { PILOT_TAGLINE } from "@/lib/pilot-scope";
+import { BrandEmblem } from "./BrandEmblem";
 
 interface LayoutProps { children: ReactNode; }
 
@@ -46,7 +47,7 @@ export const Layout = ({ children }: LayoutProps) => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 shadow-card">
         <div className="container mx-auto px-6 py-5"><div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group"><div className="flex items-center justify-center h-12 w-12 rounded-xl gradient-delta shadow-glow transition-transform group-hover:scale-105"><Sprout className="h-7 w-7 text-white" /></div><div><h1 className="text-2xl font-display font-bold text-foreground">Agurate<span className="font-bold text-green-600">AI</span></h1><p className="text-xs text-muted-foreground">{PILOT_TAGLINE}</p></div></Link>
+          <Link to="/" className="flex items-center gap-3 group"><BrandEmblem className="h-12 w-12 shadow-glow transition-transform group-hover:scale-105" /><div><h1 className="text-2xl font-display font-bold text-foreground">Agurate<span className="font-bold text-green-600">AI</span></h1><p className="text-xs text-muted-foreground">{PILOT_TAGLINE}</p></div></Link>
           <div className="flex items-center gap-2"><KeyboardShortcutsHelp /><Button onClick={handleLogout} variant="ghost" size="sm" className="hover:bg-destructive/10 hover:text-destructive transition-colors"><LogOut className="mr-2 h-4 w-4" />Logout</Button></div>
         </div></div>
       </header>
