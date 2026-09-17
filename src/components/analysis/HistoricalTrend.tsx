@@ -92,7 +92,7 @@ export function HistoricalTrend({
                 borderRadius: "8px"
               }}
               formatter={(value: number) => [`${Math.round(value)}%`, "Health Score"]}
-              labelFormatter={(date) => format(new Date(date), "MMM d, yyyy")}
+              labelFormatter={(date) => format(new Date(String(date)), "MMM d, yyyy")}
             />
             <Line 
               type="monotone" 
