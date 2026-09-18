@@ -9,6 +9,12 @@
 
 Public product access is open, while crop-analysis evidence remains bounded to **Morehouse Parish x soybeans**. See docs/PILOT-SCOPE-MOREHOUSE-SOYBEAN.md. Unvalidated suite modules route to PilotDeferred.
 
+## TypeSafe image gate
+
+`analyze-crop` now runs a compact TypeSafe System One gate after auth/input validation/crop resolution and before rate-limited expensive vision analysis. The gate sends only JSON request metadata, never images or base64, and asks for image usability, scope route, and overclaim risk. It can short-circuit to the existing Morehouse-soybean honesty defer or a `vision_observation.status = insufficient_evidence` retake response.
+
+`TYPESAFE_API_KEY` and optional `TYPESAFE_API_URL` are Supabase edge secrets only. If the key is unset or the service errors/timeouts, the function uses a local conservative fallback. The gate is a decision aid only: it never mints `health_score`, confidence 0-100 values, diagnoses, yield guarantees, LSU claims, or replacement specialist vision scores.
+
 ## Status (in-repo vs production-complete)
 
 | Gate | Status | Evidence |
