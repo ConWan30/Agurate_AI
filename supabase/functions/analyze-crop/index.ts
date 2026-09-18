@@ -5,6 +5,7 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { requireAuthenticatedUser, getAnonClient, getServiceClient } from '../_shared/auth.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { enforceRateLimit, RATE_LIMITS } from '../_shared/rateLimiter.ts';
+import { buildImageGateState, runImageGate } from '../_shared/typesafeImageGate.ts';
 import {
   buildVisionObservation,
   getConfiguredSpecialistDetector,
@@ -34,6 +35,11 @@ const analyzeCropSchema = z
     photoLocationLng: z.number().min(-180).max(180).optional(),
     gpsAccuracyMeters: z.number().min(0).max(100_000).optional(),
     capturedOffline: z.boolean().optional(),
+    clientQualityHints: z.object({
+      declaredBlurry: z.boolean().optional(),
+      declaredTooFar: z.boolean().optional(),
+      bytesHint: z.number().min(0).optional().nullable(),
+    }).optional(),
   })
   .superRefine((data, ctx) => {
     if (data.storagePath && !data.fieldId) {
@@ -143,6 +149,7 @@ serve(async (req) => {
       photoLocationLng,
       gpsAccuracyMeters,
       capturedOffline,
+      clientQualityHints,
     } = validation.data;
     let cropType = validation.data.cropType;
     
@@ -207,13 +214,105 @@ serve(async (req) => {
       });
     }
     cropType = resolvedCropType;
-    if (cropType !== 'soybean') {
+
+    const imageGateState = buildImageGateState({
+      cropType,
+      parishHint: location ?? null,
+      fieldId: fieldId ?? null,
+      mediaType,
+      imageUrl,
+      clientQualityHints: clientQualityHints
+        ? {
+            declaredBlurry: clientQualityHints.declaredBlurry,
+            declaredTooFar: clientQualityHints.declaredTooFar,
+            bytesHint: clientQualityHints.bytesHint,
+          }
+        : null,
+    });
+    const imageGate = await runImageGate(imageGateState);
+    const gateConfidence = imageGate.scope_route_confidence ?? imageGate.image_usable_confidence ?? null;
+    const shouldActOnGate = gateConfidence == null || gateConfidence >= 0.7;
+    const shouldSoftDefer = gateConfidence != null && gateConfidence >= 0.4 && gateConfidence < 0.7;
+    const shouldHoldForOverclaim = imageGate.scope_route !== 'retake_image' && imageGate.overclaim_risk === 2 && (imageGate.overclaim_risk_confidence == null || imageGate.overclaim_risk_confidence >= 0.7);
+    if (cropType !== 'soybean' || imageGate.scope_route === 'defer_out_of_wedge' || shouldHoldForOverclaim || (imageGate.scope_route === 'unknown_hold' && (shouldActOnGate || shouldSoftDefer))) {
       return new Response(
         JSON.stringify({
           error: 'Current crop image observations are scoped to Morehouse Parish soybeans only.',
           details: 'Other crops are deferred until supporting evidence and validation are available.',
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (imageGate.scope_route === 'retake_image' && shouldActOnGate) {
+      const visionObservation = buildVisionObservation({
+        imageReference: storagePath ?? imageUrl,
+        cropType: 'soybean',
+        fieldId,
+        location: location ?? null,
+        weatherAvailable: false,
+        modelConfig: {
+          provider: imageGate.source === 'typesafe' ? 'typesafe-system-one' : 'local-image-gate',
+          model: imageGate.source === 'typesafe' ? 'jev-latest' : 'local-fallback',
+          modelVersion: null,
+        },
+        imageAnalysis: {
+          confidence_score: 0.1,
+          visual_cues: imageGate.reason,
+          symptoms: ['media quality insufficient for crop-health interpretation'],
+          visible_findings: [
+            {
+              tag: 'image_quality_problem',
+              description: 'Media quality is insufficient for a soybean canopy or leaf observation.',
+              confidence: imageGate.image_usable_confidence,
+              evidence: [imageGate.reason],
+            },
+          ],
+          disease_identified: [],
+          pest_identified: [],
+        },
+      });
+      return new Response(
+        JSON.stringify({
+          error: 'Insufficient evidence for crop-health interpretation',
+          vision_observation: visionObservation,
+        }),
+        { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (!imageGate.image_usable && imageGate.image_usable_confidence != null && imageGate.image_usable_confidence >= 0.7) {
+      const visionObservation = buildVisionObservation({
+        imageReference: storagePath ?? imageUrl,
+        cropType: 'soybean',
+        fieldId,
+        location: location ?? null,
+        weatherAvailable: false,
+        modelConfig: {
+          provider: imageGate.source === 'typesafe' ? 'typesafe-system-one' : 'local-image-gate',
+          model: imageGate.source === 'typesafe' ? 'jev-latest' : 'local-fallback',
+          modelVersion: null,
+        },
+        imageAnalysis: {
+          confidence_score: 0.1,
+          visual_cues: imageGate.reason,
+          symptoms: ['media quality insufficient for crop-health interpretation'],
+          visible_findings: [
+            {
+              tag: 'image_quality_problem',
+              description: 'Media quality is insufficient for a soybean canopy or leaf observation.',
+              confidence: imageGate.image_usable_confidence,
+              evidence: [imageGate.reason],
+            },
+          ],
+          disease_identified: [],
+          pest_identified: [],
+        },
+      });
+      return new Response(
+        JSON.stringify({
+          error: 'Insufficient evidence for crop-health interpretation',
+          vision_observation: visionObservation,
+        }),
+        { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
