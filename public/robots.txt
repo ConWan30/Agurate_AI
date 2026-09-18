@@ -1,7 +1,5 @@
 User-agent: *
 Allow: /
-Allow: /beta-signup
-Allow: /join-beta
 Allow: /auth
 Allow: /how-it-works
 Allow: /install

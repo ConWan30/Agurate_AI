@@ -16,11 +16,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['favicon.png', 'robots.txt', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['favicon.png', 'apple-touch-icon.png', 'robots.txt', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'AgurateAI - Crop Health Monitoring',
         short_name: 'AgurateAI',
-        description: 'Closed-beta AI crop health monitoring for Louisiana Delta agriculture',
+        description: 'Public crop observation and research-framed decision support for Morehouse Parish, Louisiana',
         theme_color: '#16a34a',
         background_color: '#ffffff',
         display: 'standalone',
@@ -53,15 +53,7 @@ export default defineConfig({
             purpose: 'maskable'
           }
         ],
-        categories: ['agriculture', 'productivity', 'business'],
-        screenshots: [
-          {
-            src: '/screenshot-mobile.png',
-            sizes: '640x1136',
-            type: 'image/png',
-            form_factor: 'narrow'
-          }
-        ]
+        categories: ['agriculture', 'productivity', 'business']
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg}'],

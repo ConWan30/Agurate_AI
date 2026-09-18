@@ -10,3 +10,4 @@
 - [ ] Apply Supabase migrations + enable leaked-password protection
 - [ ] Publish updated app (Lovable / production deploy)
 - [x] Replace the current icon emblem and favicon with the uploaded AgurateAI logo
+- [x] Finish repository-wide branding rollout across PWA, metadata, discovery files, and README

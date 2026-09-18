@@ -14,8 +14,6 @@ const SITEMAP = fs.readFileSync(path.join(ROOT, 'public', 'sitemap.xml'), 'utf8'
 /** Routes that must remain publicly crawlable / smoke-tested. */
 const REQUIRED_PUBLIC = [
   '/',
-  '/beta-signup',
-  '/join-beta',
   '/auth',
   '/how-it-works',
   '/install',

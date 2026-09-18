@@ -5,7 +5,7 @@
 <h1 align="center">AgurateAI</h1>
 
 <p align="center">
-  <strong>AI-assisted crop health intelligence for the Louisiana Delta</strong>
+  <strong>Local Land. Smarter Decisions.</strong>
 </p>
 
 <p align="center">
@@ -69,32 +69,19 @@ The product is a **public agricultural decision aid**. Public access does not me
 
 ---
 
-## Product snapshot
-
-<p align="center">
-  <img src="public/screenshot-mobile.png" alt="AgurateAI brand visual" width="360" />
-</p>
-
----
-
 ## Features
 
-Core capabilities available in the public decision-aid experience:
+Core capabilities currently reachable after account creation:
 
 | Feature | Description |
 |---------|-------------|
 | **AI Crop Scanner** | Photograph plants in the field and receive AI-assisted health scoring with observations |
-| **Predictive Analytics** | Explore scenario-style questions about conditions and management choices |
 | **Research-framed guidance** | Review crop observations with visible uncertainty and source context |
-| **Water Stress & DIRT** | Deep-dive views for water-stress context and DIRT-related exploration |
-| **Conservation Tracking** | Log and review conservation-oriented field activity |
-| **Variety Recommendations** | Browse variety context aligned to Delta crop systems |
-| **LSU Researcher Directory** | Find AgCenter researcher directory entries (privacy-conscious listings) |
-| **Community Intelligence** | Share and learn from regional grower signal when validated and enabled |
 | **Interactive Field Maps** | Map fields and relate scans to locations |
-| **Insurance Documentation** | Generate documentation-oriented exports for records |
+| **Field & Scan History** | Organize fields and revisit earlier crop observations |
+| **Profile & Tutorials** | Manage account details and review in-product guidance |
 
-Supporting product surfaces include dashboard history, upload flows, PWA install support, and normal account access. Legacy beta signup paths redirect to `/auth`.
+Supporting product surfaces include the dashboard, photo upload flow, installable app support, and normal account access. Predictive analytics, insurance, cooperatives, Delta Intelligence, researcher directory, conservation tracking, and other extended modules are deferred and are not part of the active public toolset. Legacy beta enrollment paths remain only as redirects to account access.
 
 ---
 
@@ -195,9 +182,9 @@ GitHub sync does not itself publish a site or apply database migrations.
 
 ```text
 src/                 React app (pages, components, hooks, lib)
-public/              PWA icons, favicon, brand screenshot asset
+public/              PWA icons, favicon, and public discovery files
 supabase/
-  functions/         Edge Functions (AI analysis, beta signup, etc.)
+  functions/         Edge Functions supporting analysis and account workflows
   migrations/        Postgres + RLS schema history
 docs/                Shipping and launch checklists
 e2e/                 Playwright honesty / smoke specs
@@ -220,14 +207,14 @@ See the shipping checklist for production steps that still require dashboard cre
 
 ## Status
 
-**Public access - launch-readiness work in progress.**
+**Published for public access with an intentionally narrow evidence boundary.**
 
-In-repo quality gates (typecheck, unit tests, honesty static scan, edge check, Playwright honesty, production build) are maintained on this branch. Remote production cutover (apply migrations, deploy functions, publish, live URL smoke) still depends on operator credentials outside this repository.
+The application is live at https://agurateai.lovable.app. In-repo quality gates cover type checking, tests, honesty checks, public-route alignment, edge checks, and production builds; future releases still require the normal deployment and live verification process.
 
 ---
 
 <p align="center">
   <img src="public/icon-192.png" alt="AgurateAI" width="48" height="48" />
   <br />
-  <sub>AgurateAI · Louisiana Delta crop intelligence</sub>
+  <sub>AgurateAI · Local Land. Smarter Decisions. · Morehouse Parish, Louisiana</sub>
 </p>
