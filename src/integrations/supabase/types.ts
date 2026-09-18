@@ -156,7 +156,6 @@ export type Database = {
           stress_level: string | null
           symptoms: string[] | null
           synced_at: string | null
-          vision_observation: Json | null
           weather_precipitation_mm: number | null
           weather_temp_f: number | null
         }
@@ -186,7 +185,6 @@ export type Database = {
           stress_level?: string | null
           symptoms?: string[] | null
           synced_at?: string | null
-          vision_observation?: Json | null
           weather_precipitation_mm?: number | null
           weather_temp_f?: number | null
         }
@@ -216,7 +214,6 @@ export type Database = {
           stress_level?: string | null
           symptoms?: string[] | null
           synced_at?: string | null
-          vision_observation?: Json | null
           weather_precipitation_mm?: number | null
           weather_temp_f?: number | null
         }
