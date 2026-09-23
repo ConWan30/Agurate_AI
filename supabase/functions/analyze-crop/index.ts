@@ -885,6 +885,48 @@ Respond with JSON:
       }
 
       finalResult.assessment_id = assessment.id;
+
+      // STEP 4: Call jev-scan-preflight after successful assessment persistence
+      // This runs TypeSafe System One to judge structured claims and map stamps
+      try {
+        const jevPreflightUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/jev-scan-preflight`;
+        const jevPayload = {
+          assessmentId: assessment.id,
+          fieldId,
+          visionObservation,
+          cropType,
+          parish: location ?? null,
+          growthStage: imageAnalysis.growth_stage ?? null,
+          weather7d: weatherData ?? null,
+          weather14d: null,
+          priorScanTags: [],
+          extensionPassages: [],
+        };
+
+        const jevResponse = await fetch(jevPreflightUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(jevPayload),
+        });
+
+        if (jevResponse.ok) {
+          const jevResult = await jevResponse.json();
+          finalResult.jev_scan = {
+            stamp: jevResult.stamp,
+            reasoning: jevResult.reasoning,
+          };
+          console.log('Jev scan preflight complete:', jevResult.stamp);
+        } else {
+          console.warn('Jev scan preflight failed (non-fatal):', jevResponse.status);
+          finalResult.jev_scan = null;
+        }
+      } catch (jevError) {
+        console.warn('Jev scan preflight error (non-fatal):', jevError);
+        finalResult.jev_scan = null;
+      }
     }
 
     return new Response(
