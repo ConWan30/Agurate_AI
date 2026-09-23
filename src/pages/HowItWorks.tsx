@@ -14,15 +14,15 @@ export default function HowItWorks() {
     {
       icon: Database,
       title: 'Context Gathering',
-      description: 'AI pulls your last 10 assessments, conservation practices, variety performance, weather history, community insights, and water stress predictions',
-      tech: 'Unified Intelligence Pool Query',
+      description: 'AI may retrieve available prior assessments, weather context, and field notes when those data exist for your field',
+      tech: 'Field context query',
       color: 'bg-blue-500/10 text-blue-700 border-blue-500/20'
     },
     {
       icon: Brain,
-      title: 'Enhanced Vision Analysis',
-      description: 'Gemini 2.5 analyzes your photo WITH full field context—comparing to historical progression, variety-specific disease signatures, weather patterns, and successful community interventions',
-      tech: 'Gemini 2.5 Pro + Unified Context',
+      title: 'Vision Analysis',
+      description: 'Gemini 2.5 analyzes your photo and incorporates available field context when present—prior notes, weather data, and variety information if recorded',
+      tech: 'Gemini 2.5 Pro + available context',
       color: 'bg-purple-500/10 text-purple-700 border-purple-500/20'
     },
     {
@@ -66,17 +66,17 @@ export default function HowItWorks() {
   const useCases = [
     {
       icon: Zap,
-      title: 'Early Disease Detection',
-      scenario: 'Flag possible soybean foliar stress earlier than visual scouting alone',
-      impact: 'Act sooner with a research-framed treatment plan',
-      savings: 'Earlier intervention window'
+      title: 'Stress Signal Review',
+      scenario: 'Review possible soybean foliar stress signals captured via phone camera',
+      impact: 'Consider earlier intervention with research-framed observations',
+      savings: 'Earlier review window'
     },
     {
       icon: Cloud,
-      title: 'Weather Stress Prevention',
+      title: 'Weather Stress Context',
       scenario: 'Explore multi-day heat-stress outlooks during Louisiana summers (illustrative decision aid)',
-      impact: 'Adjust irrigation before damage occurs',
-      savings: 'Proactive irrigation cues'
+      impact: 'Consider irrigation adjustments informed by weather context',
+      savings: 'Proactive irrigation planning'
     },
     {
       icon: MapPin,
@@ -224,10 +224,10 @@ export default function HowItWorks() {
               <div className="grid md:grid-cols-3 gap-6">
                 {[
                   { icon: Camera, label: 'Historical Image Progression', desc: 'Visual symptom evolution patterns' },
-                  { icon: TrendingUp, label: 'Variety-Specific Signatures', desc: 'Disease resistance & stress traits' },
-                  { icon: Cloud, label: 'Weather Correlation Patterns', desc: 'Symptom triggers from climate data' },
-                  { icon: Layers, label: 'Conservation Practice Impact', desc: 'Soil health improvement tracking' },
-                  { icon: Network, label: 'Community Success Patterns', desc: 'Peer-shared treatment notes when available' },
+                  { icon: TrendingUp, label: 'Variety-Specific Notes', desc: 'Variety information when recorded' },
+                  { icon: Cloud, label: 'Weather Correlation', desc: 'Weather data when available' },
+                  { icon: Layers, label: 'Conservation Practice Notes', desc: 'Practice tracking when entered' },
+                  { icon: Network, label: 'Community Context (Deferred)', desc: 'Peer comparison deferred for pilot' },
                   { icon: Brain, label: 'Weather + History Context', desc: 'Parish weather beside your soybean scans when data exists' }
                 ].map((item, idx) => (
                   <div key={idx} className="text-center p-4 bg-background/50 rounded-lg border">
@@ -273,7 +273,7 @@ export default function HowItWorks() {
         <section className="space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-display font-bold">Data Flow & Privacy</h2>
-            <p className="text-muted-foreground">Your data is encrypted and secure at every step</p>
+            <p className="text-muted-foreground">Your data is encrypted in transit and at rest</p>
           </div>
 
           <Card className="field-card">
@@ -364,12 +364,12 @@ export default function HowItWorks() {
                   <span className="font-semibold">Typically a few seconds</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Overlay Type:</span>
-                  <span className="font-semibold">On-device overlay</span>
+                  <span className="text-muted-foreground">Processing:</span>
+                  <span className="font-semibold">Cloud-based</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Edge Processing:</span>
-                  <span className="font-semibold">Cloud-based</span>
+                  <span className="text-muted-foreground">Display:</span>
+                  <span className="font-semibold">Browser overlay</span>
                 </div>
               </CardContent>
             </Card>
@@ -383,7 +383,7 @@ export default function HowItWorks() {
               <Sparkles className="h-3 w-3 mr-1" />
               Enhanced Intelligence
             </Badge>
-            <h2 className="text-4xl font-display font-bold">8 Game-Changing Features</h2>
+            <h2 className="text-4xl font-display font-bold">Decision-Aid Features</h2>
             <p className="text-lg text-muted-foreground">
               Features are framed for practical field review without diagnosis or guaranteed savings claims
             </p>
@@ -396,11 +396,11 @@ export default function HowItWorks() {
           </div>
         </section>
 
-        {/* Real-World Use Cases */}
+        {/* Use Cases */}
         <section className="space-y-6">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-display font-bold">Real-World Impact</h2>
-            <p className="text-muted-foreground">How Louisiana Delta farmers use AgurateAI</p>
+            <h2 className="text-3xl font-display font-bold">Pilot Use Cases</h2>
+            <p className="text-muted-foreground">Illustrative Louisiana Delta soybean scenarios</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
