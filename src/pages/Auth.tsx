@@ -187,7 +187,7 @@ export default function Auth() {
           <Badge className="mb-6 w-fit glass border-primary-foreground/40 text-primary-foreground backdrop-blur-md">
             <Zap className="h-3 w-3 mr-1" /> AI-Powered Precision Agriculture
           </Badge>
-          <h2 className="text-3xl font-heading font-bold mb-4 leading-tight">Transform Your Farming with Intelligent Crop Analysis</h2>
+          <h2 className="text-3xl font-heading font-bold mb-4 leading-tight">Review Your Crops with AI-Powered Analysis</h2>
           <p className="text-lg opacity-90 mb-8 leading-relaxed">Create an account and explore AgurateAI. Crop observations are decision aids, not diagnoses.</p>
           <div className="space-y-4">
             <div className="flex items-center gap-3"><div className="h-10 w-10 rounded-xl bg-primary-foreground/20 flex items-center justify-center"><CheckCircle2 className="h-5 w-5" /></div><div><p className="font-semibold">Crop Health Assessment</p><p className="text-sm opacity-75">Research-framed crop health assessments</p></div></div>
