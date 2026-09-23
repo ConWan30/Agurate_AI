@@ -44,20 +44,59 @@ deno test supabase/functions/_shared/jevScanPreflight_test.ts
 3. Verify existing pilot-scope defer triggers before Jev is called
 4. Jev should not be invoked for out-of-wedge crops
 
-## Pre-existing CI Status
+## CI Checks
 
-Check existing CI status before merging:
+### What CI Will Validate
+
+1. **Edge function typecheck** (`npm run check:edge`)
+   - Runs `deno check` on all edge function index.ts files
+   - Will validate `supabase/functions/jev-scan-preflight/index.ts`
+   - Should pass ✅ (follows existing patterns)
+
+2. **AI transport tests** (`npm run test:edge`)
+   - Runs `deno test supabase/functions/_shared/ai_test.ts`
+   - Existing test, unchanged by this PR
+   - Should pass ✅ (no changes to AI transport layer)
+
+3. **TypeScript typecheck** (`npm run typecheck`)
+   - No TypeScript changes in client code
+   - Should pass ✅
+
+4. **Lint** (`npm run lint`)
+   - No linting changes
+   - Should pass ✅
+
+5. **Unit tests** (`npm run test:ci`)
+   - No changes to existing unit tests
+   - Should pass ✅
+
+6. **E2E honesty smoke test**
+   - No UI changes
+   - Should pass ✅
+
+7. **Migration lock verification** (`npm run verify:lock-migrations`)
+   - New migration added: `20260923200000_add_jev_scan_results.sql`
+   - Should pass ✅ (follows naming convention)
+
+### Notes for Jev-Specific Tests
+
+The stamp mapping tests in `supabase/functions/_shared/jevScanPreflight_test.ts` are **not** automatically run by CI (not included in `test:edge` script). These should be run manually or added to CI in a future PR:
+
 ```bash
-# If CI was already failing before this PR, note it here
+deno test supabase/functions/_shared/jevScanPreflight_test.ts
 ```
 
-This PR adds:
-- New edge function: `jev-scan-preflight`
-- New migration: `20260923200000_add_jev_scan_results.sql`
-- Stamp mapping tests
-- Integration hook in `analyze-crop`
+### Pre-existing CI Status
 
-No changes to existing test suites or UI components.
+Latest main branch CI status: ✅ Passing (as of commit 7693a6b)
+
+This PR adds:
+- ✨ New edge function: `jev-scan-preflight`
+- ✨ New migration: `20260923200000_add_jev_scan_results.sql`
+- ✨ Stamp mapping tests (manual run required)
+- 📝 Integration hook in `analyze-crop`
+
+No changes to existing test suites, UI components, or client code.
 
 ## TypeSafe API Key Setup
 
