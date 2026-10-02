@@ -55,8 +55,11 @@ export default function PublicHome() {
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-primary-foreground leading-tight mb-6">
                 Crop intelligence you can put to work in the field
               </h1>
-              <p className="text-xl md:text-2xl text-primary-foreground/90 leading-relaxed mb-8">
+              <p className="text-xl md:text-2xl text-primary-foreground/90 leading-relaxed">
                 AgurateAI is now open for anyone to try. Create an account, explore the tools, and use crop observations as research-informed decision support — not as a diagnosis or guaranteed outcome.
+              </p>
+              <p className="text-base md:text-lg text-primary-foreground/80 leading-relaxed mt-4 mb-8 max-w-2xl">
+                Built for Louisiana Delta growers, with Morehouse Parish soybeans as our current evidence bound — not statewide or universal validation.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/auth">
