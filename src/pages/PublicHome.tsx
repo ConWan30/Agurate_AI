@@ -69,7 +69,7 @@ export default function PublicHome() {
                 </Link>
                 <Link to="/how-it-works">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto border-primary-foreground/50 bg-background/10 text-primary-foreground hover:bg-background/20 px-8 py-6 text-lg">
-                    Explore AgurateAI
+                    See How It Works
                   </Button>
                 </Link>
               </div>
